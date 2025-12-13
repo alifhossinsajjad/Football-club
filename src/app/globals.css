@@ -1,7 +1,10 @@
-/* src/app/globals.css */
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme Variables */
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;
@@ -27,14 +30,18 @@
   }
 }
 
+/* Global base styles */
 @layer base {
   * {
     @apply border-border;
-    font-family: 'Poppins', sans-serif;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: 'Poppins', sans-serif;
     background-color: #0B0D2C;
     color: #ffffff;
+    margin: 0;
+    padding: 0;
   }
 }

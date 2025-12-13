@@ -1,19 +1,19 @@
-// src/app/admin/layout.js
-'use client'
+import './globals.css'
+import { StoreProvider } from '@/store/StoreProvider'
 
-import Sidebar from '@/components/layout/Sidebar'
-import Topbar from '@/components/layout/Topbar'
+export const metadata = {
+  title: 'NextGen Pros - Admin Dashboard',
+  description: 'Next-generation digital platform for youth football talent discovery',
+}
 
-export default function AdminLayout({ children }) {
+export default function RootLayout({ children }) {
   return (
-    <div className="min-h-screen bg-[#0B0D2C]">
-      <Sidebar />
-      <Topbar />
-      
-      {/* Main Content */}
-      <main className="ml-64 mt-20 p-8">
-        {children}
-      </main>
-    </div>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <StoreProvider>
+          {children}
+        </StoreProvider>
+      </body>
+    </html>
   )
 }
