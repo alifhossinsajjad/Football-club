@@ -1,7 +1,12 @@
 {
   "name": "nextgen-pros",
+  "author": {
+    "name": "Anik Paul",
+    "url": "https://paulanik.com"
+  },
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -21,14 +26,14 @@
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-redux": "^9.2.0",
-    "tailwind-merge": "^3.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.0.0",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "3.4.14",
+    "postcss": "8.4.31",
+    "autoprefixer": "10.4.19"
   }
 }
