@@ -74,16 +74,18 @@ export default function BoostingLayout({ children }) {
           Profile Boosting Management
         </h1>
         
-        <button 
-          className="px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105 flex items-center gap-2"
-          style={{
-            backgroundColor: '#04B5A3',
-            backgroundImage: 'none'
-          }}
-        >
-          <TrendingUp className="w-5 h-5" />
-          Boost Profile
-        </button>
+        <Link href="/admin/boost-profile">
+          <button 
+            className="px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105 flex items-center gap-2"
+            style={{
+              backgroundColor: '#04B5A3',
+              backgroundImage: 'none'
+            }}
+          >
+            <TrendingUp className="w-5 h-5" />
+            Boost Profile
+          </button>
+        </Link>
       </div>
 
       {/* Stats Grid */}
