@@ -45,7 +45,7 @@ To create a seamless digital ecosystem that connects football talent with opport
 
 ### 🎯 Multi-Dashboard System
 
-#### Admin Dashboard ✅ **(Complete)**
+#### Admin Dashboard ✅ **(In Development)**
 - **User Management**: Comprehensive user role management and permissions
 - **Settings Module**: 
   - General settings with platform branding
@@ -338,7 +338,7 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 
 ### ✅ Completed Features
 
-#### Admin Dashboard (100%)
+#### Admin Dashboard (In Development)
 - [x] Main dashboard with analytics
 - [x] User management
 - [x] Settings module
@@ -452,9 +452,9 @@ git push origin feature/player-dashboard
 We welcome contributions to NextGen Pros! Here's how you can help:
 
 1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
-4. **Push to the branch** (`git push origin feature/AmazingFeature`)
+2. **Create a feature branch** (`git checkout -b feature/Feature`)
+3. **Commit your changes** (`git commit -m 'Add some Feature'`)
+4. **Push to the branch** (`git push origin feature/Feature`)
 5. **Open a Pull Request**
 
 ### Contribution Guidelines
@@ -501,6 +501,6 @@ For questions or support, please contact the development team through the projec
 
 <div align="center">
 
-**Made with ❤️ by the NextGen Pros Team**
+**Made with ❤️ by the RT**
 
 </div>
