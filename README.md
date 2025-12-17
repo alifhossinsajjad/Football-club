@@ -338,7 +338,7 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 
 ### ✅ Completed Features
 
-#### Admin Dashboard (In Development)
+#### Admin Dashboard (In Development.)
 - [x] Main dashboard with analytics
 - [x] User management
 - [x] Settings module
