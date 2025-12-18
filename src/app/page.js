@@ -28,14 +28,20 @@
 
 
 import Banner from '@/components/landing/Banner'
+import ClubsSection from '@/components/landing/ClubSection'
+import FeaturedPlayers from '@/components/landing/Featured'
+import HowItWorks from '@/components/landing/HowItWorks'
 import Navbar from '@/components/landing/Navbar'
 import React from 'react'
 
 export default function LandingPage() {
   return (
-    <div >
+    <div>
       <Navbar />
       <Banner/>
+      <ClubsSection/>
+      <HowItWorks/>
+      <FeaturedPlayers/>
     </div>
   )
 }

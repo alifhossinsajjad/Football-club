@@ -36,6 +36,9 @@
     @apply border-border;
   }
 
+
+
+  
   body {
     @apply bg-background text-foreground;
     font-family: 'Poppins', sans-serif;
@@ -44,4 +47,15 @@
     margin: 0;
     padding: 0;
   }
+
+  
+}
+@layer components {
+  .text-landing {
+    color: #7DB5B5;
+  }
+   .text-landing-number {
+    color: #09585E;
+  }
+
 }
