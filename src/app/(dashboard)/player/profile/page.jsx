@@ -34,12 +34,13 @@ export default function PlayerProfilePage() {
       dateOfBirth: "15/03/2008",
       jerseyNumber: "#10",
     },
-    about: "Highly skilled and dedicated forward with exceptional technical abilities and a strong goal-scoring record. Known for excellent ball control, pace, and tactical awareness. Currently playing for Manchester United Youth Academy and representing England U-18 National Team. Passionate about developing my skills and pursuing a professional career in football at the highest level.",
+    about:
+      "Highly skilled and dedicated forward with exceptional technical abilities and a strong goal-scoring record. Known for excellent ball control, pace, and tactical awareness. Currently playing for Manchester United Youth Academy and representing England U-18 National Team. Passionate about developing my skills and pursuing a professional career in football at the highest level.",
     statistics: {
       matches: 28,
       goals: 19,
       assists: 12,
-      minutes: 2340
+      minutes: 2340,
     },
     skills: [
       { skill: "Pace", value: 92 },
@@ -71,13 +72,13 @@ export default function PlayerProfilePage() {
     ],
     contact: {
       email: "sourav.debnath@email.com",
-      phone: "+44 7700 900000"
+      phone: "+44 7700 900000",
     },
     socialMedia: {
       instagram: "@souravdebnath_10",
       twitter: "@souravdebnath_10",
       facebook: "@souravdebnath_10",
-      youtube: "Sourav Debnath Football"
+      youtube: "Sourav Debnath Football",
     },
     achievements: [
       "Player of the Month - March 2025",
@@ -92,12 +93,12 @@ export default function PlayerProfilePage() {
       scoutViews: 87,
       scoutViewsChange: "+35 this week",
       clubInterest: "16 clubs",
-      clubInterestChange: "+8 new this month"
+      clubInterestChange: "+8 new this month",
     },
     preferences: {
       preferredLeague: "Premier League, Liga Bundesliga",
       contractStatus: "Open to Offers",
-      availability: "Available from Summer 2025"
+      availability: "Available from Summer 2025",
     },
     videos: [
       {
@@ -105,18 +106,18 @@ export default function PlayerProfilePage() {
         src: "/player/profile/highlight1.jpg",
         alt: "Season Highlights 2024/25 - Part 1",
         title: "Season Highlights 2024/25 - Part 1",
-        duration: "3:45 minutes"
+        duration: "3:45 minutes",
       },
       {
         id: 2,
         src: "/player/profile/highlight2.jpg",
         alt: "Season Highlights 2024/25 - Part 2",
         title: "Season Highlights 2024/25 - Part 2",
-        duration: "3:45 minutes"
-      }
+        duration: "3:45 minutes",
+      },
     ],
     coverImage: "/player/profile/profileBanner.png",
-    profileImage: "/player/profile/profile.png"
+    profileImage: "/player/profile/profile.png",
   });
 
   const handleEditProfile = () => {
@@ -152,20 +153,20 @@ export default function PlayerProfilePage() {
 
   // Function to update profile data
   const updatePlayerProfileData = (updates) => {
-    setPlayerProfileData(prev => ({
+    setPlayerProfileData((prev) => ({
       ...prev,
-      ...updates
+      ...updates,
     }));
   };
 
   // Function to update nested profile data
   const updateProfileField = (field, value) => {
-    setPlayerProfileData(prev => ({
+    setPlayerProfileData((prev) => ({
       ...prev,
       profile: {
         ...prev.profile,
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
@@ -239,11 +240,13 @@ export default function PlayerProfilePage() {
           />
 
           {/* Profile Insights */}
-          <PlayerProfileInsights
-            playerProfileData={playerProfileData}
-            isEditing={isEditing}
-            updatePlayerProfileData={updatePlayerProfileData}
-          />
+          {isEditing || (
+            <PlayerProfileInsights
+              playerProfileData={playerProfileData}
+              isEditing={isEditing}
+              updatePlayerProfileData={updatePlayerProfileData}
+            />
+          )}
 
           {/* Preferences */}
           <PlayerProfilePreference

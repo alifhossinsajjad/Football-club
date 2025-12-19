@@ -1,36 +1,38 @@
 import { Facebook, Instagram, SquarePen, Twitter, Youtube } from "lucide-react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { Input } from "@/components/ui/input"; // Custom Input
 
-export default function SocialMedia({ playerProfileData, isEditing, updatePlayerProfileData }) {
+export default function SocialMedia({
+  playerProfileData,
+  isEditing,
+  updatePlayerProfileData,
+}) {
   const theme = useSelector((state) => state.theme);
-  
-  // Get social media data from playerProfileData or use defaults
+
   const initialSocialMedia = playerProfileData.socialMedia || {
-    instagram: "@souravdebnath_10",
-    twitter: "@souravdebnath_10",
-    facebook: "@souravdebnath_10",
-    youtube: "Sourav Debnath Football"
+    instagram: "@johndoe_10",
+    twitter: "@johndoe_10",
+    facebook: "John Doe",
+    youtube: "John Doe Football",
   };
-  
-  // Local state for editable social media
-  const [editableSocialMedia, setEditableSocialMedia] = useState(initialSocialMedia);
-  
-  // Handle social media changes
+
+  const [editableSocialMedia, setEditableSocialMedia] =
+    useState(initialSocialMedia);
+
   const handleSocialMediaChange = (platform, value) => {
     const updatedSocialMedia = {
       ...editableSocialMedia,
-      [platform]: value
+      [platform]: value,
     };
-    
+
     setEditableSocialMedia(updatedSocialMedia);
-    
-    // Update the parent state
+
     if (updatePlayerProfileData) {
       updatePlayerProfileData({ socialMedia: updatedSocialMedia });
     }
   };
-  
+
   return (
     <div
       className="p-6 rounded-xl border relative"
@@ -47,64 +49,59 @@ export default function SocialMedia({ playerProfileData, isEditing, updatePlayer
           </button>
         )}
       </div>
-      <div className="space-y-4 text-base">
+      <div className="space-y-6 text-base">
         <div className="flex items-center gap-3">
-          <Instagram className="w-5 h-5 text-[#FF0000]" />
+          <Instagram className="w-5 h-5 text-pink-500" />
           {isEditing ? (
-            <input
-              type="text"
-              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+            <Input
               value={editableSocialMedia.instagram}
-              onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
+              onChange={(e) =>
+                handleSocialMediaChange("instagram", e.target.value)
+              }
             />
           ) : (
-            <span className="text-gray-300">{initialSocialMedia.instagram}</span>
+            <span className="text-gray-300">
+              {initialSocialMedia.instagram}
+            </span>
           )}
         </div>
         <div className="flex items-center gap-3">
           <Twitter
-            className="w-5 h-5 text-gray-400"
-            style={{
-              color: theme.colors.primaryCyan,
-            }}
+            className="w-5 h-5"
+            style={{ color: theme.colors.primaryCyan }}
           />
           {isEditing ? (
-            <input
-              type="text"
-              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+            <Input
               value={editableSocialMedia.twitter}
-              onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
+              onChange={(e) =>
+                handleSocialMediaChange("twitter", e.target.value)
+              }
             />
           ) : (
             <span className="text-gray-300">{initialSocialMedia.twitter}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
-          <Facebook
-            className="w-5 h-5 text-gray-400"
-            style={{
-              color: theme.colors.primaryCyan,
-            }}
-          />
+          <Facebook className="w-5 h-5 text-blue-600" />
           {isEditing ? (
-            <input
-              type="text"
-              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+            <Input
               value={editableSocialMedia.facebook}
-              onChange={(e) => handleSocialMediaChange('facebook', e.target.value)}
+              onChange={(e) =>
+                handleSocialMediaChange("facebook", e.target.value)
+              }
             />
           ) : (
             <span className="text-gray-300">{initialSocialMedia.facebook}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
-          <Youtube className="w-5 h-5 text-[#FF0000]" />
+          <Youtube className="w-5 h-5 text-red-600" />
           {isEditing ? (
-            <input
-              type="text"
-              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+            <Input
               value={editableSocialMedia.youtube}
-              onChange={(e) => handleSocialMediaChange('youtube', e.target.value)}
+              onChange={(e) =>
+                handleSocialMediaChange("youtube", e.target.value)
+              }
             />
           ) : (
             <span className="text-gray-300">{initialSocialMedia.youtube}</span>
