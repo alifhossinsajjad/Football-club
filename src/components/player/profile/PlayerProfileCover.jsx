@@ -8,6 +8,7 @@ export default function PlayerProfileCover({
   setIsEditing,
   isEditing,
   updatePlayerProfileData,
+  onBoost,
 }) {
   const theme = useSelector((state) => state.theme);
   const fileInputRef = useRef(null);
@@ -73,7 +74,11 @@ export default function PlayerProfileCover({
             } flex items-center`}
           >
             {" "}
-           { isEditing ? <Save className="w-4 h-4 mr-2" /> : <SquarePen className="w-4 h-4 mr-2" />}
+            {isEditing ? (
+              <Save className="w-4 h-4 mr-2" />
+            ) : (
+              <SquarePen className="w-4 h-4 mr-2" />
+            )}
             {isEditing ? "Save Changes" : "Edit Profile"}
           </span>
         </Button>
@@ -82,7 +87,13 @@ export default function PlayerProfileCover({
             variant="outline"
             className="rounded-md"
             style={{ backgroundColor: theme.colors.primaryCyan }}
-            onClick={() => console.log("Boost Profile clicked")}
+            onClick={() => {
+              if (onBoost) {
+                onBoost();
+              } else {
+                console.log("Boost Profile clicked");
+              }
+            }}
           >
             <Upload className="w-4 h-4 mr-2" />
             Boost Profile

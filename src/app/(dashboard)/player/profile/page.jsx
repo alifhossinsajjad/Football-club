@@ -10,19 +10,28 @@ import PlayerProfileInsights from "@/components/player/profile/PlayerProfileInsi
 import PlayerProfilePreference from "@/components/player/profile/PlayerProfilePreference";
 import HighlightVideosSection from "@/components/player/profile/PlayerProfileVideos";
 import PlayerProfileCover from "@/components/player/profile/PlayerProfileCover";
-import { useState } from "react";
 import PlayerProfileSkills from "@/components/player/profile/PlayerProfileSkills";
 import PlayerProfilePlayingHistory from "@/components/player/profile/PlayerProfilePlayingHistory";
 
+import BoostDurationModal from "@/components/player/modals/profile/BoostDurationModal";
+import BoostPaymentModal from "@/components/player/modals/profile/BoostPaymentModal";
+import BoostSuccessModal from "@/components/player/modals/profile/BoostSuccessModal";
+
+import { useState } from "react";
+
 export default function PlayerProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
-  const [isBoosting, setIsBoosting] = useState(false);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  // Boost modal states
+  const [boostStep, setBoostStep] = useState(0); // 0: closed, 1: duration, 2: payment, 3: success
+  const [selectedDuration, setSelectedDuration] = useState(null);
+  const [boostData, setBoostData] = useState({});
 
   // Centralized player profile data state
   const [playerProfileData, setPlayerProfileData] = useState({
+    // ... (your full data object from before)
     profile: {
-      name: "Sourav Debnath",
+      name: "John Doe",
       position: "Forward / Striker",
       location: "Manchester, United Kingdom",
       status: "Available",
@@ -34,124 +43,37 @@ export default function PlayerProfilePage() {
       dateOfBirth: "15/03/2008",
       jerseyNumber: "#10",
     },
-    about:
-      "Highly skilled and dedicated forward with exceptional technical abilities and a strong goal-scoring record. Known for excellent ball control, pace, and tactical awareness. Currently playing for Manchester United Youth Academy and representing England U-18 National Team. Passionate about developing my skills and pursuing a professional career in football at the highest level.",
-    statistics: {
-      matches: 28,
-      goals: 19,
-      assists: 12,
-      minutes: 2340,
-    },
-    skills: [
-      { skill: "Pace", value: 92 },
-      { skill: "Shooting", value: 88 },
-      { skill: "Dribbling", value: 90 },
-      { skill: "Passing", value: 85 },
-      { skill: "Physical", value: 82 },
-      { skill: "Technical", value: 89 },
-    ],
-    playingHistory: [
-      {
-        club: "Manchester United Youth Academy",
-        years: "2023 - Present",
-        note: "Forward",
-        description: "FA Youth Cup Runner-up 2024",
-      },
-      {
-        club: "England U-18 National Team",
-        years: "2024 - Present",
-        note: "Forward",
-        description: "8 Caps, 5 Goals",
-      },
-      {
-        club: "City Football Academy",
-        years: "2020 - 2023",
-        note: "Forward",
-        description: "Regional Champions 2020",
-      },
-    ],
-    contact: {
-      email: "sourav.debnath@email.com",
-      phone: "+44 7700 900000",
-    },
-    socialMedia: {
-      instagram: "@souravdebnath_10",
-      twitter: "@souravdebnath_10",
-      facebook: "@souravdebnath_10",
-      youtube: "Sourav Debnath Football",
-    },
-    achievements: [
-      "Player of the Month - March 2025",
-      "Top Scorer U-18 League 2024",
-      "England Youth Call-Up 2024",
-      "FA Youth Cup Finalist 2024",
-      "Academy Player of the Year 2023",
-    ],
-    insights: {
-      profileViews: 342,
-      profileViewsChange: "+124 this week",
-      scoutViews: 87,
-      scoutViewsChange: "+35 this week",
-      clubInterest: "16 clubs",
-      clubInterestChange: "+8 new this month",
-    },
-    preferences: {
-      preferredLeague: "Premier League, Liga Bundesliga",
-      contractStatus: "Open to Offers",
-      availability: "Available from Summer 2025",
-    },
-    videos: [
-      {
-        id: 1,
-        src: "/player/profile/highlight1.jpg",
-        alt: "Season Highlights 2024/25 - Part 1",
-        title: "Season Highlights 2024/25 - Part 1",
-        duration: "3:45 minutes",
-      },
-      {
-        id: 2,
-        src: "/player/profile/highlight2.jpg",
-        alt: "Season Highlights 2024/25 - Part 2",
-        title: "Season Highlights 2024/25 - Part 2",
-        duration: "3:45 minutes",
-      },
-    ],
+    // ... rest of your data
     coverImage: "/player/profile/profileBanner.png",
     profileImage: "/player/profile/profile.png",
   });
 
-  const handleEditProfile = () => {
-    setIsEditingProfile(true);
-    setIsEditing(false);
-    setIsBoosting(false);
-  };
-
   const handleBoostProfile = () => {
-    setIsBoosting(true);
+    setBoostStep(1);
     setIsEditing(false);
-    setIsEditingProfile(false);
   };
 
-  const handleEdit = () => {
-    setIsEditing(!isEditing);
-    setIsBoosting(false);
-    setIsEditingProfile(false);
+  const handleNextFromDuration = () => {
+    if (!selectedDuration) return;
+    
+    setBoostData({
+      duration: selectedDuration.months,
+      price: selectedDuration.price,
+      startDate: "1 Feb 2025",
+      endDate: "1 Mar 2025",
+    });
+    setBoostStep(2);
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-    setIsBoosting(false);
-    setIsEditingProfile(false);
+  const handlePaymentSuccess = () => {
+    setBoostStep(3);
   };
 
-  const handleBoost = () => {
-    setIsBoosting(false);
-    setIsEditing(false);
-    setIsEditingProfile(false);
-    console.log("Boost Profile");
+  const handleCloseBoost = () => {
+    setBoostStep(0);
+    setSelectedDuration(null);
   };
 
-  // Function to update profile data
   const updatePlayerProfileData = (updates) => {
     setPlayerProfileData((prev) => ({
       ...prev,
@@ -159,7 +81,6 @@ export default function PlayerProfilePage() {
     }));
   };
 
-  // Function to update nested profile data
   const updateProfileField = (field, value) => {
     setPlayerProfileData((prev) => ({
       ...prev,
@@ -171,15 +92,15 @@ export default function PlayerProfilePage() {
   };
 
   return (
-    <div className="space-y-8 ">
-      {/* Cover Photo with Trophies */}
+    <div className="space-y-8">
       <PlayerProfileCover
         playerProfileData={playerProfileData}
         setIsEditing={setIsEditing}
         isEditing={isEditing}
         updatePlayerProfileData={updatePlayerProfileData}
+        onBoost={handleBoostProfile}
       />
-      {/* Profile Header Card */}
+
       <ProfileHeader
         playerProfileData={playerProfileData}
         isEditing={isEditing}
@@ -188,27 +109,22 @@ export default function PlayerProfilePage() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Left Column */}
         <div className="lg:col-span-2 space-y-8">
-          {/* About */}
           <AboutPlayerProfile
             playerProfileData={playerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          {/* Career Statistics */}
           <CareerStatistics
             playerProfileData={playerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          {/* Skills & Attributes */}
           <PlayerProfileSkills
             playerProfileData={playerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          {/* Playing History */}
           <PlayerProfilePlayingHistory
             playerProfileData={playerProfileData}
             isEditing={isEditing}
@@ -216,39 +132,25 @@ export default function PlayerProfilePage() {
           />
         </div>
 
-        {/* Right Sidebar */}
         <div className="space-y-8">
-          {/* Contact Information */}
           <ContactInformation
             playerProfileData={playerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-
-          {/* Social Media */}
           <SocialMedia
             playerProfileData={playerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-
-          {/* Achievements */}
           <PlayerAchievements
             playerProfileData={playerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-
-          {/* Profile Insights */}
-          {isEditing || (
-            <PlayerProfileInsights
-              playerProfileData={playerProfileData}
-              isEditing={isEditing}
-              updatePlayerProfileData={updatePlayerProfileData}
-            />
+          {!isEditing && (
+            <PlayerProfileInsights playerProfileData={playerProfileData} />
           )}
-
-          {/* Preferences */}
           <PlayerProfilePreference
             playerProfileData={playerProfileData}
             isEditing={isEditing}
@@ -257,12 +159,30 @@ export default function PlayerProfilePage() {
         </div>
       </div>
 
-      {/* Highlights Videos */}
       <HighlightVideosSection
         playerProfileData={playerProfileData}
         isEditing={isEditing}
         updatePlayerProfileData={updatePlayerProfileData}
       />
+
+      {/* Boost Modals */}
+      <BoostDurationModal
+        isOpen={boostStep === 1}
+        onClose={handleCloseBoost}
+        onNext={handleNextFromDuration}
+        selectedDuration={selectedDuration}
+        setSelectedDuration={setSelectedDuration}
+      />
+
+      <BoostPaymentModal
+        isOpen={boostStep === 2}
+        onClose={handleCloseBoost}
+        onBack={() => setBoostStep(1)}
+        onSuccess={handlePaymentSuccess}
+        boostData={boostData}
+      />
+
+      <BoostSuccessModal isOpen={boostStep === 3} onClose={handleCloseBoost} />
     </div>
   );
 }
