@@ -1,11 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import PlayerTitle from "../playerTitle";
-import { Calendar, Flag, MapPin, Ruler, Weight } from "lucide-react";
+import { Calendar, Flag, MapPin, Ruler, SquarePen, Weight } from "lucide-react";
 import Image from "next/image";
 
-export default function ProfileHeader() {
+export default function ProfileHeader({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
+  const { isEditing } = playerProfileData;
+  
   return (
     <div className="relative   px-6 xl:px-20">
       <div
@@ -18,7 +20,7 @@ export default function ProfileHeader() {
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Profile Photo */}
           <div className=" ">
-            <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-full  overflow-hidden">
+            <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-full  overflow-hidden relative">
               <Image
                 alt="John Doe"
                 width={400}
@@ -26,6 +28,13 @@ export default function ProfileHeader() {
                 src="/player/profile/profile.png"
                 className="w-full h-full object-cover"
               />
+              {isEditing && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
+                  <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm">
+                    <SquarePen className="w-6 h-6 text-white" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -33,10 +42,10 @@ export default function ProfileHeader() {
           <div className="flex-1 text-white">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <PlayerTitle title="John Doe" />
-                <p className="text-xl text-gray-300">Forward / Striker</p>
+                <PlayerTitle title={playerProfileData.profile.name} />
+                <p className="text-xl text-gray-300">{playerProfileData.profile.position}</p>
                 <p className="text-base text-gray-500 flex items-center gap-2">
-                  <MapPin className="w-4 h-4" /> Manchester, United Kingdom
+                  <MapPin className="w-4 h-4" /> {playerProfileData.profile.location}
                 </p>
               </div>
               <div
@@ -46,7 +55,7 @@ export default function ProfileHeader() {
                   color: theme.colors.primaryCyan,
                 }}
               >
-                Available
+                {playerProfileData.profile.status}
               </div>
             </div>
 
@@ -64,7 +73,7 @@ export default function ProfileHeader() {
                   </span>{" "}
                   Age
                 </p>
-                <p className="text-base ">17 years</p>
+                <p className="text-base ">{playerProfileData.profile.age}</p>
               </div>
               <div
                 className="text-left p-4 rounded-md flex flex-col  gap-2 "
@@ -79,7 +88,7 @@ export default function ProfileHeader() {
                   </span>{" "}
                   Height
                 </p>
-                <p className="text-base ">5'11" (180 cm)</p>
+                <p className="text-base ">{playerProfileData.profile.height}</p>
               </div>
               <div
                 className="text-left p-4 rounded-md flex flex-col  gap-2 "
@@ -93,7 +102,7 @@ export default function ProfileHeader() {
                   </span>{" "}
                   Weight
                 </p>
-                <p className="text-base ">165 lbs (75 kg)</p>
+                <p className="text-base ">{playerProfileData.profile.weight}</p>
               </div>
               <div
                 className="text-left p-4 rounded-md flex flex-col  gap-2 "
@@ -107,7 +116,7 @@ export default function ProfileHeader() {
                   </span>{" "}
                   Nationality
                 </p>
-                <p className="text-base   gap-2">British</p>
+                <p className="text-base   gap-2">{playerProfileData.profile.nationality}</p>
               </div>
             </div>
 
@@ -115,15 +124,15 @@ export default function ProfileHeader() {
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-6 mt-8 text-left text-base">
               <div>
                 <p className="text-gray-400 ">Preferred Foot</p>
-                <p>Right</p>
+                <p>{playerProfileData.profile.preferredFoot}</p>
               </div>
               <div>
                 <p className="text-gray-400 ">Date of Birth</p>
-                <p>15/03/2008</p>
+                <p>{playerProfileData.profile.dateOfBirth}</p>
               </div>
               <div>
                 <p className="text-gray-400 ">Jersey Number</p>
-                <p>#10</p>
+                <p>{playerProfileData.profile.jerseyNumber}</p>
               </div>
             </div>
           </div>

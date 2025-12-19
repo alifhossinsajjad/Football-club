@@ -1,24 +1,33 @@
-import { Award } from "lucide-react";
+import { Award, SquarePen } from "lucide-react";
 import React from "react";
 import { useSelector } from "react-redux";
 
-export default function PlayerAchievements() {
+export default function PlayerAchievements({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
+  const { isEditing } = playerProfileData;
+  
   return (
     <div
-      className="p-6 rounded-xl border"
+      className="p-6 rounded-xl border relative"
       style={{
         backgroundColor: theme.colors.backgroundCard,
         borderColor: `${theme.colors.primaryCyan}33`,
       }}
     >
-      <h3 className="text-xl  text-white mb-4 flex items-center gap-2">
-        <Award
-          className="w-5 h-5"
-          style={{ color: theme.colors.primaryCyan }}
-        />
-        Achievements
-      </h3>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-xl  text-white flex items-center gap-2">
+          <Award
+            className="w-5 h-5"
+            style={{ color: theme.colors.primaryCyan }}
+          />
+          Achievements
+        </h3>
+        {isEditing && (
+          <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
+            <SquarePen className="w-4 h-4 text-gray-400" />
+          </button>
+        )}
+      </div>
       <div className="space-y-3">
         {[
           "Player of the Month - March 2025",
@@ -38,6 +47,14 @@ export default function PlayerAchievements() {
           </div>
         ))}
       </div>
+      
+      {isEditing && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
+          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
+            <SquarePen className="w-6 h-6 text-white" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

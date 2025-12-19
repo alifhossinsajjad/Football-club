@@ -2,15 +2,16 @@
 
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
-import { Upload, Play } from "lucide-react";
+import { Upload, Play, SquarePen } from "lucide-react";
 import Image from "next/image";
 
-export default function HighlightVideosSection() {
+export default function HighlightVideosSection({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
+  const { isEditing } = playerProfileData;
 
   return (
     <div
-      className="p-6 rounded-xl border max-w-6xl"
+      className="p-6 rounded-xl border max-w-6xl relative"
       style={{
         backgroundColor: theme.colors.backgroundCard,
         borderColor: `${theme.colors.primaryCyan}33`,
@@ -20,6 +21,11 @@ export default function HighlightVideosSection() {
         <h2 className="text-xl  text-white flex items-center gap-2">
           Highlight Videos
         </h2>
+        {isEditing && (
+          <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
+            <SquarePen className="w-4 h-4 text-gray-400" />
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6  ">
@@ -63,6 +69,14 @@ export default function HighlightVideosSection() {
           </div>
         </div>
       </div>
+      
+      {isEditing && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
+          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
+            <SquarePen className="w-6 h-6 text-white" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
