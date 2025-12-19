@@ -1,26 +1,41 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
+import { Input } from "@/components/ui/input"; // Custom Input
 
-export default function PlayerProfilePreference({ playerProfileData }) {
+export default function PlayerProfilePreference({
+  playerProfileData,
+  isEditing,
+  updatePlayerProfileData,
+}) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
-  
-  // Local state for editable preferences
-  const [preferences, setPreferences] = useState({
+
+  // Get preferences data from playerProfileData or use defaults
+  const initialPreferences = playerProfileData.preferences || {
     preferredLeague: "Premier League, Liga Bundesliga",
     contractStatus: "Open to Offers",
-    availability: "Available from Summer 2025"
-  });
-  
-  // Handler for updating preferences
-  const handlePreferenceChange = (field, value) => {
-    setPreferences(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    availability: "Available from Summer 2025",
   };
-  
+
+  // Local state for editable preferences
+  const [editablePreferences, setEditablePreferences] =
+    useState(initialPreferences);
+
+  // Handle preference changes
+  const handlePreferenceChange = (field, value) => {
+    const updatedPreferences = {
+      ...editablePreferences,
+      [field]: value,
+    };
+
+    setEditablePreferences(updatedPreferences);
+
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ preferences: updatedPreferences });
+    }
+  };
+
   return (
     <div
       className="p-6 rounded-xl border relative"
@@ -30,51 +45,51 @@ export default function PlayerProfilePreference({ playerProfileData }) {
       }}
     >
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-base  font-bold text-white">Preferences</h3>
+        <h3 className="text-base font-bold text-white">Preferences</h3>
         {isEditing && (
           <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
             <SquarePen className="w-4 h-4 text-gray-400" />
           </button>
         )}
       </div>
-      <div className="space-y-4 flex flex-col gap-2">
+      <div className="space-y-6 flex flex-col gap-2">
         <div>
-          <div className="text-gray-400 ">Preferred League</div>
+          <div className="text-gray-400 mb-2">Preferred League</div>
           {isEditing ? (
-            <input
-              type="text"
-              className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
-              value={preferences.preferredLeague}
-              onChange={(e) => handlePreferenceChange('preferredLeague', e.target.value)}
+            <Input
+              value={editablePreferences.preferredLeague}
+              onChange={(e) =>
+                handlePreferenceChange("preferredLeague", e.target.value)
+              }
             />
           ) : (
-            <p>{preferences.preferredLeague}</p>
+            <p className="text-white">{initialPreferences.preferredLeague}</p>
           )}
         </div>
         <div>
-          <div className="text-gray-400">Contract Status</div>
+          <div className="text-gray-400 mb-2">Contract Status</div>
           {isEditing ? (
-            <input
-              type="text"
-              className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
-              value={preferences.contractStatus}
-              onChange={(e) => handlePreferenceChange('contractStatus', e.target.value)}
+            <Input
+              value={editablePreferences.contractStatus}
+              onChange={(e) =>
+                handlePreferenceChange("contractStatus", e.target.value)
+              }
             />
           ) : (
-            <p>{preferences.contractStatus}</p>
+            <p className="text-white">{initialPreferences.contractStatus}</p>
           )}
         </div>
         <div>
-          <div className="text-gray-400">Availability</div>
+          <div className="text-gray-400 mb-2">Availability</div>
           {isEditing ? (
-            <input
-              type="text"
-              className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
-              value={preferences.availability}
-              onChange={(e) => handlePreferenceChange('availability', e.target.value)}
+            <Input
+              value={editablePreferences.availability}
+              onChange={(e) =>
+                handlePreferenceChange("availability", e.target.value)
+              }
             />
           ) : (
-            <p>{preferences.availability}</p>
+            <p className="text-white">{initialPreferences.availability}</p>
           )}
         </div>
       </div>

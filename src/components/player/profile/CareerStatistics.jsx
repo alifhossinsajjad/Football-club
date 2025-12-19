@@ -1,27 +1,41 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
+import { Input } from "@/components/ui/input"; // Custom Input
 
-export default function CareerStatistics({ playerProfileData }) {
+export default function CareerStatistics({
+  playerProfileData,
+  isEditing,
+  updatePlayerProfileData,
+}) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
-  
-  // Local state for editable statistics
-  const [stats, setStats] = useState({
+
+  // Get statistics from playerProfileData or use defaults
+  const initialStats = playerProfileData.statistics || {
     matches: 28,
     goals: 19,
     assists: 12,
-    minutes: 2340
-  });
-  
-  // Handler for updating stats
-  const handleStatChange = (stat, value) => {
-    setStats(prev => ({
-      ...prev,
-      [stat]: value
-    }));
+    minutes: 2340,
   };
-  
+
+  // Local state for editable fields
+  const [editableStats, setEditableStats] = useState(initialStats);
+
+  // Handle stat changes
+  const handleStatChange = (stat, value) => {
+    const updatedStats = {
+      ...editableStats,
+      [stat]: parseInt(value) || 0,
+    };
+
+    setEditableStats(updatedStats);
+
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ statistics: updatedStats });
+    }
+  };
+
   return (
     <div
       className="p-6 rounded-xl border relative"
@@ -31,7 +45,7 @@ export default function CareerStatistics({ playerProfileData }) {
       }}
     >
       <div className="flex justify-between items-start mb-6">
-        <h2 className="text-xl font-bold text-white">
+        <h2 className="text-xl  text-white">
           Career Statistics (2024/25 Season)
         </h2>
         {isEditing && (
@@ -40,93 +54,109 @@ export default function CareerStatistics({ playerProfileData }) {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Matches */}
         <div
-          className="text-center p-4 rounded-lg"
-          style={{ backgroundColor: theme.colors.backgroundDark }}
-        >
-          <div
-            className="text-3xl font-bold"
-            style={{ color: theme.colors.primaryCyan }}
-          >
-            {isEditing ? (
-              <input
-                type="number"
-                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.matches}
-                onChange={(e) => handleStatChange('matches', parseInt(e.target.value) || 0)}
-              />
-            ) : (
-              stats.matches
-            )}
-          </div>
-          <p className="text-sm text-gray-400 mt-2">Matches</p>
-        </div>
-        <div
-          className="text-center p-4 rounded-lg"
+          className="text-center p-6 rounded-xl"
           style={{
-            backgroundColor: theme.colors.backgroundDark,
-            color: theme.colors.primaryCyan,
-          }}
-        >
-          <div className="text-3xl font-bold ">
-            {isEditing ? (
-              <input
-                type="number"
-                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.goals}
-                onChange={(e) => handleStatChange('goals', parseInt(e.target.value) || 0)}
-              />
-            ) : (
-              stats.goals
-            )}
-          </div>
-          <p className="text-sm text-gray-400 mt-2">Goals</p>
-        </div>
-        <div
-          className="text-center p-4 rounded-lg"
-          style={{
-            backgroundColor: theme.colors.backgroundDark,
-            color: theme.colors.primaryCyan,
-          }}
-        >
-          <div className="text-3xl font-bold ">
-            {isEditing ? (
-              <input
-                type="number"
-                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.assists}
-                onChange={(e) => handleStatChange('assists', parseInt(e.target.value) || 0)}
-              />
-            ) : (
-              stats.assists
-            )}
-          </div>
-          <p className="text-sm text-gray-400 mt-2">Assists</p>
-        </div>
-        <div
-          className="text-center p-4 rounded-lg"
-          style={{
-            backgroundColor: theme.colors.backgroundDark,
-            color: theme.colors.primaryCyan,
+            backgroundColor: isEditing
+              ? theme.colors.backgroundCard
+              : theme.colors.backgroundDark,
           }}
         >
           <div
-            className="text-3xl font-bold"
+            className="text-4xl  mb-2"
             style={{ color: theme.colors.primaryCyan }}
           >
             {isEditing ? (
-              <input
+              <Input
                 type="number"
-                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.minutes}
-                onChange={(e) => handleStatChange('minutes', parseInt(e.target.value) || 0)}
+                value={editableStats.matches}
+                onChange={(e) => handleStatChange("matches", e.target.value)}
+                className="text-lg text-white rounded-lg  "
               />
             ) : (
-              stats.minutes.toLocaleString()
+              initialStats.matches
             )}
           </div>
-          <p className="text-sm text-gray-400 mt-2">Minutes</p>
+          <p className="text-sm text-gray-400">Matches</p>
+        </div>
+
+        {/* Goals */}
+        <div
+          className="text-center p-6 rounded-xl"
+          style={{
+            backgroundColor: isEditing
+              ? theme.colors.backgroundCard
+              : theme.colors.backgroundDark,
+          }}
+        >
+          <div className="text-4xl  mb-2 text-white">
+            {isEditing ? (
+              <Input
+                type="number"
+                value={editableStats.goals}
+                onChange={(e) => handleStatChange("goals", e.target.value)}
+                className="text-lg text-white rounded-lg  "
+              />
+            ) : (
+              initialStats.goals
+            )}
+          </div>
+          <p className="text-sm text-gray-400">Goals</p>
+        </div>
+
+        {/* Assists */}
+        <div
+          className="text-center p-6 rounded-xl"
+          style={{
+            backgroundColor: isEditing
+              ? theme.colors.backgroundCard
+              : theme.colors.backgroundDark,
+          }}
+        >
+          <div className="text-4xl  mb-2 text-white">
+            {isEditing ? (
+              <Input
+                type="number"
+                value={editableStats.assists}
+                onChange={(e) => handleStatChange("assists", e.target.value)}
+                className="text-lg text-white rounded-lg  "
+              />
+            ) : (
+              initialStats.assists
+            )}
+          </div>
+          <p className="text-sm text-gray-400">Assists</p>
+        </div>
+
+        {/* Minutes */}
+        <div
+          className="text-center p-6 rounded-xl"
+          style={{
+            backgroundColor: isEditing
+              ? theme.colors.backgroundCard
+              : theme.colors.backgroundDark,
+          }}
+        >
+          <div
+            className="text-4xl  mb-2"
+            style={{ color: theme.colors.primaryCyan }}
+          >
+            {isEditing ? (
+              <Input
+                type="number"
+                value={editableStats.minutes}
+                onChange={(e) => handleStatChange("minutes", e.target.value)}
+                className="text-lg text-white rounded-lg"
+              />
+            ) : (
+              initialStats.minutes.toLocaleString()
+            )}
+          </div>
+          <p className="text-sm text-gray-400">Minutes</p>
         </div>
       </div>
     </div>
