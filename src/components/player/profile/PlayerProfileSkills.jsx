@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
 export default function PlayerProfileSkills({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
   const { isEditing } = playerProfileData;
+  
+  // Local state for editable skills
+  const [skills, setSkills] = useState([
+    { skill: "Pace", value: 92 },
+    { skill: "Shooting", value: 88 },
+    { skill: "Dribbling", value: 90 },
+    { skill: "Passing", value: 85 },
+    { skill: "Physical", value: 82 },
+    { skill: "Technical", value: 89 },
+  ]);
+  
+  // Handler for updating skill values
+  const handleSkillChange = (index, value) => {
+    const updatedSkills = [...skills];
+    updatedSkills[index].value = parseInt(value) || 0;
+    setSkills(updatedSkills);
+  };
   
   return (
     <div
@@ -23,18 +40,22 @@ export default function PlayerProfileSkills({ playerProfileData }) {
         )}
       </div>
       <div className="space-y-4">
-        {[
-          { skill: "Pace", value: 92 },
-          { skill: "Shooting", value: 88 },
-          { skill: "Dribbling", value: 90 },
-          { skill: "Passing", value: 85 },
-          { skill: "Physical", value: 82 },
-          { skill: "Technical", value: 89 },
-        ].map(({ skill, value }) => (
+        {skills.map(({ skill, value }, index) => (
           <div key={skill}>
             <div className="flex justify-between mb-1">
               <span className="text-white">{skill}</span>
-              <span className="text-gray-400">{value}</span>
+              {isEditing ? (
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  className="text-gray-400 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-12 text-right"
+                  value={value}
+                  onChange={(e) => handleSkillChange(index, e.target.value)}
+                />
+              ) : (
+                <span className="text-gray-400">{value}</span>
+              )}
             </div>
             <div className="w-full bg-gray-800 rounded-full h-3">
               <div
@@ -48,14 +69,6 @@ export default function PlayerProfileSkills({ playerProfileData }) {
           </div>
         ))}
       </div>
-      
-      {isEditing && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

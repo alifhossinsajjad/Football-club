@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
 export default function CareerStatistics({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
   const { isEditing } = playerProfileData;
+  
+  // Local state for editable statistics
+  const [stats, setStats] = useState({
+    matches: 28,
+    goals: 19,
+    assists: 12,
+    minutes: 2340
+  });
+  
+  // Handler for updating stats
+  const handleStatChange = (stat, value) => {
+    setStats(prev => ({
+      ...prev,
+      [stat]: value
+    }));
+  };
   
   return (
     <div
@@ -33,7 +49,16 @@ export default function CareerStatistics({ playerProfileData }) {
             className="text-3xl font-bold"
             style={{ color: theme.colors.primaryCyan }}
           >
-            28
+            {isEditing ? (
+              <input
+                type="number"
+                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
+                value={stats.matches}
+                onChange={(e) => handleStatChange('matches', parseInt(e.target.value) || 0)}
+              />
+            ) : (
+              stats.matches
+            )}
           </div>
           <p className="text-sm text-gray-400 mt-2">Matches</p>
         </div>
@@ -44,7 +69,18 @@ export default function CareerStatistics({ playerProfileData }) {
             color: theme.colors.primaryCyan,
           }}
         >
-          <div className="text-3xl font-bold ">19</div>
+          <div className="text-3xl font-bold ">
+            {isEditing ? (
+              <input
+                type="number"
+                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
+                value={stats.goals}
+                onChange={(e) => handleStatChange('goals', parseInt(e.target.value) || 0)}
+              />
+            ) : (
+              stats.goals
+            )}
+          </div>
           <p className="text-sm text-gray-400 mt-2">Goals</p>
         </div>
         <div
@@ -54,7 +90,18 @@ export default function CareerStatistics({ playerProfileData }) {
             color: theme.colors.primaryCyan,
           }}
         >
-          <div className="text-3xl font-bold ">12</div>
+          <div className="text-3xl font-bold ">
+            {isEditing ? (
+              <input
+                type="number"
+                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
+                value={stats.assists}
+                onChange={(e) => handleStatChange('assists', parseInt(e.target.value) || 0)}
+              />
+            ) : (
+              stats.assists
+            )}
+          </div>
           <p className="text-sm text-gray-400 mt-2">Assists</p>
         </div>
         <div
@@ -68,19 +115,20 @@ export default function CareerStatistics({ playerProfileData }) {
             className="text-3xl font-bold"
             style={{ color: theme.colors.primaryCyan }}
           >
-            2,340
+            {isEditing ? (
+              <input
+                type="number"
+                className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
+                value={stats.minutes}
+                onChange={(e) => handleStatChange('minutes', parseInt(e.target.value) || 0)}
+              />
+            ) : (
+              stats.minutes.toLocaleString()
+            )}
           </div>
           <p className="text-sm text-gray-400 mt-2">Minutes</p>
         </div>
       </div>
-      
-      {isEditing && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,10 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
 export default function PlayerProfilePlayingHistory({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
   const { isEditing } = playerProfileData;
+  
+  // Local state for editable history
+  const [history, setHistory] = useState([
+    {
+      club: "Manchester United Youth Academy",
+      years: "2023 - Present",
+      note: "Forward",
+      description: "FA Youth Cup Runner-up 2024",
+    },
+    {
+      club: "England U-18 National Team",
+      years: "2024 - Present",
+      note: "Forward",
+      description: "8 Caps, 5 Goals",
+    },
+    {
+      club: "City Football Academy",
+      years: "2020 - 2023",
+      note: "Forward",
+      description: "Regional Champions 2020",
+    },
+  ]);
+  
+  // Handler for updating history items
+  const handleHistoryChange = (index, field, value) => {
+    const updatedHistory = [...history];
+    updatedHistory[index][field] = value;
+    setHistory(updatedHistory);
+  };
   
   return (
     <div
@@ -23,26 +52,7 @@ export default function PlayerProfilePlayingHistory({ playerProfileData }) {
         )}
       </div>
       <div className="space-y-6 ">
-        {[
-          {
-            club: "Manchester United Youth Academy",
-            years: "2023 - Present",
-            note: "Forward",
-            description: "FA Youth Cup Runner-up 2024",
-          },
-          {
-            club: "England U-18 National Team",
-            years: "2024 - Present",
-            note: "Forward",
-            description: "8 Caps, 5 Goals",
-          },
-          {
-            club: "City Football Academy",
-            years: "2020 - 2023",
-            note: "Forward",
-            description: "Regional Champions 2020",
-          },
-        ].map((item) => (
+        {history.map((item, index) => (
           <div
             key={item.club}
             className="flex items-center justify-between py-3 border-b last:border-0 p-4  rounded-md"
@@ -53,36 +63,67 @@ export default function PlayerProfilePlayingHistory({ playerProfileData }) {
           >
             <div className="flex flex-col gap-2 w-full">
               <div className="flex justify-between  ">
-                <p className="font-medium text-white">{item.club}</p>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    className="font-medium text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+                    value={item.club}
+                    onChange={(e) => handleHistoryChange(index, 'club', e.target.value)}
+                  />
+                ) : (
+                  <p className="font-medium text-white">{item.club}</p>
+                )}
                 {item.years && (
-                  <p
-                    className="text-sm  text-gray-400 py-1"
-                    style={{
-                      color: theme.colors.primaryCyan,
-                    }}
-                  >
-                    {item.years}
-                  </p>
+                  isEditing ? (
+                    <input
+                      type="text"
+                      className="text-sm text-gray-400 py-1 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+                      style={{
+                        color: theme.colors.primaryCyan,
+                      }}
+                      value={item.years}
+                      onChange={(e) => handleHistoryChange(index, 'years', e.target.value)}
+                    />
+                  ) : (
+                    <p
+                      className="text-sm  text-gray-400 py-1"
+                      style={{
+                        color: theme.colors.primaryCyan,
+                      }}
+                    >
+                      {item.years}
+                    </p>
+                  )
                 )}
               </div>
               {item.note && (
-                <p className="text-sm text-gray-400">{item.note}</p>
+                isEditing ? (
+                  <input
+                    type="text"
+                    className="text-sm text-gray-400 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+                    value={item.note}
+                    onChange={(e) => handleHistoryChange(index, 'note', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-400">{item.note}</p>
+                )
               )}
               {item.description && (
-                <p className="text-sm text-gray-400">{item.description}</p>
+                isEditing ? (
+                  <input
+                    type="text"
+                    className="text-sm text-gray-400 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+                    value={item.description}
+                    onChange={(e) => handleHistoryChange(index, 'description', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-400">{item.description}</p>
+                )
               )}
             </div>
           </div>
         ))}
       </div>
-      
-      {isEditing && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

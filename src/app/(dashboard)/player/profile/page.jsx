@@ -17,13 +17,18 @@ import PlayerProfilePlayingHistory from "@/components/player/profile/PlayerProfi
 
 export default function PlayerProfilePage() {
   const theme = useSelector((state) => state.theme);
-  
+  const [isEditing, setIsEditing] = useState(false);
+  const [isBoosting, setIsBoosting] = useState(false);
+  const [isEditingProfile, SetIsEditingProfile] = useState(false);
+
   // Centralized player profile data state
   const [playerProfileData, setPlayerProfileData] = useState({
-    isEditing: false,
-    isBoosting: false,
-    isEditingProfile: false,
-    // Add other profile data here as needed
+    isEditing,
+    setIsEditing,
+    isBoosting,
+    setIsBoosting,
+    isEditingProfile,
+    SetIsEditingProfile,
     profile: {
       name: "John Doe",
       position: "Forward / Striker",
@@ -35,52 +40,52 @@ export default function PlayerProfilePage() {
       nationality: "British",
       preferredFoot: "Right",
       dateOfBirth: "15/03/2008",
-      jerseyNumber: "#10"
-    }
+      jerseyNumber: "#10",
+    },
   });
 
   const handleEditProfile = () => {
-    setPlayerProfileData(prev => ({
+    setPlayerProfileData((prev) => ({
       ...prev,
       isEditingProfile: true,
       isEditing: false,
-      isBoosting: false
+      isBoosting: false,
     }));
   };
 
   const handleBoostProfile = () => {
-    setPlayerProfileData(prev => ({
+    setPlayerProfileData((prev) => ({
       ...prev,
       isBoosting: true,
       isEditing: false,
-      isEditingProfile: false
+      isEditingProfile: false,
     }));
   };
 
   const handleEdit = () => {
-    setPlayerProfileData(prev => ({
+    setPlayerProfileData((prev) => ({
       ...prev,
       isEditing: true,
       isBoosting: false,
-      isEditingProfile: false
+      isEditingProfile: false,
     }));
   };
 
   const handleCancel = () => {
-    setPlayerProfileData(prev => ({
+    setPlayerProfileData((prev) => ({
       ...prev,
       isEditing: false,
       isBoosting: false,
-      isEditingProfile: false
+      isEditingProfile: false,
     }));
   };
 
   const handleBoost = () => {
-    setPlayerProfileData(prev => ({
+    setPlayerProfileData((prev) => ({
       ...prev,
       isBoosting: false,
       isEditing: false,
-      isEditingProfile: false
+      isEditingProfile: false,
     }));
     console.log("Boost Profile");
   };
@@ -88,7 +93,7 @@ export default function PlayerProfilePage() {
   return (
     <div className="space-y-8 ">
       {/* Cover Photo with Trophies */}
-      <PlayerProfileCover playerProfileData={playerProfileData} />
+      <PlayerProfileCover playerProfileData={playerProfileData} setIsEditing={setIsEditing} isEditing={isEditing} />
       {/* Profile Header Card */}
       <ProfileHeader playerProfileData={playerProfileData} />
 
