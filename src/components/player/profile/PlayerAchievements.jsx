@@ -1,10 +1,26 @@
 import { Award, SquarePen } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function PlayerAchievements({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
   const { isEditing } = playerProfileData;
+  
+  // Local state for editable achievements
+  const [achievements, setAchievements] = useState([
+    "Player of the Month - March 2025",
+    "Top Scorer U-18 League 2024",
+    "England Youth Call-Up 2024",
+    "FA Youth Cup Finalist 2024",
+    "Academy Player of the Year 2023",
+  ]);
+  
+  // Handler for updating achievements
+  const handleAchievementChange = (index, value) => {
+    const updatedAchievements = [...achievements];
+    updatedAchievements[index] = value;
+    setAchievements(updatedAchievements);
+  };
   
   return (
     <div
@@ -29,32 +45,27 @@ export default function PlayerAchievements({ playerProfileData }) {
         )}
       </div>
       <div className="space-y-3">
-        {[
-          "Player of the Month - March 2025",
-          "Top Scorer U-18 League 2024",
-          "England Youth Call-Up 2024",
-          "FA Youth Cup Finalist 2024",
-          "Academy Player of the Year 2023",
-        ].map((ach) => (
-          <div key={ach} className="flex items-start gap-3">
+        {achievements.map((ach, index) => (
+          <div key={index} className="flex items-start gap-3">
             <div
               className="w-2 h-2 mt-2 rounded-full  flex-shrink-0"
               style={{
                 backgroundColor: theme.colors.primaryCyan,
               }}
             />
-            <p className="text-base text-gray-300">{ach}</p>
+            {isEditing ? (
+              <input
+                type="text"
+                className="text-base text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
+                value={ach}
+                onChange={(e) => handleAchievementChange(index, e.target.value)}
+              />
+            ) : (
+              <p className="text-base text-gray-300">{ach}</p>
+            )}
           </div>
         ))}
       </div>
-      
-      {isEditing && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

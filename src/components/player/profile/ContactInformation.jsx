@@ -1,10 +1,24 @@
 import { Mail, Phone, SquarePen } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function ContactInformation({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
   const { isEditing } = playerProfileData;
+  
+  // Local state for editable contact info
+  const [contactInfo, setContactInfo] = useState({
+    email: "john.doe@email.com",
+    phone: "+44 7700 900000"
+  });
+  
+  // Handler for updating contact info
+  const handleContactChange = (field, value) => {
+    setContactInfo(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
   
   return (
     <div
@@ -30,7 +44,16 @@ export default function ContactInformation({ playerProfileData }) {
               color: theme.colors.primaryCyan,
             }}
           />
-          <span className="text-gray-300">john.doe@email.com</span>
+          {isEditing ? (
+            <input
+              type="email"
+              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+              value={contactInfo.email}
+              onChange={(e) => handleContactChange('email', e.target.value)}
+            />
+          ) : (
+            <span className="text-gray-300">{contactInfo.email}</span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <Phone
@@ -39,17 +62,18 @@ export default function ContactInformation({ playerProfileData }) {
               color: theme.colors.primaryCyan,
             }}
           />
-          <span className="text-gray-300">+44 7700 900000</span>
+          {isEditing ? (
+            <input
+              type="tel"
+              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+              value={contactInfo.phone}
+              onChange={(e) => handleContactChange('phone', e.target.value)}
+            />
+          ) : (
+            <span className="text-gray-300">{contactInfo.phone}</span>
+          )}
         </div>
       </div>
-      
-      {isEditing && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

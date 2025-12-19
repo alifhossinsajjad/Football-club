@@ -1,16 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { SquarePen, Upload } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-export default function PlayerProfileCover({ playerProfileData }) {
+export default function PlayerProfileCover({
+  playerProfileData,
+  setIsEditing,
+  isEditing,
+}) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
-  
+
+  // Local state for editable cover image
+  const [coverImage, setCoverImage] = useState(
+    "/player/profile/profileBanner.png"
+  );
+
   return (
     <div className="relative rounded-xl overflow-hidden">
       <img
-        src="/player/profile/profileBanner.png"
+        src={coverImage}
         alt="Cover"
         className="w-full h-64 lg:h-96 object-cover"
       />
@@ -24,27 +32,31 @@ export default function PlayerProfileCover({ playerProfileData }) {
           style={{
             color: theme.colors.primaryCyan,
           }}
-          onClick={() => console.log('Edit Profile clicked')}
+          onClick={() => setIsEditing(true)}
         >
-          <SquarePen className="w-4 h-4 mr-2" /> Edit Profile
+          <SquarePen className="w-4 h-4 mr-2" />{" "}
+          {isEditing ? "Save Changes" : "Edit Profile"}
         </Button>
         <Button
           variant="outline"
           className="rounded-md"
           style={{ backgroundColor: theme.colors.primaryCyan }}
-          onClick={() => console.log('Boost Profile clicked')}
+          onClick={() => console.log("Boost Profile clicked")}
         >
           <Upload className="w-4 h-4 mr-2" />
           Boost Profile
         </Button>
       </div>
-      
+
       {/* Edit overlay for cover photo */}
       {isEditing && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
+          <div className="text-center">
+            <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm mb-2">
+              <SquarePen className="w-6 h-6 text-white" />
+            </button>
+            <p className="text-white text-sm">Click to change cover image</p>
+          </div>
         </div>
       )}
     </div>

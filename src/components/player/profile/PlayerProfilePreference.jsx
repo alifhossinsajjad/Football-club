@@ -1,10 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
 export default function PlayerProfilePreference({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
   const { isEditing } = playerProfileData;
+  
+  // Local state for editable preferences
+  const [preferences, setPreferences] = useState({
+    preferredLeague: "Premier League, Liga Bundesliga",
+    contractStatus: "Open to Offers",
+    availability: "Available from Summer 2025"
+  });
+  
+  // Handler for updating preferences
+  const handlePreferenceChange = (field, value) => {
+    setPreferences(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
   
   return (
     <div
@@ -23,26 +38,46 @@ export default function PlayerProfilePreference({ playerProfileData }) {
         )}
       </div>
       <div className="space-y-4 flex flex-col gap-2">
-        <p>
-          <div className="text-gray-400 ">Preferred League</div> Premier
-          League, Liga Bundesliga
-        </p>
-        <p>
-          <div className="text-gray-400">Contract Status</div> Open to Offers
-        </p>
-        <p>
-          <div className="text-gray-400">Availability</div> Available from
-          Summer 2025
-        </p>
-      </div>
-      
-      {isEditing && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
+        <div>
+          <div className="text-gray-400 ">Preferred League</div>
+          {isEditing ? (
+            <input
+              type="text"
+              className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
+              value={preferences.preferredLeague}
+              onChange={(e) => handlePreferenceChange('preferredLeague', e.target.value)}
+            />
+          ) : (
+            <p>{preferences.preferredLeague}</p>
+          )}
         </div>
-      )}
+        <div>
+          <div className="text-gray-400">Contract Status</div>
+          {isEditing ? (
+            <input
+              type="text"
+              className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
+              value={preferences.contractStatus}
+              onChange={(e) => handlePreferenceChange('contractStatus', e.target.value)}
+            />
+          ) : (
+            <p>{preferences.contractStatus}</p>
+          )}
+        </div>
+        <div>
+          <div className="text-gray-400">Availability</div>
+          {isEditing ? (
+            <input
+              type="text"
+              className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
+              value={preferences.availability}
+              onChange={(e) => handlePreferenceChange('availability', e.target.value)}
+            />
+          ) : (
+            <p>{preferences.availability}</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

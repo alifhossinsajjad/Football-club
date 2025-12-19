@@ -1,10 +1,26 @@
 import { Facebook, Instagram, SquarePen, Twitter, Youtube } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function SocialMedia({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
   const { isEditing } = playerProfileData;
+  
+  // Local state for editable social media handles
+  const [socialMedia, setSocialMedia] = useState({
+    instagram: "@johndoe_10",
+    twitter: "@johndoe_10",
+    facebook: "@johndoe_10",
+    youtube: "John Doe Football"
+  });
+  
+  // Handler for updating social media handles
+  const handleSocialMediaChange = (platform, value) => {
+    setSocialMedia(prev => ({
+      ...prev,
+      [platform]: value
+    }));
+  };
   
   return (
     <div
@@ -25,7 +41,16 @@ export default function SocialMedia({ playerProfileData }) {
       <div className="space-y-4 text-base">
         <div className="flex items-center gap-3">
           <Instagram className="w-5 h-5 text-[#FF0000]" />
-          <span className="text-gray-300">@johndoe_10</span>
+          {isEditing ? (
+            <input
+              type="text"
+              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+              value={socialMedia.instagram}
+              onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
+            />
+          ) : (
+            <span className="text-gray-300">{socialMedia.instagram}</span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <Twitter
@@ -34,7 +59,16 @@ export default function SocialMedia({ playerProfileData }) {
               color: theme.colors.primaryCyan,
             }}
           />
-          <span className="text-gray-300">@johndoe_10</span>
+          {isEditing ? (
+            <input
+              type="text"
+              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+              value={socialMedia.twitter}
+              onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
+            />
+          ) : (
+            <span className="text-gray-300">{socialMedia.twitter}</span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <Facebook
@@ -43,21 +77,31 @@ export default function SocialMedia({ playerProfileData }) {
               color: theme.colors.primaryCyan,
             }}
           />
-          <span className="text-gray-300">@johndoe_10</span>
+          {isEditing ? (
+            <input
+              type="text"
+              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+              value={socialMedia.facebook}
+              onChange={(e) => handleSocialMediaChange('facebook', e.target.value)}
+            />
+          ) : (
+            <span className="text-gray-300">{socialMedia.facebook}</span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <Youtube className="w-5 h-5 text-[#FF0000]" />
-          <span className="text-gray-300">John Doe Football</span>
+          {isEditing ? (
+            <input
+              type="text"
+              className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
+              value={socialMedia.youtube}
+              onChange={(e) => handleSocialMediaChange('youtube', e.target.value)}
+            />
+          ) : (
+            <span className="text-gray-300">{socialMedia.youtube}</span>
+          )}
         </div>
       </div>
-      
-      {isEditing && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl opacity-0 hover:opacity-100 transition-opacity">
-          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-            <SquarePen className="w-6 h-6 text-white" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }
