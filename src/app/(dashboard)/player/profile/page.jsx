@@ -17,80 +17,116 @@ import PlayerProfilePlayingHistory from "@/components/player/profile/PlayerProfi
 
 export default function PlayerProfilePage() {
   const theme = useSelector((state) => state.theme);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isBoosting, setIsBoosting] = useState(false);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  
+  // Centralized player profile data state
+  const [playerProfileData, setPlayerProfileData] = useState({
+    isEditing: false,
+    isBoosting: false,
+    isEditingProfile: false,
+    // Add other profile data here as needed
+    profile: {
+      name: "John Doe",
+      position: "Forward / Striker",
+      location: "Manchester, United Kingdom",
+      status: "Available",
+      age: "17 years",
+      height: "5'11 (180 cm)",
+      weight: "165 lbs (75 kg)",
+      nationality: "British",
+      preferredFoot: "Right",
+      dateOfBirth: "15/03/2008",
+      jerseyNumber: "#10"
+    }
+  });
 
   const handleEditProfile = () => {
-    setIsEditingProfile(true);
-    setIsEditing(false);
-    setIsBoosting(false);
+    setPlayerProfileData(prev => ({
+      ...prev,
+      isEditingProfile: true,
+      isEditing: false,
+      isBoosting: false
+    }));
   };
 
   const handleBoostProfile = () => {
-    setIsBoosting(true);
-    setIsEditing(false);
-    setIsEditingProfile(false);
+    setPlayerProfileData(prev => ({
+      ...prev,
+      isBoosting: true,
+      isEditing: false,
+      isEditingProfile: false
+    }));
   };
+
   const handleEdit = () => {
-    setIsEditing(true);
-    setIsBoosting(false);
-    setIsEditingProfile(false);
+    setPlayerProfileData(prev => ({
+      ...prev,
+      isEditing: true,
+      isBoosting: false,
+      isEditingProfile: false
+    }));
   };
+
   const handleCancel = () => {
-    setIsEditing(false);
-    setIsBoosting(false);
-    setIsEditingProfile(false);
+    setPlayerProfileData(prev => ({
+      ...prev,
+      isEditing: false,
+      isBoosting: false,
+      isEditingProfile: false
+    }));
   };
+
   const handleBoost = () => {
-    setIsBoosting(false);
-    setIsEditing(false);
-    setIsEditingProfile(false);
+    setPlayerProfileData(prev => ({
+      ...prev,
+      isBoosting: false,
+      isEditing: false,
+      isEditingProfile: false
+    }));
     console.log("Boost Profile");
   };
 
   return (
     <div className="space-y-8 ">
       {/* Cover Photo with Trophies */}
-      <PlayerProfileCover isEditing={isEditing} />
+      <PlayerProfileCover playerProfileData={playerProfileData} />
       {/* Profile Header Card */}
-      <ProfileHeader isEditing={isEditing} />
+      <ProfileHeader playerProfileData={playerProfileData} />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-8">
           {/* About */}
-          <AboutPlayerProfile isEditing={isEditing} />
+          <AboutPlayerProfile playerProfileData={playerProfileData} />
           {/* Career Statistics */}
-          <CareerStatistics isEditing={isEditing} />
+          <CareerStatistics playerProfileData={playerProfileData} />
           {/* Skills & Attributes */}
-          <PlayerProfileSkills isEditing={isEditing} />
+          <PlayerProfileSkills playerProfileData={playerProfileData} />
           {/* Playing History */}
-          <PlayerProfilePlayingHistory isEditing={isEditing} />
+          <PlayerProfilePlayingHistory playerProfileData={playerProfileData} />
         </div>
 
         {/* Right Sidebar */}
         <div className="space-y-8">
           {/* Contact Information */}
-          <ContactInformation isEditing={isEditing} />
+          <ContactInformation playerProfileData={playerProfileData} />
 
           {/* Social Media */}
-          <SocialMedia isEditing={isEditing} />
+          <SocialMedia playerProfileData={playerProfileData} />
 
           {/* Achievements */}
-          <PlayerAchievements isEditing={isEditing} />
+          <PlayerAchievements playerProfileData={playerProfileData} />
 
           {/* Profile Insights */}
-          <PlayerProfileInsights isEditing={isEditing} />
+          <PlayerProfileInsights playerProfileData={playerProfileData} />
 
           {/* Preferences */}
-          <PlayerProfilePreference isEditing={isEditing} />
+          <PlayerProfilePreference playerProfileData={playerProfileData} />
         </div>
       </div>
 
       {/* Highlights Videos */}
-      <HighlightVideosSection isEditing={isEditing} />
+      <HighlightVideosSection playerProfileData={playerProfileData} />
     </div>
   );
 }

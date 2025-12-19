@@ -3,8 +3,10 @@ import { SquarePen, Upload } from "lucide-react";
 import React from "react";
 import { useSelector } from "react-redux";
 
-export default function PlayerProfileCover() {
+export default function PlayerProfileCover({ playerProfileData }) {
   const theme = useSelector((state) => state.theme);
+  const { isEditing } = playerProfileData;
+  
   return (
     <div className="relative rounded-xl overflow-hidden">
       <img
@@ -22,6 +24,7 @@ export default function PlayerProfileCover() {
           style={{
             color: theme.colors.primaryCyan,
           }}
+          onClick={() => console.log('Edit Profile clicked')}
         >
           <SquarePen className="w-4 h-4 mr-2" /> Edit Profile
         </Button>
@@ -29,11 +32,21 @@ export default function PlayerProfileCover() {
           variant="outline"
           className="rounded-md"
           style={{ backgroundColor: theme.colors.primaryCyan }}
+          onClick={() => console.log('Boost Profile clicked')}
         >
           <Upload className="w-4 h-4 mr-2" />
           Boost Profile
         </Button>
       </div>
+      
+      {/* Edit overlay for cover photo */}
+      {isEditing && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
+          <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
+            <SquarePen className="w-6 h-6 text-white" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
