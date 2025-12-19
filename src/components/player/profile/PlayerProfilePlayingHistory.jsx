@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
-export default function PlayerProfilePlayingHistory({ playerProfileData }) {
+export default function PlayerProfilePlayingHistory({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
   
-  // Local state for editable history
-  const [history, setHistory] = useState([
+  // Get history data from playerProfileData or use defaults
+  const initialHistory = playerProfileData.playingHistory || [
     {
       club: "Manchester United Youth Academy",
       years: "2023 - Present",
@@ -26,13 +25,25 @@ export default function PlayerProfilePlayingHistory({ playerProfileData }) {
       note: "Forward",
       description: "Regional Champions 2020",
     },
-  ]);
+  ];
   
-  // Handler for updating history items
+  // Local state for editable history
+  const [editableHistory, setEditableHistory] = useState(initialHistory);
+  
+  // Handle history item changes
   const handleHistoryChange = (index, field, value) => {
-    const updatedHistory = [...history];
-    updatedHistory[index][field] = value;
-    setHistory(updatedHistory);
+    const updatedHistory = [...editableHistory];
+    updatedHistory[index] = {
+      ...updatedHistory[index],
+      [field]: value
+    };
+    
+    setEditableHistory(updatedHistory);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ playingHistory: updatedHistory });
+    }
   };
   
   return (
@@ -52,7 +63,7 @@ export default function PlayerProfilePlayingHistory({ playerProfileData }) {
         )}
       </div>
       <div className="space-y-6 ">
-        {history.map((item, index) => (
+        {editableHistory.map((item, index) => (
           <div
             key={item.club}
             className="flex items-center justify-between py-3 border-b last:border-0 p-4  rounded-md"

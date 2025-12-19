@@ -2,23 +2,32 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
-export default function PlayerProfilePreference({ playerProfileData }) {
+export default function PlayerProfilePreference({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
   
-  // Local state for editable preferences
-  const [preferences, setPreferences] = useState({
+  // Get preferences data from playerProfileData or use defaults
+  const initialPreferences = playerProfileData.preferences || {
     preferredLeague: "Premier League, Liga Bundesliga",
     contractStatus: "Open to Offers",
     availability: "Available from Summer 2025"
-  });
+  };
   
-  // Handler for updating preferences
+  // Local state for editable preferences
+  const [editablePreferences, setEditablePreferences] = useState(initialPreferences);
+  
+  // Handle preference changes
   const handlePreferenceChange = (field, value) => {
-    setPreferences(prev => ({
-      ...prev,
+    const updatedPreferences = {
+      ...editablePreferences,
       [field]: value
-    }));
+    };
+    
+    setEditablePreferences(updatedPreferences);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ preferences: updatedPreferences });
+    }
   };
   
   return (
@@ -44,11 +53,11 @@ export default function PlayerProfilePreference({ playerProfileData }) {
             <input
               type="text"
               className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
-              value={preferences.preferredLeague}
+              value={editablePreferences.preferredLeague}
               onChange={(e) => handlePreferenceChange('preferredLeague', e.target.value)}
             />
           ) : (
-            <p>{preferences.preferredLeague}</p>
+            <p>{initialPreferences.preferredLeague}</p>
           )}
         </div>
         <div>
@@ -57,11 +66,11 @@ export default function PlayerProfilePreference({ playerProfileData }) {
             <input
               type="text"
               className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
-              value={preferences.contractStatus}
+              value={editablePreferences.contractStatus}
               onChange={(e) => handlePreferenceChange('contractStatus', e.target.value)}
             />
           ) : (
-            <p>{preferences.contractStatus}</p>
+            <p>{initialPreferences.contractStatus}</p>
           )}
         </div>
         <div>
@@ -70,11 +79,11 @@ export default function PlayerProfilePreference({ playerProfileData }) {
             <input
               type="text"
               className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
-              value={preferences.availability}
+              value={editablePreferences.availability}
               onChange={(e) => handlePreferenceChange('availability', e.target.value)}
             />
           ) : (
-            <p>{preferences.availability}</p>
+            <p>{initialPreferences.availability}</p>
           )}
         </div>
       </div>

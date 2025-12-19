@@ -2,24 +2,33 @@ import { Facebook, Instagram, SquarePen, Twitter, Youtube } from "lucide-react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-export default function SocialMedia({ playerProfileData }) {
+export default function SocialMedia({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
   
-  // Local state for editable social media handles
-  const [socialMedia, setSocialMedia] = useState({
-    instagram: "@johndoe_10",
-    twitter: "@johndoe_10",
-    facebook: "@johndoe_10",
-    youtube: "John Doe Football"
-  });
+  // Get social media data from playerProfileData or use defaults
+  const initialSocialMedia = playerProfileData.socialMedia || {
+    instagram: "@souravdebnath_10",
+    twitter: "@souravdebnath_10",
+    facebook: "@souravdebnath_10",
+    youtube: "Sourav Debnath Football"
+  };
   
-  // Handler for updating social media handles
+  // Local state for editable social media
+  const [editableSocialMedia, setEditableSocialMedia] = useState(initialSocialMedia);
+  
+  // Handle social media changes
   const handleSocialMediaChange = (platform, value) => {
-    setSocialMedia(prev => ({
-      ...prev,
+    const updatedSocialMedia = {
+      ...editableSocialMedia,
       [platform]: value
-    }));
+    };
+    
+    setEditableSocialMedia(updatedSocialMedia);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ socialMedia: updatedSocialMedia });
+    }
   };
   
   return (
@@ -45,11 +54,11 @@ export default function SocialMedia({ playerProfileData }) {
             <input
               type="text"
               className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-              value={socialMedia.instagram}
+              value={editableSocialMedia.instagram}
               onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
             />
           ) : (
-            <span className="text-gray-300">{socialMedia.instagram}</span>
+            <span className="text-gray-300">{initialSocialMedia.instagram}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -63,11 +72,11 @@ export default function SocialMedia({ playerProfileData }) {
             <input
               type="text"
               className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-              value={socialMedia.twitter}
+              value={editableSocialMedia.twitter}
               onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
             />
           ) : (
-            <span className="text-gray-300">{socialMedia.twitter}</span>
+            <span className="text-gray-300">{initialSocialMedia.twitter}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -81,11 +90,11 @@ export default function SocialMedia({ playerProfileData }) {
             <input
               type="text"
               className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-              value={socialMedia.facebook}
+              value={editableSocialMedia.facebook}
               onChange={(e) => handleSocialMediaChange('facebook', e.target.value)}
             />
           ) : (
-            <span className="text-gray-300">{socialMedia.facebook}</span>
+            <span className="text-gray-300">{initialSocialMedia.facebook}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -94,11 +103,11 @@ export default function SocialMedia({ playerProfileData }) {
             <input
               type="text"
               className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-              value={socialMedia.youtube}
+              value={editableSocialMedia.youtube}
               onChange={(e) => handleSocialMediaChange('youtube', e.target.value)}
             />
           ) : (
-            <span className="text-gray-300">{socialMedia.youtube}</span>
+            <span className="text-gray-300">{initialSocialMedia.youtube}</span>
           )}
         </div>
       </div>

@@ -2,24 +2,33 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
-export default function CareerStatistics({ playerProfileData }) {
+export default function CareerStatistics({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
   
-  // Local state for editable statistics
-  const [stats, setStats] = useState({
+  // Get statistics from playerProfileData or use defaults
+  const initialStats = playerProfileData.statistics || {
     matches: 28,
     goals: 19,
     assists: 12,
     minutes: 2340
-  });
+  };
   
-  // Handler for updating stats
+  // Local state for editable fields
+  const [editableStats, setEditableStats] = useState(initialStats);
+  
+  // Handle stat changes
   const handleStatChange = (stat, value) => {
-    setStats(prev => ({
-      ...prev,
-      [stat]: value
-    }));
+    const updatedStats = {
+      ...editableStats,
+      [stat]: parseInt(value) || 0
+    };
+    
+    setEditableStats(updatedStats);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ statistics: updatedStats });
+    }
   };
   
   return (
@@ -53,11 +62,11 @@ export default function CareerStatistics({ playerProfileData }) {
               <input
                 type="number"
                 className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.matches}
-                onChange={(e) => handleStatChange('matches', parseInt(e.target.value) || 0)}
+                value={editableStats.matches}
+                onChange={(e) => handleStatChange('matches', e.target.value)}
               />
             ) : (
-              stats.matches
+              initialStats.matches
             )}
           </div>
           <p className="text-sm text-gray-400 mt-2">Matches</p>
@@ -74,11 +83,11 @@ export default function CareerStatistics({ playerProfileData }) {
               <input
                 type="number"
                 className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.goals}
-                onChange={(e) => handleStatChange('goals', parseInt(e.target.value) || 0)}
+                value={editableStats.goals}
+                onChange={(e) => handleStatChange('goals', e.target.value)}
               />
             ) : (
-              stats.goals
+              initialStats.goals
             )}
           </div>
           <p className="text-sm text-gray-400 mt-2">Goals</p>
@@ -95,11 +104,11 @@ export default function CareerStatistics({ playerProfileData }) {
               <input
                 type="number"
                 className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.assists}
-                onChange={(e) => handleStatChange('assists', parseInt(e.target.value) || 0)}
+                value={editableStats.assists}
+                onChange={(e) => handleStatChange('assists', e.target.value)}
               />
             ) : (
-              stats.assists
+              initialStats.assists
             )}
           </div>
           <p className="text-sm text-gray-400 mt-2">Assists</p>
@@ -119,11 +128,11 @@ export default function CareerStatistics({ playerProfileData }) {
               <input
                 type="number"
                 className="text-3xl font-bold bg-transparent text-center w-full focus:outline-none border-b border-cyan-500"
-                value={stats.minutes}
-                onChange={(e) => handleStatChange('minutes', parseInt(e.target.value) || 0)}
+                value={editableStats.minutes}
+                onChange={(e) => handleStatChange('minutes', e.target.value)}
               />
             ) : (
-              stats.minutes.toLocaleString()
+              initialStats.minutes.toLocaleString()
             )}
           </div>
           <p className="text-sm text-gray-400 mt-2">Minutes</p>

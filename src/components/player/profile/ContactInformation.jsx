@@ -2,22 +2,31 @@ import { Mail, Phone, SquarePen } from "lucide-react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-export default function ContactInformation({ playerProfileData }) {
+export default function ContactInformation({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
+  
+  // Get contact info from playerProfileData or use defaults
+  const initialContactInfo = playerProfileData.contact || {
+    email: "sourav.debnath@email.com",
+    phone: "+44 7700 900000"
+  };
   
   // Local state for editable contact info
-  const [contactInfo, setContactInfo] = useState({
-    email: "john.doe@email.com",
-    phone: "+44 7700 900000"
-  });
+  const [editableContactInfo, setEditableContactInfo] = useState(initialContactInfo);
   
-  // Handler for updating contact info
+  // Handle contact info changes
   const handleContactChange = (field, value) => {
-    setContactInfo(prev => ({
-      ...prev,
+    const updatedContactInfo = {
+      ...editableContactInfo,
       [field]: value
-    }));
+    };
+    
+    setEditableContactInfo(updatedContactInfo);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ contact: updatedContactInfo });
+    }
   };
   
   return (
@@ -48,11 +57,11 @@ export default function ContactInformation({ playerProfileData }) {
             <input
               type="email"
               className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-              value={contactInfo.email}
+              value={editableContactInfo.email}
               onChange={(e) => handleContactChange('email', e.target.value)}
             />
           ) : (
-            <span className="text-gray-300">{contactInfo.email}</span>
+            <span className="text-gray-300">{initialContactInfo.email}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -66,11 +75,11 @@ export default function ContactInformation({ playerProfileData }) {
             <input
               type="tel"
               className="text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-              value={contactInfo.phone}
+              value={editableContactInfo.phone}
               onChange={(e) => handleContactChange('phone', e.target.value)}
             />
           ) : (
-            <span className="text-gray-300">{contactInfo.phone}</span>
+            <span className="text-gray-300">{initialContactInfo.phone}</span>
           )}
         </div>
       </div>

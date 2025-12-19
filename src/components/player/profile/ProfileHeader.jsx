@@ -1,22 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import PlayerTitle from "../playerTitle";
 import { Calendar, Flag, MapPin, Ruler, SquarePen, Weight } from "lucide-react";
 import Image from "next/image";
 
-export default function ProfileHeader({ playerProfileData }) {
+export default function ProfileHeader({ playerProfileData, isEditing, updateProfileField }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
+  const profileData = playerProfileData.profile;
+  const fileInputRef = useRef(null);
   
   // Local state for editable fields
-  const [profileData, setProfileData] = useState(playerProfileData.profile);
+  const [editableProfileData, setEditableProfileData] = useState(profileData);
   
-  // Handler for updating profile data
-  const handleProfileChange = (field, value) => {
-    setProfileData(prev => ({
+  // Handle input changes
+  const handleInputChange = (field, value) => {
+    setEditableProfileData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Update the parent state
+    if (updateProfileField) {
+      updateProfileField(field, value);
+    }
+  };
+  
+  // Handle profile image change
+  const handleProfileImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && updateProfileField) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        // Update the parent state with new profile image
+        updateProfileField('profileImage', event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Trigger file input click
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
   };
   
   return (
@@ -33,14 +57,22 @@ export default function ProfileHeader({ playerProfileData }) {
           <div className=" ">
             <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-full  overflow-hidden relative">
               <Image
-                alt="John Doe"
+                alt={profileData.name}
                 width={400}
                 height={400}
-                src="/player/profile/profile.png"
+                src={playerProfileData.profileImage || "/player/profile/profile.png"}
                 className="w-full h-full object-cover"
               />
+              {/* Hidden file input for profile image */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleProfileImageChange}
+              />
               {isEditing && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full cursor-pointer" onClick={triggerFileInput}>
                   <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm">
                     <SquarePen className="w-6 h-6 text-white" />
                   </button>
@@ -57,8 +89,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-2xl font-bold text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 mb-2"
-                    value={profileData.name}
-                    onChange={(e) => handleProfileChange('name', e.target.value)}
+                    value={editableProfileData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
                   />
                 ) : (
                   <PlayerTitle title={profileData.name} />
@@ -67,8 +99,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-xl text-gray-300 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 mb-2"
-                    value={profileData.position}
-                    onChange={(e) => handleProfileChange('position', e.target.value)}
+                    value={editableProfileData.position}
+                    onChange={(e) => handleInputChange('position', e.target.value)}
                   />
                 ) : (
                   <p className="text-xl text-gray-300">{profileData.position}</p>
@@ -79,8 +111,8 @@ export default function ProfileHeader({ playerProfileData }) {
                     <input
                       type="text"
                       className="text-base text-gray-500 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                      value={profileData.location}
-                      onChange={(e) => handleProfileChange('location', e.target.value)}
+                      value={editableProfileData.location}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
                     />
                   </div>
                 ) : (
@@ -118,8 +150,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-base bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={profileData.age}
-                    onChange={(e) => handleProfileChange('age', e.target.value)}
+                    value={editableProfileData.age}
+                    onChange={(e) => handleInputChange('age', e.target.value)}
                   />
                 ) : (
                   <p className="text-base ">{profileData.age}</p>
@@ -142,8 +174,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-base bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={profileData.height}
-                    onChange={(e) => handleProfileChange('height', e.target.value)}
+                    value={editableProfileData.height}
+                    onChange={(e) => handleInputChange('height', e.target.value)}
                   />
                 ) : (
                   <p className="text-base ">{profileData.height}</p>
@@ -165,8 +197,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-base bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={profileData.weight}
-                    onChange={(e) => handleProfileChange('weight', e.target.value)}
+                    value={editableProfileData.weight}
+                    onChange={(e) => handleInputChange('weight', e.target.value)}
                   />
                 ) : (
                   <p className="text-base ">{profileData.weight}</p>
@@ -188,8 +220,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-base bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={profileData.nationality}
-                    onChange={(e) => handleProfileChange('nationality', e.target.value)}
+                    value={editableProfileData.nationality}
+                    onChange={(e) => handleInputChange('nationality', e.target.value)}
                   />
                 ) : (
                   <p className="text-base   gap-2">{profileData.nationality}</p>
@@ -205,8 +237,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={profileData.preferredFoot}
-                    onChange={(e) => handleProfileChange('preferredFoot', e.target.value)}
+                    value={editableProfileData.preferredFoot}
+                    onChange={(e) => handleInputChange('preferredFoot', e.target.value)}
                   />
                 ) : (
                   <p>{profileData.preferredFoot}</p>
@@ -218,8 +250,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={profileData.dateOfBirth}
-                    onChange={(e) => handleProfileChange('dateOfBirth', e.target.value)}
+                    value={editableProfileData.dateOfBirth}
+                    onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
                   />
                 ) : (
                   <p>{profileData.dateOfBirth}</p>
@@ -231,8 +263,8 @@ export default function ProfileHeader({ playerProfileData }) {
                   <input
                     type="text"
                     className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={profileData.jerseyNumber}
-                    onChange={(e) => handleProfileChange('jerseyNumber', e.target.value)}
+                    value={editableProfileData.jerseyNumber}
+                    onChange={(e) => handleInputChange('jerseyNumber', e.target.value)}
                   />
                 ) : (
                   <p>{profileData.jerseyNumber}</p>

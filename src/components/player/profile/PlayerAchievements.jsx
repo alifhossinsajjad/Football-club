@@ -2,24 +2,32 @@ import { Award, SquarePen } from "lucide-react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-export default function PlayerAchievements({ playerProfileData }) {
+export default function PlayerAchievements({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
   
-  // Local state for editable achievements
-  const [achievements, setAchievements] = useState([
+  // Get achievements data from playerProfileData or use defaults
+  const initialAchievements = playerProfileData.achievements || [
     "Player of the Month - March 2025",
     "Top Scorer U-18 League 2024",
     "England Youth Call-Up 2024",
     "FA Youth Cup Finalist 2024",
     "Academy Player of the Year 2023",
-  ]);
+  ];
   
-  // Handler for updating achievements
+  // Local state for editable achievements
+  const [editableAchievements, setEditableAchievements] = useState(initialAchievements);
+  
+  // Handle achievement changes
   const handleAchievementChange = (index, value) => {
-    const updatedAchievements = [...achievements];
+    const updatedAchievements = [...editableAchievements];
     updatedAchievements[index] = value;
-    setAchievements(updatedAchievements);
+    
+    setEditableAchievements(updatedAchievements);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ achievements: updatedAchievements });
+    }
   };
   
   return (
@@ -45,7 +53,7 @@ export default function PlayerAchievements({ playerProfileData }) {
         )}
       </div>
       <div className="space-y-3">
-        {achievements.map((ach, index) => (
+        {editableAchievements.map((ach, index) => (
           <div key={index} className="flex items-start gap-3">
             <div
               className="w-2 h-2 mt-2 rounded-full  flex-shrink-0"

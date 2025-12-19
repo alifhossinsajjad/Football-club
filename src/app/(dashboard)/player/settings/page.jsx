@@ -7,7 +7,7 @@ export default function SettingsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/player/settings/general");
+    router.push("/player/settings/account");
   }, [router]);
 
   return null;

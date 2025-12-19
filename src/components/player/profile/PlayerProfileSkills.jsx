@@ -2,25 +2,36 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
-export default function PlayerProfileSkills({ playerProfileData }) {
+export default function PlayerProfileSkills({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
   
-  // Local state for editable skills
-  const [skills, setSkills] = useState([
+  // Get skills data from playerProfileData or use defaults
+  const initialSkills = playerProfileData.skills || [
     { skill: "Pace", value: 92 },
     { skill: "Shooting", value: 88 },
     { skill: "Dribbling", value: 90 },
     { skill: "Passing", value: 85 },
     { skill: "Physical", value: 82 },
     { skill: "Technical", value: 89 },
-  ]);
+  ];
   
-  // Handler for updating skill values
+  // Local state for editable skills
+  const [editableSkills, setEditableSkills] = useState(initialSkills);
+  
+  // Handle skill value changes
   const handleSkillChange = (index, value) => {
-    const updatedSkills = [...skills];
-    updatedSkills[index].value = parseInt(value) || 0;
-    setSkills(updatedSkills);
+    const updatedSkills = [...editableSkills];
+    updatedSkills[index] = {
+      ...updatedSkills[index],
+      value: parseInt(value) || 0
+    };
+    
+    setEditableSkills(updatedSkills);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ skills: updatedSkills });
+    }
   };
   
   return (
@@ -40,7 +51,7 @@ export default function PlayerProfileSkills({ playerProfileData }) {
         )}
       </div>
       <div className="space-y-4">
-        {skills.map(({ skill, value }, index) => (
+        {editableSkills.map(({ skill, value }, index) => (
           <div key={skill}>
             <div className="flex justify-between mb-1">
               <span className="text-white">{skill}</span>

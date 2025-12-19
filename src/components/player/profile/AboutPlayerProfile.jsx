@@ -2,17 +2,30 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { SquarePen } from "lucide-react";
 
-export default function AboutPlayerProfile({ playerProfileData }) {
+export default function AboutPlayerProfile({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
-  const [aboutText, setAboutText] = useState(
-    "Highly skilled and dedicated forward with exceptional technical " +
+  
+  // Get about text from playerProfileData or use default
+  const initialAboutText = playerProfileData.about || "Highly skilled and dedicated forward with exceptional technical " +
     "abilities and a strong goal-scoring record. Known for excellent ball " +
     "control, pace, and tactical awareness. Currently playing for Manchester " +
     "United Youth Academy and representing England U-18 National Team. " +
     "Passionate about developing my skills and pursuing a professional career " +
-    "in football at the highest level."
-  );
+    "in football at the highest level.";
+  
+  // Local state for editable field
+  const [editableAboutText, setEditableAboutText] = useState(initialAboutText);
+  
+  // Handle textarea changes
+  const handleTextareaChange = (e) => {
+    const newValue = e.target.value;
+    setEditableAboutText(newValue);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ about: newValue });
+    }
+  };
   
   return (
     <div
@@ -38,13 +51,13 @@ export default function AboutPlayerProfile({ playerProfileData }) {
             backgroundColor: theme.colors.backgroundDark,
             borderColor: `${theme.colors.primaryCyan}33`,
           }}
-          value={aboutText}
-          onChange={(e) => setAboutText(e.target.value)}
+          value={editableAboutText}
+          onChange={handleTextareaChange}
           rows={6}
         />
       ) : (
         <p className="text-gray-300 leading-relaxed">
-          {aboutText}
+          {initialAboutText}
         </p>
       )}
     </div>

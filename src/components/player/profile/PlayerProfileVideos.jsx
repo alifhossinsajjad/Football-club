@@ -6,12 +6,11 @@ import { Upload, Play, SquarePen } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
-export default function HighlightVideosSection({ playerProfileData }) {
+export default function HighlightVideosSection({ playerProfileData, isEditing, updatePlayerProfileData }) {
   const theme = useSelector((state) => state.theme);
-  const { isEditing } = playerProfileData;
   
-  // Local state for editable video data
-  const [videos, setVideos] = useState([
+  // Get video data from playerProfileData or use defaults
+  const initialVideos = playerProfileData.videos || [
     {
       id: 1,
       src: "/player/profile/highlight1.jpg",
@@ -26,13 +25,23 @@ export default function HighlightVideosSection({ playerProfileData }) {
       title: "Season Highlights 2024/25 - Part 2",
       duration: "3:45 minutes"
     }
-  ]);
+  ];
   
-  // Handler for updating video data
-  const handleVideoChange = (index, field, value) => {
-    const updatedVideos = [...videos];
-    updatedVideos[index][field] = value;
-    setVideos(updatedVideos);
+  // Local state for editable videos
+  const [editableVideos, setEditableVideos] = useState(initialVideos);
+  
+  // Handle video changes
+  const handleVideoChange = (id, field, value) => {
+    const updatedVideos = editableVideos.map(video => 
+      video.id === id ? { ...video, [field]: value } : video
+    );
+    
+    setEditableVideos(updatedVideos);
+    
+    // Update the parent state
+    if (updatePlayerProfileData) {
+      updatePlayerProfileData({ videos: updatedVideos });
+    }
   };
 
   return (
@@ -55,7 +64,7 @@ export default function HighlightVideosSection({ playerProfileData }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6  ">
-        {videos.map((video, index) => (
+        {editableVideos.map((video) => (
           <div key={video.id} className="relative group cursor-pointer rounded-lg overflow-hidden">
             <Image
               width={400}
@@ -73,7 +82,7 @@ export default function HighlightVideosSection({ playerProfileData }) {
                   type="text"
                   className="text-white font-medium bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
                   value={video.title}
-                  onChange={(e) => handleVideoChange(index, 'title', e.target.value)}
+                  onChange={(e) => handleVideoChange(video.id, 'title', e.target.value)}
                 />
               ) : (
                 <p className="text-white font-medium">{video.title}</p>
@@ -83,7 +92,7 @@ export default function HighlightVideosSection({ playerProfileData }) {
                   type="text"
                   className="text-sm text-gray-400 bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500 w-full"
                   value={video.duration}
-                  onChange={(e) => handleVideoChange(index, 'duration', e.target.value)}
+                  onChange={(e) => handleVideoChange(video.id, 'duration', e.target.value)}
                 />
               ) : (
                 <p className="text-sm text-gray-400">{video.duration}</p>
