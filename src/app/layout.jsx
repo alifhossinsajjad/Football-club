@@ -2,7 +2,7 @@ import "./globals.css";
 import { StoreProvider } from "@/store/StoreProvider";
 
 export const metadata = {
-  title: "NextGen Pros - Admin Dashboard",
+  title: "NextGen Pros",
   description:
     "Next-generation digital platform for youth football talent discovery",
 };
