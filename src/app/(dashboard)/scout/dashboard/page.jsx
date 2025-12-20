@@ -2,13 +2,13 @@
 
 import { useSelector } from "react-redux";
 import { Eye, MessageSquare, Calendar, StarIcon, Star } from "lucide-react";
-import StateCard from "@/components/ui/player/StateCard";
-import MessageItem from "@/components/ui/player/MessageItem";
 import { Button } from "@/components/ui/button";
 import GradientTitle from "@/components/scout/reusable/GradientTitle";
 import StatCards from "@/components/ui/scout/StatCards";
 import ShortlistedPlayerCard from "@/components/ui/scout/ShortlistedPlayerCard";
 import UpcomingEvent from "@/components/ui/scout/UpcomingEvent";
+import Messages from "@/components/ui/scout/Messages";
+import RecentPlayerView from "@/components/ui/scout/RecentPlayerView";
 
 export default function ScoutDashboard() {
   //   const theme = useSelector((state) => state.theme);
@@ -149,63 +149,112 @@ export default function ScoutDashboard() {
               size="icon"
               className="flex items-center gap-2 w-full"
             >
-              <span className=""> View All Events</span>
+              <span className="text-[#00E5FF]"> View All Events</span>
             </Button>
           </div>
         </div>
       </div>
-
-      {/* Recent Messages */}
-      <div
-        className="border rounded-lg p-4 lg:p-6"
-        style={{
-          backgroundColor: theme.colors.backgroundCard,
-          borderColor: `${theme.colors.primaryCyan}33`,
-        }}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-white flex items-center gap-3">
-            <MessageSquare
-              className="w-5 h-5"
-              style={{ color: theme.colors.primaryCyan }}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* recent players view */}
+        <div
+          className="border rounded-lg p-4 lg:p-6"
+          style={{
+            backgroundColor: theme.colors.backgroundCard,
+            borderColor: `${theme.colors.primaryCyan}33`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+              Recent Player Views
+            </h2>
+          </div>
+          <div className="space-y-4">
+            <RecentPlayerView
+              logo="/Scout/Shortlisted-player/John.png"
+              name="Player 1"
+              role="Midfielder"
+              country="Spain"
+              time="2h ago"
+              unread={true}
+              theme={theme}
             />
-            Recent Messages
-          </h2>
+            <RecentPlayerView
+              logo="/Scout/Shortlisted-player/Sarah.png"
+              name="Player 2"
+              role="Midfielder"
+              country="Spain"
+              time="2h ago"
+              unread={true}
+              theme={theme}
+            />
+            <RecentPlayerView
+              logo="/Scout/Shortlisted-player/Mike.png"
+              name="Player 1"
+              role="Midfielder"
+              country="Spain"
+              time="2h ago"
+              unread={true}
+              theme={theme}
+            />
+            <RecentPlayerView
+              logo="/Scout/Shortlisted-player/John.png"
+              name="Player 1"
+              role="Midfielder"
+              country="Spain"
+              time="2h ago"
+              unread={true}
+              theme={theme}
+            />
+          </div>
         </div>
-        <div className="space-y-4">
-          <MessageItem
-            logo="/player/dashboard/Elite.png"
-            name="FC Barcelona Youth"
-            message="We are interested in your profile..."
-            time="2h ago"
-            unread={true}
-            theme={theme}
-          />
-          <MessageItem
-            logo="/player/dashboard/mike.png"
-            name="Mike Scout"
-            message="Great highlight reel! Would love to..."
-            time="5h ago"
-            unread={true}
-            theme={theme}
-          />
-          <MessageItem
-            logo="/player/dashboard/Elite.png"
-            name="Real Madrid Academy"
-            message="Thank you for your interest..."
-            time="1d ago"
-            unread={false}
-            theme={theme}
-          />
-        </div>
-        <div className="px-4 pt-6">
-          <Button
-            variant="outline"
-            size="icon"
-            className="flex items-center gap-2 w-full"
-          >
-            <span className=""> View All Messages</span>
-          </Button>
+        {/* Recent Messages */}
+        <div
+          className="border rounded-lg p-4 lg:p-6"
+          style={{
+            backgroundColor: theme.colors.backgroundCard,
+            borderColor: `${theme.colors.primaryCyan}33`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+              Recent Messages
+            </h2>
+          </div>
+          <div className="space-y-4">
+            <Messages
+              logo="/Scout/Shortlisted-player/John.png"
+              name="FC Barcelona Youth"
+              message="We are interested in your profile..."
+              time="2h ago"
+              unread={true}
+              theme={theme}
+            />
+            <Messages
+              logo="/player/dashboard/mike.png"
+              name="Mike Scout"
+              message="Great highlight reel! Would love to..."
+              time="5h ago"
+              unread={true}
+              theme={theme}
+            />
+            <Messages
+              logo="/Scout/Shortlisted-player/Sarah.png"
+              name="Real Madrid Academy"
+              message="Thank you for your interest..."
+              time="1d ago"
+              unread={false}
+              theme={theme}
+            />
+            <div className="px-4 pt-6">
+              <Button
+                variant="outline"
+                size="icon"
+                className="flex items-center gap-2 w-full"
+              >
+                <span className="text-[#00E5FF]"> View All Messages</span>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

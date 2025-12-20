@@ -3,6 +3,7 @@
 import { useSelector } from "react-redux";
 import ScoutSidebar from "@/components/scout/layout/ScoutSidebar";
 import ScoutTopbar from "@/components/scout/layout/ScoutTopbar";
+import ScoutFooter from "@/components/scout/layout/ScoutFooter";
 
 export default function ScoutLayout({ children }) {
   const theme = useSelector((state) => state.theme);
@@ -19,6 +20,7 @@ export default function ScoutLayout({ children }) {
 
       {/* Main Content - Responsive */}
       <main className="lg:ml-64 mt-20 p-4 lg:p-8">{children}</main>
+      <ScoutFooter />
     </div>
   );
 }
