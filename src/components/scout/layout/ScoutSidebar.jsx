@@ -7,25 +7,34 @@ import Image from "next/image";
 import { useState } from "react";
 import {
   LayoutDashboard,
-  Calendar,
-  CreditCard,
-  MessageSquare,
-  Settings,
   X,
   Menu,
+  Users,
+  Building,
+  CalendarSearch,
+  ShieldIcon,
+  InboxIcon,
+  Settings2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { path: "/player/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { path: "/player/events", icon: Calendar, label: "Event Management" },
-  { path: "/player/messages", icon: MessageSquare, label: "Messages" },
+  { path: "/scout/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/scout/player-discovery", icon: Users, label: "Player Discovery" },
+  { path: "/scout/club-directory", icon: Building, label: "Club Directory" },
   {
-    path: "/player/subscription",
-    icon: CreditCard,
-    label: "Subscription Tracking",
+    path: "/scout/events",
+    icon: CalendarSearch,
+    label: "Events",
   },
-  { path: "/player/settings", icon: Settings, label: "Settings" },
+
+  {
+    path: "/scout/scout-directory",
+    icon: ShieldIcon,
+    label: "Scout Directory",
+  },
+  { path: "/scout/messaging", icon: InboxIcon, label: "Messaging" },
+  { path: "/scout/settings", icon: Settings2, label: "Settings" },
 ];
 
 export default function ScoutSidebar() {
@@ -113,29 +122,12 @@ export default function ScoutSidebar() {
                     href={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 relative",
-                      isActive ? "text-white" : "text-gray-400 hover:text-white"
-                    )}
-                    style={
+                      "sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-200",
+                      "rounded-[10px] border border-transparent",
                       isActive
-                        ? {
-                            background: `linear-gradient(90deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
-                            borderTop: `1.25px solid ${theme.colors.primaryCyan}4D`,
-                          }
-                        : {
-                            backgroundColor: "transparent",
-                          }
-                    }
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = `${theme.colors.backgroundDark}4D`;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                      }
-                    }}
+                        ? "text-white active"
+                        : "text-gray-400 hover:text-white"
+                    )}
                   >
                     <Icon
                       className="w-5 h-5"
