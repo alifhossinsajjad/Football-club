@@ -8,7 +8,7 @@ const initialState = {
     primaryMagenta: '#9C27B0',
     backgroundDark: '#0B0D2C',
     backgroundCard: '#12143A',
-    neonAccent: '#14F1D9'
+    neonAccent: '#04B5A3'
   }
 }
 
