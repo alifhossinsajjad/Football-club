@@ -25,7 +25,7 @@ export default function CreateArticlePage() {
   return (
     <div className="min-h-screen p-4 lg:p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <button
           onClick={() => router.back()}
           className="flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:scale-110"
@@ -51,9 +51,9 @@ export default function CreateArticlePage() {
             Create Article
           </h1>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <button 
-            className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
             style={{
               backgroundColor: 'transparent',
               border: `1px solid ${theme.colors.primaryCyan}33`,
@@ -63,7 +63,7 @@ export default function CreateArticlePage() {
             Cancel
           </button>
           <button 
-            className="px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105"
             style={{
               backgroundColor: '#04B5A3',
               backgroundImage: 'none'
@@ -76,7 +76,7 @@ export default function CreateArticlePage() {
 
       {/* Form Container - Full Width */}
       <div 
-        className="rounded-lg border p-8"
+        className="rounded-lg border p-4 sm:p-6 lg:p-8 w-full max-w-full overflow-hidden"
         style={{
           backgroundColor: theme.colors.backgroundCard,
           borderColor: `${theme.colors.primaryCyan}33`
@@ -185,7 +185,7 @@ export default function CreateArticlePage() {
             onChange={(e) => setFormData({...formData, excerpt: e.target.value})}
             placeholder="Write a brief summary (150-160 characters recommended for SEO)..."
             rows={3}
-            className="w-full px-4 py-3 rounded-lg resize-none"
+            className="w-full max-w-full px-4 py-3 rounded-lg resize-none"
             style={{
               backgroundColor: theme.colors.backgroundDark,
               borderColor: `${theme.colors.primaryCyan}33`,
@@ -195,47 +195,48 @@ export default function CreateArticlePage() {
           />
         </div>
 
-        {/* Article Content */}
-        <div className="mb-6">
+        {/* Article Content - FIXED */}
+        <div className="mb-6 w-full max-w-full">
           <label className="block text-white font-semibold mb-2">
             Article Content <span style={{ color: '#EF4444' }}>*</span>
           </label>
           
-          {/* Text Editor Toolbar */}
+          {/* Text Editor Toolbar - FIXED */}
           <div 
-            className="flex items-center gap-1 p-2 rounded-t-lg border-b"
+            className="flex items-center gap-1 p-2 rounded-t-lg border-b overflow-x-auto"
             style={{
               backgroundColor: theme.colors.backgroundDark,
-              borderColor: `${theme.colors.primaryCyan}33`
+              borderColor: `${theme.colors.primaryCyan}33`,
+              maxWidth: '100%'
             }}
           >
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <Bold className="w-4 h-4 text-gray-400" />
             </button>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <Italic className="w-4 h-4 text-gray-400" />
             </button>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <Underline className="w-4 h-4 text-gray-400" />
             </button>
-            <div className="w-px h-6 bg-gray-700 mx-1"></div>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <div className="w-px h-6 bg-gray-700 mx-1 flex-shrink-0"></div>
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <Heading1 className="w-4 h-4 text-gray-400" />
             </button>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <Heading2 className="w-4 h-4 text-gray-400" />
             </button>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <Heading3 className="w-4 h-4 text-gray-400" />
             </button>
-            <div className="w-px h-6 bg-gray-700 mx-1"></div>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <div className="w-px h-6 bg-gray-700 mx-1 flex-shrink-0"></div>
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <LinkIcon className="w-4 h-4 text-gray-400" />
             </button>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <ImageIcon className="w-4 h-4 text-gray-400" />
             </button>
-            <button className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <button className="p-2 rounded hover:bg-gray-700 transition-colors flex-shrink-0">
               <List className="w-4 h-4 text-gray-400" />
             </button>
           </div>
@@ -245,13 +246,20 @@ export default function CreateArticlePage() {
             onChange={(e) => setFormData({...formData, content: e.target.value})}
             placeholder="Start writing your article..."
             rows={15}
-            className="w-full px-4 py-3 rounded-b-lg resize-none font-mono text-sm"
+            className="w-full max-w-full px-4 py-3 rounded-b-lg font-mono text-sm resize-y"
             style={{
               backgroundColor: theme.colors.backgroundDark,
               borderColor: `${theme.colors.primaryCyan}33`,
               border: `1px solid ${theme.colors.primaryCyan}33`,
               borderTop: 'none',
-              color: '#FFFFFF'
+              color: '#FFFFFF',
+              minHeight: '300px',
+              maxHeight: '600px',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              wordWrap: 'break-word',
+              wordBreak: 'break-word',
+              whiteSpace: 'pre-wrap'
             }}
           />
           <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
@@ -270,7 +278,7 @@ export default function CreateArticlePage() {
               onChange={(e) => setFormData({...formData, metaDescription: e.target.value})}
               placeholder="SEO meta description (150-160 characters)..."
               rows={2}
-              className="w-full px-4 py-3 rounded-lg resize-none"
+              className="w-full max-w-full px-4 py-3 rounded-lg resize-none"
               style={{
                 backgroundColor: theme.colors.backgroundDark,
                 borderColor: `${theme.colors.primaryCyan}33`,

@@ -55,7 +55,7 @@ export default function EditCategoryPage() {
   return (
     <div className="min-h-screen p-4 lg:p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <button
           onClick={() => router.back()}
           className="flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:scale-110"
@@ -82,9 +82,9 @@ export default function EditCategoryPage() {
           </h1>
           <p className="text-gray-400 text-sm mt-1">Modify category settings and properties</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <button 
-            className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
             style={{
               backgroundColor: 'transparent',
               border: `1px solid ${theme.colors.primaryCyan}33`,
@@ -94,7 +94,7 @@ export default function EditCategoryPage() {
             Cancel
           </button>
           <button 
-            className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
             style={{
               backgroundColor: 'rgba(239, 68, 68, 0.2)',
               color: '#EF4444'
@@ -104,7 +104,7 @@ export default function EditCategoryPage() {
             Delete Category
           </button>
           <button 
-            className="px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105 flex items-center justify-center gap-2"
             style={{
               backgroundColor: '#04B5A3',
               backgroundImage: 'none'
@@ -138,7 +138,7 @@ export default function EditCategoryPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Category Information Card */}
           <div 
-            className="rounded-lg border p-6"
+            className="rounded-lg border p-4 sm:p-6"
             style={{
               backgroundColor: theme.colors.backgroundCard,
               borderColor: `${theme.colors.primaryCyan}33`
@@ -224,7 +224,7 @@ export default function EditCategoryPage() {
 
           {/* SEO Settings - Separate Card */}
           <div 
-            className="rounded-lg border p-6"
+            className="rounded-lg border p-4 sm:p-6"
             style={{
               backgroundColor: theme.colors.backgroundCard,
               borderColor: `${theme.colors.primaryCyan}33`

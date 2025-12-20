@@ -31,7 +31,7 @@ export default function ArticlePreviewPage() {
   return (
     <div className="min-h-screen p-4 lg:p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <button
           onClick={() => router.back()}
           className="flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:scale-110"
@@ -59,7 +59,7 @@ export default function ArticlePreviewPage() {
         </div>
         <button 
           onClick={() => router.push('/admin/news/1/edit')}
-          className="px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105"
+          className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105"
           style={{
             backgroundColor: '#04B5A3',
             backgroundImage: 'none'
@@ -88,7 +88,7 @@ export default function ArticlePreviewPage() {
 
       {/* Article Content - Full Width */}
       <div 
-        className="rounded-lg border p-8"
+        className="rounded-lg border p-4 sm:p-6 lg:p-8"
         style={{
           backgroundColor: theme.colors.backgroundCard,
           borderColor: `${theme.colors.primaryCyan}33`
@@ -122,9 +122,9 @@ export default function ArticlePreviewPage() {
         </h1>
 
         {/* Author and Date */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden">
+            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
               <Image
                 src="/author.jpg"
                 alt="Admin"
@@ -138,14 +138,16 @@ export default function ArticlePreviewPage() {
               <div className="text-gray-400 text-xs">Author</div>
             </div>
           </div>
-          <div className="h-8 w-px bg-gray-700"></div>
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
-            <span className="text-gray-400">Published on 2025-01-10</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <TrendingUp className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
-            <span className="text-gray-400">Trending in Training</span>
+          <div className="hidden sm:block h-8 w-px bg-gray-700"></div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 text-sm">
+              <Calendar className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+              <span className="text-gray-400">Published on 2025-01-10</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <TrendingUp className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+              <span className="text-gray-400">Trending in Training</span>
+            </div>
           </div>
         </div>
 
@@ -287,10 +289,10 @@ export default function ArticlePreviewPage() {
         </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t" style={{ borderColor: `${theme.colors.primaryCyan}1A` }}>
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-8 pt-6 border-t" style={{ borderColor: `${theme.colors.primaryCyan}1A` }}>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
             <button 
-              className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 flex items-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
               style={{
                 backgroundColor: `${theme.colors.primaryCyan}20`,
                 color: theme.colors.primaryCyan
@@ -300,7 +302,7 @@ export default function ArticlePreviewPage() {
               Add Tags
             </button>
             <button 
-              className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 flex items-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
               style={{
                 backgroundColor: 'rgba(239, 68, 68, 0.2)',
                 color: '#EF4444'
@@ -310,7 +312,7 @@ export default function ArticlePreviewPage() {
               Delete Article
             </button>
           </div>
-          <div className="text-gray-500 text-sm">
+          <div className="text-gray-500 text-sm w-full sm:w-auto text-left sm:text-right">
             Last updated: 2025-01-10
           </div>
         </div>
