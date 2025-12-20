@@ -83,7 +83,8 @@ export default function EditCategoryPage() {
           <p className="text-gray-400 text-sm mt-1">Modify category settings and properties</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <button 
+          <button
+            onClick={() => router.back()} 
             className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
             style={{
               backgroundColor: 'transparent',

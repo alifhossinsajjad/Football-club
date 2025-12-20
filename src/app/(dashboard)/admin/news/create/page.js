@@ -53,6 +53,7 @@ export default function CreateArticlePage() {
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <button 
+            onClick={() => router.back()}
             className="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
             style={{
               backgroundColor: 'transparent',
