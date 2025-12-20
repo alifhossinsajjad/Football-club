@@ -1,14 +1,17 @@
-'use client'
+"use client";
 
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle } from "lucide-react";
 
-let toastContainer = null
+let toastContainer = null;
 
-export function showSuccessToast() {
+export function showSuccessToast(
+  title = "Success!",
+  message = "Operation completed successfully"
+) {
   // Create container if it doesn't exist
   if (!toastContainer) {
-    toastContainer = document.createElement('div')
-    toastContainer.id = 'toast-container'
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toast-container";
     toastContainer.style.cssText = `
       position: fixed;
       top: 24px;
@@ -17,12 +20,12 @@ export function showSuccessToast() {
       display: flex;
       flex-direction: column;
       gap: 12px;
-    `
-    document.body.appendChild(toastContainer)
+    `;
+    document.body.appendChild(toastContainer);
   }
 
   // Create toast element
-  const toast = document.createElement('div')
+  const toast = document.createElement("div");
   toast.style.cssText = `
     background: linear-gradient(135deg, #00E5FF 0%, #9C27B0 100%);
     color: white;
@@ -35,7 +38,7 @@ export function showSuccessToast() {
     min-width: 300px;
     animation: slideIn 0.3s ease-out;
     font-family: 'Poppins', sans-serif;
-  `
+  `;
 
   toast.innerHTML = `
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -43,13 +46,13 @@ export function showSuccessToast() {
       <polyline points="22 4 12 14.01 9 11.01"></polyline>
     </svg>
     <div>
-      <p style="font-weight: 600; margin: 0; font-size: 14px;">Changes Saved!</p>
-      <p style="margin: 4px 0 0 0; opacity: 0.9; font-size: 12px;">Theme colors updated successfully</p>
+      <p style="font-weight: 600; margin: 0; font-size: 14px;">${title}</p>
+      <p style="margin: 4px 0 0 0; opacity: 0.9; font-size: 12px;">${message}</p>
     </div>
-  `
+  `;
 
   // Add animation
-  const style = document.createElement('style')
+  const style = document.createElement("style");
   style.textContent = `
     @keyframes slideIn {
       from {
@@ -71,24 +74,24 @@ export function showSuccessToast() {
         opacity: 0;
       }
     }
-  `
-  if (!document.getElementById('toast-styles')) {
-    style.id = 'toast-styles'
-    document.head.appendChild(style)
+  `;
+  if (!document.getElementById("toast-styles")) {
+    style.id = "toast-styles";
+    document.head.appendChild(style);
   }
 
-  toastContainer.appendChild(toast)
+  toastContainer.appendChild(toast);
 
   // Auto remove after 3 seconds
   setTimeout(() => {
-    toast.style.animation = 'slideOut 0.3s ease-in forwards'
+    toast.style.animation = "slideOut 0.3s ease-in forwards";
     setTimeout(() => {
-      toastContainer.removeChild(toast)
+      toastContainer.removeChild(toast);
       // Remove container if empty
       if (toastContainer.children.length === 0) {
-        document.body.removeChild(toastContainer)
-        toastContainer = null
+        document.body.removeChild(toastContainer);
+        toastContainer = null;
       }
-    }, 300)
-  }, 3000)
+    }, 300);
+  }, 3000);
 }
