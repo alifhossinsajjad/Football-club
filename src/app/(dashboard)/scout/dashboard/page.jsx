@@ -21,10 +21,10 @@ export default function ScoutDashboard() {
   };
 
   return (
-    <div className="space-y-6 lg:space-y-8">
+    <div className="space-y-6">
       {/* Welcome Header */}
       <div>
-        <GradientTitle text="Welcome Back, Mike!" />
+        <GradientTitle text="Welcome Back, Michael!" />
       </div>
 
       {/* Stats Grid */}
