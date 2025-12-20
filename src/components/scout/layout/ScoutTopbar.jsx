@@ -67,12 +67,12 @@ export default function ScoutTopbar() {
         {/* User Profile */}
         <div className="flex items-center gap-2 lg:gap-3">
           <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
-            <AvatarImage src="/user_pp.jpg" alt="Nolan Torff" />
+            <AvatarImage src="/Scout/Scout.png" alt="Michael Thompson" />
             <AvatarFallback>NT</AvatarFallback>
           </Avatar>
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-white">Nolan Torff</p>
-            <p className="text-xs text-gray-400">Administrator</p>
+            <p className="text-sm font-semibold text-white">Michael Thompson</p>
+            <p className="text-xs text-gray-400">Professional Scout</p>
           </div>
         </div>
       </div>
