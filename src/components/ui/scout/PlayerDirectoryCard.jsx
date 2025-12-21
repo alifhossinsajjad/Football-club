@@ -1,5 +1,6 @@
 import React from "react";
 import { MessageSquare, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function PlayerDirectoryCard({
   image = "/placeholder.png",
@@ -18,6 +19,7 @@ export default function PlayerDirectoryCard({
     },
   },
 }) {
+  const router = useRouter();
   const hasHighlightVideo =
     highlightVideo && highlightVideo !== "_" && highlightVideo !== "";
 
@@ -96,7 +98,31 @@ export default function PlayerDirectoryCard({
             backgroundColor: theme.colors.primaryCyan,
           }}
         >
-          <button className="text-white text-sm font-semibold">
+          {/* <button
+            onClick={() => router.push("/scout/player-profile")}
+            className="text-white text-sm font-semibold"
+          >
+            View Full Profile
+          </button> */}
+          <button
+            onClick={() =>
+              router.push(
+                `/scout/player-profile?data=${encodeURIComponent(
+                  JSON.stringify({
+                    image,
+                    name: title,
+                    position: role,
+                    nationality,
+                    age,
+                    currentClub,
+                    rating,
+                    highlightVideo,
+                  })
+                )}`
+              )
+            }
+            className="text-white text-sm font-semibold"
+          >
             View Full Profile
           </button>
         </div>
