@@ -10,6 +10,7 @@ const initialState = {
     backgroundDark: "#0B0D2C",
     backgroundCard: "#12143A",
     neonAccent: "#14F1D9",
+    statNeon: "#00E5FF",
   },
 };
 

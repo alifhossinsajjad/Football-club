@@ -1,22 +1,22 @@
 "use client";
 
-import ProfileHeader from "@/components/player/profile/ProfileHeader";
-import AboutPlayerProfile from "@/components/player/profile/AboutPlayerProfile";
-import CareerStatistics from "@/components/player/profile/CareerStatistics";
-import SocialMedia from "@/components/player/profile/SocialMedia";
-import ContactInformation from "@/components/player/profile/ContactInformation";
 import PlayerAchievements from "@/components/player/profile/PlayerAchievements";
-import PlayerProfileInsights from "@/components/player/profile/PlayerProfileInsights";
+
 import PlayerProfilePreference from "@/components/player/profile/PlayerProfilePreference";
 import HighlightVideosSection from "@/components/player/profile/PlayerProfileVideos";
-import PlayerProfileCover from "@/components/player/profile/PlayerProfileCover";
-import PlayerProfileSkills from "@/components/player/profile/PlayerProfileSkills";
-import PlayerProfilePlayingHistory from "@/components/player/profile/PlayerProfilePlayingHistory";
-import BoostDurationModal from "@/components/player/modals/profile/BoostDurationModal";
-import BoostPaymentModal from "@/components/player/modals/profile/BoostPaymentModal";
-import BoostSuccessModal from "@/components/player/modals/profile/BoostSuccessModal";
 
 import { useState } from "react";
+import ProfileCover from "@/components/ui/scout/profile/ProfileCover";
+import ProfileDetails from "@/components/ui/scout/profile/ProfileDetails";
+import AboutProfile from "@/components/ui/scout/profile/AboutProfile";
+import StatisticsPart from "@/components/ui/scout/profile/StatisticsPart";
+import SkillsPlayer from "@/components/ui/scout/profile/SkillsPlayer";
+import PlayHistory from "@/components/ui/scout/profile/PlayHistory";
+import ContactThePlayer from "@/components/ui/scout/profile/ContactThePlayer";
+import PlayerSocialMedia from "@/components/ui/scout/profile/PlayerSocialMedia";
+import AchievementList from "@/components/ui/scout/profile/AchievementList";
+import PlayersProfile from "@/components/ui/scout/profile/PlayersProfile";
+import HighlightVideo from "@/components/ui/scout/profile/HighlightVideo";
 
 export default function PlayerProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -27,7 +27,7 @@ export default function PlayerProfilePage() {
   const [boostData, setBoostData] = useState({});
 
   // Centralized player profile data state
-  const [playerProfileData, setPlayerProfileData] = useState({
+  const [scoutPlayerProfileData, setScoutPlayerProfileData] = useState({
     // ... (your full data object from before)
     profile: {
       name: "John Doe",
@@ -42,8 +42,8 @@ export default function PlayerProfilePage() {
       dateOfBirth: "15/03/2008",
       jerseyNumber: "#10",
     },
-    // ... rest of your data
-    coverImage: "/player/profile/profileBanner.png",
+
+    coverImage: "/Scout/player-banner.png",
     profileImage: "/player/profile/profile.png",
   });
 
@@ -64,24 +64,15 @@ export default function PlayerProfilePage() {
     setBoostStep(2);
   };
 
-  const handlePaymentSuccess = () => {
-    setBoostStep(3);
-  };
-
-  const handleCloseBoost = () => {
-    setBoostStep(0);
-    setSelectedDuration(null);
-  };
-
   const updatePlayerProfileData = (updates) => {
-    setPlayerProfileData((prev) => ({
+    setScoutPlayerProfileData((prev) => ({
       ...prev,
       ...updates,
     }));
   };
 
   const updateProfileField = (field, value) => {
-    setPlayerProfileData((prev) => ({
+    setScoutPlayerProfileData((prev) => ({
       ...prev,
       profile: {
         ...prev.profile,
@@ -92,16 +83,16 @@ export default function PlayerProfilePage() {
 
   return (
     <div className="space-y-8">
-      <PlayerProfileCover
-        playerProfileData={playerProfileData}
+      <ProfileCover
+        scoutPlayerProfileData={scoutPlayerProfileData}
         setIsEditing={setIsEditing}
         isEditing={isEditing}
         updatePlayerProfileData={updatePlayerProfileData}
         onBoost={handleBoostProfile}
       />
 
-      <ProfileHeader
-        playerProfileData={playerProfileData}
+      <ProfileDetails
+        scoutPlayerProfileData={scoutPlayerProfileData}
         isEditing={isEditing}
         updateProfileField={updateProfileField}
       />
@@ -109,79 +100,63 @@ export default function PlayerProfilePage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <AboutPlayerProfile
-            playerProfileData={playerProfileData}
+          <AboutProfile
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          <CareerStatistics
-            playerProfileData={playerProfileData}
+          <StatisticsPart
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          <PlayerProfileSkills
-            playerProfileData={playerProfileData}
+
+          <SkillsPlayer
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          <PlayerProfilePlayingHistory
-            playerProfileData={playerProfileData}
+
+          <PlayHistory
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
         </div>
 
         <div className="space-y-8">
-          <ContactInformation
-            playerProfileData={playerProfileData}
+          <ContactThePlayer
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          <SocialMedia
-            playerProfileData={playerProfileData}
+
+          <PlayerSocialMedia
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          <PlayerAchievements
-            playerProfileData={playerProfileData}
+
+
+          <AchievementList
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-          {!isEditing && (
-            <PlayerProfileInsights playerProfileData={playerProfileData} />
-          )}
-          <PlayerProfilePreference
-            playerProfileData={playerProfileData}
+
+          <PlayersProfile
+            scoutPlayerProfileData={scoutPlayerProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
         </div>
       </div>
 
-      <HighlightVideosSection
-        playerProfileData={playerProfileData}
+      <HighlightVideo
+        scoutPlayerProfileData={scoutPlayerProfileData}
         isEditing={isEditing}
         updatePlayerProfileData={updatePlayerProfileData}
       />
-
-      {/* Boost Modals */}
-      <BoostDurationModal
-        isOpen={boostStep === 1}
-        onClose={handleCloseBoost}
-        onNext={handleNextFromDuration}
-        selectedDuration={selectedDuration}
-        setSelectedDuration={setSelectedDuration}
-      />
-
-      <BoostPaymentModal
-        isOpen={boostStep === 2}
-        onClose={handleCloseBoost}
-        onBack={() => setBoostStep(1)}
-        onSuccess={handlePaymentSuccess}
-        boostData={boostData}
-      />
-
-      <BoostSuccessModal isOpen={boostStep === 3} onClose={handleCloseBoost} />
     </div>
   );
 }
