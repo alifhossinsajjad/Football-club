@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown} from "lucide-react";
 
 export default function SearchFilters({ theme }) {
   const [filters, setFilters] = useState({
