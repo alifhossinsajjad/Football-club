@@ -1,52 +1,55 @@
-"use client"
+"use client";
 
-import { Lock } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { Lock } from "lucide-react";
+import { useSelector } from "react-redux";
+import SectionTitel from "./ReUseable/SectionTitle";
 
 const players = [
   {
-    firstName: 'Lionel',
-    lastName: 'Messi',
-    country: 'Argentina',
-    flag: '🇦🇷',
-    position: 'Forward',
-    image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=150&h=150&fit=crop&crop=face'
+    firstName: "Lionel",
+    lastName: "Messi",
+    country: "Argentina",
+    flag: "🇦🇷",
+    position: "Forward",
+    image:
+      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=150&h=150&fit=crop&crop=face",
   },
   {
-    firstName: 'Kevin',
-    lastName: 'Bruyne',
-    country: 'Belgium',
-    flag: '🇧🇪',
-    position: 'Midfielder',
-    image: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=150&h=150&fit=crop&crop=face'
+    firstName: "Kevin",
+    lastName: "Bruyne",
+    country: "Belgium",
+    flag: "🇧🇪",
+    position: "Midfielder",
+    image:
+      "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=150&h=150&fit=crop&crop=face",
   },
   {
-    firstName: 'Virgil',
-    lastName: 'van',
-    country: 'Netherlands',
-    flag: '🇳🇱',
-    position: 'Defender',
-    image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=150&h=150&fit=crop&crop=face'
+    firstName: "Virgil",
+    lastName: "van",
+    country: "Netherlands",
+    flag: "🇳🇱",
+    position: "Defender",
+    image:
+      "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=150&h=150&fit=crop&crop=face",
   },
   {
-    firstName: 'Mbappé',
-    lastName: '',
-    country: 'France',
-    flag: '🇫🇷',
-    position: 'Forward',
-    image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=150&h=150&fit=crop&crop=face'
-  }
+    firstName: "Mbappé",
+    lastName: "",
+    country: "France",
+    flag: "🇫🇷",
+    position: "Forward",
+    image:
+      "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=150&h=150&fit=crop&crop=face",
+  },
 ];
 
 const FeaturedPlayers = () => {
-
-
-const theme = useSelector(state => state.theme);
+  const theme = useSelector((state) => state.theme);
   return (
     <section className="py-20 px-4 ">
       <div className="container mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        {/* <div className="text-center mb-12">
           <h2  className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
                         style={{
                             backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
@@ -60,7 +63,12 @@ const theme = useSelector(state => state.theme);
           <p className="text-muted-foreground text-sm md:text-base">
             Browse top football talent and explore detailed player profiles.
           </p>
-        </div>
+        </div> */}
+
+        <SectionTitel
+          title="FEATURED PLAYERS"
+          subtitle="Browse top football talent and explore detailed player profiles."
+        />
 
         {/* Players Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -79,9 +87,13 @@ const theme = useSelector(state => state.theme);
                 </h3>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">{player.flag}</span>
-                  <span className="text-muted-foreground text-sm">{player.country}</span>
+                  <span className="text-muted-foreground text-sm">
+                    {player.country}
+                  </span>
                 </div>
-                <p className="text-purple-400 text-sm">Position: {player.position}</p>
+                <p className="text-purple-400 text-sm">
+                  Position: {player.position}
+                </p>
               </div>
 
               {/* Player Image */}
@@ -96,11 +108,13 @@ const theme = useSelector(state => state.theme);
           ))}
         </div>
 
-        {/* View All Button */}
-        <div className="text-center">
-          <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-muted-foreground/50 text-foreground text-sm font-medium hover:border-cyan-400 hover:text-cyan-400 transition-colors duration-300">
-            View All Players
-            <Lock className="w-4 h-4" />
+   
+
+        <div className="flex justify-center mt-10">
+          <button className="px-8 py-2 border border-purple/50 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2"
+           style={{ borderColor: theme.colors.primaryMagenta }}
+          >
+            View All Clubs <Lock size={14} />
           </button>
         </div>
       </div>
