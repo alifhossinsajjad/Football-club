@@ -13,7 +13,6 @@ const playerSettingsTabs = [
     icon: Bell,
     label: "Notifications",
   },
-  { path: "/player/settings/subscription", icon: Globe, label: "Subscription" },
   { path: "/player/settings/preferences", icon: Globe, label: "Preferences" },
 ];
 

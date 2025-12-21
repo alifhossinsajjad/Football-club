@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, CreditCard, Lock, ChevronLeft, ArrowLeft } from "lucide-react";
-import NextImage from "next/image";
 import { useSelector } from "react-redux";
 import PlayerTitle from "../../playerTitle";
 
