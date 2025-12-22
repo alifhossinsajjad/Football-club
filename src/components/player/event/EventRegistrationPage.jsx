@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Check, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import Step1 from "./steps/Step1";
+import Step2 from "./steps/Step2";
 
 export default function EventRegistrationPage({ params }) {
   const theme = useSelector((state) => state.theme);
@@ -81,7 +83,7 @@ export default function EventRegistrationPage({ params }) {
       <div className="py-8">
         <div
           className="flex items-center justify-start sm:justify-center
- gap-8 py-6 rounded-md mb-12 border px-12  mx-auto overflow-auto"
+                gap-8 py-6 rounded-md mb-12 border px-12  mx-auto overflow-auto"
           style={{
             backgroundColor: theme.colors.backgroundCard,
             borderColor: `${theme.colors.primaryCyan}33`,
@@ -125,89 +127,9 @@ export default function EventRegistrationPage({ params }) {
 
         {/* Step Content */}
         <div className=" mx-auto">
-          {step === 1 && (
-            <div
-              className="rounded-xl p-8 border"
-              style={{
-                backgroundColor: theme.colors.backgroundCard,
-                borderColor: `${theme.colors.primaryCyan}33`,
-              }}
-            >
-              <h2 className="text-2xl font-bold text-white mb-8">
-                Personal Information
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input placeholder="First Name" />
-                <Input placeholder="Last Name" />
-                <Input placeholder="Email Address" />
-                <Input placeholder="Phone Number" />
-                <Input type="date" placeholder="Date of Birth" />
-              </div>
-              <div className="mt-6 p-4 rounded-lg bg-backgroundDark/50">
-                <p className="text-sm text-gray-300">
-                  Age Requirement: This event requires participants to be
-                  between 16–18 years old. Please ensure your age meets this
-                  requirement.
-                </p>
-              </div>
-            </div>
-          )}
+          {step === 1 && <Step1 />}
 
-          {step === 2 && (
-            <div
-              className="rounded-xl p-8 space-y-8 border"
-              style={{
-                backgroundColor: theme.colors.backgroundCard,
-                borderColor: `${theme.colors.primaryCyan}33`,
-              }}
-            >
-              <h2 className="text-2xl font-bold text-white">
-                Emergency Contact & Medical Information
-              </h2>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  Emergency Contact
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Input placeholder="Full name" />
-                  <Input placeholder="Relationship" />
-                  <Input placeholder="Emergency Phone" />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  Medical Information
-                </h3>
-                <textarea
-                  className="w-full p-4 rounded-lg resize-none"
-                  rows="4"
-                  placeholder="List any medical conditions (e.g. asthma, diabetes). Leave blank if none."
-                  style={{
-                    backgroundColor: theme.colors.backgroundDark,
-                    border: `1px solid ${theme.colors.primaryCyan}33`,
-                    color: "white",
-                  }}
-                />
-                <textarea
-                  className="w-full p-4 rounded-lg resize-none mt-4"
-                  rows="3"
-                  placeholder="Allergies (Leave blank if none)"
-                  style={{
-                    backgroundColor: theme.colors.backgroundDark,
-                    border: `1px solid ${theme.colors.primaryCyan}33`,
-                    color: "white",
-                  }}
-                />
-                <div className="mt-4 p-4 rounded-lg bg-backgroundDark/50">
-                  <p className="text-sm text-gray-300">
-                    Medical Clearance Required: All participants must provide a
-                    medical clearance certificate before the event. This will be
-                    requested via email after registration.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+          {step === 2 && <Step2 />}
 
           {step === 3 && (
             <div
@@ -314,7 +236,7 @@ export default function EventRegistrationPage({ params }) {
                     className="text-2xl font-bold"
                     style={{ color: theme.colors.primaryCyan }}
                   >
-                    €52.50
+                    € 52.50
                   </p>
                   <p className="text-gray-400 text-sm mt-2">
                     Card ending in **
@@ -347,7 +269,7 @@ export default function EventRegistrationPage({ params }) {
                 <label className="flex items-center gap-3">
                   <input type="checkbox" className="w-5 h-5" />
                   <span className="text-gray-300">
-                    Cancellation Policy: Full refund 3–6 days before event, 50%
+                    Cancellation Policy: Full refund 3-6 days before event, 50%
                     within 3 days. No refund less than 3 days.
                   </span>
                 </label>
@@ -365,16 +287,16 @@ export default function EventRegistrationPage({ params }) {
                 </h4>
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Registration Fee</span>
-                  <span className="text-white">€{event.price}</span>
+                  <span className="text-white">€ {event.price}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Processing Fee</span>
-                  <span className="text-white">€2.50</span>
+                  <span className="text-white">€ 2.50</span>
                 </div>
                 <div className="border-t border-primaryCyan/20 pt-4 flex justify-between text-xl font-bold">
                   <span className="text-gray-300">Total Amount</span>
                   <span style={{ color: theme.colors.primaryCyan }}>
-                    €52.50
+                    € 52.50
                   </span>
                 </div>
               </div>
@@ -383,7 +305,7 @@ export default function EventRegistrationPage({ params }) {
                 className="rounded-full py-6 px-12 text-lg"
                 style={{ backgroundColor: theme.colors.primaryCyan }}
               >
-                Confirm Registration & Pay €52.50
+                Confirm Registration & Pay € 52.50
               </Button>
             </div>
           )}
@@ -392,15 +314,19 @@ export default function EventRegistrationPage({ params }) {
         {/* Navigation Buttons */}
         {step < 4 && (
           <div
-            className=" mx-auto mt-12 flex justify-between p-6 rounded-lg border"
+            className={`mx-auto mt-12 flex ${
+              step != 1 ? "justify-between" : "justify-end"
+            }  p-6 rounded-lg border`}
             style={{
               backgroundColor: theme.colors.backgroundCard,
               borderColor: `${theme.colors.primaryCyan}33`,
             }}
           >
-            <Button variant="outline" onClick={handleBack}>
-              Back
-            </Button>
+            {step != 1 && (
+              <Button variant="outline" onClick={handleBack}>
+                Back
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={handleNext}
