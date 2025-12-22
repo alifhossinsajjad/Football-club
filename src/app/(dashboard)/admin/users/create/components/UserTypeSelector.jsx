@@ -50,7 +50,9 @@ export default function UserTypeSelector({ selectedType, onTypeChange }) {
               onClick={() => onTypeChange(type.id)}
               className="rounded-lg border p-6 text-left transition-all hover:scale-[1.02]"
               style={{
-                backgroundColor: theme.colors.backgroundDark,
+                background: isSelected
+                  ? `linear-gradient(90deg, ${theme.colors.primaryCyan}1A 0%, ${theme.colors.primaryMagenta}1A 100%)`
+                  : theme.colors.backgroundDark,
                 borderColor: isSelected
                   ? theme.colors.primaryCyan
                   : `${theme.colors.primaryCyan}33`,
