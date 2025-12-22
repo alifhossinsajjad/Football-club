@@ -40,16 +40,17 @@ import React from 'react'
 
 export default function LandingPage() {
   return (
-    <div>
+    <div className="w-full overflow-x-hidden">
       <Navbar />
-      <Banner/>
-      <ClubsSection/>
-      <HowItWorks/>
-      <FeaturedPlayers/>
-      <LatestNews/>
-      <UpcomingEvent/>
-      <Subscription/>
-      <Footer/>
+      <Banner />
+      <ClubsSection />
+      <HowItWorks />
+      <FeaturedPlayers />
+      <LatestNews />
+      <UpcomingEvent />
+      <Subscription />
+      <Footer />
     </div>
   )
 }
+
