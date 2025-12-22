@@ -37,7 +37,7 @@ export default function EventDetailsPage({ params }) {
   ];
 
   const requirements = [
-    "Age Requirement: Players must be between 16–18 years old",
+    "Age Requirement: Players must be between 16-18 years old",
     "Experience Level: Minimum 2 years of competitive football experience required",
     "Medical Clearance: Completed medical clearance form must be submitted before the event",
     "Equipment: Bring your own football boots, shin guards, and training gear",

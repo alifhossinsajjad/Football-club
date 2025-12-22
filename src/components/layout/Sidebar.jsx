@@ -36,7 +36,6 @@ export default function Sidebar() {
   const pathname = usePathname()
   const theme = useSelector(state => state.theme)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
   // Check if path starts with the menu item path (for nested routes)
   const isActiveRoute = (itemPath) => {
     return pathname === itemPath || pathname.startsWith(itemPath + '/')
