@@ -134,23 +134,23 @@ export default function CreateEventPage() {
 
       {/* Progress Stepper */}
       <div
-        className="rounded-lg border p-6 mb-8"
+        className="rounded-lg border p-4 sm:p-6 mb-8"
         style={{
           backgroundColor: theme.colors.backgroundCard,
           borderColor: `${theme.colors.primaryCyan}33`,
         }}
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 overflow-x-auto">
           {steps.map((step, index) => {
             const Icon = step.icon;
             const isCompleted = currentStep > step.number;
             const isActive = currentStep === step.number;
 
             return (
-              <div key={step.number} className="flex items-center flex-1">
-                <div className="flex flex-col items-center">
+              <div key={step.number} className="flex items-center flex-1 min-w-0">
+                <div className="flex flex-col items-center flex-shrink-0">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all"
                     style={{
                       background:
                         isCompleted || isActive
@@ -163,10 +163,10 @@ export default function CreateEventPage() {
                     }}
                   >
                     {isCompleted ? (
-                      <Check className="w-6 h-6 text-white" />
+                      <Check className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     ) : (
                       <span
-                        className="text-lg font-bold"
+                        className="text-base sm:text-lg font-bold"
                         style={{ color: isActive ? "#FFFFFF" : "#6B7280" }}
                       >
                         {step.number}
@@ -174,7 +174,7 @@ export default function CreateEventPage() {
                     )}
                   </div>
                   <span
-                    className="text-xs font-medium text-center"
+                    className="text-[10px] sm:text-xs font-medium text-center whitespace-nowrap"
                     style={{
                       color: isActive || isCompleted ? "#FFFFFF" : "#6B7280",
                     }}
@@ -184,7 +184,7 @@ export default function CreateEventPage() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className="flex-1 h-1 mx-4"
+                    className="flex-1 h-1 mx-2 sm:mx-4 min-w-[20px]"
                     style={{
                       background: isCompleted
                         ? theme.colors.primaryCyan
@@ -804,7 +804,7 @@ export default function CreateEventPage() {
                       className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3"
                       style={{
                         background:
-                          "linear-gradient(180deg, rgba(0, 229, 255, 0.2) 0%, rgba(156, 39, 176, 0.2) 100%)",
+                          "linear-gradient(180deg, ${theme.colors.primaryCyan}33 0%, ${theme.colors.primaryMagenta}33 100%)",
                       }}
                     >
                       <Upload
