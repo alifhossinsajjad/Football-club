@@ -108,7 +108,7 @@ export default function DashboardPage() {
         Dashboard Overview
       </h1>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Updated Style */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -125,26 +125,15 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between mb-4">
                 {/* Icon with Gradient Background */}
                 <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center relative"
+                  className="w-12 h-12 rounded-lg flex items-center justify-center"
                   style={{
-                    background: `linear-gradient(135deg, ${theme.colors.primaryCyan}33 0%, ${theme.colors.primaryMagenta}33 100%)`,
+                    background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33 0%, ${theme.colors.primaryMagenta}33 100%)`,
                   }}
                 >
-                  <div
-                    style={{
-                      width: "24px",
-                      height: "24px",
-                      position: "relative",
-                    }}
-                  >
-                    <Icon
-                      className="w-6 h-6"
-                      style={{
-                        stroke: `url(#${stat.gradientId})`,
-                        strokeWidth: 2,
-                      }}
-                    />
-                  </div>
+                  <Icon
+                    className="w-6 h-6"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                 </div>
 
                 {/* Change Badge */}
@@ -187,24 +176,28 @@ export default function DashboardPage() {
           Recent Activity
         </h2>
 
-        <div className="space-y-0">
+        <div className="space-y-4">
           {recentActivities.map((activity, index) => (
             <div
               key={activity.id}
-              className={`flex items-center justify-between py-4 ${
-                index !== recentActivities.length - 1 ? "border-b" : ""
+              className={`rounded-lg p-4 transition-all hover:scale-[1.01] ${
+                index !== recentActivities.length - 1 ? "mb-3" : ""
               }`}
               style={{
-                borderColor: `${theme.colors.primaryCyan}1A`,
+                backgroundColor: theme.colors.backgroundDark,
               }}
             >
-              <div>
-                <p className="text-white font-medium mb-1">{activity.title}</p>
-                <p className="text-gray-400 text-sm">{activity.subtitle}</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white font-medium mb-1">
+                    {activity.title}
+                  </p>
+                  <p className="text-gray-400 text-sm">{activity.subtitle}</p>
+                </div>
+                <p className="text-gray-500 text-sm whitespace-nowrap ml-4">
+                  {activity.time}
+                </p>
               </div>
-              <p className="text-gray-500 text-sm whitespace-nowrap ml-4">
-                {activity.time}
-              </p>
             </div>
           ))}
         </div>
