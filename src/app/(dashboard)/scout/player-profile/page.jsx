@@ -1,10 +1,5 @@
 "use client";
 
-import PlayerAchievements from "@/components/player/profile/PlayerAchievements";
-
-import PlayerProfilePreference from "@/components/player/profile/PlayerProfilePreference";
-import HighlightVideosSection from "@/components/player/profile/PlayerProfileVideos";
-
 import { useState } from "react";
 import ProfileCover from "@/components/ui/scout/profile/ProfileCover";
 import ProfileDetails from "@/components/ui/scout/profile/ProfileDetails";
@@ -18,7 +13,7 @@ import AchievementList from "@/components/ui/scout/profile/AchievementList";
 import PlayersProfile from "@/components/ui/scout/profile/PlayersProfile";
 import HighlightVideo from "@/components/ui/scout/profile/HighlightVideo";
 
-export default function PlayerProfilePage() {
+export default function ScoutPlayerProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
 
   // Boost modal states
@@ -136,7 +131,6 @@ export default function PlayerProfilePage() {
             isEditing={isEditing}
             updatePlayerProfileData={updatePlayerProfileData}
           />
-
 
           <AchievementList
             scoutPlayerProfileData={scoutPlayerProfileData}

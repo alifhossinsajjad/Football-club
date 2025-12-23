@@ -19,11 +19,29 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function PlayerRegisterPage() {
   const theme = useSelector((state) => state.theme);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    dob: "",
+    nationality: "",
+    phone: "",
+    email: "player@example.com",
+    password: "",
+    confirmPassword: "",
+  });
+  const router = useRouter();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    router.push("/player/auth/complete-profile");
+  };
 
   return (
     <div
@@ -65,7 +83,7 @@ export default function PlayerRegisterPage() {
             borderColor: `${theme.colors.primaryCyan}33`,
           }}
         >
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-6">
               <div className="relative">
@@ -81,6 +99,10 @@ export default function PlayerRegisterPage() {
                     backgroundColor: theme.colors.backgroundDark,
                     borderColor: `${theme.colors.primaryCyan}33`,
                   }}
+                  value={formData.firstName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, firstName: e.target.value })
+                  }
                 />
               </div>
               <div className="relative">
@@ -96,6 +118,10 @@ export default function PlayerRegisterPage() {
                     backgroundColor: theme.colors.backgroundDark,
                     borderColor: `${theme.colors.primaryCyan}33`,
                   }}
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, lastName: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -114,6 +140,10 @@ export default function PlayerRegisterPage() {
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
                 }}
+                value={formData.dob}
+                onChange={(e) =>
+                  setFormData({ ...formData, dob: e.target.value })
+                }
               />
             </div>
 
@@ -131,6 +161,10 @@ export default function PlayerRegisterPage() {
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
                 }}
+                value={formData.nationality}
+                onChange={(e) =>
+                  setFormData({ ...formData, nationality: e.target.value })
+                }
               />
             </div>
 
@@ -148,6 +182,10 @@ export default function PlayerRegisterPage() {
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
                 }}
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
               />
             </div>
 
@@ -161,7 +199,10 @@ export default function PlayerRegisterPage() {
                 type="email"
                 placeholder="player@example.com"
                 className="h-14 rounded-xl"
-                defaultValue="player@example.com"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 style={{
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
@@ -183,11 +224,15 @@ export default function PlayerRegisterPage() {
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
                 }}
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                 className="absolute right-4 top-12  text-gray-400 hover:text-white"
+                className="absolute right-4 top-12  text-gray-400 hover:text-white"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -214,6 +259,10 @@ export default function PlayerRegisterPage() {
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
                 }}
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
               />
               <button
                 type="button"
@@ -231,6 +280,7 @@ export default function PlayerRegisterPage() {
             {/* Create Account Button */}
             <Button
               variant="outline"
+              onClick={() => handleSubmit()}
               className="w-full h-14 rounded-md text-lg font-semibold flex items-center justify-center gap-3"
               style={{ backgroundColor: theme.colors.primaryCyan }}
             >
@@ -292,7 +342,7 @@ export default function PlayerRegisterPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 text-sm max-w-sm md:max-w-md mx-auto">
           By creating an account, you agree to our{" "}
           <Link
             href="#"

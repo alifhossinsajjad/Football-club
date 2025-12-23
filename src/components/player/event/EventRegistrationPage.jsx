@@ -143,16 +143,20 @@ export default function EventRegistrationPage({ params }) {
         {/* Navigation Buttons */}
         {step < 5 && (
           <div
-            className={`mx-auto mt-12 flex ${
+            className={`mx-auto mt-12 flex p-4 space-y-4 h-full items-center ${
               step != 1 ? "justify-between" : "justify-end"
-            }  p-6 rounded-lg border`}
+            }  px-6 rounded-lg border`}
             style={{
               backgroundColor: theme.colors.backgroundCard,
               borderColor: `${theme.colors.primaryCyan}33`,
             }}
           >
             {step != 1 && (
-              <Button variant="outline" onClick={handleBack}>
+              <Button
+                className={`${step == 4 ? "py-10 mt-3" : ""}`}
+                variant="outline"
+                onClick={handleBack}
+              >
                 Back
               </Button>
             )}
@@ -167,29 +171,29 @@ export default function EventRegistrationPage({ params }) {
               </Button>
             )}
             {step == 4 && (
-              <div className="text-center mt-12">
-                <Button
-                  variant="outline"
-                  className="rounded-md py-10 px-8  font-semibold flex items-center justify-center gap-3 text-left hover:bg-primaryCyan/20"
+              <Button
+                variant="outline"
+                className="rounded-md py-10 md:px-8 font-semibold flex items-center justify-center gap-3 text-left hover:bg-primaryCyan/20"
+                style={{
+                  backgroundColor: `${theme.colors.primaryCyan}`,
+                }}
+              >
+                <div className="text-left md:text-lg ">
+                  Confirm Registration
+                  <h3 className="text-sm text-gray-300">
+                    Secure payment via Stripe
+                  </h3>
+                </div>
+                <div
+                  className="md:text-2xl p-2 md:p-3  rounded-full shadow-md"
                   style={{
                     backgroundColor: `${theme.colors.primaryCyan}`,
+                    opacity: 0.95,
                   }}
                 >
-                  <div className="text-left text-lg ">
-                    Confirm Registration & Pay
-                    <h3 className="text-sm">Secure payment via Stripe</h3>
-                  </div>
-                  <div
-                    className="text-2xl p-3  rounded-full shadow-md"
-                    style={{
-                      backgroundColor: `${theme.colors.primaryCyan}`,
-                      opacity: 0.95,
-                    }}
-                  >
-                    € {total}
-                  </div>
-                </Button>
-              </div>
+                  € {total}
+                </div>
+              </Button>
             )}
           </div>
         )}
