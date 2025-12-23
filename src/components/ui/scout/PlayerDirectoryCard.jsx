@@ -1,135 +1,131 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { MessageSquare, Star } from "lucide-react";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
+import PlayerInteractionModal from "./modals/PlayerInteractionModal";
+import { Button } from "../button";
 
 export default function PlayerDirectoryCard({
   image = "/placeholder.png",
-  title = "Unknown",
-  role = "-",
+  name = "Unknown",
+  position = "-",
   nationality = "-",
-  nationFlag = "",
+  flag = "",
   age = "-",
-  rating = "_",
-  highlightVideo = "_",
-  currentClub = "_",
+  rating = "-",
+  highlightVideo = null,
+  currentClub = "-",
+  onViewProfile,
   theme = {
     colors: {
+      backgroundCard: "#0F1129",
       backgroundDark: "#0B0D2C",
       primaryCyan: "#04B5A3",
     },
   },
 }) {
-  const router = useRouter();
-  const hasHighlightVideo =
-    highlightVideo && highlightVideo !== "_" && highlightVideo !== "";
+  const hasHighlightVideo = highlightVideo && highlightVideo !== "null";
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div
-      className="border rounded-lg p-4 space-y-5 hover:opacity-80 transition-all"
+      className="rounded-xl p-6 border space-y-4 transition-all hover:shadow-xl"
       style={{
         backgroundColor: theme.colors.backgroundCard,
         borderColor: `${theme.colors.primaryCyan}33`,
       }}
     >
-      {/* image and title */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-15 h-15 rounded-full overflow-hidden">
-            <img
-              className="w-full h-full object-cover"
+      {/* Header: Image, Name, Position, Star */}
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primaryCyan/50">
+            <Image
               src={image}
-              alt={title}
+              alt={name}
+              width={64}
+              height={64}
+              className="w-full h-full object-cover"
             />
           </div>
           <div>
-            <h3 className="text-white font-bold">{title}</h3>
-            <p className="text-gray-400">{role}</p>
+            <h3 className="text-white font-bold text-lg">{name}</h3>
+            <p className="text-gray-400 text-sm">{position}</p>
           </div>
         </div>
-        <Star className="text-[#00E5FF] w-5 h-5" />
+        <Star className="w-6 h-6 text-primaryCyan fill-primaryCyan" />
       </div>
 
-      {/* nationality */}
-      <div className="flex text-sm sm:text-base justify-between items-center text-gray-300">
-        <p>Nationality:</p>
-        <p>
-          {nationFlag} {nationality}
-        </p>
+      {/* Nationality */}
+      <div className="flex justify-between text-gray-300">
+        <span>Nationality:</span>
+        <span className="flex items-center gap-2">
+          {flag && <span className="text-2xl">{flag}</span>}
+          {nationality}
+        </span>
       </div>
 
-      {/* age */}
-      <div className="flex text-sm sm:text-base justify-between items-center text-gray-300">
-        <p>Age:</p>
-        <p>{age}</p>
+      {/* Age */}
+      <div className="flex justify-between text-gray-300">
+        <span>Age:</span>
+        <span>{age}</span>
       </div>
-      {/* rating */}
-      <div className="flex text-sm sm:text-base justify-between items-center text-gray-300">
-        <p>Rating:</p>
-        <p className="text-[#00E5FF]">{rating}/100</p>
+
+      {/* Rating */}
+      <div className="flex justify-between text-gray-300">
+        <span>Rating:</span>
+        <span className="text-primaryCyan font-bold">{rating}/100</span>
       </div>
-      {/* highlight video */}
-      <div className="flex text-sm sm:text-base justify-between items-center text-gray-300">
-        <p>Highlight Video:</p>
+
+      {/* Highlight Video */}
+      <div className="flex justify-between text-gray-300">
+        <span>Highlight Video:</span>
         {hasHighlightVideo ? (
-          <a
-            href={highlightVideo}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#05DF72] font-medium hover:underline"
-          >
-            Available
-          </a>
+          <span className="text-green-400 font-medium">Available</span>
         ) : (
-          <span className="text-[#FFFFFF66]">Not Available</span>
+          <span className="text-gray-500">Not available</span>
         )}
       </div>
 
-      {/* current club */}
-      <div className="flex text-sm sm:text-base justify-between items-center text-gray-300">
-        <p>Current Club:</p>
-        <p>{currentClub}</p>
+      {/* Current Club */}
+      <div className="flex justify-between text-gray-300">
+        <span>Current Club:</span>
+        <span>{currentClub}</span>
       </div>
 
-      {/* button */}
-      <div className="flex text-sm sm:text-base items-center gap-2 ">
-        <div
-          className="flex-1 rounded-md py-2 text-center cursor-pointer hover:opacity-90"
-          style={{
-            backgroundColor: theme.colors.primaryCyan,
-          }}
+      {/* Action Buttons */}
+      <div className="flex gap-3 pt-4">
+        <Button
+          variant="outline"
+          onClick={onViewProfile}
+          className="flex-1 py-3 rounded-lg font-medium text-white transition-all"
+          style={{ backgroundColor: theme.colors.primaryCyan }}
         >
-          {/* <button
-            onClick={() => router.push("/scout/player-profile")}
-            className="text-white text-sm font-semibold"
-          >
-            View Full Profile
-          </button> */}
-          <button
-            onClick={() =>
-              router.push(
-                `/scout/player-profile?data=${encodeURIComponent(
-                  JSON.stringify({
-                    image,
-                    name: title,
-                    position: role,
-                    nationality,
-                    age,
-                    currentClub,
-                    rating,
-                    highlightVideo,
-                  })
-                )}`
-              )
-            }
-            className="text-white text-sm font-semibold"
-          >
-            View Full Profile
-          </button>
-        </div>
-        <button className="cursor-pointer px-4 py-2 border-2 border-[#04B5A333] rounded-lg">
-          <MessageSquare className="w-4 h-4 text-[#04B5A3]" />
+          View Profile
+        </Button>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="p-3 rounded-lg border-2 transition-all"
+          style={{ borderColor: `${theme.colors.primaryCyan}33` }}
+        >
+          <MessageSquare
+            className="w-5 h-5"
+            style={{ color: theme.colors.primaryCyan }}
+          />
         </button>
       </div>
+      {isModalOpen && (
+        <PlayerInteractionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          player={{
+            name: name,
+            image: image,
+            status: "Active now",
+          }}
+          theme={theme}
+        />
+      )}
     </div>
   );
 }

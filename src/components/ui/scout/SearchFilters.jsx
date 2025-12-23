@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ChevronDown} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export default function SearchFilters({ theme }) {
   const [filters, setFilters] = useState({
@@ -35,10 +35,10 @@ export default function SearchFilters({ theme }) {
   const ageRanges = ["All Ages", "16-20", "21-25", "26-30", "31-35", "36+"];
 
   const colors = theme?.colors || {
-    primaryCyan: "#04B5A3",
+    primaryCyan: theme.colors.primaryCyan,
     primaryMagenta: "#9C27B0",
-    backgroundDark: "#0B0D2C",
-    backgroundCard: "#12143A",
+    backgroundDark: theme.colors.backgroundDark,
+    backgroundCard: theme.colors.backgroundCard,
     neonAccent: "#14F1D9",
   };
 
@@ -65,7 +65,7 @@ export default function SearchFilters({ theme }) {
         onClick={() =>
           setOpenDropdown(openDropdown === filterName ? null : filterName)
         }
-        style={{ backgroundColor: colors.backgroundCard }}
+        style={{ backgroundColor: colors.backgroundDark }}
         className="w-full px-4 py-3 rounded-lg text-left flex items-center justify-between border border-gray-700 hover:border-gray-600 transition-colors"
       >
         <span className="text-white">{value}</span>
@@ -91,7 +91,9 @@ export default function SearchFilters({ theme }) {
               }`}
               style={{
                 backgroundColor:
-                  value === option ? colors.primaryCyan + "20" : "transparent",
+                  value === option
+                    ? colors.primaryCyan + "20"
+                    : theme.colors.backgroundDark,
                 color: value === option ? colors.neonAccent : "white",
               }}
             >

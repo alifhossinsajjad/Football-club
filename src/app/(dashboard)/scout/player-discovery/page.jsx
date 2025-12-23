@@ -3,19 +3,82 @@ import GradientTitle from "@/components/scout/reusable/GradientTitle";
 import { Button } from "@/components/ui/button";
 import PlayerDirectoryCard from "@/components/ui/scout/PlayerDirectoryCard";
 import SearchFilters from "@/components/ui/scout/SearchFilters";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useSelector } from "react-redux";
 
+const mockPlayers = [
+  {
+    id: 1,
+    image: "/Scout/Shortlisted-player/John.png",
+    name: "John Doe",
+    position: "midfielder",
+    nationality: "Spain",
+    age: "19 years",
+    rating: "89",
+    highlightVideo: "Real Madrid Academy",
+    currentClub: "Real Madrid Academy",
+  },
+  {
+    id: 2,
+    image: "/Scout/Shortlisted-player/John.png",
+    name: "James Smith",
+    position: "forward",
+    nationality: "England",
+    age: "20 years",
+    rating: "92",
+    highlightVideo: "",
+    currentClub: "Chelsea Academy",
+  },
+  {
+    id: 3,
+    image: "/Scout/Shortlisted-player/John.png",
+    name: "Robert Garcia",
+    position: "defender",
+    nationality: "Argentina",
+    age: "18 years",
+    rating: "87",
+    highlightVideo: "Real Madrid Academy",
+    currentClub: "AC Milan Youth",
+  },
+  {
+    id: 4,
+    image: "/Scout/Shortlisted-player/John.png",
+    name: "Michael Chen",
+    position: "goalkeeper",
+    nationality: "Japan",
+    age: "21 years",
+    rating: "90",
+    highlightVideo: "Real Madrid Academy",
+    currentClub: "São Paulo FC",
+  },
+  {
+    id: 5,
+    image: "/Scout/Shortlisted-player/John.png",
+    name: "Ahmed Hassan",
+    position: "midfielder",
+    nationality: "Egypt",
+    age: "19 years",
+    rating: "85",
+    highlightVideo: "",
+    currentClub: "PSG Academy",
+  },
+  {
+    id: 6,
+    image: "/Scout/Shortlisted-player/John.png",
+    name: "Pierre Dubois",
+    position: "forward",
+    nationality: "France",
+    age: "20 years",
+    rating: "91",
+    highlightVideo: "Real Madrid Academy",
+    currentClub: "Al Ahly SC",
+  },
+];
+
 export default function page() {
   const theme = useSelector((state) => state.theme);
-  //   const theme = useSelector((state) => state.theme) || {
-  //     colors: {
-  //       primaryCyan: "#04B5A3",
-  //       primaryMagenta: "#9C27B0",
-  //       backgroundCard: "#12143A",
-  //     },
-  //   };
-
+  const router = useRouter();
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
@@ -24,72 +87,36 @@ export default function page() {
       </div>
       <SearchFilters theme={theme} />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <PlayerDirectoryCard
-          image="/Scout/Shortlisted-player/John.png"
-          title="John Doe"
-          role="midfielder"
-          nationality="spain"
-          age="19 years"
-          rating="89"
-          highlightVideo="jdsnqeknd"
-          currentClub="Real Madrid Academy"
-          theme={theme}
-        />
-        <PlayerDirectoryCard
-          image="/Scout/Shortlisted-player/John.png"
-          title="John Doe"
-          role="midfielder"
-          nationality="spain"
-          age="19 years"
-          rating="89"
-          highlightVideo=""
-          currentClub="Chelsea Academy"
-          theme={theme}
-        />
-        <PlayerDirectoryCard
-          image="/Scout/Shortlisted-player/John.png"
-          title="John Doe"
-          role="midfielder"
-          nationality="spain"
-          age="19 years"
-          rating="89"
-          highlightVideo="jdsnqeknd"
-          currentClub="AC Milan Youth"
-          theme={theme}
-        />
-        <PlayerDirectoryCard
-          image="/Scout/Shortlisted-player/John.png"
-          title="John Doe"
-          role="midfielder"
-          nationality="spain"
-          age="19 years"
-          rating="89"
-          highlightVideo="jdsnqeknd"
-          currentClub="São Paulo FC"
-          theme={theme}
-        />
-        <PlayerDirectoryCard
-          image="/Scout/Shortlisted-player/John.png"
-          title="John Doe"
-          role="midfielder"
-          nationality="spain"
-          age="19 years"
-          rating="89"
-          highlightVideo=""
-          currentClub="PSG Academy"
-          theme={theme}
-        />
-        <PlayerDirectoryCard
-          image="/Scout/Shortlisted-player/John.png"
-          title="John Doe"
-          role="midfielder"
-          nationality="spain"
-          age="19 years"
-          rating="89"
-          highlightVideo="jdsnqeknd"
-          currentClub="Al Ahly SC"
-          theme={theme}
-        />
+        {mockPlayers.map((player) => (
+          <PlayerDirectoryCard
+            key={player.id}
+            image={player.image}
+            name={player.name}
+            position={player.position}
+            nationality={player.nationality}
+            age={player.age}
+            rating={player.rating}
+            highlightVideo={player.highlightVideo}
+            currentClub={player.currentClub}
+            theme={theme}
+            onViewProfile={() =>
+              router.push(
+                `/scout/player-profile?data=${encodeURIComponent(
+                  JSON.stringify({
+                    image: player.image,
+                    name: player.name,
+                    position: player.role,
+                    nationality: player.nationality,
+                    age: player.age,
+                    currentClub: player.currentClub,
+                    rating: player.rating,
+                    highlightVideo: player.highlightVideo,
+                  })
+                )}`
+              )
+            }
+          />
+        ))}
       </div>
       <div className="px-4 flex items-center justify-center">
         <Button variant="outline" size="icon" className="w-full md:w-1/5">

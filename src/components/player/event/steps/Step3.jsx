@@ -1,56 +1,114 @@
-import { Input } from "@/components/ui/input";
+"use client";
+
 import React from "react";
 import { useSelector } from "react-redux";
+import { Input } from "@/components/ui/input";
+import { Lock, CreditCard, Calendar, User, LockIcon } from "lucide-react";
 
 export default function Step3({ event }) {
   const theme = useSelector((state) => state.theme);
+
+  const total = (event.price + 2.5).toFixed(2);
+
   return (
     <div
-      className="rounded-xl p-8 space-y-8"
-      style={{ backgroundColor: theme.colors.backgroundCard }}
+      className="rounded-xl p-8 space-y-10 border"
+      style={{
+        backgroundColor: theme.colors.backgroundCard,
+        borderColor: `${theme.colors.primaryCyan}33`,
+      }}
     >
-      <h2 className="text-2xl font-bold text-white mb-8">Payment</h2>
-
       {/* Payment Summary */}
       <div
-        className="rounded-xl p-6 mb-8"
-        style={{ backgroundColor: theme.colors.backgroundDark }}
+        className="rounded-xl p-6 border space-y-4"
+        style={{
+          background: `linear-gradient(90deg, ${theme.colors.primaryCyan}20, ${theme.colors.primaryMagenta}33)`,
+          borderTop: `1.25px solid ${theme.colors.primaryCyan}4D`,
+        }}
       >
-        <div className="flex justify-between mb-4">
-          <span className="text-gray-300">Registration Fee</span>
+        {/* Title */}
+        <h2 className="text-2xl font-medium text-white">Payment Summary</h2>
+
+        <div className="flex justify-between mb-3 text-sm">
+          <span className="text-gray-400">Registration Fee</span>
           <span className="text-white">€{event.price}</span>
         </div>
-        <div className="flex justify-between mb-4">
-          <span className="text-gray-300">Processing Fee</span>
+
+        <div className="flex justify-between mb-4 text-sm">
+          <span className="text-gray-400">Processing Fee</span>
           <span className="text-white">€2.50</span>
         </div>
-        <div className="border-t border-primaryCyan/20 pt-4 flex justify-between text-2xl font-bold">
+
+        <div
+          className="border-t border-opacity-2  pt-4 flex justify-between text-xl font-bold"
+          style={{
+            borderColor: theme.colors.primaryCyan,
+          }}
+        >
           <span className="text-gray-300">Total</span>
-          <span style={{ color: theme.colors.primaryCyan }}>
-            €{(event.price + 2.5).toFixed(2)}
-          </span>
+          <span style={{ color: theme.colors.primaryCyan }}>€{total}</span>
         </div>
       </div>
 
       {/* Payment Details */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4">
+        <h3 className="text-lg font-semibold text-white mb-6">
           Payment Details
         </h3>
-        <Input placeholder="Card Number" className="mb-4" />
-        <div className="grid grid-cols-2 gap-4">
-          <Input placeholder="Expiry Date" />
-          <Input placeholder="CVV" />
+
+        <div className="space-y-6">
+          <Input
+            label="Card Number"
+            placeholder="1234 5678 9012 3456"
+            className="h-14 rounded-xl"
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Expiry Date"
+              placeholder="MM / YY"
+              className="h-14 rounded-xl"
+            />
+
+            <Input
+              label="CVV"
+              type="password"
+              placeholder="***"
+              className="h-14 rounded-xl"
+            />
+          </div>
+
+          <Input
+            label="Name on Card"
+            placeholder="Cardholder name"
+            className="h-14 rounded-xl"
+          />
         </div>
-        <Input placeholder="Name on card" className="mt-4" />
       </div>
 
-      <div className="p-4 rounded-lg bg-backgroundDark/50 flex items-center gap-3">
-        <Lock className="w-5 h-5 text-primaryCyan" />
-        <p className="text-sm text-gray-300">
-          Your payment information is encrypted and secure. We use Stripe for
-          payment processing.
-        </p>
+      {/* Security Notice */}
+      <div
+        className="mt-6 p-4 rounded-lg border"
+        style={{
+          backgroundColor: `${theme.colors.backgroundDark}80`,
+          borderColor: `${theme.colors.primaryCyan}22`,
+        }}
+      >
+        <div className="text-sm text-gray-400 leading-relaxed flex gap-4">
+          <LockIcon
+            className="w-12 md:w-5 md:h-5 md:mt-1 "
+            style={{
+              color: theme.colors.primaryCyan,
+            }}
+          />
+          <div>
+            <div className="font-semibold text-white leading-relaxed">
+              Secure Payment
+            </div>{" "}
+            Your payment information is encrypted and secure. We use Stripe for
+            payment processing.
+          </div>
+        </div>
       </div>
     </div>
   );
