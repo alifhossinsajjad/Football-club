@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,15 +17,23 @@ import {
   Building,
   Euro,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 
-export default function ScoutEventDetailsPage({ params }) {
+export default function ScoutEventDetailsPage() {
   const theme = useSelector((state) => state.theme);
   const router = useRouter();
-  const { id } = params;
-  console.log("Event ID from URL:", id);
+  const { id } = useParams();
+
+  // In Next.js App Router, params in client components need to be handled differently
+  // We'll use a useEffect to get the id after component mounts
+  const [eventId, setEventId] = React.useState(null);
+
+  React.useEffect(() => {
+    setEventId(id);
+    console.log("Event ID from URL:", id);
+  }, [id]);
 
   // Mock data - same as in the events page
   const mockEvents = [
@@ -33,11 +42,11 @@ export default function ScoutEventDetailsPage({ params }) {
       image: "/Scout/events/banner.jpg",
       title: "Elite Youth Showcase 2025",
       type: "Showcase",
-      date: "Monday 15 December 2025", // Updated format to match details page
+      date: "Monday 15 December 2025",
       time: "10:00 AM - 5:00 PM",
       duration: "50.00",
-      location: "Camp Nou Training Ground", // Updated to match details page
-      address: "C/ Aristides Maillol, 12, Barcelona, Spain", // Added address
+      location: "Camp Nou Training Ground",
+      address: "C/ Aristides Maillol, 12, Barcelona, Spain",
       organizer: "FC Barcelona Youth",
       organizerLogo: "/clubs/barcelona.png",
       entryFee: "Free",
@@ -54,7 +63,7 @@ export default function ScoutEventDetailsPage({ params }) {
     },
     {
       id: 2,
-      image: "/Scout/events/event.jpg",
+      image: "/Scout/events/banner.jpg",
       title: "Winter Trials - U18",
       type: "Trial",
       date: "Monday 20 December 2025", // Updated format
@@ -175,10 +184,21 @@ export default function ScoutEventDetailsPage({ params }) {
   ];
 
   // Find the event that matches the ID from the URL
-  const event = mockEvents.find((e) => e.id === parseInt(id)) || mockEvents[0]; // Default to first event if not found
+  const event = eventId
+    ? mockEvents.find((e) => e.id === parseInt(eventId))
+    : mockEvents[0]; // Default to first event if eventId is not yet set
+
+  // Show loading state if event ID is not yet available
+  if (eventId === null) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-white">Loading event details...</p>
+      </div>
+    );
+  }
 
   // Calculate spots available based on spots taken and total spots
-  const spotsAvailable = event.totalSpots - event.spots;
+  const spotsAvailable = event?.totalSpots - event.spots;
 
   const registeredPlayers = [
     {
@@ -245,7 +265,7 @@ export default function ScoutEventDetailsPage({ params }) {
           src={event.image}
           alt={event.title}
           fill
-          quality={100}
+          quality={70}
           className="object-cover"
         />
         {/* Featured Badge */}
@@ -254,7 +274,7 @@ export default function ScoutEventDetailsPage({ params }) {
         </div>
 
         {/* Title & Organizer */}
-        <div className="absolute bottom-0 text-white  bg-[#00000082] z-50 w-full px-8 py-8  bg-opacity-60">
+        <div className="absolute bottom-0 text-white  bg-[#00000082]  w-full px-8 py-8  bg-opacity-60">
           <h1 className="text-3xl font-semibold my-2">{event.title}</h1>
           <div className="flex items-center gap-4">
             <Image
@@ -291,7 +311,7 @@ export default function ScoutEventDetailsPage({ params }) {
         >
           {/* Event Details Card */}
           <div
-            className="rounded-xl p-8 border relative z-40"
+            className="rounded-xl p-8 border "
             style={{
               backgroundColor: theme.colors.backgroundCard,
               borderColor: `${theme.colors.primaryCyan}33`,
@@ -373,7 +393,7 @@ export default function ScoutEventDetailsPage({ params }) {
                 <div>
                   <p className="text-gray-400">Spots Available</p>
                   <p className="text-white font-medium">
-                    {spotsAvailable} / {event.totalSpots}
+                    {spotsAvailable} / {event?.totalSpots}
                   </p>
                 </div>
               </div>
@@ -410,7 +430,7 @@ export default function ScoutEventDetailsPage({ params }) {
               variant="outline"
               className="w-full rounded-lg py-4 text-lg font-medium mb-4"
               style={{ backgroundColor: theme.colors.primaryCyan }}
-              onClick={() => router.push(`/scout/events/${params.id}/register`)}
+              onClick={() => router.push(`/scout/events/${eventId}/register`)}
             >
               Register Now
             </Button>
