@@ -67,7 +67,7 @@ export default function ClubTopbar() {
         {/* User Profile */}
         <div className="flex items-center gap-2 lg:gap-3">
           <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
-            <AvatarImage src="/fc-barcelona-youth.jpg" alt="FC Barcelona Youth" />
+            <AvatarImage src="/fc-barcelona-youth.png" alt="FC Barcelona Youth" className="object-contain p-1" />
             <AvatarFallback>FB</AvatarFallback>
           </Avatar>
           <div className="hidden sm:block">
