@@ -159,8 +159,8 @@ export default function EventsDirectoryPage() {
               <div
                 className="absolute top-4 right-4 px-4 py-1 rounded-full text-sm font-medium"
                 style={{
-                  backgroundColor: `${theme.colors.primaryCyan}20`,
-                  color: theme.colors.primaryCyan,
+                  backgroundColor: `${theme.colors.greenBg}`,
+                  color: "#05DF72",
                 }}
               >
                 Registered
@@ -195,7 +195,7 @@ export default function EventsDirectoryPage() {
                 style={{
                   backgroundColor: event.registered
                     ? "transparent"
-                    : theme.colors.primaryCyan,
+                    : theme.colors.button,
                   border: event.registered
                     ? `2px solid ${theme.colors.primaryCyan}`
                     : "none",

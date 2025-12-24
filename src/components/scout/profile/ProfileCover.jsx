@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Save, SquarePen, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useRef } from "react";
 import { useSelector } from "react-redux";
 
 export default function ProfileCover({
   scoutPlayerProfileData,
-
+  setIsEditing,
+  isEditing,
   updatePlayerProfileData,
 }) {
   const theme = useSelector((state) => state.theme);
@@ -14,7 +15,7 @@ export default function ProfileCover({
   const router = useRouter();
   // Get cover image from playerProfileData or use default
   const coverImage =
-    scoutPlayerProfileData.coverImage || "/player/profile/profileBanner.png";
+    scoutPlayerProfileData.coverImage || "/scout/stadium-banner.png";
 
   // Handle cover image change
   const handleCoverImageChange = (e) => {
@@ -29,6 +30,11 @@ export default function ProfileCover({
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // Trigger file input click
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
   };
 
   return (
@@ -50,22 +56,48 @@ export default function ProfileCover({
       />
 
       {/* Action Buttons */}
-      <div className="absolute top-4 left-4 flex gap-3 z-20">
+      <div className="absolute top-4 right-4 flex gap-3 z-20">
         <Button
-          className={`rounded-md hover:opacity-80 text-white transition-all`}
+          className={`rounded-md text-white transition-all`}
           variant="outline"
           style={{
-            backgroundColor: theme.colors.backgroundDark,
+            color: theme.colors.primaryCyan,
+            backgroundColor: isEditing
+              ? `${theme.colors.primaryCyan}`
+              : ` white`,
           }}
-          onClick={() => router.push("/scout/player-discovery")}
+          onClick={() => setIsEditing(!isEditing)}
         >
-          <ChevronLeft
-            style={{ color: theme.colors.primaryCyan }}
-            className="w-4 text-white h-4 mr-2"
-          />
-          Back to Directory
+          <span
+            className={`text-${
+              isEditing ? "white" : "black"
+            } flex items-center`}
+          >
+            {" "}
+            {isEditing ? (
+              <Save className="w-4 h-4 mr-2" />
+            ) : (
+              <SquarePen className="w-4 h-4 mr-2" />
+            )}
+            {isEditing ? "Save Changes" : "Edit Profile"}
+          </span>
         </Button>
       </div>
+
+      {/* Edit overlay for cover photo */}
+      {isEditing && (
+        <div
+          className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl cursor-pointer"
+          onClick={triggerFileInput}
+        >
+          <div className="text-center">
+            <button className="p-3 rounded-full bg-white/20 backdrop-blur-sm mb-2">
+              <SquarePen className="w-6 h-6 text-white" />
+            </button>
+            <p className="text-white text-sm">Click to change cover image</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

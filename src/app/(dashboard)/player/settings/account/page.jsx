@@ -159,12 +159,12 @@ export default function AccountSettingsPage() {
 
       <div className="pt-8">
         <Button
+          variant="common"
           onClick={() => {
             console.log("Save button clicked");
           }}
-          className="w-full rounded-full text-white font-medium py-6 text-lg"
+          className="w-full  text-white font-medium py-6 text-lg"
           style={{
-            backgroundColor: theme.colors.primaryCyan,
             backgroundImage: "none",
             boxShadow: "0 4px 15px rgba(0, 229, 255, 0.3)",
           }}

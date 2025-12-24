@@ -82,7 +82,9 @@ export default function BoostSuccessModal({ isOpen, onClose, boostData }) {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Amount Paid</span>
-              <span className="text-white font-medium">€{price}</span>
+              <span className=" font-medium" style={{ color: theme.colors.primaryCyan }}>
+                €{price}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Status</span>
@@ -94,10 +96,9 @@ export default function BoostSuccessModal({ isOpen, onClose, boostData }) {
 
           {/* Done Button */}
           <Button
-            variant="outline"
+            variant="common"
             onClick={onClose}
             className="w-full mt-10 rounded-md py-6 text-lg"
-            style={{ backgroundColor: theme.colors.primaryCyan }}
           >
             Done
           </Button>

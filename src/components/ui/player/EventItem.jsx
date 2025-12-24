@@ -15,6 +15,7 @@ export default function EventItem({
       className="flex items-center justify-between p-3 lg:p-4 rounded-lg transition-all cursor-pointer gap-3"
       style={{
         backgroundColor: "transparent",
+        color: theme.colors.primaryCyan,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = `${theme.colors.backgroundDark}80`;
@@ -44,7 +45,14 @@ export default function EventItem({
 
       {/* Status badge */}
       <div className="text-end">
-        <p className="text-lg text-[#04B5A3]  truncate">{date}</p>
+        <p
+          className="text-lg  truncate"
+          style={{
+            color: theme.colors.primaryCyan,
+          }}
+        >
+          {date}
+        </p>
         <p className="text-md text-gray-400 truncate">{time}</p>
       </div>
     </div>

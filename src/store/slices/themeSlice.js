@@ -5,12 +5,14 @@ const initialState = {
   tagline:
     "Next-generation digital platform for youth football talent discovery",
   colors: {
-    primaryCyan: "#04B5A3",
+    button: "#04B5A3",
+    primaryCyan: "#00E5FF",
     primaryMagenta: "#9C27B0",
     backgroundDark: "#0B0D2C",
     backgroundCard: "#12143A",
     neonAccent: "#14F1D9",
     statNeon: "#00E5FF",
+    greenBg: "#00C95033",
   },
 };
 

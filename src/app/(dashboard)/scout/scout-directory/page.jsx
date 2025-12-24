@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 const mockScouts = [
   {
     id: 1,
-    image: "/scout/roberto.png",
+    image: "/scout/martinez.png",
     name: "Roberto Martinez",
     role: "Senior Scout - Youth Development",
     countries: "Spain, Portugal",
