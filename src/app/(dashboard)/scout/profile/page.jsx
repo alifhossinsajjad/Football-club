@@ -32,6 +32,7 @@ export default function ScoutProfilePage() {
       role: "Senior Scout - Youth Development",
       image: "/Scout/martinez.png",
       coverImage: "/stadium/stadium-banner.jpg",
+      age: 45,
       location: "Madrid, Spain",
       joined: "January 2020",
       connections: 334,
@@ -202,7 +203,7 @@ export default function ScoutProfilePage() {
         updateProfileField={updateProfileField}
       />
 
-      <ScoutStatsGrid
+    {isEditing ||  <ScoutStatsGrid
         stats={{
           viewedPlayers: 342,
           viewedChange: "+48 this week",
@@ -214,7 +215,7 @@ export default function ScoutProfilePage() {
           unread: 5,
         }}
         theme={theme}
-      />
+      />}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">

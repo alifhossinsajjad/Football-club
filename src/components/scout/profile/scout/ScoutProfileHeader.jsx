@@ -8,6 +8,9 @@ import {
   Weight,
   Upload,
   SquarePen,
+  CalendarRange,
+  Users,
+  Trophy,
 } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -74,7 +77,7 @@ export default function ScoutProfileHeader({
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Profile Photo */}
           <div className="relative flex flex-col items-center">
-            <div className="w-40 h-40 lg:w-48 lg:h-48  rounded-full overflow-hidden border-4 border-green-500">
+            <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden border-4 border-green-500">
               <Image
                 alt={profileData.name}
                 width={400}
@@ -355,7 +358,7 @@ export default function ScoutProfileHeader({
           </div>
 
           {/* Main Info */}
-          <div className="flex-1 text-white">
+          <div className="flex-1 text-white max-w-lg mx-auto">
             <div className="flex items-start justify-between mb-6">
               <div>
                 {isEditing ? (
@@ -396,47 +399,22 @@ export default function ScoutProfileHeader({
                   </div>
                 ) : (
                   <p className="text-base text-gray-500 flex items-center gap-2">
-                    <MapPin className="w-4 h-4" /> {profileData.location}
+                    {profileData.role}
                   </p>
                 )}
               </div>
-              {isEditing ? (
-                <input
-                  type="text"
-                  className="px-4 py-2 rounded-sm text-sm font-medium bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                  style={{
-                    backgroundColor: `${theme.colors.backgroundDark}`,
-                    color: theme.colors.primaryCyan,
-                  }}
-                  value={editableProfileData.status}
-                  onChange={(e) => handleInputChange("status", e.target.value)}
-                />
-              ) : (
-                <div
-                  className="px-4 py-2 rounded-sm text-sm font-medium"
-                  style={{
-                    backgroundColor: `${theme.colors.backgroundDark}`,
-                    color: theme.colors.primaryCyan,
-                  }}
-                >
-                  {profileData.status}
-                </div>
-              )}
             </div>
 
             {/* Personal Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-3 2xl:grid-cols-4 gap-6 text-left">
-              <div
-                className="text-left p-4 rounded-md flex flex-col  gap-2 "
-                style={{
-                  backgroundColor: theme.colors.backgroundDark,
-                }}
-              >
-                <p className="text-gray-400 text-base items-center flex gap-2">
-                  <span>
-                    <Calendar className="w-4 h-4" />
-                  </span>{" "}
-                  Age
+            <div className="grid grid-cols-2  gap-6 text-left">
+              <div className="text-left   rounded-md flex   gap-2 ">
+                <p className="text-gray-400 justify-center text-base items-center flex gap-2">
+                  <MapPin
+                    className="w-6 h-6"
+                    style={{
+                      color: theme.colors.primaryCyan,
+                    }}
+                  />
                 </p>
                 {isEditing ? (
                   <input
@@ -446,132 +424,89 @@ export default function ScoutProfileHeader({
                     onChange={(e) => handleInputChange("age", e.target.value)}
                   />
                 ) : (
-                  <p className="text-base ">{profileData.age}</p>
+                  <div className="text-base flex ">
+                    <div className="">
+                      <p className="text-sm mt-1 text-gray-400">Location</p>
+                      <p className="text-base ">{profileData.location}</p>
+                    </div>
+                  </div>
                 )}
               </div>
-              <div
-                className="text-left p-4 rounded-md flex flex-col  gap-2 "
-                style={{
-                  backgroundColor: theme.colors.backgroundDark,
-                }}
-              >
-                <p className="text-gray-400 text-base items-center flex gap-2">
-                  {" "}
-                  <span>
-                    <Ruler className="w-4 h-4" />
-                  </span>{" "}
-                  Height
+              <div className="text-left   rounded-md flex   gap-2 ">
+                <p className="text-gray-400 justify-center text-base items-center flex gap-2">
+                  <CalendarRange
+                    className="w-6 h-6"
+                    style={{
+                      color: theme.colors.primaryCyan,
+                    }}
+                  />
                 </p>
                 {isEditing ? (
                   <input
                     type="text"
                     className="text-base bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={editableProfileData.height}
-                    onChange={(e) =>
-                      handleInputChange("height", e.target.value)
-                    }
+                    value={editableProfileData.age}
+                    onChange={(e) => handleInputChange("age", e.target.value)}
                   />
                 ) : (
-                  <p className="text-base ">{profileData.height}</p>
+                  <div className="text-base flex ">
+                    <div className="">
+                      <p className="text-sm mt-1 text-gray-400">Joined</p>
+                      <p className="text-base ">{profileData.joined}</p>
+                    </div>
+                  </div>
                 )}
               </div>
-              <div
-                className="text-left p-4 rounded-md flex flex-col  gap-2 "
-                style={{
-                  backgroundColor: theme.colors.backgroundDark,
-                }}
-              >
-                <p className="text-gray-400 text-base items-center flex gap-2">
-                  <span>
-                    <Weight className="w-4 h-4" />
-                  </span>{" "}
-                  Weight
+              <div className="text-left   rounded-md flex   gap-2 ">
+                <p className="text-gray-400 justify-center text-base items-center flex gap-2">
+                  <Users
+                    className="w-6 h-6"
+                    style={{
+                      color: theme.colors.primaryCyan,
+                    }}
+                  />
                 </p>
                 {isEditing ? (
                   <input
                     type="text"
                     className="text-base bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={editableProfileData.weight}
-                    onChange={(e) =>
-                      handleInputChange("weight", e.target.value)
-                    }
+                    value={editableProfileData.age}
+                    onChange={(e) => handleInputChange("age", e.target.value)}
                   />
                 ) : (
-                  <p className="text-base ">{profileData.weight}</p>
+                  <div className="text-base flex ">
+                    <div className="">
+                      <p className="text-sm mt-1 text-gray-400">Connection</p>
+                      <p className="text-base ">{profileData.connections}</p>
+                    </div>
+                  </div>
                 )}
               </div>
-              <div
-                className="text-left p-4 rounded-md flex flex-col  gap-2 "
-                style={{
-                  backgroundColor: theme.colors.backgroundDark,
-                }}
-              >
-                <p className="text-gray-400 text-base items-center flex gap-2">
-                  <span>
-                    <Flag className="w-4 h-4" />
-                  </span>{" "}
-                  Nationality
+              <div className="text-left   rounded-md flex   gap-2 ">
+                <p className="text-gray-400 justify-center text-base items-center flex gap-2">
+                  <Trophy
+                    className="w-6 h-6"
+                    style={{
+                      color: theme.colors.primaryCyan,
+                    }}
+                  />
                 </p>
                 {isEditing ? (
                   <input
                     type="text"
                     className="text-base bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={editableProfileData.nationality}
-                    onChange={(e) =>
-                      handleInputChange("nationality", e.target.value)
-                    }
+                    value={editableProfileData.age}
+                    onChange={(e) => handleInputChange("age", e.target.value)}
                   />
                 ) : (
-                  <p className="text-base   gap-2">{profileData.nationality}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Additional Info */}
-            <div className="grid grid-cols-2 xl:grid-cols-3 gap-6 mt-8 text-left text-base">
-              <div>
-                <p className="text-gray-400 ">Preferred Foot</p>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={editableProfileData.preferredFoot}
-                    onChange={(e) =>
-                      handleInputChange("preferredFoot", e.target.value)
-                    }
-                  />
-                ) : (
-                  <p>{profileData.preferredFoot}</p>
-                )}
-              </div>
-              <div>
-                <p className="text-gray-400 ">Date of Birth</p>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={editableProfileData.dateOfBirth}
-                    onChange={(e) =>
-                      handleInputChange("dateOfBirth", e.target.value)
-                    }
-                  />
-                ) : (
-                  <p>{profileData.dateOfBirth}</p>
-                )}
-              </div>
-              <div>
-                <p className="text-gray-400 ">Jersey Number</p>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    className="text-white bg-transparent border-b border-gray-600 focus:outline-none focus:border-cyan-500"
-                    value={editableProfileData.jerseyNumber}
-                    onChange={(e) =>
-                      handleInputChange("jerseyNumber", e.target.value)
-                    }
-                  />
-                ) : (
-                  <p>{profileData.jerseyNumber}</p>
+                  <div className="text-base flex ">
+                    <div className="">
+                      <p className="text-sm mt-1 text-gray-400">Experience</p>
+                      <p className="text-base ">
+                        {profileData.experience} Years
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
