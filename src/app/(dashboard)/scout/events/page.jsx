@@ -203,7 +203,7 @@ export default function ScoutEventsPage() {
       {/* Load More */}
       <div className="flex justify-center mt-12">
         <Button
-          variant="outline"
+          variant="common"
           className="px-12 py-4 rounded-md text-lg font-medium"
           style={{
             backgroundColor: `${theme.colors.primaryCyan}20`,

@@ -81,7 +81,6 @@ export default function ScoutDirectoryCard({ scout, theme }) {
           <p className="text-white font-bold text-lg">{experience} years</p>
         </div>
         <div className="flex items-center gap-3">
-          <Users className="w-5 h-5 text-primaryCyan" />
           <div>
             <p className="text-gray-400 text-sm">Connections</p>
             <p className="text-white font-bold text-lg">{connections}</p>
@@ -93,9 +92,8 @@ export default function ScoutDirectoryCard({ scout, theme }) {
       <div className="flex gap-4 pt-4">
         <Button
           onClick={() => router.push(`/scout/scout-directory/${scout.id}`)}
-          variant="outline"
+          variant="common"
           className="flex-1  py-3 font-medium"
-          style={{ backgroundColor: theme.colors.primaryCyan }}
         >
           View Profile
         </Button>

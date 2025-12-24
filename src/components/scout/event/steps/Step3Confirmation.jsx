@@ -1,7 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Check, User, Briefcase, Shield, Lock, Phone } from "lucide-react";
+import {
+  Check,
+  User,
+  Briefcase,
+  Shield,
+  Lock,
+  Phone,
+  CircleAlert,
+} from "lucide-react";
 import { Checkbox } from "@/components/ui/Checkbox";
 import Link from "next/link";
 
@@ -159,6 +167,28 @@ export default function Step3Confirmation({ event, theme }) {
             I acknowledge that I will adhere to the professional code of conduct
             while attending this event
           </span>
+        </label>
+        <label
+          className="flex items-center gap-4 cursor-pointer hover:border  p-4 rounded-md "
+          style={{
+            backgroundColor: theme.colors.backgroundDark,
+            borderColor: `${theme.colors.primaryCyan}33`,
+          }}
+        >
+          <CircleAlert
+            className="w-12 md:w-5 md:h-5 md:mt-1 "
+            style={{
+              color: theme.colors.primaryCyan,
+            }}
+          />
+          <div className="text-gray-400">
+            <div className="font-semibold text-white leading-relaxed">
+              Free Event Registration
+            </div>
+            As a verified scout, you can attend this event at no cost. A
+            confirmation email with event details and access credentials will be
+            sent to your registered email address.
+          </div>
         </label>
       </div>
     </div>

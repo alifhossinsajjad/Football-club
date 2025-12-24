@@ -148,20 +148,14 @@ export default function ScoutEventRegistrationPage({ params }) {
           )}
 
           {step !== 3 && (
-            <Button
-              variant="outline"
-              onClick={handleNext}
-              className="px-8"
-              style={{ backgroundColor: theme.colors.primaryCyan }}
-            >
+            <Button variant="common" onClick={handleNext} className="px-8">
               Next Step →
             </Button>
           )}
           {step == 3 && (
             <Button
-              variant="outline"
+              variant="common"
               className="  font-semibold text-md px-8 py-2"
-              style={{ backgroundColor: theme.colors.primaryCyan }}
             >
               Confirm Registration (Free)
             </Button>
