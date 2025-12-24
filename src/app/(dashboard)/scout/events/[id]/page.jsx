@@ -427,9 +427,8 @@ export default function ScoutEventDetailsPage() {
               Register to observe players and gain access to full profiles.
             </p>
             <Button
-              variant="outline"
+              variant="common"
               className="w-full rounded-lg py-4 text-lg font-medium mb-4"
-              style={{ backgroundColor: theme.colors.primaryCyan }}
               onClick={() => router.push(`/scout/events/${eventId}/register`)}
             >
               Register Now

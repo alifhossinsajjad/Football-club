@@ -90,16 +90,15 @@ export default function PlayerDirectoryCard({
       {/* Current Club */}
       <div className="flex justify-between text-gray-300">
         <span>Current Club:</span>
-        <span>{currentClub}</span>
+        <span className="text-[#05DF72]">{currentClub}</span>
       </div>
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4">
         <Button
-          variant="outline"
+          variant="common"
           onClick={onViewProfile}
           className="flex-1 py-3 rounded-lg font-medium text-white transition-all"
-          style={{ backgroundColor: theme.colors.primaryCyan }}
         >
           View Profile
         </Button>

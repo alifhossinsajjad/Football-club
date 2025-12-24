@@ -2,7 +2,14 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, Trophy, MapPin, MessageSquare } from "lucide-react";
+import {
+  Users,
+  Calendar,
+  Trophy,
+  MapPin,
+  MessageSquare,
+  Building,
+} from "lucide-react";
 import { useState } from "react";
 import ClubInteractionModal from "../modals/ClubInteractionModal";
 
@@ -38,8 +45,12 @@ export default function ClubDirectoryCard({
               className="w-full h-full object-contain"
             />
           </div>
-          <div>
+          <div className="space-y-1">
             <h3 className="text-xl font-bold text-white">{name}</h3>
+            <p className=" flex items-center gap-2 text-sm" style={{ color: theme.colors.primaryCyan }}>
+              <Building className="w-4 h-4" />
+              Professional Academy
+            </p>
             <p className="text-gray-400 flex items-center gap-2 text-sm">
               <MapPin className="w-4 h-4" />
               {location}
@@ -51,24 +62,14 @@ export default function ClubDirectoryCard({
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="flex items-center gap-3 text-gray-300">
-          <Users
-            className="w-5 h-5 "
-            style={{
-              color: theme.colors.primaryCyan,
-            }}
-          />
+          <Users className="w-5 h-5 text-[#C27AFF]" />
           <div>
             <p className="text-gray-400">Players</p>
             <p className="font-medium text-white">{playersCount}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 text-gray-300">
-          <Calendar
-            className="w-5 h-5"
-            style={{
-              color: theme.colors.primaryCyan,
-            }}
-          />
+          <Trophy className="w-5 h-5 text-yellow-400" />
           <div>
             <p className="text-gray-400">Established</p>
             <p className="font-medium text-white">{established}</p>
@@ -79,8 +80,12 @@ export default function ClubDirectoryCard({
       {/* Recent Achievement */}
       <div>
         <p className="text-gray-400 text-sm mb-2">Recent Achievement</p>
-        <p className="text-white flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-yellow-500" />
+        <p
+          className=" flex items-center gap-2"
+          style={{
+            color: theme.colors.primaryCyan,
+          }}
+        >
           {recentAchievement}
         </p>
       </div>
@@ -89,10 +94,9 @@ export default function ClubDirectoryCard({
 
       <div className="flex gap-3 pt-4">
         <Button
-          variant="outline"
+          variant="common"
           onClick={onViewDetails}
           className="flex-1 py-3 rounded-lg font-medium text-white transition-all"
-          style={{ backgroundColor: theme.colors.primaryCyan }}
         >
           View Profile
         </Button>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Star } from "lucide-react";
+import { Button } from "../button";
 
 export default function ShortlistedPlayerCard({
   image = "/placeholder.png",
@@ -8,12 +9,7 @@ export default function ShortlistedPlayerCard({
   nationality = "-",
   nationFlag = "",
   age = "-",
-  theme = {
-    colors: {
-      backgroundDark: "#0B0D2C",
-      primaryCyan: "#04B5A3",
-    },
-  },
+  theme,
 }) {
   return (
     <div
@@ -56,14 +52,9 @@ export default function ShortlistedPlayerCard({
       </div>
 
       {/* button */}
-      <div
-        className="rounded-md py-2 text-center cursor-pointer hover:opacity-90"
-        style={{
-          backgroundColor: theme.colors.primaryCyan,
-        }}
-      >
-        <button className="text-white text-sm font-semibold">View Full Profile</button>
-      </div>
+      <Button variant="common" className="text-white text-sm font-semibold w-full">
+        View Full Profile
+      </Button>
     </div>
   );
 }

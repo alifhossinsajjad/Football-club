@@ -12,13 +12,7 @@ import RecentPlayerView from "@/components/ui/scout/RecentPlayerView";
 
 export default function ScoutDashboard() {
   //   const theme = useSelector((state) => state.theme);
-  const theme = useSelector((state) => state.theme) || {
-    colors: {
-      primaryCyan: "#04B5A3",
-      primaryMagenta: "#9C27B0",
-      backgroundCard: "#12143A",
-    },
-  };
+  const theme = useSelector((state) => state.theme);
 
   return (
     <div className="space-y-6">

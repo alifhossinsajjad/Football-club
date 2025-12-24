@@ -136,10 +136,9 @@ export default function EventCard({
         {/* Buttons */}
         <div className="flex gap-3">
           <Button
-            variant="outline"
+            variant="common"
             onClick={onRegister}
             className="w-1/2 rounded-lg py-3 font-medium"
-            style={{ backgroundColor: theme.colors.primaryCyan }}
           >
             Register Now
           </Button>
@@ -147,10 +146,6 @@ export default function EventCard({
             onClick={onViewDetails}
             variant="outline"
             className="px-6 rounded-lg w-1/2"
-            style={{
-              borderColor: `${theme.colors.primaryCyan}33`,
-              color: theme.colors.primaryCyan,
-            }}
           >
             View Details
           </Button>

@@ -27,14 +27,14 @@ export default function UpcomingEvent({
           <p className="text-base lg:text-lg font-semibold text-white truncate">
             {title}
           </p>
-          <p className="text-sm text-gray-400 truncate">{academy}</p>
+          <p className="text-sm text-gray-400 truncate"> {academy}</p>
           <p className="text-xs text-gray-400 truncate">{location}</p>
         </div>
       </div>
 
       {/* Status badge */}
       <div className="text-end">
-        <p className="text-lg text-[#04B5A3]  truncate">{date}</p>
+        <p className="text-lg  truncate" style={{ color: theme.colors.primaryCyan }}> {date}</p>
         <p className="text-md text-gray-400 truncate">{time}</p>
       </div>
     </div>
