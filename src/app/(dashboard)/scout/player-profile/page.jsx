@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import ProfileCover from "@/components/ui/scout/profile/ProfileCover";
-import ProfileDetails from "@/components/ui/scout/profile/ProfileDetails";
-import AboutProfile from "@/components/ui/scout/profile/AboutProfile";
-import StatisticsPart from "@/components/ui/scout/profile/StatisticsPart";
-import SkillsPlayer from "@/components/ui/scout/profile/SkillsPlayer";
-import PlayHistory from "@/components/ui/scout/profile/PlayHistory";
-import ContactThePlayer from "@/components/ui/scout/profile/ContactThePlayer";
-import PlayerSocialMedia from "@/components/ui/scout/profile/PlayerSocialMedia";
-import AchievementList from "@/components/ui/scout/profile/AchievementList";
-import PlayersProfile from "@/components/ui/scout/profile/PlayersProfile";
-import HighlightVideo from "@/components/ui/scout/profile/HighlightVideo";
+import ProfileCover from "@/components/scout/profile/ProfileCover";
+import ProfileDetails from "@/components/scout/profile/ProfileDetails";
+import AboutProfile from "@/components/scout/profile/AboutProfile";
+import StatisticsPart from "@/components/scout/profile/StatisticsPart";
+import SkillsPlayer from "@/components/scout/profile/SkillsPlayer";
+import PlayHistory from "@/components/scout/profile/PlayHistory";
+import ContactThePlayer from "@/components/scout/profile/ContactThePlayer";
+import PlayerSocialMedia from "@/components/scout/profile/PlayerSocialMedia";
+import AchievementList from "@/components/scout/profile/AchievementList";
+import PlayersProfile from "@/components/scout/profile/PlayersProfile";
+import HighlightVideo from "@/components/scout/profile/HighlightVideo";
 
 export default function ScoutPlayerProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
