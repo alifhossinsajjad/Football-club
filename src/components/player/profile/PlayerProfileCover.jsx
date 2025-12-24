@@ -61,10 +61,7 @@ export default function PlayerProfileCover({
           className={`rounded-md text-white transition-all`}
           variant="outline"
           style={{
-            color: theme.colors.primaryCyan,
-            backgroundColor: isEditing
-              ? `${theme.colors.primaryCyan}`
-              : ` white`,
+            backgroundColor: isEditing ? `${theme.colors.button}` : ` white`,
           }}
           onClick={() => setIsEditing(!isEditing)}
         >
@@ -84,9 +81,8 @@ export default function PlayerProfileCover({
         </Button>
         {isEditing || (
           <Button
-            variant="outline"
+            variant="common"
             className="rounded-md"
-            style={{ backgroundColor: theme.colors.primaryCyan }}
             onClick={() => {
               if (onBoost) {
                 onBoost();

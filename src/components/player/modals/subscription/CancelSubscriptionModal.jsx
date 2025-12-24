@@ -49,11 +49,10 @@ export default function CancelSubscriptionModal({ isOpen, onClose }) {
         <div className="flex gap-4">
           <Button
             variant="outline"
-            className="flex-1  py-6"
+            className="flex-1 text-white py-6"
             style={{
               backgroundColor: "transparent",
               border: `1px solid ${theme.colors.primaryCyan}`,
-              color: theme.colors.primaryCyan,
             }}
             onClick={onClose}
           >
@@ -61,7 +60,7 @@ export default function CancelSubscriptionModal({ isOpen, onClose }) {
           </Button>
           <Button
             variant="outline"
-            className="flex-1  py-6"
+            className="flex-1 text-white py-6"
             style={{ backgroundColor: "#EF4444" }}
             onClick={() => {
               // Real cancel logic here

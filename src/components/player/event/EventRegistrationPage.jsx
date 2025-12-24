@@ -161,22 +161,14 @@ export default function EventRegistrationPage({ params }) {
               </Button>
             )}
             {step != 4 && (
-              <Button
-                variant="outline"
-                onClick={handleNext}
-                className=" px-8"
-                style={{ backgroundColor: theme.colors.primaryCyan }}
-              >
+              <Button variant="common" onClick={handleNext} className=" px-8">
                 Next Step →
               </Button>
             )}
             {step == 4 && (
               <Button
-                variant="outline"
+                variant="common"
                 className="rounded-md py-10 md:px-8 font-semibold flex items-center justify-center gap-3 text-left hover:bg-primaryCyan/20"
-                style={{
-                  backgroundColor: `${theme.colors.primaryCyan}`,
-                }}
               >
                 <div className="text-left md:text-lg ">
                   Confirm Registration
@@ -185,9 +177,9 @@ export default function EventRegistrationPage({ params }) {
                   </h3>
                 </div>
                 <div
-                  className="md:text-2xl p-2 md:p-3  rounded-full shadow-md"
+                  className="md:text-2xl p-2 md:p-3  rounded-md shadow-md"
                   style={{
-                    backgroundColor: `${theme.colors.primaryCyan}`,
+                    backgroundColor: `${theme.colors.button}`,
                     opacity: 0.95,
                   }}
                 >

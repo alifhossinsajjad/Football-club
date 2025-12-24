@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import {
   CardSim,
   Check,
+  CircleAlert,
   CreditCard,
   Lock,
+  LockIcon,
   Phone,
   Shield,
   User,
@@ -223,14 +225,19 @@ export default function Step4({ event, formData = {} }) {
             borderColor: `${theme.colors.primaryCyan}33`,
           }}
         >
-          <Checkbox
-            type="checkbox"
-            className="mt-1 w-5 h-5 rounded accent-primaryCyan"
+          <CircleAlert
+            className="w-12 md:w-5 md:h-5 md:mt-1 "
+            style={{
+              color: theme.colors.primaryCyan,
+            }}
           />
-          <span className="text-gray-300 text-base leading-relaxed">
-            Cancellation Policy: Full refund 7+ days before the event. 3-6 days
-            50% refund, less than 3 days: No refund.
-          </span>
+          <div className="text-gray-400">
+            <div className="font-semibold text-white leading-relaxed">
+              Cancellation Policy
+            </div>
+            Cancellations made 7+ days before the event: Full refund. 3-6 days:
+            50% refund. Less than 3 days: No refund.
+          </div>
         </label>
       </div>
 
@@ -309,8 +316,6 @@ export default function Step4({ event, formData = {} }) {
           </div>
         </div>
       </div>
-
-     
     </div>
   );
 }

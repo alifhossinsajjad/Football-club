@@ -2,52 +2,158 @@
 
 import { useState } from "react";
 import ProfileCover from "@/components/scout/profile/ProfileCover";
-import ProfileDetails from "@/components/scout/profile/ProfileDetails";
-import AboutProfile from "@/components/scout/profile/AboutProfile";
-import StatisticsPart from "@/components/scout/profile/StatisticsPart";
-import SkillsPlayer from "@/components/scout/profile/SkillsPlayer";
-import PlayHistory from "@/components/scout/profile/PlayHistory";
-import ContactThePlayer from "@/components/scout/profile/ContactThePlayer";
-import PlayerSocialMedia from "@/components/scout/profile/PlayerSocialMedia";
-import AchievementList from "@/components/scout/profile/AchievementList";
-import PlayersProfile from "@/components/scout/profile/PlayersProfile";
-import HighlightVideo from "@/components/scout/profile/HighlightVideo";
-import BoostDurationModal from "@/components/player/modals/profile/BoostDurationModal";
-import BoostPaymentModal from "@/components/player/modals/profile/BoostPaymentModal";
-import BoostSuccessModal from "@/components/player/modals/profile/BoostSuccessModal";
+import ProfileHeader from "@/components/player/profile/ProfileHeader";
+import AboutPlayerProfile from "@/components/player/profile/AboutPlayerProfile";
+import CareerStatistics from "@/components/player/profile/CareerStatistics";
+import SocialMedia from "@/components/player/profile/SocialMedia";
+import ContactInformation from "@/components/player/profile/ContactInformation";
+import PlayerAchievements from "@/components/player/profile/PlayerAchievements";
+import PlayerProfileInsights from "@/components/player/profile/PlayerProfileInsights";
+import PlayerProfilePreference from "@/components/player/profile/PlayerProfilePreference";
+import HighlightVideosSection from "@/components/player/profile/PlayerProfileVideos";
+import PlayerProfileSkills from "@/components/player/profile/PlayerProfileSkills";
+import PlayerProfilePlayingHistory from "@/components/player/profile/PlayerProfilePlayingHistory";
+import ScoutStatsGrid from "@/components/scout/profile/grid/ScoutStatsGrid";
+import { useSelector } from "react-redux";
 
 export default function ScoutProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
+  const theme = useSelector((state) => state.theme);
 
   // Boost modal states
-  const [boostStep, setBoostStep] = useState(0);
   const [selectedDuration, setSelectedDuration] = useState(null);
-  const [boostData, setBoostData] = useState({});
 
   // Centralized scout profile data state
   const [scoutProfileData, setScoutProfileData] = useState({
     profile: {
       name: "Roberto Martinez",
-      position: "Senior Scout - Youth Development",
+      role: "Senior Scout - Youth Development",
+      image: "/Scout/roberto.png",
+      coverImage: "/stadium/stadium-banner.jpg",
       location: "Madrid, Spain",
-      status: "Active",
-      age: "45 years",
-      height: "6'0 (183 cm)",
-      weight: "180 lbs (82 kg)",
-      nationality: "Spanish",
-      preferredFoot: "Right",
-      dateOfBirth: "01/05/1979",
-      jerseyNumber: "-",
+      joined: "January 2020",
+      connections: 334,
+      experience: 15,
+      viewedPlayers: 342,
+      viewedChange: "+48 this week",
+      shortlistedPlayers: 28,
+      activeShortlisted: 12,
+      upcomingEvents: 6,
+      nextEvent: "Sep 15",
+      conversations: 15,
+      unread: 5,
+      about:
+        "Highly experienced and dedicated professional football scout with over 20 years in talent identification and player development. Specialized in youth scouting, technical analysis, and international talent discovery. Successfully identified and recommended numerous players who have gone on to play at the highest levels of European football. Known for meticulous attention to detail, strong networking capabilities, and an exceptional eye for raw talent.",
+      specializations: [
+        "Youth Scouting",
+        "Technical Analysis",
+        "Player Development",
+        "International Scouting",
+      ],
+      contact: {
+        email: "r.martinez@footballpros.com",
+        phone: "+34 7700 900000",
+        website: "www.robertomscout.com",
+      },
+      social: {
+        instagram: "@rmscout",
+        twitter: "@RMartinezScout",
+        linkedin: "Roberto Martinez",
+        youtube: "MT Scouting Analysis",
+      },
+      languages: ["English", "Spanish", "French", "Portuguese", "German"],
+      stats: {
+        scouted: "1,200+",
+        recommended: 145,
+        placements: 89,
+        successRate: "61%",
+        clubsWorked: 25,
+      },
+      notableDiscoveries: [
+        {
+          name: "Carlos Fernandez",
+          position: "Midfielder U17",
+          club: "Real Madrid",
+          year: 2018,
+        },
+        {
+          name: "Lucas Silva",
+          position: "Forward U16",
+          club: "Barcelona",
+          year: 2019,
+        },
+        {
+          name: "Miguel Torres",
+          position: "Defender U18",
+          club: "Atletico Madrid",
+          year: 2020,
+        },
+        {
+          name: "James Wilson",
+          position: "Midfielder U17",
+          club: "Manchester United",
+          year: 2021,
+        },
+        {
+          name: "Pierre Dubois",
+          position: "Forward U18",
+          club: "PSG",
+          year: 2022,
+        },
+      ],
+      regions: [
+        { country: "England", coverage: "Full Coverage", years: 20 },
+        { country: "Spain", coverage: "Full Coverage", years: 15 },
+        { country: "Germany", coverage: "Partial Coverage", years: 12 },
+        { country: "France", coverage: "Full Coverage", years: 18 },
+        { country: "Portugal", coverage: "Full Coverage", years: 10 },
+      ],
+      history: [
+        {
+          club: "Manchester United Youth Academy",
+          role: "Senior Scout",
+          period: "2021 - Present",
+          current: true,
+        },
+        {
+          club: "Liverpool FC",
+          role: "Youth Development Scout",
+          period: "2018 - 2021",
+        },
+        {
+          club: "England U-18 National Team",
+          role: "Talent Scout",
+          period: "2015 - 2018",
+        },
+        {
+          club: "City Football Academy",
+          role: "Regional Scout",
+          period: "2012 - 2015",
+        },
+        {
+          club: "Chelsea FC Academy",
+          role: "Junior Scout",
+          period: "2008 - 2012",
+        },
+      ],
+      achievements: [
+        "Scout of the Year - Premier League Youth Development 2024",
+        "Discovered 5 players who went on to represent national teams",
+        "Successfully identified talent for 25+ professional clubs",
+        "Top 10 Most Influential Scouts in Europe - 2023",
+        "Excellence in Youth Development Award - 2022",
+      ],
+      affiliations: [
+        "Manchester United Youth Academy",
+        "Liverpool FC",
+        "Real Madrid Academy",
+        "Barcelona La Masia",
+        "Chelsea FC Academy",
+      ],
     },
-
     coverImage: "/scout/stadium-banner.png",
     profileImage: "/scout/roberto.jpg",
   });
-
-  const handleBoostProfile = () => {
-    setBoostStep(1);
-    setIsEditing(false);
-  };
 
   const handleNextFromDuration = () => {
     if (!selectedDuration) return;
@@ -58,17 +164,9 @@ export default function ScoutProfilePage() {
       startDate: "1 Feb 2025",
       endDate: "1 Mar 2025",
     });
-    setBoostStep(2);
   };
 
-  const handlePaymentSuccess = () => {
-    setBoostStep(3);
-  };
-
-  const handleCloseBoost = () => {
-    setBoostStep(0);
-    setSelectedDuration(null);
-  };
+  const handlePaymentSuccess = () => {};
 
   const updateScoutProfileData = (updates) => {
     setScoutProfileData((prev) => ({
@@ -94,94 +192,85 @@ export default function ScoutProfilePage() {
         setIsEditing={setIsEditing}
         isEditing={isEditing}
         updatePlayerProfileData={updateScoutProfileData}
-        onBoost={handleBoostProfile}
       />
 
-      <ProfileDetails
-        scoutPlayerProfileData={scoutProfileData}
+      <ProfileHeader
+        playerProfileData={scoutProfileData}
         isEditing={isEditing}
         updateProfileField={updateProfileField}
-        setIsEditing={setIsEditing}
+      />
+
+      <ScoutStatsGrid
+        stats={{
+          viewedPlayers: 342,
+          viewedChange: "+48 this week",
+          shortlistedPlayers: 28,
+          activeShortlisted: 12,
+          upcomingEvents: 6,
+          nextEvent: "Sep 15",
+          conversations: 15,
+          unread: 5,
+        }}
+        theme={theme}
       />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <AboutProfile
-            scoutPlayerProfileData={scoutProfileData}
+          <AboutPlayerProfile
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-          <StatisticsPart
-            scoutPlayerProfileData={scoutProfileData}
+          <CareerStatistics
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-
-          <SkillsPlayer
-            scoutPlayerProfileData={scoutProfileData}
+          <PlayerProfileSkills
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-
-          <PlayHistory
-            scoutPlayerProfileData={scoutProfileData}
+          <PlayerProfilePlayingHistory
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
         </div>
 
         <div className="space-y-8">
-          <ContactThePlayer
-            scoutPlayerProfileData={scoutProfileData}
+          <ContactInformation
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-
-          <PlayerSocialMedia
-            scoutPlayerProfileData={scoutProfileData}
+          <SocialMedia
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-
-          <AchievementList
-            scoutPlayerProfileData={scoutProfileData}
+          <PlayerAchievements
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-
-          <PlayersProfile
-            scoutPlayerProfileData={scoutProfileData}
+          {!isEditing && (
+            <PlayerProfileInsights playerProfileData={scoutProfileData} />
+          )}
+          <PlayerProfilePreference
+            playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
         </div>
       </div>
 
-      <HighlightVideo
-        scoutPlayerProfileData={scoutProfileData}
+      <HighlightVideosSection
+        playerProfileData={scoutProfileData}
         isEditing={isEditing}
         updatePlayerProfileData={updateScoutProfileData}
       />
-
-      {/* Boost Modals */}
-      <BoostDurationModal
-        isOpen={boostStep === 1}
-        onClose={handleCloseBoost}
-        onNext={handleNextFromDuration}
-        selectedDuration={selectedDuration}
-        setSelectedDuration={setSelectedDuration}
-      />
-
-      <BoostPaymentModal
-        isOpen={boostStep === 2}
-        onClose={handleCloseBoost}
-        onBack={() => setBoostStep(1)}
-        onSuccess={handlePaymentSuccess}
-        boostData={boostData}
-      />
-
-      <BoostSuccessModal isOpen={boostStep === 3} onClose={handleCloseBoost} />
     </div>
   );
 }

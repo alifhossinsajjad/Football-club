@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CreditCard, X } from "lucide-react";
+import { CircleAlert, CreditCard, LockIcon, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import {
   Select,
@@ -18,13 +18,13 @@ export default function UpdatePaymentMethodModal({ isOpen, onClose }) {
 
   const inputStyle = {
     backgroundColor: theme.colors.backgroundDark,
-    border: `1px solid ${theme.colors.primaryCyan}`,
+    border: `1px solid ${theme.colors.greenBg}`,
   };
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div
-        className="w-full max-w-xl p-8 rounded-xl relative max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-2xl p-8 rounded-xl relative max-h-[90vh] overflow-y-auto"
         style={{ backgroundColor: theme.colors.backgroundCard }}
       >
         {/* Close Button */}
@@ -33,12 +33,12 @@ export default function UpdatePaymentMethodModal({ isOpen, onClose }) {
         </button>
 
         {/* Header */}
-        <h3 className="text-xl font-semibold text-white mb-4">
+        <h3 className="text-xl font-semibold text-white mb-4 ">
           Update Payment Method
         </h3>
 
         {/* Current Payment */}
-        <div className="mb-4">
+        <div className="mb-4 border-t pt-8">
           <h4 className="text-base font-medium text-white mb-2">
             Current Payment Method
           </h4>
@@ -127,7 +127,6 @@ export default function UpdatePaymentMethodModal({ isOpen, onClose }) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-gray-300 mb-1 block">City</label>
                 <input
                   type="text"
                   placeholder="City"
@@ -136,9 +135,6 @@ export default function UpdatePaymentMethodModal({ isOpen, onClose }) {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-300 mb-1 block">
-                  Postal Code
-                </label>
                 <input
                   type="text"
                   placeholder="Postal Code"
@@ -146,31 +142,6 @@ export default function UpdatePaymentMethodModal({ isOpen, onClose }) {
                   style={inputStyle}
                 />
               </div>
-            </div>
-
-            {/* Country */}
-            <div className="mt-3">
-              <label className="text-xs text-gray-300 mb-1 block">
-                Country
-              </label>
-              <Select defaultValue="spain">
-                <SelectTrigger className="h-10 text-sm" style={inputStyle}>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent
-                  style={{
-                    backgroundColor: theme.colors.backgroundDark,
-                    borderColor: `${theme.colors.primaryCyan}33`,
-                  }}
-                >
-                  <SelectItem value="spain">Spain</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="usa">United States</SelectItem>
-                  <SelectItem value="germany">Germany</SelectItem>
-                  <SelectItem value="france">France</SelectItem>
-                  <SelectItem value="portugal">Portugal</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
@@ -182,9 +153,26 @@ export default function UpdatePaymentMethodModal({ isOpen, onClose }) {
             </span>
           </div>
 
-          <p className="text-xs text-gray-500 mt-3">
-            Your payment is secure. We use industry-standard encryption.
-          </p>
+          <label
+            className="flex items-center gap-4 cursor-pointer   p-2 rounded-md "
+            style={{
+              backgroundColor: theme.colors.backgroundDark,
+              borderColor: `${theme.colors.primaryCyan}33`,
+            }}
+          >
+            <LockIcon
+              className="w-12 md:w-5 md:h-5 md:mt-1 "
+              style={{
+                color: theme.colors.primaryCyan,
+              }}
+            />
+            <div className="text-gray-400 text-sm">
+              <div className="font-semibold text-white leading-relaxed">
+                Your payment is secure
+              </div>
+              We use industry-standard encryption to protect your information.
+            </div>
+          </label>
         </div>
 
         {/* Actions */}
@@ -201,9 +189,8 @@ export default function UpdatePaymentMethodModal({ isOpen, onClose }) {
             Cancel
           </Button>
           <Button
-            variant="outline"
+            variant="common"
             className="flex-1  py-4 text-sm"
-            style={{ backgroundColor: theme.colors.primaryCyan }}
             onClick={() => {
               alert("Payment method updated");
               onClose();

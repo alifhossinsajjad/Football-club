@@ -15,9 +15,11 @@ import StateCard from "@/components/ui/player/StateCard";
 import MessageItem from "@/components/ui/player/MessageItem";
 import EventItem from "@/components/ui/player/EventItem";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function PlayerDashboard() {
   const theme = useSelector((state) => state.theme);
+  const router = useRouter();
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -97,7 +99,7 @@ export default function PlayerDashboard() {
         className="border rounded-lg p-4 lg:p-6"
         style={{
           backgroundColor: theme.colors.backgroundCard,
-          borderColor: `${theme.colors.primaryCyan}33`,
+          borderColor: `${theme.colors.primaryCyan}`,
         }}
       >
         <div className="flex items-center justify-between mb-6">
@@ -129,11 +131,12 @@ export default function PlayerDashboard() {
         </div>
         <div className="px-4">
           <Button
+            onClick={() => router.push("/player/events")}
             variant="outline"
             size="icon"
             className="flex items-center gap-2 w-full"
           >
-            <span className=""> View All Events</span>
+            <span>View All Events</span>
           </Button>
         </div>
       </div>
@@ -183,6 +186,7 @@ export default function PlayerDashboard() {
         </div>
         <div className="px-4 pt-6">
           <Button
+            onClick={() => router.push("/player/messages")}
             variant="outline"
             size="icon"
             className="flex items-center gap-2 w-full"

@@ -158,10 +158,10 @@ export default function PreferencesPage() {
       {/* Save Button */}
       <div className="pt-8">
         <Button
+          variant="common"
           onClick={handleSave}
-          className="w-full rounded-full text-white font-medium py-6 text-lg"
+          className="w-full  text-white font-medium py-6 text-lg"
           style={{
-            backgroundColor: theme.colors.primaryCyan,
             backgroundImage: "none",
             boxShadow: "0 4px 15px rgba(0, 229, 255, 0.3)",
           }}

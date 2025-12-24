@@ -234,11 +234,10 @@ export default function MessagingPage() {
                     }}
                   />
                   <Button
-                    variant="outline"
+                    variant="common"
                     onClick={handleSendMessage}
                     className="rounded-full w-12 h-12 p-0"
                     style={{
-                      backgroundColor: theme.colors.primaryCyan,
                       boxShadow: "0 4px 15px rgba(0, 229, 255, 0.3)",
                     }}
                   >

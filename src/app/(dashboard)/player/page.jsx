@@ -15,9 +15,11 @@ import StateCard from "@/components/ui/player/StateCard";
 import MessageItem from "@/components/ui/player/MessageItem";
 import EventItem from "@/components/ui/player/EventItem";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function PlayerDashboard() {
   const theme = useSelector((state) => state.theme);
+  const router = useRouter();
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -129,6 +131,7 @@ export default function PlayerDashboard() {
         </div>
         <div className="px-4">
           <Button
+            onclick={() => router.push("/player/events")}
             variant="outline"
             size="icon"
             className="flex items-center gap-2 w-full"

@@ -85,7 +85,7 @@ export default function BoostDurationModal({
               <div className="grid grid-cols-2 gap-4">
                 {durations.map((d) => (
                   <Button
-                    variant="outline"
+                    variant="common"
                     key={d?.months}
                     onClick={() => setSelectedDuration(d)}
                     className={`p-6 text-base rounded-xl relative flex items-center justify-between  border-2 transition-all ${
@@ -110,9 +110,9 @@ export default function BoostDurationModal({
                     </p>
                     {d.save > 0 && (
                       <p
-                        className="absolute right-5 -top-5 p-1 rounded-lg text-sm "
+                        className="absolute right-5 -top-6 p-1 rounded-lg text-sm "
                         style={{
-                          backgroundColor: theme.colors.primaryCyan,
+                          backgroundColor: theme.colors.button,
                         }}
                       >
                         Save {d.save}%
@@ -277,9 +277,8 @@ export default function BoostDurationModal({
                 </li>
               </ul>
               <Button
-                variant="outline"
+                variant="common"
                 className="px-8 lg:px-16 mt-6 w-full"
-                style={{ backgroundColor: theme.colors.primaryCyan }}
                 onClick={onNext}
                 disabled={!selectedDuration}
               >

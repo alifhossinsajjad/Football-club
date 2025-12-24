@@ -254,10 +254,9 @@ export default function EventDetailsPage({ params }) {
 
           {/* Register Button */}
           <Button
-            variant="outline"
+            variant="common"
             onClick={handleRegister}
             className="w-full  py-6 text-lg"
-            style={{ backgroundColor: theme.colors.primaryCyan }}
           >
             {event.registered ? "Already Registered" : "Register for Event"}
           </Button>

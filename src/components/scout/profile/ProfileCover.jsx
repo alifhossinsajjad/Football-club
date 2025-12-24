@@ -9,7 +9,6 @@ export default function ProfileCover({
   setIsEditing,
   isEditing,
   updatePlayerProfileData,
-  onBoost,
 }) {
   const theme = useSelector((state) => state.theme);
   const fileInputRef = useRef(null);
@@ -83,23 +82,6 @@ export default function ProfileCover({
             {isEditing ? "Save Changes" : "Edit Profile"}
           </span>
         </Button>
-        {isEditing || (
-          <Button
-            variant="outline"
-            className="rounded-md"
-            style={{ backgroundColor: theme.colors.primaryCyan }}
-            onClick={() => {
-              if (onBoost) {
-                onBoost();
-              } else {
-                console.log("Boost Profile clicked");
-              }
-            }}
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Boost Profile
-          </Button>
-        )}
       </div>
 
       {/* Edit overlay for cover photo */}
