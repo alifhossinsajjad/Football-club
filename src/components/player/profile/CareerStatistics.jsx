@@ -93,13 +93,16 @@ export default function CareerStatistics({
               : theme.colors.backgroundDark,
           }}
         >
-          <div className="text-4xl  mb-2 text-white">
+          <div className="text-4xl  mb-2 text-white" style={{ color: theme.colors.primaryCyan }}>
             {isEditing ? (
               <Input
                 type="number"
                 value={editableStats.goals}
                 onChange={(e) => handleStatChange("goals", e.target.value)}
-                className="text-lg text-white rounded-lg  "
+                className="text-lg  rounded-lg  "
+                style={{
+                  borderColor: `${theme.colors.primaryCyan}33`,
+                }}
               />
             ) : (
               initialStats.goals
@@ -117,13 +120,13 @@ export default function CareerStatistics({
               : theme.colors.backgroundDark,
           }}
         >
-          <div className="text-4xl  mb-2 text-white">
+          <div className="text-4xl  mb-2 text-white" style={{ color: theme.colors.primaryCyan }}>
             {isEditing ? (
               <Input
                 type="number"
                 value={editableStats.assists}
                 onChange={(e) => handleStatChange("assists", e.target.value)}
-                className="text-lg text-white rounded-lg  "
+                className="text-lg  rounded-lg  "
               />
             ) : (
               initialStats.assists
@@ -150,7 +153,7 @@ export default function CareerStatistics({
                 type="number"
                 value={editableStats.minutes}
                 onChange={(e) => handleStatChange("minutes", e.target.value)}
-                className="text-lg text-white rounded-lg"
+                className="text-lg  rounded-lg"
               />
             ) : (
               initialStats.minutes.toLocaleString()

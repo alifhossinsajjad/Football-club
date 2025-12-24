@@ -134,27 +134,7 @@ export default function PlayerProfilePlayingHistory({
               </div>
 
               {/* Years & Role Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  {isEditing ? (
-                    <Input
-                      background={theme.colors.backgroundCard}
-                      value={item.years}
-                      onChange={(e) =>
-                        handleHistoryChange(index, "years", e.target.value)
-                      }
-                      className="text-sm"
-                      placeholder="Period (e.g. 2021 - Present)"
-                    />
-                  ) : (
-                    <p
-                      className="text-sm"
-                      style={{ color: theme.colors.primaryCyan }}
-                    >
-                      {item.years}
-                    </p>
-                  )}
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
                 <div>
                   {isEditing ? (
                     <Input
@@ -168,6 +148,26 @@ export default function PlayerProfilePlayingHistory({
                     />
                   ) : (
                     <p className="text-sm text-gray-400">{item.note}</p>
+                  )}
+                </div>
+                <div>
+                  {isEditing ? (
+                    <Input
+                      background={theme.colors.backgroundCard}
+                      value={item.years}
+                      onChange={(e) =>
+                        handleHistoryChange(index, "years", e.target.value)
+                      }
+                      className="text-sm"
+                      placeholder="Period (e.g. 2021 - Present)"
+                    />
+                  ) : (
+                    <p
+                      className="text-sm absolute  right-0 top-0 md:-top-8 text-gray-400"
+                      style={{ color: theme.colors.primaryCyan }}
+                    >
+                      {item.years}
+                    </p>
                   )}
                 </div>
               </div>
