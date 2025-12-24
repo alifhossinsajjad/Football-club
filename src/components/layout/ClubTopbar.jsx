@@ -1,11 +1,15 @@
+// File: src/components/layout/ClubTopbar.jsx
+
 'use client'
 
 import { useSelector } from 'react-redux'
+import { useRouter } from 'next/navigation'
 import { Search, Bell } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 
 export default function ClubTopbar() {
   const theme = useSelector(state => state.theme)
+  const router = useRouter()
 
   return (
     <header 
@@ -64,17 +68,20 @@ export default function ClubTopbar() {
           ></span>
         </button>
 
-        {/* User Profile */}
-        <div className="flex items-center gap-2 lg:gap-3">
+        {/* User Profile - Clickable */}
+        <button
+          onClick={() => router.push('/club/profile')}
+          className="flex items-center gap-2 lg:gap-3 hover:opacity-80 transition-opacity"
+        >
           <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
             <AvatarImage src="/fc-barcelona-youth.png" alt="FC Barcelona Youth" className="object-contain p-1" />
             <AvatarFallback>FB</AvatarFallback>
           </Avatar>
-          <div className="hidden sm:block">
+          <div className="hidden sm:block text-left">
             <p className="text-sm font-semibold text-white">FC Barcelona Youth</p>
             <p className="text-xs text-gray-400">Club Administrator</p>
           </div>
-        </div>
+        </button>
       </div>
     </header>
   )
