@@ -41,10 +41,6 @@ export default function ContactThePlayer({
     >
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <Mail
-            className="w-5 h-5"
-            style={{ color: theme.colors.primaryCyan }}
-          />
           Contact Information
         </h3>
         {isEditing && (

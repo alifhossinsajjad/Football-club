@@ -167,7 +167,7 @@ export default function PlayHistory({
                       placeholder="Role/Position"
                     />
                   ) : (
-                    <p className="text-sm text-gray-400">{item.note}</p>
+                    <p className="text-sm text-gray-400 ">{item.note}</p>
                   )}
                 </div>
               </div>

@@ -1,20 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import ProfileCover from "@/components/scout/profile/ProfileCover";
-import ProfileHeader from "@/components/player/profile/ProfileHeader";
-import AboutPlayerProfile from "@/components/player/profile/AboutPlayerProfile";
-import CareerStatistics from "@/components/player/profile/CareerStatistics";
-import SocialMedia from "@/components/player/profile/SocialMedia";
 import ContactInformation from "@/components/player/profile/ContactInformation";
 import PlayerAchievements from "@/components/player/profile/PlayerAchievements";
-import PlayerProfileInsights from "@/components/player/profile/PlayerProfileInsights";
 import PlayerProfilePreference from "@/components/player/profile/PlayerProfilePreference";
-import HighlightVideosSection from "@/components/player/profile/PlayerProfileVideos";
-import PlayerProfileSkills from "@/components/player/profile/PlayerProfileSkills";
-import PlayerProfilePlayingHistory from "@/components/player/profile/PlayerProfilePlayingHistory";
 import ScoutStatsGrid from "@/components/scout/profile/grid/ScoutStatsGrid";
 import { useSelector } from "react-redux";
+import ScoutProfileHeader from "@/components/scout/profile/scout/ScoutProfileHeader";
+import ScoutProfileCover from "@/components/scout/profile/scout/ScoutProfileCover";
+import AboutScoutProfile from "@/components/scout/profile/scout/AboutScoutProfile";
+import ScoutSocialMedia from "@/components/scout/profile/scout/ScoutSocialMedia";
+import ScoutingStatistics from "@/components/scout/profile/scout/ScoutingStatistics";
+import NotableDiscoveries from "@/components/scout/profile/scout/NotableDiscoveries";
+import ScoutingRegions from "@/components/scout/profile/scout/ScoutingRegions";
+import ScoutProfessionalHistory from "@/components/scout/profile/scout/ScoutProfessionalHistory";
+import ScoutLanguages from "@/components/scout/profile/scout/ScoutLanguages";
+import ScoutClubAffiliations from "@/components/scout/profile/scout/ScoutClubAffiliations";
 
 export default function ScoutProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,13 +23,14 @@ export default function ScoutProfilePage() {
 
   // Boost modal states
   const [selectedDuration, setSelectedDuration] = useState(null);
+  const [boostData, setBoostData] = useState({});
 
   // Centralized scout profile data state
   const [scoutProfileData, setScoutProfileData] = useState({
     profile: {
       name: "Roberto Martinez",
       role: "Senior Scout - Youth Development",
-      image: "/Scout/roberto.png",
+      image: "/Scout/martinez.png",
       coverImage: "/stadium/stadium-banner.jpg",
       location: "Madrid, Spain",
       joined: "January 2020",
@@ -55,7 +57,7 @@ export default function ScoutProfilePage() {
         phone: "+34 7700 900000",
         website: "www.robertomscout.com",
       },
-      social: {
+      socialMedia: {
         instagram: "@rmscout",
         twitter: "@RMartinezScout",
         linkedin: "Roberto Martinez",
@@ -187,14 +189,14 @@ export default function ScoutProfilePage() {
 
   return (
     <div className="space-y-8">
-      <ProfileCover
-        scoutPlayerProfileData={scoutProfileData}
+      <ScoutProfileCover
+        playerProfileData={scoutProfileData}
         setIsEditing={setIsEditing}
         isEditing={isEditing}
         updatePlayerProfileData={updateScoutProfileData}
       />
 
-      <ProfileHeader
+      <ScoutProfileHeader
         playerProfileData={scoutProfileData}
         isEditing={isEditing}
         updateProfileField={updateProfileField}
@@ -217,25 +219,35 @@ export default function ScoutProfilePage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <AboutPlayerProfile
+          <AboutScoutProfile
             playerProfileData={scoutProfileData}
             isEditing={isEditing}
-            updatePlayerProfileData={updateScoutProfileData}
+            updateScoutProfileData={updateScoutProfileData}
           />
-          <CareerStatistics
-            playerProfileData={scoutProfileData}
+          <ScoutingStatistics
+            stats={scoutProfileData.profile.stats}
             isEditing={isEditing}
-            updatePlayerProfileData={updateScoutProfileData}
+            onUpdate={(updated) => updateProfileField('stats', updated)}
+            theme={theme}
           />
-          <PlayerProfileSkills
-            playerProfileData={scoutProfileData}
+          <NotableDiscoveries
+            discoveries={scoutProfileData.profile.notableDiscoveries}
             isEditing={isEditing}
-            updatePlayerProfileData={updateScoutProfileData}
+            onUpdate={(updated) => updateProfileField('notableDiscoveries', updated)}
+            theme={theme}
           />
-          <PlayerProfilePlayingHistory
-            playerProfileData={scoutProfileData}
+          <ScoutingRegions
+            regions={scoutProfileData.profile.regions}
             isEditing={isEditing}
-            updatePlayerProfileData={updateScoutProfileData}
+            onUpdate={(updated) => updateProfileField('regions', updated)}
+            theme={theme}
+          />
+
+          <ScoutProfessionalHistory
+            history={scoutProfileData.profile.history}
+            isEditing={isEditing}
+            onUpdate={(updated) => updateProfileField('history', updated)}
+            theme={theme}
           />
         </div>
 
@@ -245,7 +257,24 @@ export default function ScoutProfilePage() {
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-          <SocialMedia
+          <ScoutSocialMedia
+            playerProfileData={scoutProfileData}
+            isEditing={isEditing}
+            updatePlayerProfileData={updateScoutProfileData}
+          />
+          <ScoutLanguages
+            languages={scoutProfileData.profile.languages}
+            isEditing={isEditing}
+            onUpdate={(updated) => updateProfileField('languages', updated)}
+            theme={theme}
+          />
+          <ScoutClubAffiliations
+            affiliations={scoutProfileData.profile.affiliations}
+            isEditing={isEditing}
+            onUpdate={(updated) => updateProfileField('affiliations', updated)}
+            theme={theme}
+          />
+          <PlayerProfilePreference
             playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
@@ -255,22 +284,8 @@ export default function ScoutProfilePage() {
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-          {!isEditing && (
-            <PlayerProfileInsights playerProfileData={scoutProfileData} />
-          )}
-          <PlayerProfilePreference
-            playerProfileData={scoutProfileData}
-            isEditing={isEditing}
-            updatePlayerProfileData={updateScoutProfileData}
-          />
         </div>
       </div>
-
-      <HighlightVideosSection
-        playerProfileData={scoutProfileData}
-        isEditing={isEditing}
-        updatePlayerProfileData={updateScoutProfileData}
-      />
     </div>
   );
 }

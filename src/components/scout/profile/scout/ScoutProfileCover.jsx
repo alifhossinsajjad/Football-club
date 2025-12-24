@@ -1,21 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { Save, SquarePen, Upload } from "lucide-react";
+import { ChevronLeft, Save, SquarePen, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useRef } from "react";
 import { useSelector } from "react-redux";
 
-export default function PlayerProfileCover({
+export default function ScoutProfileCover({
   playerProfileData,
   setIsEditing,
   isEditing,
   updatePlayerProfileData,
-  onBoost,
 }) {
   const theme = useSelector((state) => state.theme);
   const fileInputRef = useRef(null);
-
+  const router = useRouter();
   // Get cover image from playerProfileData or use default
   const coverImage =
-    playerProfileData.coverImage || "/player/profile/profileBanner.png";
+    playerProfileData.coverImage || "/scout/stadium-banner.png";
 
   // Handle cover image change
   const handleCoverImageChange = (e) => {
@@ -42,7 +42,7 @@ export default function PlayerProfileCover({
       <img
         src={coverImage}
         alt="Cover"
-        className="w-full h-64 lg:h-96 object-cover"
+        className="w-full h-64 lg:h-96 object-cover object-top"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-black/1 to-transparent" />
 
@@ -58,20 +58,14 @@ export default function PlayerProfileCover({
       {/* Action Buttons */}
       <div className="absolute top-4 right-4 flex gap-3 z-20">
         <Button
-          className={`rounded-md text-white transition-all`}
-          variant="outline"
-          style={{
-            backgroundColor: isEditing ? `${theme.colors.button}` : ` white`,
-          }}
+          className={`rounded-md text-white text-base transition-all`}
+          variant="common"
           onClick={() => setIsEditing(!isEditing)}
         >
           <span
             className={`text-${
-              isEditing ? "white" : "black"
+              isEditing ? "white" : "white"
             } flex items-center`}
-            style={{
-              color: isEditing ? `` : ` ${theme.colors.button}`,
-            }}
           >
             {" "}
             {isEditing ? (
@@ -82,22 +76,6 @@ export default function PlayerProfileCover({
             {isEditing ? "Save Changes" : "Edit Profile"}
           </span>
         </Button>
-        {isEditing || (
-          <Button
-            variant="common"
-            className="rounded-md"
-            onClick={() => {
-              if (onBoost) {
-                onBoost();
-              } else {
-                console.log("Boost Profile clicked");
-              }
-            }}
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Boost Profile
-          </Button>
-        )}
       </div>
 
       {/* Edit overlay for cover photo */}

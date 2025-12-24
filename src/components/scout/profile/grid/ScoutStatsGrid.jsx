@@ -20,6 +20,7 @@ export default function ScoutStatsGrid({ stats, theme }) {
       title: "Players Viewed",
       value: viewedPlayers,
       subtitle: viewedChange,
+      color: "#05DF72",
       subtitleColor: "text-primaryCyan",
     },
     {
@@ -27,6 +28,7 @@ export default function ScoutStatsGrid({ stats, theme }) {
       title: "Shortlisted Players",
       value: shortlistedPlayers,
       subtitle: `${activeShortlisted} active`,
+      color: theme.colors.primaryCyan,
       subtitleColor: "text-primaryCyan",
     },
     {
@@ -34,6 +36,7 @@ export default function ScoutStatsGrid({ stats, theme }) {
       title: "Upcoming Events",
       value: upcomingEvents,
       subtitle: `Next: ${nextEvent}`,
+      color: theme.colors.primaryCyan,
       subtitleColor: "text-primaryCyan",
     },
     {
@@ -41,6 +44,7 @@ export default function ScoutStatsGrid({ stats, theme }) {
       title: "Active Conversations",
       value: conversations,
       subtitle: `${unread} unread`,
+      color: "#05DF72",
       subtitleColor: "text-primaryCyan",
     },
   ];
@@ -50,20 +54,32 @@ export default function ScoutStatsGrid({ stats, theme }) {
       {cards.map((card, index) => (
         <div
           key={index}
-          className="rounded-xl p-6 border text-center transition-all hover:shadow-xl"
+          className="rounded-xl p-6 border  space-y-2 transition-all hover:shadow-xl"
           style={{
             backgroundColor: theme.colors.backgroundCard,
             borderColor: `${theme.colors.primaryCyan}33`,
           }}
         >
-          <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primaryCyan to-primaryMagenta flex items-center justify-center">
-              <card.icon className="w-6 h-6 text-white" />
+          <div className="flex  mb-4">
+            <div
+              className="w-12 h-12 rounded-full bg-opacity-10 flex items-center justify-center"
+              style={{
+                background: `linear-gradient(90deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
+                color: theme.colors.primaryCyan,
+              }}
+            >
+              <card.icon className="w-6 h-6" />
             </div>
           </div>
-          <p className="text-4xl font-bold text-white mb-2">{card.value}</p>
+
           <p className="text-gray-400 text-sm mb-1">{card.title}</p>
-          <p className={`text-sm font-medium ${card.subtitleColor}`}>
+          <p className="text-4xl  text-white mb-2">{card.value}</p>
+          <p
+            className={`text-sm font-medium ${card.subtitleColor}`}
+            style={{
+              color: card.color,
+            }}
+          >
             {card.subtitle}
           </p>
         </div>
