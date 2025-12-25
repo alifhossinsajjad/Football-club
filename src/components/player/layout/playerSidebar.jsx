@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import { useState } from "react";
@@ -15,6 +15,7 @@ import {
   Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { path: "/player/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -32,6 +33,7 @@ export default function PlayerSidebar() {
   const pathname = usePathname();
   const theme = useSelector((state) => state.theme);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   // Check if path starts with the menu item path (for nested routes)
   const isActiveRoute = (itemPath) => {
@@ -83,7 +85,9 @@ export default function PlayerSidebar() {
         </button>
 
         {/* Logo */}
-        <div
+        <Button
+          onClick={() => router.push("/")}
+          variant="outline"
           // className="flex items-center justify-center border-b px-6 py-3"
           className="w-[255px] h-[152px] px-6 py-3 border-b-[1.25px] flex items-center justify-center gap-1"
           // className="h-20 flex items-center justify-center border-b px-4"
@@ -98,7 +102,7 @@ export default function PlayerSidebar() {
             height={48}
             priority
           />
-        </div>
+        </Button>
 
         {/* Menu Items */}
         <nav className="flex-1 overflow-y-auto py-6 px-3">
