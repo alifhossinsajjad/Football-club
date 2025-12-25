@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useSelector } from "react-redux"
-import { useRouter } from "next/navigation"
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Edit,
@@ -23,13 +23,13 @@ import {
   Video,
   Home,
   Send,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function ClubProfilePage() {
-  const theme = useSelector((state) => state.theme)
-  const router = useRouter()
+  const theme = useSelector((state) => state.theme);
+  const router = useRouter();
 
-  const ageGroups = ["U-10", "U-12", "U-14", "U-16", "U-18"]
+  const ageGroups = ["U-10", "U-12", "U-14", "U-16", "U-18"];
 
   const facilities = [
     { icon: Dumbbell, text: "State-of-the-art training center" },
@@ -38,13 +38,25 @@ export default function ClubProfilePage() {
     { icon: Video, text: "Modern gym and fitness facilities" },
     { icon: Home, text: "Video analysis room" },
     { icon: Users, text: "Accommodation for academy players" },
-  ]
+  ];
 
   const achievements = [
-    { year: "2023", title: "UEFA Youth League Winners", desc: "Champions of Europe's premier youth competition" },
-    { year: "2024", title: "La Liga Youth Champions", desc: "Domestic league winners for the third consecutive" },
-    { year: "2021", title: "Copa del Rey Youth Trophy", desc: "National cup competition winners" },
-  ]
+    {
+      year: "2023",
+      title: "UEFA Youth League Winners",
+      desc: "Champions of Europe's premier youth competition",
+    },
+    {
+      year: "2024",
+      title: "La Liga Youth Champions",
+      desc: "Domestic league winners for the third consecutive",
+    },
+    {
+      year: "2021",
+      title: "Copa del Rey Youth Trophy",
+      desc: "National cup competition winners",
+    },
+  ];
 
   const upcomingEvents = [
     {
@@ -74,7 +86,7 @@ export default function ClubProfilePage() {
       price: "€500 (Week)",
       image: "/summer-training-camp.jpg",
     },
-  ]
+  ];
 
   const photoGallery = [
     "/phone-gallery-1.jpg",
@@ -83,19 +95,46 @@ export default function ClubProfilePage() {
     "/phone-gallery-4.jpg",
     "/phone-gallery-5.jpg",
     "/phone-gallery-6.jpg",
-  ]
+  ];
 
   const featuredPlayers = [
-    { name: "Marc González", position: "Forward", age: "U-17", image: "/MarcusSilva-1.jpg" },
-    { name: "Luca Martínez", position: "Midfielder", age: "U-16", image: "/EmmaRodriguez-2.jpg" },
-    { name: "João Silva", position: "Defender", age: "U-16", image: "/joao-silva.jpg" },
-    { name: "Ahmed Hassan", position: "Goalkeeper", age: "U-18", image: "/ahmed-hassan.jpg" },
-  ]
+    {
+      name: "Marc González",
+      position: "Forward",
+      age: "U-17",
+      image: "/MarcusSilva-1.jpg",
+    },
+    {
+      name: "Luca Martínez",
+      position: "Midfielder",
+      age: "U-16",
+      image: "/EmmaRodriguez-2.jpg",
+    },
+    {
+      name: "João Silva",
+      position: "Defender",
+      age: "U-16",
+      image: "/joao-silva.jpg",
+    },
+    {
+      name: "Ahmed Hassan",
+      position: "Goalkeeper",
+      age: "U-18",
+      image: "/ahmed-hassan.jpg",
+    },
+  ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: theme.colors.backgroundDark }}>
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: theme.colors.backgroundDark }}
+    >
       <div className="relative h-64 lg:h-80">
-        <img src="/club-profile-cover.jpg" alt="Club Cover" className="w-full h-full object-cover brightness-90" />
+        <img
+          src="/club-profile-cover.jpg"
+          alt="Club Cover"
+          className="w-full h-full object-cover brightness-90"
+        />
 
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
 
@@ -107,8 +146,13 @@ export default function ClubProfilePage() {
             backdropFilter: "blur(10px)",
           }}
         >
-          <ArrowLeft className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
-          <span className="text-white font-medium text-sm">Back to Directory</span>
+          <ArrowLeft
+            className="w-4 h-4"
+            style={{ color: theme.colors.primaryCyan }}
+          />
+          <span className="text-white font-medium text-sm">
+            Back to Directory
+          </span>
         </button>
 
         <button
@@ -158,27 +202,46 @@ export default function ClubProfilePage() {
 
             <div className="flex-1 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                <Building2 className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
-                <span className="text-xs font-semibold tracking-wide" style={{ color: theme.colors.primaryCyan }}>
+                <Building2
+                  className="w-4 h-4"
+                  style={{ color: theme.colors.primaryCyan }}
+                />
+                <span
+                  className="text-xs font-semibold tracking-wide"
+                  style={{ color: theme.colors.primaryCyan }}
+                >
                   Professional Academy
                 </span>
               </div>
 
-              <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">FC Barcelona Youth</h1>
+              <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+                FC Barcelona Youth
+              </h1>
 
-              <p className="text-base text-gray-400 mb-4">Developing Champions since 1979</p>
+              <p className="text-base text-gray-400 mb-4">
+                Developing Champions since 1979
+              </p>
 
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2 text-sm text-gray-300">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+                  <MapPin
+                    className="w-4 h-4"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                   <span>Barcelona, Spain</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+                  <Calendar
+                    className="w-4 h-4"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                   <span>Est. 1979</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+                  <Users
+                    className="w-4 h-4"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                   <span>156 Players</span>
                 </div>
               </div>
@@ -211,6 +274,7 @@ export default function ClubProfilePage() {
                   backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  display: "inline-block",
                 }}
               >
                 About the Academy
@@ -218,23 +282,33 @@ export default function ClubProfilePage() {
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-white font-semibold text-base mb-3">Overview</h3>
+                  <h3 className="text-white font-semibold text-base mb-3">
+                    Overview
+                  </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    FC Barcelona Youth Academy, also known as La Masia, is one of the most prestigious youth development
-                    programs in world football. Our academy has produced some of the greatest players in football
-                    history and is renowned for developing well-rounded individuals. With a focus on technical
-                    excellence, tactical intelligence, and personal development, we prepare young talents for successful
-                    careers while maintaining our philosophy that centers on possession-based football, creative play,
-                    and nurturing talent from a young age.
+                    FC Barcelona Youth Academy, also known as La Masia, is one
+                    of the most prestigious youth development programs in world
+                    football. Our academy has produced some of the greatest
+                    players in football history and is renowned for developing
+                    well-rounded individuals. With a focus on technical
+                    excellence, tactical intelligence, and personal development,
+                    we prepare young talents for successful careers while
+                    maintaining our philosophy that centers on possession-based
+                    football, creative play, and nurturing talent from a young
+                    age.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="text-white font-semibold text-base mb-3">Our Mission</h3>
+                  <h3 className="text-white font-semibold text-base mb-3">
+                    Our Mission
+                  </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    Our mission is to identify, develop, and nurture young football talent while instilling the values
-                    of respect, effort, ambition, teamwork, and humility. We aim to create not just exceptional
-                    footballers, but exemplary individuals who will represent the club with pride and distinction.
+                    Our mission is to identify, develop, and nurture young
+                    football talent while instilling the values of respect,
+                    effort, ambition, teamwork, and humility. We aim to create
+                    not just exceptional footballers, but exemplary individuals
+                    who will represent the club with pride and distinction.
                   </p>
                 </div>
               </div>
@@ -254,6 +328,7 @@ export default function ClubProfilePage() {
                   backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  display: "inline-block",
                 }}
               >
                 Recent Achievements
@@ -267,13 +342,23 @@ export default function ClubProfilePage() {
                     style={{ backgroundColor: theme.colors.backgroundDark }}
                   >
                     <div className="flex items-center gap-2 mb-3">
-                      <Trophy className="w-5 h-5" style={{ color: "#FDC700" }} />
-                      <span className="font-bold text-lg" style={{ color: theme.colors.primaryCyan }}>
+                      <Trophy
+                        className="w-5 h-5"
+                        style={{ color: "#FDC700" }}
+                      />
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: theme.colors.primaryCyan }}
+                      >
                         {achievement.year}
                       </span>
                     </div>
-                    <h3 className="text-white font-semibold text-sm mb-2 leading-snug">{achievement.title}</h3>
-                    <p className="text-gray-400 text-xs leading-relaxed">{achievement.desc}</p>
+                    <h3 className="text-white font-semibold text-sm mb-2 leading-snug">
+                      {achievement.title}
+                    </h3>
+                    <p className="text-gray-400 text-xs leading-relaxed">
+                      {achievement.desc}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -293,6 +378,7 @@ export default function ClubProfilePage() {
                   backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  display: "inline-block",
                 }}
               >
                 Upcoming Events
@@ -325,22 +411,35 @@ export default function ClubProfilePage() {
                       </div>
                     </div>
                     <div className="p-4 space-y-2">
-                      <h3 className="text-white font-semibold text-sm line-clamp-1">{event.title}</h3>
+                      <h3 className="text-white font-semibold text-sm line-clamp-1">
+                        {event.title}
+                      </h3>
                       <div className="space-y-1.5 text-xs text-gray-400">
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-3.5 h-3.5" style={{ color: "#FDC700" }} />
+                          <Calendar
+                            className="w-3.5 h-3.5"
+                            style={{ color: "#FDC700" }}
+                          />
                           <span>{event.date}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Users className="w-3.5 h-3.5" style={{ color: "#FDC700" }} />
+                          <Users
+                            className="w-3.5 h-3.5"
+                            style={{ color: "#FDC700" }}
+                          />
                           <span>{event.time}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <MapPin className="w-3.5 h-3.5" style={{ color: "#FDC700" }} />
+                          <MapPin
+                            className="w-3.5 h-3.5"
+                            style={{ color: "#FDC700" }}
+                          />
                           <span className="line-clamp-1">{event.location}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">{event.price}</span>
+                          <span className="font-semibold text-white">
+                            {event.price}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -363,6 +462,7 @@ export default function ClubProfilePage() {
                   backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  display: "inline-block",
                 }}
               >
                 Photo Gallery
@@ -370,7 +470,10 @@ export default function ClubProfilePage() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {photoGallery.map((photo, index) => (
-                  <div key={index} className="aspect-video rounded-lg overflow-hidden cursor-pointer group">
+                  <div
+                    key={index}
+                    className="aspect-video rounded-lg overflow-hidden cursor-pointer group"
+                  >
                     <img
                       src={photo || "/placeholder.svg"}
                       alt={`Gallery ${index + 1}`}
@@ -395,6 +498,7 @@ export default function ClubProfilePage() {
                   backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  display: "inline-block",
                 }}
               >
                 Featured Players
@@ -415,8 +519,13 @@ export default function ClubProfilePage() {
                         style={{ borderColor: `${theme.colors.primaryCyan}40` }}
                       />
                     </div>
-                    <h3 className="text-white font-semibold text-sm mb-1">{player.name}</h3>
-                    <p className="text-xs font-medium mb-0.5" style={{ color: theme.colors.primaryCyan }}>
+                    <h3 className="text-white font-semibold text-sm mb-1">
+                      {player.name}
+                    </h3>
+                    <p
+                      className="text-xs font-medium mb-0.5"
+                      style={{ color: theme.colors.primaryCyan }}
+                    >
                       {player.position}
                     </p>
                     <p className="text-xs text-gray-400">{player.age}</p>
@@ -463,13 +572,18 @@ export default function ClubProfilePage() {
               <h2 className="text-xl font-bold text-white mb-4">Facilities</h2>
               <div className="space-y-3">
                 {facilities.map((facility, index) => {
-                  const Icon = facility.icon
+                  const Icon = facility.icon;
                   return (
                     <div key={index} className="flex items-start gap-3">
-                      <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: theme.colors.primaryCyan }} />
-                      <span className="text-gray-300 text-sm leading-relaxed">{facility.text}</span>
+                      <Icon
+                        className="w-4 h-4 flex-shrink-0 mt-0.5"
+                        style={{ color: theme.colors.primaryCyan }}
+                      />
+                      <span className="text-gray-300 text-sm leading-relaxed">
+                        {facility.text}
+                      </span>
                     </div>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -481,22 +595,34 @@ export default function ClubProfilePage() {
                 borderColor: `${theme.colors.primaryCyan}1A`,
               }}
             >
-              <h2 className="text-xl font-bold text-white mb-4">Contact Information</h2>
+              <h2 className="text-xl font-bold text-white mb-4">
+                Contact Information
+              </h2>
 
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-white mb-3">Get in Touch</h3>
+                <h3 className="text-sm font-semibold text-white mb-3">
+                  Get in Touch
+                </h3>
                 <div className="space-y-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <Mail className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+                      <Mail
+                        className="w-4 h-4"
+                        style={{ color: theme.colors.primaryCyan }}
+                      />
                       <span className="text-xs text-gray-400">Email</span>
                     </div>
-                    <p className="text-white text-sm pl-6">academy@fcbarcelona.com</p>
+                    <p className="text-white text-sm pl-6">
+                      academy@fcbarcelona.com
+                    </p>
                   </div>
 
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <Phone className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+                      <Phone
+                        className="w-4 h-4"
+                        style={{ color: theme.colors.primaryCyan }}
+                      />
                       <span className="text-xs text-gray-400">Phone</span>
                     </div>
                     <p className="text-white text-sm pl-6">+34 93 496 36 00</p>
@@ -504,18 +630,28 @@ export default function ClubProfilePage() {
 
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <Globe className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+                      <Globe
+                        className="w-4 h-4"
+                        style={{ color: theme.colors.primaryCyan }}
+                      />
                       <span className="text-xs text-gray-400">Website</span>
                     </div>
-                    <p className="text-white text-sm pl-6">www.fcbarcelona.com</p>
+                    <p className="text-white text-sm pl-6">
+                      www.fcbarcelona.com
+                    </p>
                   </div>
 
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <MapPinIcon className="w-4 h-4" style={{ color: theme.colors.primaryCyan }} />
+                      <MapPinIcon
+                        className="w-4 h-4"
+                        style={{ color: theme.colors.primaryCyan }}
+                      />
                       <span className="text-xs text-gray-400">Address</span>
                     </div>
-                    <p className="text-white text-sm pl-6">Carrer de Aristides Maillol 08028 Barcelona, Spain</p>
+                    <p className="text-white text-sm pl-6">
+                      Carrer de Aristides Maillol 08028 Barcelona, Spain
+                    </p>
                   </div>
                 </div>
               </div>
@@ -535,7 +671,10 @@ export default function ClubProfilePage() {
                   className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all hover:opacity-80"
                   style={{ backgroundColor: theme.colors.backgroundDark }}
                 >
-                  <Facebook className="w-5 h-5" style={{ color: theme.colors.primaryCyan }} />
+                  <Facebook
+                    className="w-5 h-5"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                   <span className="text-white text-sm">Facebook</span>
                 </a>
 
@@ -544,7 +683,10 @@ export default function ClubProfilePage() {
                   className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all hover:opacity-80"
                   style={{ backgroundColor: theme.colors.backgroundDark }}
                 >
-                  <Instagram className="w-5 h-5" style={{ color: theme.colors.primaryCyan }} />
+                  <Instagram
+                    className="w-5 h-5"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                   <span className="text-white text-sm">Instagram</span>
                 </a>
 
@@ -553,7 +695,10 @@ export default function ClubProfilePage() {
                   className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all hover:opacity-80"
                   style={{ backgroundColor: theme.colors.backgroundDark }}
                 >
-                  <Twitter className="w-5 h-5" style={{ color: theme.colors.primaryCyan }} />
+                  <Twitter
+                    className="w-5 h-5"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                   <span className="text-white text-sm">Twitter</span>
                 </a>
 
@@ -562,7 +707,10 @@ export default function ClubProfilePage() {
                   className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all hover:opacity-80"
                   style={{ backgroundColor: theme.colors.backgroundDark }}
                 >
-                  <Youtube className="w-5 h-5" style={{ color: theme.colors.primaryCyan }} />
+                  <Youtube
+                    className="w-5 h-5"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
                   <span className="text-white text-sm">YouTube</span>
                 </a>
               </div>
@@ -579,5 +727,5 @@ export default function ClubProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
