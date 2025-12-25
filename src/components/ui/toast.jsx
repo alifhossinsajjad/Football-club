@@ -4,7 +4,10 @@ import { CheckCircle } from "lucide-react";
 
 let toastContainer = null;
 
-export function showSuccessToast() {
+export function showSuccessToast(
+  title = "Success!",
+  message = "Operation completed successfully"
+) {
   // Create container if it doesn't exist
   if (!toastContainer) {
     toastContainer = document.createElement("div");
@@ -43,8 +46,8 @@ export function showSuccessToast() {
       <polyline points="22 4 12 14.01 9 11.01"></polyline>
     </svg>
     <div>
-      <p style="font-weight: 600; margin: 0; font-size: 14px;">Changes Saved!</p>
-      <p style="margin: 4px 0 0 0; opacity: 0.9; font-size: 12px;">Theme colors updated successfully</p>
+      <p style="font-weight: 600; margin: 0; font-size: 14px;">${title}</p>
+      <p style="margin: 4px 0 0 0; opacity: 0.9; font-size: 12px;">${message}</p>
     </div>
   `;
 
