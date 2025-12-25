@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/player/Progress";
-import PlayerComplete1 from "@/components/player/complete-profile/PlayerComplete1";
-import PlayerComplete2 from "@/components/player/complete-profile/PlayerComplete2";
-import PlayerComplete3 from "@/components/player/complete-profile/PlayerComplete3";
-import PlayerComplete4 from "@/components/player/complete-profile/PlayerComplete4";
 import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ScoutComplete1 from "@/components/scout/complete-profile/ScoutComplete1";
+import ScoutComplete2 from "@/components/scout/complete-profile/ScoutComplete2";
+import ScoutComplete3 from "@/components/scout/complete-profile/ScoutComplete3";
+import ScoutComplete4 from "@/components/scout/complete-profile/ScoutComplete4";
 
 export default function PlayerOnboardingPage() {
   const theme = useSelector((state) => state.theme);
@@ -64,7 +64,7 @@ export default function PlayerOnboardingPage() {
         >
           {/* Step 1: Complete Your Profile */}
           {step === 1 && (
-            <PlayerComplete1
+            <ScoutComplete1
               formData={formData}
               updateFormData={updateFormData}
             />
@@ -72,7 +72,7 @@ export default function PlayerOnboardingPage() {
 
           {/* Step 2: Sports Commitment */}
           {step === 2 && (
-            <PlayerComplete2
+            <ScoutComplete2
               formData={formData}
               updateFormData={updateFormData}
             />
@@ -80,7 +80,7 @@ export default function PlayerOnboardingPage() {
 
           {/* Step 3: Parent / Guardian Consent */}
           {step === 3 && (
-            <PlayerComplete3
+            <ScoutComplete3
               formData={formData}
               updateFormData={updateFormData}
             />
@@ -88,7 +88,7 @@ export default function PlayerOnboardingPage() {
 
           {/* Step 4: Privacy & Consent */}
           {step === 4 && (
-            <PlayerComplete4
+            <ScoutComplete4
               formData={formData}
               updateFormData={updateFormData}
             />
