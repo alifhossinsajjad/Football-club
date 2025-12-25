@@ -89,7 +89,7 @@ export default function LoginPageComponent({
       }
     }
 
-    // ❌ If no match found after checking all
+    //  If no match found after checking all
     setError("Invalid credentials. Use the test credentials shown below.");
     setLoading(false);
   };
@@ -136,30 +136,6 @@ export default function LoginPageComponent({
         <div className="pb-4">
           <h1 className="text-2xl font-bold text-white mb-2">{welcomeTitle}</h1>
           <p className="text-gray-400">{welcomeSubtitle}</p>
-        </div>
-
-        {/* Mock Credentials Hint */}
-        <div className="border border-gray-700 rounded-lg p-5 text-left text-sm text-gray-300 mb-6 bg-gray-900/40">
-          <p className="font-semibold mb-3 text-white">
-            Test Credentials ({role}):
-          </p>
-          <div className="space-y-2 font-mono">
-            <p>
-              Email:{" "}
-              <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">
-                {currentMock.email}
-              </code>
-            </p>
-            <p>
-              Password:{" "}
-              <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">
-                {currentMock.password}
-              </code>
-            </p>
-          </div>
-          <p className="mt-3 text-xs text-gray-500">
-            Copy or type exactly • No extra spaces • Case-sensitive password
-          </p>
         </div>
 
         {/* Login Form Card */}
