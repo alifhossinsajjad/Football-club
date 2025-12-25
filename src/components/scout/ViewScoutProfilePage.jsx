@@ -194,13 +194,14 @@ export default function ViewScoutProfilePage() {
         playerProfileData={scoutProfileData}
         setIsEditing={setIsEditing}
         isEditing={isEditing}
-        showEditSaveButton={false}
+        owner={false}
         updatePlayerProfileData={updateScoutProfileData}
       />
 
       <ScoutProfileHeader
         playerProfileData={scoutProfileData}
         isEditing={isEditing}
+        showMessageButton={true}
         updateProfileField={updateProfileField}
       />
 

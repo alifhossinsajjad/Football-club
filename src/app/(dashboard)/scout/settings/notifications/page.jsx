@@ -35,9 +35,9 @@ export default function NotificationsPage() {
 
   return (
     <div
-      className="space-y-8 p-6 min-h-screen"
+      className="space-y-8  min-h-screen mt-12"
       style={{
-        backgroundColor: theme.colors.backgroundCard,
+        backgroundColor: theme.colors.backgroundDark,
       }}
     >
       {/* Email Notifications */}
