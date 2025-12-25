@@ -11,11 +11,21 @@ import {
 } from "@/components/ui/player/select";
 import { Search } from "lucide-react";
 
-export default function ScoutSearchFilters({ theme }) {
-  const [country, setCountry] = useState("All Countries");
-  const [region, setRegion] = useState("All Regions");
-  const [specialization, setSpecialization] = useState("All Specializations");
-  const [searchQuery, setSearchQuery] = useState("");
+import { useEffect } from "react";
+
+export default function ScoutSearchFilters({ theme, onFilterChange, filters }) {
+  const [localCountry, setLocalCountry] = useState(filters?.country || "All Countries");
+  const [localRegion, setLocalRegion] = useState(filters?.region || "All Regions");
+  const [localSpecialization, setLocalSpecialization] = useState(filters?.specialization || "All Specializations");
+  const [localSearchQuery, setLocalSearchQuery] = useState(filters?.searchQuery || "");
+
+  // Update local state when filters prop changes
+  useEffect(() => {
+    setLocalCountry(filters?.country || "All Countries");
+    setLocalRegion(filters?.region || "All Regions");
+    setLocalSpecialization(filters?.specialization || "All Specializations");
+    setLocalSearchQuery(filters?.searchQuery || "");
+  }, [filters]);
 
   const countries = [
     "All Countries",
@@ -45,10 +55,19 @@ export default function ScoutSearchFilters({ theme }) {
   ];
 
   const resetFilters = () => {
-    setCountry("All Countries");
-    setRegion("All Regions");
-    setSpecialization("All Specializations");
-    setSearchQuery("");
+    setLocalCountry("All Countries");
+    setLocalRegion("All Regions");
+    setLocalSpecialization("All Specializations");
+    setLocalSearchQuery("");
+    
+    if (onFilterChange) {
+      onFilterChange({
+        country: "All Countries",
+        region: "All Regions",
+        specialization: "All Specializations",
+        searchQuery: "",
+      });
+    }
   };
 
   return (
@@ -78,7 +97,18 @@ export default function ScoutSearchFilters({ theme }) {
       {/* Filters Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Country */}
-        <Select value={country} onValueChange={setCountry}>
+        <Select 
+          value={localCountry} 
+          onValueChange={(value) => {
+            setLocalCountry(value);
+            if (onFilterChange) {
+              onFilterChange({
+                ...filters,
+                country: value,
+              });
+            }
+          }}
+        >
           <SelectTrigger className="h-12 rounded-lg">
             <SelectValue />
           </SelectTrigger>
@@ -92,7 +122,18 @@ export default function ScoutSearchFilters({ theme }) {
         </Select>
 
         {/* Region */}
-        <Select value={region} onValueChange={setRegion}>
+        <Select 
+          value={localRegion} 
+          onValueChange={(value) => {
+            setLocalRegion(value);
+            if (onFilterChange) {
+              onFilterChange({
+                ...filters,
+                region: value,
+              });
+            }
+          }}
+        >
           <SelectTrigger className="h-12 rounded-lg">
             <SelectValue />
           </SelectTrigger>
@@ -106,7 +147,18 @@ export default function ScoutSearchFilters({ theme }) {
         </Select>
 
         {/* Specialization */}
-        <Select value={specialization} onValueChange={setSpecialization}>
+        <Select 
+          value={localSpecialization} 
+          onValueChange={(value) => {
+            setLocalSpecialization(value);
+            if (onFilterChange) {
+              onFilterChange({
+                ...filters,
+                specialization: value,
+              });
+            }
+          }}
+        >
           <SelectTrigger className="h-12 rounded-lg">
             <SelectValue />
           </SelectTrigger>
@@ -124,8 +176,16 @@ export default function ScoutSearchFilters({ theme }) {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={localSearchQuery}
+            onChange={(e) => {
+              setLocalSearchQuery(e.target.value);
+              if (onFilterChange) {
+                onFilterChange({
+                  ...filters,
+                  searchQuery: e.target.value,
+                });
+              }
+            }}
             className="pl-12 h-12 rounded-lg"
           />
         </div>

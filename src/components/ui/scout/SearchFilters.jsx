@@ -1,16 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
-export default function SearchFilters({ theme }) {
+export default function SearchFilters({ theme, onFilterChange, filters: propFilters }) {
   const [filters, setFilters] = useState({
-    position: "All Positions",
-    nationality: "All Countries",
-    ageRange: "All Ages",
-    searchName: "",
+    position: propFilters?.position || "All Positions",
+    nationality: propFilters?.nationality || "All Countries",
+    ageRange: propFilters?.ageRange || "All Ages",
+    searchName: propFilters?.searchName || "",
   });
 
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  // Update local state when propFilters change
+  useEffect(() => {
+    setFilters({
+      position: propFilters?.position || "All Positions",
+      nationality: propFilters?.nationality || "All Countries",
+      ageRange: propFilters?.ageRange || "All Ages",
+      searchName: propFilters?.searchName || "",
+    });
+  }, [propFilters]);
 
   const positions = [
     "All Positions",
@@ -43,17 +53,27 @@ export default function SearchFilters({ theme }) {
   };
 
   const handleFilterChange = (filterName, value) => {
-    setFilters({ ...filters, [filterName]: value });
+    const newFilters = { ...filters, [filterName]: value };
+    setFilters(newFilters);
     setOpenDropdown(null);
+    
+    if (onFilterChange) {
+      onFilterChange(newFilters);
+    }
   };
 
   const resetFilters = () => {
-    setFilters({
+    const resetFilterValues = {
       position: "All Positions",
       nationality: "All Countries",
       ageRange: "All Ages",
       searchName: "",
-    });
+    };
+    setFilters(resetFilterValues);
+    
+    if (onFilterChange) {
+      onFilterChange(resetFilterValues);
+    }
   };
 
   const Dropdown = ({ label, value, options, filterName }) => (
@@ -152,9 +172,14 @@ export default function SearchFilters({ theme }) {
           <input
             type="text"
             value={filters.searchName}
-            onChange={(e) =>
-              setFilters({ ...filters, searchName: e.target.value })
-            }
+            onChange={(e) => {
+              const newFilters = { ...filters, searchName: e.target.value };
+              setFilters(newFilters);
+              
+              if (onFilterChange) {
+                onFilterChange(newFilters);
+              }
+            }}
             placeholder="Search by name..."
             style={{ backgroundColor: colors.backgroundCard }}
             className="w-full px-4 py-3 rounded-lg border border-gray-700 focus:border-gray-600 focus:outline-none text-white placeholder-gray-500 transition-colors"

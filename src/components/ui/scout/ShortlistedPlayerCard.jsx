@@ -1,6 +1,7 @@
 import React from "react";
 import { Star } from "lucide-react";
 import { Button } from "../button";
+import { useRouter } from "next/navigation";
 
 export default function ShortlistedPlayerCard({
   image = "/placeholder.png",
@@ -11,6 +12,7 @@ export default function ShortlistedPlayerCard({
   age = "-",
   theme,
 }) {
+  const router = useRouter();
   return (
     <div
       className="border rounded-lg p-4 space-y-5 hover:opacity-80 transition-all"
@@ -52,7 +54,14 @@ export default function ShortlistedPlayerCard({
       </div>
 
       {/* button */}
-      <Button variant="common" className="text-white text-sm font-semibold w-full">
+      <Button
+        onclick={() => {
+          Router.push(`/scout/player-profile`);
+        }}
+        variant="common"
+        size="icon"
+        className="flex items-center gap-2 w-full"
+      >
         View Full Profile
       </Button>
     </div>

@@ -1,6 +1,7 @@
 // ScoutDirectoryPage.jsx
 "use client";
 
+import { useState } from "react";
 import GradientTitle from "@/components/scout/reusable/GradientTitle";
 import ScoutSearchFilters from "@/components/ui/scout/Filters/ScoutSearchFilters";
 import ScoutDirectoryCard from "@/components/ui/scout/cards/ScoutDirectoryCard";
@@ -72,6 +73,94 @@ const mockScouts = [
 
 export default function ScoutDirectoryPage() {
   const theme = useSelector((state) => state.theme);
+  
+  const [country, setCountry] = useState("All Countries");
+  const [region, setRegion] = useState("All Regions");
+  const [specialization, setSpecialization] = useState("All Specializations");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const countries = [
+    "All Countries",
+    "Spain",
+    "England",
+    "Germany",
+    "France",
+    "Brazil",
+    "Italy",
+    "Portugal",
+  ];
+  
+  const regions = [
+    "All Regions",
+    "Europe",
+    "South America",
+    "Africa",
+    "Asia",
+    "North America",
+  ];
+  
+  const specializations = [
+    "All Specializations",
+    "Youth Scouting",
+    "Technical Analysis",
+    "International Scouting",
+    "Talent ID",
+    "Position-based",
+  ];
+
+  const resetFilters = () => {
+    setCountry("All Countries");
+    setRegion("All Regions");
+    setSpecialization("All Specializations");
+    setSearchQuery("");
+  };
+
+  // Filter scouts based on selected criteria
+  const filteredScouts = mockScouts.filter(scout => {
+    // Filter by country
+    if (country !== "All Countries") {
+      const scoutCountries = scout.countries.split(',').map(c => c.trim());
+      if (!scoutCountries.includes(country)) {
+        return false;
+      }
+    }
+    
+    // Filter by specialization
+    if (specialization !== "All Specializations" && 
+        !scout.specializations.includes(specialization)) {
+      return false;
+    }
+    
+    // Filter by region - we'll map countries to regions
+    if (region !== "All Regions") {
+      const regionCountries = {
+        "Europe": ["Spain", "England", "Germany", "France", "Italy", "Portugal", "Netherlands", "Belgium", "Scandinavia"],
+        "South America": ["Brazil", "Argentina", "Uruguay"],
+        "Africa": ["Egypt", "Nigeria"],
+        "Asia": ["China", "Japan", "South Korea", "UAE"],
+        "North America": ["USA", "Mexico"],
+      };
+      
+      const regionCountryList = regionCountries[region] || [];
+      const scoutCountries = scout.countries.split(',').map(c => c.trim());
+      
+      if (!scoutCountries.some(scoutCountry => 
+        regionCountryList.includes(scoutCountry)
+      )) {
+        return false;
+      }
+    }
+    
+    // Filter by search query
+    if (searchQuery && 
+        !scout.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
+        !scout.role.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !scout.countries.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    return true;
+  });
 
   return (
     <div className="space-y-8 pb-12">
@@ -79,13 +168,28 @@ export default function ScoutDirectoryPage() {
       <GradientTitle text="Scout Directory" />
 
       {/* Filters */}
-      <ScoutSearchFilters theme={theme} />
+      <ScoutSearchFilters 
+        theme={theme} 
+        filters={{ country, region, specialization, searchQuery }}
+        onFilterChange={({ country: newCountry, region: newRegion, specialization: newSpecialization, searchQuery: newSearchQuery }) => {
+          setCountry(newCountry);
+          setRegion(newRegion);
+          setSpecialization(newSpecialization);
+          setSearchQuery(newSearchQuery);
+        }}
+      />
 
       {/* Scouts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {mockScouts.map((scout) => (
-          <ScoutDirectoryCard key={scout.id} scout={scout} theme={theme} />
-        ))}
+        {filteredScouts.length > 0 ? (
+          filteredScouts.map((scout) => (
+            <ScoutDirectoryCard key={scout.id} scout={scout} theme={theme} />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-400 text-lg">No scouts found matching your criteria</p>
+          </div>
+        )}
       </div>
 
       {/* Load More */}
