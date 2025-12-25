@@ -70,7 +70,7 @@ export default function ScoutingRegions({
       <div
         className={` ${
           isEditing ? "" : "grid"
-        } grid-cols-1 md:grid-cols-2 gap-4 space-y-4`}
+        } grid-cols-1 md:grid-cols-2 gap-4 `}
       >
         {regionsState.map((region, i) => (
           <div

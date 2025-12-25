@@ -1,11 +1,11 @@
 import RegisterPageComponent from "@/components/auth/RegisterPage";
 
-export default function PlayerRegisterPage() {
+export default function ScoutRegisterPage() {
   return (
     <RegisterPageComponent
-      role="Player"
+      role="Scout"
       logo="/player/logo.png"
-      welcomeSubtitle="Create your NextGen Pros player account"
+      welcomeSubtitle="Create your NextGen Pros scout account"
     />
   );
 }

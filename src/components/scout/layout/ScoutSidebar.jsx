@@ -33,7 +33,7 @@ const menuItems = [
     icon: ShieldIcon,
     label: "Scout Directory",
   },
-  { path: "/scout/messaging", icon: InboxIcon, label: "Messaging" },
+  { path: "/scout/messages", icon: InboxIcon, label: "Messaging" },
   { path: "/scout/settings", icon: Settings2, label: "Settings" },
 ];
 

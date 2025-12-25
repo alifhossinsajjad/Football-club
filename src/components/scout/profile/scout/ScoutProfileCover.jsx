@@ -9,7 +9,7 @@ export default function ScoutProfileCover({
   setIsEditing,
   isEditing,
   updatePlayerProfileData,
-  showEditSaveButton = true,
+  owner = true,
 }) {
   const theme = useSelector((state) => state.theme);
   const fileInputRef = useRef(null);
@@ -57,7 +57,7 @@ export default function ScoutProfileCover({
       />
 
       {/* Action Buttons */}
-      {showEditSaveButton && (
+      {owner && (
         <div className="absolute top-4 right-4 flex gap-3 z-20">
           <Button
             className={`rounded-md text-white text-base transition-all`}

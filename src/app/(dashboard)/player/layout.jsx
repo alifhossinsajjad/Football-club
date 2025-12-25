@@ -29,7 +29,7 @@ export default function AdminLayout({ children }) {
       <main className={` ${isAuth ? " " : " lg:ml-64 mt-20 p-4  lg:p-8"}`}>
         {children}
       </main>
-      <ScoutFooter />
+      {isAuth || <ScoutFooter />}
     </div>
   );
 }

@@ -3,7 +3,11 @@ import { useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
 import { SquarePen } from "lucide-react";
 
-export default function AboutScoutProfile({ playerProfileData, isEditing, updateScoutProfileData }) {
+export default function AboutScoutProfile({
+  playerProfileData,
+  isEditing,
+  updateScoutProfileData,
+}) {
   const theme = useSelector((state) => state.theme);
 
   // about text
@@ -17,7 +21,9 @@ export default function AboutScoutProfile({ playerProfileData, isEditing, update
     const value = e.target.value;
     setAboutText(value);
     if (updateScoutProfileData) {
-      updateScoutProfileData({ profile: { ...playerProfileData.profile, about: value } });
+      updateScoutProfileData({
+        profile: { ...playerProfileData.profile, about: value },
+      });
     }
   };
 
@@ -31,20 +37,21 @@ export default function AboutScoutProfile({ playerProfileData, isEditing, update
     >
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-xl font-bold text-white">About</h2>
-        {isEditing && (
-          <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-            <SquarePen className="w-4 h-4 text-gray-400" />
-          </button>
-        )}
       </div>
 
       {isEditing ? (
-        <textarea
-          value={aboutText}
-          onChange={handleAboutChange}
-          className="w-full p-3 rounded-lg text-white bg-[#1a2238] border border-[#00c4cc]33 focus:outline-none focus:ring-2 focus:ring-[#00c4cc]"
-          rows="6"
-        />
+        <div>
+          <textarea
+            value={aboutText}
+            onChange={handleAboutChange}
+            className="w-full p-3 rounded-lg border-b pb-8 text-white bg-[#1a2238] border border-[#00c4cc]33 focus:outline-none focus:ring-2 focus:ring-[#00c4cc]"
+            rows="6"
+            style={{
+              backgroundColor: `#1A2049`,
+              borderColor: `${theme.colors.primaryCyan}33`,
+            }}
+          />
+        </div>
       ) : (
         <p className="text-gray-300 leading-relaxed">{initialAboutText}</p>
       )}

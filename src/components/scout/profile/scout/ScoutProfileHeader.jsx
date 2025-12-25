@@ -11,27 +11,25 @@ import {
   CalendarRange,
   Users,
   Trophy,
+  Plus,
 } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/player/select";
+
 import { Button } from "@/components/ui/button";
 import PlayerTitle from "@/components/player/playerTitle";
+import ChatModal from "@/components/ui/modals/ChatModal";
 
 export default function ScoutProfileHeader({
   playerProfileData,
   isEditing,
   updateProfileField,
+  showMessageButton = false,
 }) {
   const theme = useSelector((state) => state.theme);
   const profileData = playerProfileData.profile;
   const fileInputRef = useRef(null);
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
 
   // Local state for editable fields
   const [editableProfileData, setEditableProfileData] = useState(profileData);
@@ -121,13 +119,17 @@ export default function ScoutProfileHeader({
           {/* Main Info */}
           <div className="flex-1 text-white flex flex-col gap-6">
             {/* Name & Position */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1  gap-6">
               <div>
-                <p className="text-sm text-gray-400 mb-2">Full Name</p>
+                <p className="text-sm text-gray-400 mb-2 cols">Full Name</p>
                 {isEditing ? (
                   <Input
                     value={editableProfileData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
+                    style={{
+                      backgroundColor: `#1A2049`,
+                      borderColor: `${theme.colors.primaryCyan}33`,
+                    }}
                   />
                 ) : (
                   <PlayerTitle title={profileData.name} />
@@ -135,16 +137,20 @@ export default function ScoutProfileHeader({
               </div>
 
               <div>
-                <p className="text-sm text-gray-400 mb-2">Position</p>
+                <p className="text-sm text-gray-400 mb-2">Professional Title</p>
                 {isEditing ? (
                   <Input
-                    value={editableProfileData.position}
+                    value={editableProfileData.role}
                     onChange={(e) =>
                       handleInputChange("position", e.target.value)
                     }
+                    style={{
+                      backgroundColor: `#1A2049`,
+                      borderColor: `${theme.colors.primaryCyan}33`,
+                    }}
                   />
                 ) : (
-                  <p className="text-xl font-medium">{profileData.position}</p>
+                  <p className="text-xl font-medium">{profileData.role}</p>
                 )}
               </div>
             </div>
@@ -159,6 +165,10 @@ export default function ScoutProfileHeader({
                     onChange={(e) =>
                       handleInputChange("location", e.target.value)
                     }
+                    style={{
+                      backgroundColor: `#1A2049`,
+                      borderColor: `${theme.colors.primaryCyan}33`,
+                    }}
                   />
                 ) : (
                   <p className="text-lg flex items-center gap-2">
@@ -167,145 +177,20 @@ export default function ScoutProfileHeader({
                   </p>
                 )}
               </div>
-
-              <div>
-                <p className="text-sm text-gray-400 mb-2">
-                  Availability Status
-                </p>
-                {isEditing ? (
-                  <Select
-                    value={editableProfileData.status}
-                    onValueChange={(value) =>
-                      handleInputChange("status", value)
-                    }
-                  >
-                    <SelectTrigger className="h-12">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Available">Available</SelectItem>
-                      <SelectItem value="Not Available">
-                        Not Available
-                      </SelectItem>
-                      <SelectItem value="Open to Offers">
-                        Open to Offers
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div
-                    className="px-4 py-3 rounded-lg text-sm font-medium inline-block"
-                    style={{
-                      backgroundColor: `${theme.colors.primaryCyan}20`,
-                      color: theme.colors.primaryCyan,
-                    }}
-                  >
-                    {profileData.status}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Personal Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div>
-                <p className="text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" /> Date of Birth
-                </p>
+              {/* Preferred Foot & Jersey Number */}
+              <div className="">
+                <p className="text-sm text-gray-400 mb-2">Experience</p>
                 {isEditing ? (
                   <Input
-                    value={editableProfileData.dateOfBirth}
-                    onChange={(e) =>
-                      handleInputChange("dateOfBirth", e.target.value)
-                    }
-                  />
-                ) : (
-                  <p className="font-medium">{profileData.dateOfBirth}</p>
-                )}
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <Ruler className="w-4 h-4" /> Height (cm)
-                </p>
-                {isEditing ? (
-                  <Input
-                    value={editableProfileData.height}
-                    onChange={(e) =>
-                      handleInputChange("height", e.target.value)
-                    }
-                  />
-                ) : (
-                  <p className="font-medium">{profileData.height}</p>
-                )}
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <Weight className="w-4 h-4" /> Weight (kg)
-                </p>
-                {isEditing ? (
-                  <Input
-                    value={editableProfileData.weight}
-                    onChange={(e) =>
-                      handleInputChange("weight", e.target.value)
-                    }
-                  />
-                ) : (
-                  <p className="font-medium">{profileData.weight}</p>
-                )}
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <Flag className="w-4 h-4" /> Nationality
-                </p>
-                {isEditing ? (
-                  <Input
-                    value={editableProfileData.nationality}
-                    onChange={(e) =>
-                      handleInputChange("nationality", e.target.value)
-                    }
-                  />
-                ) : (
-                  <p className="font-medium">{profileData.nationality}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Preferred Foot & Jersey Number */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <p className="text-sm text-gray-400 mb-2">Preferred Foot</p>
-                {isEditing ? (
-                  <Select
-                    value={editableProfileData.preferredFoot}
-                    onValueChange={(value) =>
-                      handleInputChange("preferredFoot", value)
-                    }
-                  >
-                    <SelectTrigger className="h-12">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Right">Right</SelectItem>
-                      <SelectItem value="Left">Left</SelectItem>
-                      <SelectItem value="Both">Both</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="font-medium">{profileData.preferredFoot}</p>
-                )}
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-400 mb-2">Jersey Number</p>
-                {isEditing ? (
-                  <Input
-                    value={editableProfileData.jerseyNumber}
+                    value={editableProfileData.experience}
                     onChange={(e) =>
                       handleInputChange("jerseyNumber", e.target.value)
                     }
+                    className="w-full"
+                    style={{
+                      backgroundColor: `#1A2049`,
+                      borderColor: `${theme.colors.primaryCyan}33`,
+                    }}
                   />
                 ) : (
                   <p className="font-medium">{profileData.jerseyNumber}</p>
@@ -510,9 +395,37 @@ export default function ScoutProfileHeader({
                 )}
               </div>
             </div>
+
+            {/* Send Message && Add To Network Button */}
+
+            {showMessageButton && (
+              <div className="mt-6 flex gap-12">
+                <Button
+                  variant="common"
+                  onClick={() => setMessageModalOpen(true)}
+                  className="rounded-sm px-7 py-4 text-base font-normal"
+                >
+                  Send Message
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="rounded-md px-7 py-4 text-base font-normal"
+                >
+                  Add To Network
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
+      {messageModalOpen && (
+        <ChatModal
+          isOpen={messageModalOpen}
+          onClose={() => setMessageModalOpen(false)}
+          player={playerProfileData.profile}
+        />
+      )}
     </div>
   );
 }
