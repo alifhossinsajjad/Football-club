@@ -1,68 +1,119 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-import NextImage from "next/image";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Checkbox } from "@/components/ui/Checkbox";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function LoginPageComponent({
-  role,
+  role, // "Player", "Scout", "Club", "Admin"
   logo,
   welcomeTitle = "Welcome Back",
   welcomeSubtitle = "Sign in to access your dashboard",
 }) {
   const theme = useSelector((state) => state.theme);
   const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Fully mock credentials - no API, no delays
+  const mockCredentials = {
+    Player: {
+      email: "player@example.com",
+      password: "player123",
 
+      dashboard: "/player/dashboard",
+    },
+    Scout: {
+      email: "scout@example.com",
+      password: "scout456",
+      dashboard: "/scout/dashboard",
+    },
+    Club: {
+      email: "club@example.com",
+      password: "club789",
+      dashboard: "/club/dashboard",
+    },
+    Admin: {
+      email: "admin@example.com",
+      password: "admin101",
+      dashboard: "/admin/dashboard",
+    },
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+
+    // Basic validation
     if (!email || !password) {
       setError("Please fill in all fields");
       return;
     }
 
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+
+    // 🔍 Check all roles one by one
+    for (const key in mockCredentials) {
+      const creds = mockCredentials[key];
+
+      if (
+        normalizedEmail === creds.email.toLowerCase() &&
+        normalizedPassword === creds.password
+      ) {
+        router.push(creds.dashboard);
+        return; // ✅ stop immediately when matched
+      }
+    }
+
+    // ❌ If no match found after checking all
+    setError("Invalid credentials. Use the test credentials shown below.");
+    setLoading(false);
+  };
+
+  // Social login also uses mock data - instantly logs in as the current role
+  const handleSocialLogin = (provider) => {
     setLoading(true);
     setError("");
 
-    try {
-      // For now, using mock authentication
-      // In a real app, you would call your authentication API here
-      console.log(`Login attempt for ${role} with email:`, email);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Redirect based on role
-      if (role === "Player") {
-        router.push("/player/dashboard");
-      } else if (role === "Scout") {
-        router.push("/scout/dashboard");
-      } else {
-        router.push("/admin/dashboard");
-      }
-    } catch (err) {
-      setError(err.message || "An error occurred during login");
-    } finally {
-      setLoading(false);
+    const roleCredentials = mockCredentials[role];
+    if (roleCredentials) {
+      router.push(roleCredentials.dashboard);
+    } else {
+      router.push("/player/dashboard"); // fallback
     }
+
+    setLoading(false);
   };
+
+  const currentMock = mockCredentials[role] || { email: "", password: "" };
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative overflow-hidden border "
+      className="min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{
         backgroundColor: theme.colors.backgroundDark,
       }}
@@ -77,7 +128,7 @@ export default function LoginPageComponent({
             width={200}
             height={200}
             priority
-            className="w-40 h-40"
+            className="w-40 h-40 object-contain"
           />
         </div>
 
@@ -85,6 +136,30 @@ export default function LoginPageComponent({
         <div className="pb-4">
           <h1 className="text-2xl font-bold text-white mb-2">{welcomeTitle}</h1>
           <p className="text-gray-400">{welcomeSubtitle}</p>
+        </div>
+
+        {/* Mock Credentials Hint */}
+        <div className="border border-gray-700 rounded-lg p-5 text-left text-sm text-gray-300 mb-6 bg-gray-900/40">
+          <p className="font-semibold mb-3 text-white">
+            Test Credentials ({role}):
+          </p>
+          <div className="space-y-2 font-mono">
+            <p>
+              Email:{" "}
+              <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">
+                {currentMock.email}
+              </code>
+            </p>
+            <p>
+              Password:{" "}
+              <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">
+                {currentMock.password}
+              </code>
+            </p>
+          </div>
+          <p className="mt-3 text-xs text-gray-500">
+            Copy or type exactly • No extra spaces • Case-sensitive password
+          </p>
         </div>
 
         {/* Login Form Card */}
@@ -98,21 +173,22 @@ export default function LoginPageComponent({
         >
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email */}
-            <div className="relative">
+            <div>
               <div className="flex pb-2 items-center gap-2 text-sm">
                 <Mail className="w-4 h-4 text-gray-400" />
-                <span>Email Address *</span>
+                <span className="text-white">Email Address *</span>
               </div>
               <Input
                 type="email"
-                placeholder="Email Address"
-                className=" h-14 rounded-xl"
+                placeholder="Enter email"
+                className="h-14 rounded-xl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
                 }}
+                required
               />
             </div>
 
@@ -120,23 +196,24 @@ export default function LoginPageComponent({
             <div className="relative">
               <div className="flex pb-2 items-center gap-2 text-sm">
                 <Lock className="w-4 h-4 text-gray-400" />
-                <span>Password *</span>
+                <span className="text-white">Password *</span>
               </div>
               <Input
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                className=" pr-12 h-14 rounded-xl"
+                placeholder="Enter password"
+                className="pr-12 h-14 rounded-xl"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
                   backgroundColor: theme.colors.backgroundDark,
                   borderColor: `${theme.colors.primaryCyan}33`,
                 }}
+                required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-2/3  -translate-y-1/2 text-gray-400 hover:text-white"
+                className="absolute right-4 top-12 text-gray-400 hover:text-white"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -155,9 +232,7 @@ export default function LoginPageComponent({
               <Link
                 href="#"
                 className="text-sm hover:underline"
-                style={{
-                  color: theme.colors.primaryCyan,
-                }}
+                style={{ color: theme.colors.primaryCyan }}
               >
                 Forgot Password?
               </Link>
@@ -169,12 +244,10 @@ export default function LoginPageComponent({
               className="w-full h-14 rounded-md text-lg font-semibold flex items-center justify-center gap-3"
               type="submit"
               disabled={loading}
+              style={{ backgroundColor: theme.colors.button }}
             >
               {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Signing In...
-                </>
+                <>Signing In...</>
               ) : (
                 <>
                   <LogIn className="w-5 h-5" />
@@ -184,7 +257,7 @@ export default function LoginPageComponent({
             </Button>
 
             {error && (
-              <div className="text-red-500 text-sm text-center mt-2">
+              <div className="text-red-400 text-sm text-center mt-4 p-3 bg-red-900/20 rounded-lg">
                 {error}
               </div>
             )}
@@ -193,11 +266,14 @@ export default function LoginPageComponent({
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-primaryCyan/20" />
+              <div
+                className="w-full border-t"
+                style={{ borderColor: `${theme.colors.primaryCyan}33` }}
+              />
             </div>
             <div className="relative flex justify-center text-sm">
               <span
-                className="px-4   text-gray-400"
+                className="px-4 text-gray-400"
                 style={{ backgroundColor: theme.colors.backgroundCard }}
               >
                 or continue with
@@ -205,7 +281,7 @@ export default function LoginPageComponent({
             </div>
           </div>
 
-          {/* Social Login */}
+          {/* Social Login (Mock - Instant Login) */}
           <div className="grid grid-cols-2 gap-4">
             <Button
               variant="outline"
@@ -214,8 +290,10 @@ export default function LoginPageComponent({
                 borderColor: `${theme.colors.primaryCyan}33`,
                 backgroundColor: theme.colors.backgroundDark,
               }}
+              onClick={() => handleSocialLogin("google")}
+              disabled={loading}
             >
-              <NextImage
+              <Image
                 src="/icons/google.png"
                 alt="Google"
                 width={24}
@@ -230,8 +308,10 @@ export default function LoginPageComponent({
                 borderColor: `${theme.colors.primaryCyan}33`,
                 backgroundColor: theme.colors.backgroundDark,
               }}
+              onClick={() => handleSocialLogin("facebook")}
+              disabled={loading}
             >
-              <NextImage
+              <Image
                 src="/icons/facebook.png"
                 alt="Facebook"
                 width={24}
@@ -243,11 +323,11 @@ export default function LoginPageComponent({
         </div>
 
         {/* Footer */}
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 text-sm mt-8">
           Protected by NextGen Pros. See our{" "}
           <Link
             href="#"
-            className=" hover:underline"
+            className="hover:underline"
             style={{ color: theme.colors.primaryCyan }}
           >
             Privacy Policy

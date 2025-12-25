@@ -3,6 +3,7 @@
 import { Lock, Clock, MapPin, Users, Mail, Phone } from "lucide-react";
 import SectionTitel from "./ReUseable/SectionTitle";
 import { useSelector } from "react-redux";
+import { Button } from "../ui/button";
 
 export default function UpcomingEvent() {
   const theme = useSelector((state) => state.theme);
@@ -120,12 +121,12 @@ export default function UpcomingEvent() {
                 </div>
               </div>
 
-              <button
-                className="w-full  text-white font-semibold py-3 rounded-full transition-colors duration-200"
-                style={{ backgroundColor: theme.colors.primaryCyan }}
+              <Button
+                variant="common"
+                className="w-full  text-white font-semibold py-3 rounded-md transition-colors duration-200"
               >
                 See more details
-              </button>
+              </Button>
             </div>
           ))}
         </div>

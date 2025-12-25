@@ -34,10 +34,10 @@ const Navbar = () => {
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 right-0 max-w-6xl mx-auto z-50 bg-transparent backdrop-blur-lg"
+      className="fixed top-0 left-0 right-0 max-w-[80vw] mx-auto z-50 bg-transparent backdrop-blur-lg"
     >
       <div
-        className="max-w-7xl rounded-md mx-auto px-4  text-[#06A295]"
+        className="max-w-[90vw] rounded-md mx-auto px-4  text-[#06A295]"
         style={{
           background:
             "linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.0001))",
@@ -79,7 +79,7 @@ const Navbar = () => {
             {/* Desktop Buttons */}
             <div className="hidden lg:flex items-center gap-3">
               <Button
-                onClick={() => router.push("/auth/login-option")}
+                onClick={() => router.push("/auth/login")}
                 className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center"
               >
                 Log in

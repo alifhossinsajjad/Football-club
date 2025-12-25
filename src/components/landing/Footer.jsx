@@ -1,7 +1,11 @@
+"use client";
 import { Instagram, Youtube, Facebook } from "lucide-react";
 import Image from "next/image";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 const Footer = () => {
+  const router = useRouter();
   return (
     <div className="w-full overflow-hidden">
       {/* Hero Background Image */}
@@ -19,12 +23,21 @@ const Footer = () => {
       {/* Footer */}
       <footer className="bg-navy-dark border-t border-cyan/20">
         {/* Main Footer Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16">
+        <div className="max-w-[80vw] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
             {/* Brand Section */}
             <div>
               {/* Logo */}
-              <div className="mb-5 sm:mb-6">
+              <Button
+                variant="outline"
+                className="mb-5 sm:mb-6 border-none hover:bg-none"
+                onClick={() => router.push("/")}
+                style={
+                  {
+                    backgroundColor: "transparent",
+                  }
+                }
+              >
                 <Image
                   src="/logo.png"
                   alt="NextGen Pros"
@@ -33,7 +46,7 @@ const Footer = () => {
                   className="w-[90px] sm:w-[110px] md:w-[120px] lg:w-[140px] h-auto"
                   priority
                 />
-              </div>
+              </Button>
 
               {/* Tagline */}
               <p className="text-[#7FB6B6] text-xs sm:text-sm leading-relaxed mb-6 sm:mb-8 max-w-xs">
@@ -172,4 +185,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
