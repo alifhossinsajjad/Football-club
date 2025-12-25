@@ -17,10 +17,10 @@ export default function ScoutLanguages({
     "French",
     "Portuguese",
     "German",
-    "Italian",
-    "Dutch",
-    "Arabic",
-    "Mandarin",
+    // "Italian",
+    // "Dutch",
+    // "Arabic",
+    // "Mandarin",
   ];
 
   const toggleLanguage = (lang) => {
@@ -55,16 +55,13 @@ export default function ScoutLanguages({
             key={lang}
             onClick={() => isEditing && toggleLanguage(lang)}
             disabled={!isEditing}
-            className={`px-6 py-3 rounded-full font-medium transition-all ${
+            className={`px-6 py-4 rounded-md  transition-all ${
               isEditing ? "cursor-pointer hover:opacity-90" : "cursor-default"
             }`}
             style={{
-              backgroundColor: languages.includes(lang)
-                ? theme.colors.primaryCyan
-                : `${theme.colors.primaryCyan}20`,
-              color: languages.includes(lang)
-                ? "white"
-                : theme.colors.primaryCyan,
+              background: `linear-gradient(to bottom right, ${theme.colors.primaryCyan}10, ${theme.colors.backgroundDark}33)`,
+              border: `2px solid ${theme.colors.primaryCyan}33`,
+              color: "white",
             }}
           >
             {lang}

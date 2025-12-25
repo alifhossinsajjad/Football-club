@@ -9,6 +9,7 @@ export default function ScoutProfileCover({
   setIsEditing,
   isEditing,
   updatePlayerProfileData,
+  showEditSaveButton = true,
 }) {
   const theme = useSelector((state) => state.theme);
   const fileInputRef = useRef(null);
@@ -56,27 +57,29 @@ export default function ScoutProfileCover({
       />
 
       {/* Action Buttons */}
-      <div className="absolute top-4 right-4 flex gap-3 z-20">
-        <Button
-          className={`rounded-md text-white text-base transition-all`}
-          variant="common"
-          onClick={() => setIsEditing(!isEditing)}
-        >
-          <span
-            className={`text-${
-              isEditing ? "white" : "white"
-            } flex items-center`}
+      {showEditSaveButton && (
+        <div className="absolute top-4 right-4 flex gap-3 z-20">
+          <Button
+            className={`rounded-md text-white text-base transition-all`}
+            variant="common"
+            onClick={() => setIsEditing(!isEditing)}
           >
-            {" "}
-            {isEditing ? (
-              <Save className="w-4 h-4 mr-2" />
-            ) : (
-              <SquarePen className="w-4 h-4 mr-2" />
-            )}
-            {isEditing ? "Save Changes" : "Edit Profile"}
-          </span>
-        </Button>
-      </div>
+            <span
+              className={`text-${
+                isEditing ? "white" : "white"
+              } flex items-center`}
+            >
+              {" "}
+              {isEditing ? (
+                <Save className="w-4 h-4 mr-2" />
+              ) : (
+                <SquarePen className="w-4 h-4 mr-2" />
+              )}
+              {isEditing ? "Save Changes" : "Edit Profile"}
+            </span>
+          </Button>
+        </div>
+      )}
 
       {/* Edit overlay for cover photo */}
       {isEditing && (

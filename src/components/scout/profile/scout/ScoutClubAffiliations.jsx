@@ -45,10 +45,10 @@ export default function ScoutClubAffiliations({
             key={index}
             className="flex items-center justify-between p-5 rounded-xl"
             style={{
-              backgroundColor: theme.colors.backgroundDark,
+              background: `linear-gradient(180deg, ${theme.colors.primaryCyan}11, ${theme.colors.primaryMagenta}11)`,
             }}
           >
-            <p className="text-white font-medium text-lg">{club}</p>
+            <p className="text-white text-sm">{club}</p>
             {isEditing && (
               <button
                 onClick={() => removeAffiliation(index)}
