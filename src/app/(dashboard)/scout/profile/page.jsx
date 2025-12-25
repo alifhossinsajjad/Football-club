@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import ContactInformation from "@/components/player/profile/ContactInformation";
-import PlayerAchievements from "@/components/player/profile/PlayerAchievements";
-import PlayerProfilePreference from "@/components/player/profile/PlayerProfilePreference";
 import ScoutStatsGrid from "@/components/scout/profile/grid/ScoutStatsGrid";
 import { useSelector } from "react-redux";
 import ScoutProfileHeader from "@/components/scout/profile/scout/ScoutProfileHeader";
@@ -16,6 +14,7 @@ import ScoutingRegions from "@/components/scout/profile/scout/ScoutingRegions";
 import ScoutProfessionalHistory from "@/components/scout/profile/scout/ScoutProfessionalHistory";
 import ScoutLanguages from "@/components/scout/profile/scout/ScoutLanguages";
 import ScoutClubAffiliations from "@/components/scout/profile/scout/ScoutClubAffiliations";
+import ScoutAchievements from "@/components/scout/profile/scout/ScoutAchivements";
 
 export default function ScoutProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -63,6 +62,7 @@ export default function ScoutProfilePage() {
         twitter: "@RMartinezScout",
         linkedin: "Roberto Martinez",
         youtube: "MT Scouting Analysis",
+        facebook: "Michael Thompson",
       },
       languages: ["English", "Spanish", "French", "Portuguese", "German"],
       stats: {
@@ -75,31 +75,36 @@ export default function ScoutProfilePage() {
       notableDiscoveries: [
         {
           name: "Carlos Fernandez",
-          position: "Midfielder U17",
+          position: "Midfielder",
+          age: "U17",
           club: "Real Madrid",
           year: 2018,
         },
         {
           name: "Lucas Silva",
-          position: "Forward U16",
+          position: "Forward",
+          age: "U16",
           club: "Barcelona",
           year: 2019,
         },
         {
           name: "Miguel Torres",
-          position: "Defender U18",
+          position: "Defender",
+          age: "U18",
           club: "Atletico Madrid",
           year: 2020,
         },
         {
           name: "James Wilson",
-          position: "Midfielder U17",
+          position: "Midfielder",
+          age: "U17",
           club: "Manchester United",
           year: 2021,
         },
         {
           name: "Pierre Dubois",
-          position: "Forward U18",
+          position: "Forward",
+          age: "U18",
           club: "PSG",
           year: 2022,
         },
@@ -203,19 +208,21 @@ export default function ScoutProfilePage() {
         updateProfileField={updateProfileField}
       />
 
-    {isEditing ||  <ScoutStatsGrid
-        stats={{
-          viewedPlayers: 342,
-          viewedChange: "+48 this week",
-          shortlistedPlayers: 28,
-          activeShortlisted: 12,
-          upcomingEvents: 6,
-          nextEvent: "Sep 15",
-          conversations: 15,
-          unread: 5,
-        }}
-        theme={theme}
-      />}
+      {isEditing || (
+        <ScoutStatsGrid
+          stats={{
+            viewedPlayers: 342,
+            viewedChange: "+48 this week",
+            shortlistedPlayers: 28,
+            activeShortlisted: 12,
+            upcomingEvents: 6,
+            nextEvent: "Sep 15",
+            conversations: 15,
+            unread: 5,
+          }}
+          theme={theme}
+        />
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -228,26 +235,28 @@ export default function ScoutProfilePage() {
           <ScoutingStatistics
             stats={scoutProfileData.profile.stats}
             isEditing={isEditing}
-            onUpdate={(updated) => updateProfileField('stats', updated)}
+            onUpdate={(updated) => updateProfileField("stats", updated)}
             theme={theme}
           />
           <NotableDiscoveries
             discoveries={scoutProfileData.profile.notableDiscoveries}
             isEditing={isEditing}
-            onUpdate={(updated) => updateProfileField('notableDiscoveries', updated)}
+            onUpdate={(updated) =>
+              updateProfileField("notableDiscoveries", updated)
+            }
             theme={theme}
           />
           <ScoutingRegions
             regions={scoutProfileData.profile.regions}
             isEditing={isEditing}
-            onUpdate={(updated) => updateProfileField('regions', updated)}
+            onUpdate={(updated) => updateProfileField("regions", updated)}
             theme={theme}
           />
 
           <ScoutProfessionalHistory
             history={scoutProfileData.profile.history}
             isEditing={isEditing}
-            onUpdate={(updated) => updateProfileField('history', updated)}
+            onUpdate={(updated) => updateProfileField("history", updated)}
             theme={theme}
           />
         </div>
@@ -263,24 +272,25 @@ export default function ScoutProfilePage() {
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}
           />
-          <ScoutLanguages
-            languages={scoutProfileData.profile.languages}
-            isEditing={isEditing}
-            onUpdate={(updated) => updateProfileField('languages', updated)}
-            theme={theme}
-          />
-          <ScoutClubAffiliations
-            affiliations={scoutProfileData.profile.affiliations}
-            isEditing={isEditing}
-            onUpdate={(updated) => updateProfileField('affiliations', updated)}
-            theme={theme}
-          />
-          <PlayerProfilePreference
-            playerProfileData={scoutProfileData}
-            isEditing={isEditing}
-            updatePlayerProfileData={updateScoutProfileData}
-          />
-          <PlayerAchievements
+          {isEditing || (
+            <ScoutLanguages
+              languages={scoutProfileData.profile.languages}
+              isEditing={isEditing}
+              onUpdate={(updated) => updateProfileField("languages", updated)}
+              theme={theme}
+            />
+          )}
+          {isEditing || (
+            <ScoutClubAffiliations
+              affiliations={scoutProfileData.profile.affiliations}
+              isEditing={isEditing}
+              onUpdate={(updated) =>
+                updateProfileField("affiliations", updated)
+              }
+              theme={theme}
+            />
+          )}
+          <ScoutAchievements
             playerProfileData={scoutProfileData}
             isEditing={isEditing}
             updatePlayerProfileData={updateScoutProfileData}

@@ -1,7 +1,7 @@
-import { Globe, Mail, Phone, SquarePen } from "lucide-react";
+import { Globe, Mail, Phone } from "lucide-react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Input } from "@/components/ui/input"; // Custom Input
+import { Input } from "@/components/ui/input";
 
 export default function ContactInformation({
   playerProfileData,
@@ -20,85 +20,90 @@ export default function ContactInformation({
     useState(initialContactInfo);
 
   const handleContactChange = (field, value) => {
-    const updatedContactInfo = {
+    const updated = {
       ...editableContactInfo,
       [field]: value,
     };
 
-    setEditableContactInfo(updatedContactInfo);
-
-    if (updatePlayerProfileData) {
-      updatePlayerProfileData({ contact: updatedContactInfo });
-    }
+    setEditableContactInfo(updated);
+    updatePlayerProfileData?.({ contact: updated });
   };
 
   return (
     <div
-      className="p-6 rounded-xl border relative"
+      className="p-6 rounded-xl border"
       style={{
         backgroundColor: theme.colors.backgroundCard,
         borderColor: `${theme.colors.primaryCyan}33`,
       }}
     >
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          Contact Information
-        </h3>
-        {isEditing && (
-          <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-            <SquarePen className="w-4 h-4 text-gray-400" />
-          </button>
-        )}
+      {/* Header */}
+      <div className="mb-4">
+        <h3 className="text-lg font-bold text-white">Contact Information</h3>
       </div>
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div
-            style={{
-              color: theme.colors.primaryCyan,
-              background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
-              borderColor: `${theme.colors.primaryCyan}50`,
-            }}
-            className="p-3 rounded-full border flex items-center justify-center"
-          >
-            <Mail
-              className="w-5 h-5 "
+
+      {/* CONTENT */}
+      <div className="space-y-5">
+        {/* EMAIL */}
+        <div className="flex items-start gap-3">
+          {!isEditing && (
+            <div
+              className="p-3 rounded-full border flex items-center justify-center"
               style={{
-                color: theme.colors.primaryCyan,
+                background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
+                borderColor: `${theme.colors.primaryCyan}50`,
               }}
-            />
-          </div>
+            >
+              <Mail
+                className="w-5 h-5"
+                style={{ color: theme.colors.primaryCyan }}
+              />
+            </div>
+          )}
+
           {isEditing ? (
-            <Input
-              value={editableContactInfo.email}
-              onChange={(e) => handleContactChange("email", e.target.value)}
-              type="email"
-            />
+            <div className="w-full">
+              <label className="text-sm text-gray-400 mb-1 block">Email</label>
+              <Input
+                type="email"
+                value={editableContactInfo.email}
+                onChange={(e) => handleContactChange("email", e.target.value)}
+              />
+            </div>
           ) : (
-            <span className="text-gray-300">{initialContactInfo.email}</span>
+            <div>
+              <div className="text-gray-300">Email</div>
+              <div className="text-gray-300">{initialContactInfo.email}</div>
+            </div>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <div
-            style={{
-              color: theme.colors.primaryCyan,
-              background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
-              borderColor: `${theme.colors.primaryCyan}50`,
-            }}
-            className="p-3 rounded-full border flex items-center justify-center"
-          >
-            <Phone
-              className="w-5 h-5 "
+
+        {/* PHONE */}
+        <div className="flex items-start gap-3">
+          {!isEditing && (
+            <div
+              className="p-3 rounded-full border flex items-center justify-center"
               style={{
-                color: theme.colors.primaryCyan,
+                background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
+                borderColor: `${theme.colors.primaryCyan}50`,
               }}
-            />
-          </div>
+            >
+              <Phone
+                className="w-5 h-5"
+                style={{ color: theme.colors.primaryCyan }}
+              />
+            </div>
+          )}
+
           {isEditing ? (
-            <Input
-              value={editableContactInfo.phone}
-              onChange={(e) => handleContactChange("phone", e.target.value)}
-              type="tel"
-            />
+            <div className="w-full">
+              <label className="text-sm text-gray-400 mb-1 block">Phone</label>
+              <Input
+                type="tel"
+                value={editableContactInfo.phone}
+                onChange={(e) => handleContactChange("phone", e.target.value)}
+              />
+            </div>
           ) : (
             <div className="text-sm">
               <div className="text-gray-300">Phone</div>
@@ -106,36 +111,41 @@ export default function ContactInformation({
             </div>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <div
-            style={{
-              color: theme.colors.primaryCyan,
-              background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
-              borderColor: `${theme.colors.primaryCyan}50`,
-            }}
-            className="p-3 rounded-full border flex items-center justify-center"
-          >
-            <Globe
-              className="w-5 h-5 "
+
+        {/* WEBSITE */}
+        <div className="flex items-start gap-3">
+          {!isEditing && (
+            <div
+              className="p-3 rounded-full border flex items-center justify-center"
               style={{
-                color: theme.colors.primaryCyan,
+                background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
+                borderColor: `${theme.colors.primaryCyan}50`,
               }}
-            />
-          </div>
+            >
+              <Globe
+                className="w-5 h-5"
+                style={{ color: theme.colors.primaryCyan }}
+              />
+            </div>
+          )}
+
           {isEditing ? (
-            <Input
-              value={editableContactInfo.website}
-              onChange={(e) => handleContactChange("website", e.target.value)}
-              type="url"
-            />
+            <div className="w-full">
+              <label className="text-sm text-gray-400 mb-1 block">
+                Website
+              </label>
+              <Input
+                type="url"
+                value={editableContactInfo.website}
+                onChange={(e) => handleContactChange("website", e.target.value)}
+              />
+            </div>
           ) : (
             <div className="text-sm">
               <div className="text-gray-300">Website</div>
               <div
                 className="text-gray-300"
-                style={{
-                  color: theme.colors.primaryCyan,
-                }}
+                style={{ color: theme.colors.primaryCyan }}
               >
                 {initialContactInfo.website}
               </div>
