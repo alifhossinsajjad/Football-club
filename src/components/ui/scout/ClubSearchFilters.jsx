@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,11 +14,19 @@ import {
   SelectTrigger,
 } from "../player/select";
 
-export default function ClubSearchFilters({ theme }) {
-  const [country, setCountry] = useState("All Countries");
-  const [clubType, setClubType] = useState("All Types");
-  const [sortBy, setSortBy] = useState("Relevance");
-  const [searchQuery, setSearchQuery] = useState("");
+export default function ClubSearchFilters({ theme, onFilterChange, filters }) {
+  const [localCountry, setLocalCountry] = useState(filters?.country || "All Countries");
+  const [localClubType, setLocalClubType] = useState(filters?.clubType || "All Types");
+  const [localSortBy, setLocalSortBy] = useState(filters?.sortBy || "Relevance");
+  const [localSearchQuery, setLocalSearchQuery] = useState(filters?.searchQuery || "");
+
+  // Update local state when filters prop changes
+  useEffect(() => {
+    setLocalCountry(filters?.country || "All Countries");
+    setLocalClubType(filters?.clubType || "All Types");
+    setLocalSortBy(filters?.sortBy || "Relevance");
+    setLocalSearchQuery(filters?.searchQuery || "");
+  }, [filters]);
 
   const countries = [
     "All Countries",
@@ -45,10 +53,19 @@ export default function ClubSearchFilters({ theme }) {
   ];
 
   const resetFilters = () => {
-    setCountry("All Countries");
-    setClubType("All Types");
-    setSortBy("Relevance");
-    setSearchQuery("");
+    setLocalCountry("All Countries");
+    setLocalClubType("All Types");
+    setLocalSortBy("Relevance");
+    setLocalSearchQuery("");
+    
+    if (onFilterChange) {
+      onFilterChange({
+        country: "All Countries",
+        clubType: "All Types",
+        sortBy: "Relevance",
+        searchQuery: "",
+      });
+    }
   };
 
   return (
@@ -79,7 +96,18 @@ export default function ClubSearchFilters({ theme }) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Country */}
         <div>
-          <Select value={country} onValueChange={setCountry}>
+          <Select 
+            value={localCountry} 
+            onValueChange={(value) => {
+              setLocalCountry(value);
+              if (onFilterChange) {
+                onFilterChange({
+                  ...filters,
+                  country: value,
+                });
+              }
+            }}
+          >
             <SelectTrigger className="h-12 rounded-lg">
               <SelectValue />
             </SelectTrigger>
@@ -95,7 +123,18 @@ export default function ClubSearchFilters({ theme }) {
 
         {/* Club Type */}
         <div>
-          <Select value={clubType} onValueChange={setClubType}>
+          <Select 
+            value={localClubType} 
+            onValueChange={(value) => {
+              setLocalClubType(value);
+              if (onFilterChange) {
+                onFilterChange({
+                  ...filters,
+                  clubType: value,
+                });
+              }
+            }}
+          >
             <SelectTrigger className="h-12 rounded-lg">
               <SelectValue />
             </SelectTrigger>
@@ -111,7 +150,18 @@ export default function ClubSearchFilters({ theme }) {
 
         {/* Sort By */}
         <div>
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select 
+            value={localSortBy} 
+            onValueChange={(value) => {
+              setLocalSortBy(value);
+              if (onFilterChange) {
+                onFilterChange({
+                  ...filters,
+                  sortBy: value,
+                });
+              }
+            }}
+          >
             <SelectTrigger className="h-12 rounded-lg">
               <SelectValue placeholder="Sort By" />
             </SelectTrigger>
@@ -130,8 +180,16 @@ export default function ClubSearchFilters({ theme }) {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={localSearchQuery}
+            onChange={(e) => {
+              setLocalSearchQuery(e.target.value);
+              if (onFilterChange) {
+                onFilterChange({
+                  ...filters,
+                  searchQuery: e.target.value,
+                });
+              }
+            }}
             className="pl-12 h-12 rounded-lg"
           />
         </div>

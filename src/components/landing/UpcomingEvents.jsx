@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
 import { Lock, Clock, MapPin, Users, Mail, Phone } from "lucide-react";
 import SectionTitel from "./ReUseable/SectionTitle";
 import { useSelector } from "react-redux";
+import { Button } from "../ui/button";
 
 export default function UpcomingEvent() {
-
-         const theme = useSelector(state => state.theme)    
+  const theme = useSelector((state) => state.theme);
   const events = [
     {
       id: 1,
       category: "Training",
-      categoryColor: "text-landing-number",
+      categoryColor: "text-[#06A295]",
       date: "10 sept 2025",
-      dateColor: "text-landing-number",
+      dateColor: "text-[#06A295]",
       title: "Youth Championship Finals",
       time: "14:00",
       location: "Wembley Stadium, London",
@@ -26,7 +26,7 @@ export default function UpcomingEvent() {
       category: "Nutrition",
       categoryColor: "text-yellow-500",
       date: "18 sept 2025",
-      dateColor: "text-landing-number",
+      dateColor: "text-[#06A295]",
       title: "Premier League Trials",
       time: "08:30",
       location: "Manchester, UK",
@@ -37,9 +37,8 @@ export default function UpcomingEvent() {
   ];
 
   return (
-    <div className="min-h-screen  text-white">
-      <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-
+    <div className=" text-white">
+      <div className="max-w-7xl mx-auto px-4  sm:px-6 lg:px-8">
         <SectionTitel
           className="max-w-xl mx-auto text-center"
           title="UPCOMING EVENTS"
@@ -51,10 +50,9 @@ export default function UpcomingEvent() {
             <div
               key={event.id}
               className=" rounded-2xl p-8 "
-
-                    style={{
-          backgroundColor: theme.colors.backgroundCard,
-        }}
+              style={{
+                backgroundColor: theme.colors.backgroundCard,
+              }}
             >
               <div className="flex items-center justify-between mb-6">
                 <span
@@ -73,18 +71,27 @@ export default function UpcomingEvent() {
 
               <div className="space-y-4 mb-8 pb-8 border-b border-gray-700">
                 <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-cyan-400 flex-shrink-0" style={{color: theme.colors.primaryCyan }} />
-                  <span className=" text-landing-number">{event.time}</span>
+                  <Clock
+                    className="w-5 h-5 text-cyan-400 flex-shrink-0"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
+                  <span className=" text-[#06A295]">{event.time}</span>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0" style={{color: theme.colors.primaryCyan }} />
-                  <span className="text-landing-number">{event.location}</span>
+                  <MapPin
+                    className="w-5 h-5 text-cyan-400 flex-shrink-0"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
+                  <span className="text-[#06A295]">{event.location}</span>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-cyan-400 flex-shrink-0" style={{color: theme.colors.primaryCyan }} />
-                  <span className="text-landing-number">{event.capacity}</span>
+                  <Users
+                    className="w-5 h-5 text-cyan-400 flex-shrink-0"
+                    style={{ color: theme.colors.primaryCyan }}
+                  />
+                  <span className="text-[#06A295]">{event.capacity}</span>
                 </div>
               </div>
 
@@ -94,21 +101,32 @@ export default function UpcomingEvent() {
                 </h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <Mail className="w-4 h-4 text-cyan-400 flex-shrink-0" style={{color: theme.colors.primaryCyan }} />
-                    <span className="text-landing-number text-sm">{event.email}</span>
+                    <Mail
+                      className="w-4 h-4 text-cyan-400 flex-shrink-0"
+                      style={{ color: theme.colors.primaryCyan }}
+                    />
+                    <span className="text-[#06A295] text-sm">
+                      {event.email}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-cyan-400 flex-shrink-0" style={{color: theme.colors.primaryCyan }}/>
-                    <span className="text-landing-number text-sm">{event.phone}</span>
+                    <Phone
+                      className="w-4 h-4 text-cyan-400 flex-shrink-0"
+                      style={{ color: theme.colors.primaryCyan }}
+                    />
+                    <span className="text-[#06A295] text-sm">
+                      {event.phone}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <button className="w-full  text-white font-semibold py-3 rounded-full transition-colors duration-200"
-              style={{ backgroundColor: theme.colors.primaryCyan }}
+              <Button
+                variant="common"
+                className="w-full  text-white font-semibold py-3 rounded-md transition-colors duration-200"
               >
                 See more details
-              </button>
+              </Button>
             </div>
           ))}
         </div>

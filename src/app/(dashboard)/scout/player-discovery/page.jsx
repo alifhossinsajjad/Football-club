@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import GradientTitle from "@/components/scout/reusable/GradientTitle";
 import { Button } from "@/components/ui/button";
 import PlayerDirectoryCard from "@/components/ui/scout/PlayerDirectoryCard";
@@ -79,44 +80,97 @@ const mockPlayers = [
 export default function page() {
   const theme = useSelector((state) => state.theme);
   const router = useRouter();
+  
+  const [filters, setFilters] = useState({
+    position: "All Positions",
+    nationality: "All Countries",
+    ageRange: "All Ages",
+    searchName: "",
+  });
+
+  // Filter players based on selected criteria
+  const filteredPlayers = mockPlayers.filter(player => {
+    // Filter by position
+    if (filters.position !== "All Positions" && 
+        !player.position.toLowerCase().includes(filters.position.toLowerCase())) {
+      return false;
+    }
+    
+    // Filter by nationality
+    if (filters.nationality !== "All Countries" && 
+        !player.nationality.toLowerCase().includes(filters.nationality.toLowerCase())) {
+      return false;
+    }
+    
+    // Filter by age range
+    if (filters.ageRange !== "All Ages") {
+      const [ageValue] = player.age.split(' ');
+      const age = parseInt(ageValue);
+      
+      if (filters.ageRange === "16-20" && (age < 16 || age > 20)) return false;
+      if (filters.ageRange === "21-25" && (age < 21 || age > 25)) return false;
+      if (filters.ageRange === "26-30" && (age < 26 || age > 30)) return false;
+      if (filters.ageRange === "31-35" && (age < 31 || age > 35)) return false;
+      if (filters.ageRange === "36+" && age < 36) return false;
+    }
+    
+    // Filter by search name
+    if (filters.searchName && 
+        !player.name.toLowerCase().includes(filters.searchName.toLowerCase())) {
+      return false;
+    }
+    
+    return true;
+  });
+
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
       <div>
         <GradientTitle text="Player Discovery" />
       </div>
-      <SearchFilters theme={theme} />
+      <SearchFilters 
+        theme={theme} 
+        filters={filters}
+        onFilterChange={setFilters}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {mockPlayers.map((player) => (
-          <PlayerDirectoryCard
-            key={player.id}
-            image={player.image}
-            name={player.name}
-            position={player.position}
-            nationality={player.nationality}
-            age={player.age}
-            rating={player.rating}
-            highlightVideo={player.highlightVideo}
-            currentClub={player.currentClub}
-            theme={theme}
-            onViewProfile={() =>
-              router.push(
-                `/scout/player-profile?data=${encodeURIComponent(
-                  JSON.stringify({
-                    image: player.image,
-                    name: player.name,
-                    position: player.role,
-                    nationality: player.nationality,
-                    age: player.age,
-                    currentClub: player.currentClub,
-                    rating: player.rating,
-                    highlightVideo: player.highlightVideo,
-                  })
-                )}`
-              )
-            }
-          />
-        ))}
+        {filteredPlayers.length > 0 ? (
+          filteredPlayers.map((player) => (
+            <PlayerDirectoryCard
+              key={player.id}
+              image={player.image}
+              name={player.name}
+              position={player.position}
+              nationality={player.nationality}
+              age={player.age}
+              rating={player.rating}
+              highlightVideo={player.highlightVideo}
+              currentClub={player.currentClub}
+              theme={theme}
+              onViewProfile={() =>
+                router.push(
+                  `/scout/player-profile?data=${encodeURIComponent(
+                    JSON.stringify({
+                      image: player.image,
+                      name: player.name,
+                      position: player.position,
+                      nationality: player.nationality,
+                      age: player.age,
+                      currentClub: player.currentClub,
+                      rating: player.rating,
+                      highlightVideo: player.highlightVideo,
+                    })
+                  )}`
+                )
+              }
+            />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-400 text-lg">No players found matching your criteria</p>
+          </div>
+        )}
       </div>
       <div className="px-4 flex items-center justify-center">
         <Button variant="outline" size="icon" className="w-full md:w-1/5">

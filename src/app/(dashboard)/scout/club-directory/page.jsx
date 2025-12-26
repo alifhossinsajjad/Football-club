@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import GradientTitle from "@/components/scout/reusable/GradientTitle";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -68,30 +69,154 @@ export default function ClubDirectoryPage() {
   const theme = useSelector((state) => state.theme);
   const router = useRouter();
 
+  const [country, setCountry] = useState("All Countries");
+  const [clubType, setClubType] = useState("All Types");
+  const [sortBy, setSortBy] = useState("Relevance");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const countries = [
+    "All Countries",
+    "Spain",
+    "England",
+    "Italy",
+    "Netherlands",
+    "Brazil",
+    "France",
+  ];
+
+  const clubTypes = [
+    "All Types",
+    "Youth Academy",
+    "Professional Academy",
+    "Reserve Team",
+  ];
+
+  const sortOptions = [
+    "Relevance",
+    "Players Count",
+    "Established Year",
+    "Recent Achievement",
+  ];
+
+  const resetFilters = () => {
+    setCountry("All Countries");
+    setClubType("All Types");
+    setSortBy("Relevance");
+    setSearchQuery("");
+  };
+
+  // Filter clubs based on selected criteria
+  const filteredClubs = mockClubs.filter((club) => {
+    // Filter by country
+    if (country !== "All Countries" && !club.location.includes(country)) {
+      return false;
+    }
+
+    // Filter by club type - we'll use keywords in the club name to determine type
+    if (clubType !== "All Types") {
+      const clubNameLower = club.name.toLowerCase();
+
+      if (
+        clubType === "Youth Academy" &&
+        !clubNameLower.includes("youth") &&
+        !clubNameLower.includes("academy")
+      ) {
+        return false;
+      }
+
+      if (
+        clubType === "Professional Academy" &&
+        !clubNameLower.includes("academy")
+      ) {
+        return false;
+      }
+
+      if (
+        clubType === "Reserve Team" &&
+        !clubNameLower.includes("reserv") &&
+        !clubNameLower.includes("u23") &&
+        !clubNameLower.includes("b-team")
+      ) {
+        return false;
+      }
+    }
+
+    // Filter by search query
+    if (
+      searchQuery &&
+      !club.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !club.location.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !club.recentAchievement.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // Sort clubs based on selected criteria
+  const sortedClubs = [...filteredClubs].sort((a, b) => {
+    switch (sortBy) {
+      case "Players Count":
+        return b.playersCount - a.playersCount;
+      case "Established Year":
+        return b.established - a.established; // Most recent first
+      case "Recent Achievement":
+        return a.recentAchievement.localeCompare(b.recentAchievement);
+      case "Relevance":
+      default:
+        return a.name.localeCompare(b.name);
+    }
+  });
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <GradientTitle text="Club Directory" />
 
       {/* Filters */}
-      <ClubSearchFilters theme={theme} />
+      <ClubSearchFilters
+        theme={theme}
+        filters={{ country, clubType, sortBy, searchQuery }}
+        onFilterChange={({
+          country: newCountry,
+          clubType: newClubType,
+          sortBy: newSortBy,
+          searchQuery: newSearchQuery,
+        }) => {
+          setCountry(newCountry);
+          setClubType(newClubType);
+          setSortBy(newSortBy);
+          setSearchQuery(newSearchQuery);
+        }}
+      />
 
       {/* Clubs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {mockClubs.map((club) => (
-          <ClubDirectoryCard
-            key={club.id}
-            logo={club.logo}
-            name={club.name}
-            image={club.logo}
-            location={club.location}
-            playersCount={club.playersCount}
-            established={club.established}
-            recentAchievement={club.recentAchievement}
-            theme={theme}
-            onViewDetails={() => router.push(`/scout/clubs/${club.id}`)}
-          />
-        ))}
+        {sortedClubs.length > 0 ? (
+          sortedClubs.map((club) => (
+            <ClubDirectoryCard
+              key={club.id}
+              logo={club.logo}
+              name={club.name}
+              image={club.logo}
+              location={club.location}
+              playersCount={club.playersCount}
+              established={club.established}
+              recentAchievement={club.recentAchievement}
+              theme={theme}
+              onViewDetails={() =>
+                router.push(`/scout/club-directory/${club.id}`)
+              }
+            />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-400 text-lg">
+              No clubs found matching your criteria
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Load More */}
