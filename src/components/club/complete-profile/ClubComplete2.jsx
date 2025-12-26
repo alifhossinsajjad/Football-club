@@ -1,244 +1,158 @@
 "use client";
 
-import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Label } from "@/components/ui/label";
-import { Globe } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/player/select";
+import { User, AlertCircle } from "lucide-react";
 
-const primaryRegions = [
-  "Spain",
-  "England",
-  "Germany",
-  "France",
-  "Italy",
-  "Portugal",
-  "Netherlands",
-  "Brazil",
-  "Argentina",
-  "USA",
-  "Africa",
-  "Asia",
-];
-
-const secondaryRegions = [
-  "Belgium",
-  "Croatia",
-  "Serbia",
-  "Poland",
-  "Turkey",
-  "Mexico",
-  "Colombia",
-  "Uruguay",
-  "Other",
-];
-
-const ageGroups = [
-  "U-12",
-  "U-14",
-  "U-16",
-  "U-18",
-  "U-21",
-  "U-23",
-  "Senior",
-  "All Ages",
-];
-
-const positions = [
-  "Goalkeeper",
-  "Defender",
-  "Midfielder",
-  "Forward",
-  "Winger",
-  "Striker",
-  "All Positions",
-];
-
-const languages = [
-  "English",
-  "Spanish",
-  "Portuguese",
-  "French",
-  "German",
-  "Italian",
-  "Dutch",
-  "Arabic",
-  "Other",
-];
-
-export default function ClubComplete2({ formData, updateFormData, onNext }) {
+export default function ClubComplete2({
+  formData,
+  updateFormData,
+  onNext,
+  onBack,
+}) {
   const theme = useSelector((state) => state.theme);
 
-  const [primaryFocus, setPrimaryFocus] = useState(
-    formData.primaryRegions || []
-  );
-  const [secondaryFocus, setSecondaryFocus] = useState(
-    formData.secondaryRegions || []
-  );
-  const [ageFocus, setAgeFocus] = useState(formData.ageGroups || []);
-  const [positionFocus, setPositionFocus] = useState(formData.positions || []);
-  const [spokenLanguages, setSpokenLanguages] = useState(
-    formData.languages || []
-  );
-
-  // Required: at least one primary region and one age group
-  const isComplete =
-    primaryFocus.length > 0 && ageFocus.length > 0 && positionFocus.length > 0;
-
-  const toggleSelection = (array, setter, value) => {
-    setter((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
-    );
-  };
-
-  const handleContinue = () => {
-    if (isComplete) {
-      updateFormData({
-        primaryRegions: primaryFocus,
-        secondaryRegions: secondaryFocus,
-        ageGroups: ageFocus,
-        positions: positionFocus,
-        languages: spokenLanguages,
-      });
-      onNext();
-    }
-  };
-
-  const BadgeToggle = ({ label, selected, onClick }) => (
-    <Button
-      variant="outline"
-      className="py-3 px-6 text-base font-medium  cursor-pointer rounded-lg transition-all"
-      style={{
-        backgroundColor: selected
-          ? `${theme.colors.primaryCyan}33`
-          : theme.colors.backgroundDark,
-        borderColor: selected
-          ? `${theme.colors.primaryCyan}30`
-          : `${theme.colors.primaryCyan}22`,
-        color: "white",
-        borderWidth: "2px",
-      }}
-      onClick={onClick}
-    >
-      {label}
-    </Button>
-  );
+  const roles = [
+    "Club President",
+    "Sporting Director",
+    "Head Scout",
+    "Academy Director",
+    "Other",
+  ];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div
+      className="p-8 rounded-2xl "
+      style={{
+        backgroundColor: theme.colors.backgroundCard,
+        borderColor: `${theme.colors.primaryCyan}33`,
+      }}
+    >
       {/* Header */}
-      <div className="text-center ">
+      <div className="text-center mb-8">
         <div
-          className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6"
+          className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"
           style={{
-            background: `linear-gradient(135deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
+            background: `linear-gradient(180deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
           }}
         >
-          <Globe className="w-10 h-10 text-white" />
+          <User className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-3xl font-bold text-white mb-3">
-          Scouting Focus Areas
+
+        <h2 className="text-2xl font-bold text-white">
+          Primary Contact Person
         </h2>
-        <p className="text-gray-400 text-lg">
-          Define your scouting regions and target profiles
+        <p className="text-gray-400 mt-1">
+          Who should we contact regarding your organization?
         </p>
       </div>
 
-      {/* Main Form Card */}
-      <div className="rounded-2xl p-8 space-y-10">
-        {/* Primary Scouting Regions */}
+      {/* Info box */}
+      <div
+        className="p-4  rounded-lg bg-[#2B7FFF1A] mb-6 flex border text-xs gap-4"
+        style={{
+          borderColor: `${theme.colors.primaryCyan}33`,
+        }}
+      >
+        <AlertCircle className="w-8 h-8 text-[#2B7FFF]" />
+        <p className="text-sm text-gray-300 mb-4">
+          <strong>Important Contact Information</strong>
+          <br />
+          This person will be the main point of contact for account management,
+          player inquiries, and platform communications.
+        </p>
+      </div>
+
+      {/* Form */}
+      <div className="space-y-6">
+        {/* Full Name */}
         <div>
-          <Label className="text-gray-300 text-sm mb-4 flex items-center gap-2">
-            Primary Scouting Regions * (Where you actively scout)
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3  gap-4">
-            {primaryRegions.map((region) => (
-              <BadgeToggle
-                key={region}
-                label={region}
-                selected={primaryFocus.includes(region)}
-                onClick={() =>
-                  toggleSelection(primaryFocus, setPrimaryFocus, region)
-                }
-              />
-            ))}
-          </div>
+          <label className="text-sm text-gray-300 mb-2 block">
+            Full Name *
+          </label>
+          <Input
+            placeholder="Contact Person's full name"
+            className="h-12"
+            value={formData.fullName || ""}
+            onChange={(e) => updateFormData({ fullName: e.target.value })}
+            style={{
+              backgroundColor: theme.colors.backgroundDark,
+            }}
+          />
         </div>
 
-        {/* Secondary Regions */}
+        {/* Role/Position */}
         <div>
-          <Label className="text-gray-300 text-sm  mb-4">
-            Secondary Regions (Optional)
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3  mt-2 gap-4">
-            {secondaryRegions.map((region) => (
-              <BadgeToggle
-                key={region}
-                label={region}
-                selected={secondaryFocus.includes(region)}
-                onClick={() =>
-                  toggleSelection(secondaryFocus, setSecondaryFocus, region)
-                }
-              />
-            ))}
-          </div>
+          <label className="text-sm text-gray-300 mb-2 block">
+            Role/Position *
+          </label>
+          <Select
+            value={formData.role || ""}
+            onValueChange={(value) => updateFormData({ role: value })}
+          >
+            <SelectTrigger
+              className="w-full h-12 rounded-md border border-gray-700 text-gray-400 px-4"
+              style={{
+                backgroundColor: theme.colors.backgroundDark,
+              }}
+            >
+              <SelectValue placeholder="Select Role" />
+            </SelectTrigger>
+            <SelectContent
+              style={{
+                backgroundColor: theme.colors.backgroundDark,
+                borderColor: theme.colors.primaryCyan + "33",
+              }}
+            >
+              {roles.map((role) => (
+                <SelectItem key={role} value={role} style={{ color: "white" }}>
+                  {role}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Age Group Focus */}
+        {/* Email Address */}
         <div>
-          <Label className="text-gray-300 text-sm  mb-4">
-            Age Group Focus *
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-            {ageGroups.map((age) => (
-              <BadgeToggle
-                key={age}
-                label={age}
-                selected={ageFocus.includes(age)}
-                onClick={() => toggleSelection(ageFocus, setAgeFocus, age)}
-              />
-            ))}
-          </div>
+          <label className="text-sm text-gray-300 mb-2 block">
+            Email Address *
+          </label>
+          <Input
+            placeholder="contact@yourclub.com"
+            className="h-12"
+            value={formData.email || ""}
+            onChange={(e) => updateFormData({ email: e.target.value })}
+            style={{
+              backgroundColor: theme.colors.backgroundDark,
+            }}
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            This must be your club's organization email
+          </p>
         </div>
 
-        {/* Position Focus */}
+        {/* Phone Number */}
         <div>
-          <Label className="text-gray-300 text-sm  mb-4">
-            Position Focus *
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-            {positions.map((pos) => (
-              <BadgeToggle
-                key={pos}
-                label={pos}
-                selected={positionFocus.includes(pos)}
-                onClick={() =>
-                  toggleSelection(positionFocus, setPositionFocus, pos)
-                }
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Languages Spoken */}
-        <div>
-          <Label className="text-gray-300 text-sm  mb-4">
-            Languages Spoken (Helpful for scouting)
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
-            {languages.map((lang) => (
-              <BadgeToggle
-                key={lang}
-                label={lang}
-                selected={spokenLanguages.includes(lang)}
-                onClick={() =>
-                  toggleSelection(spokenLanguages, setSpokenLanguages, lang)
-                }
-              />
-            ))}
-          </div>
+          <label className="text-sm text-gray-300 mb-2 block">
+            Phone Number *
+          </label>
+          <Input
+            placeholder="+34 XXX XXX XXX"
+            className="h-12"
+            value={formData.phoneNumber || ""}
+            onChange={(e) => updateFormData({ phoneNumber: e.target.value })}
+            style={{
+              backgroundColor: theme.colors.backgroundDark,
+            }}
+          />
         </div>
       </div>
     </div>

@@ -2,177 +2,237 @@
 
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/player/select";
-import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Building, Globe, Instagram, Twitter } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const rangeOptions = ["0-10", "11-25", "26-50", "51-100", "100+"];
+const additionalFacilities = [
+  "Indoor Training Facilities",
+  "Medical Staff & Facilities",
+  "Physiotherapy & Rehab Unit",
+];
 
-export default function ClubComplete3({
-  formData,
-  updateFormData,
-  onNext,
-  onBack,
-}) {
+const ageGroups = [
+  "U-8",
+  "U-10",
+  "U-12",
+  "U-14",
+  "U-16",
+  "U-18",
+  "U-21",
+  "Senior",
+];
+
+const trainingPrograms = [
+  "Technical Skills",
+  "Tactical Gaming",
+  "Physical Conditioning",
+  "Goalkeeper Training",
+  "Mental Coaching",
+];
+
+export default function ClubComplete3({ formData, updateFormData, onNext }) {
   const theme = useSelector((state) => state.theme);
 
-  const [playersDiscovered, setPlayersDiscovered] = useState(
-    formData.playersDiscovered || ""
+  const [numberOfPitches, setNumberOfPitches] = useState(
+    formData.numberOfPitches || ""
   );
-  const [contractsSigned, setContractsSigned] = useState(
-    formData.contractsSigned || ""
+  const [additionalFocus, setAdditionalFocus] = useState(
+    formData.additionalFacilities || []
   );
-  const [notableDiscoveries, setNotableDiscoveries] = useState(
-    formData.notableDiscoveries || ""
+  const [ageFocus, setAgeFocus] = useState(formData.ageGroups || []);
+  const [programFocus, setProgramFocus] = useState(
+    formData.trainingPrograms || []
   );
-  const [clubAffiliations, setClubAffiliations] = useState(
-    formData.clubAffiliations || ""
-  );
+  const [website, setWebsite] = useState(formData.website || "");
+  const [instagram, setInstagram] = useState(formData.instagram || "");
+  const [twitter, setTwitter] = useState(formData.twitter || "");
 
-  // Required fields
-  const isComplete = playersDiscovered && contractsSigned;
+  // Required: number of pitches, at least one age group and one program
+  const isComplete =
+    numberOfPitches !== "" && ageFocus.length > 0 && programFocus.length > 0;
+
+  const toggleSelection = (array, setter, value) => {
+    setter((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
+    );
+  };
 
   const handleContinue = () => {
     if (isComplete) {
       updateFormData({
-        playersDiscovered,
-        contractsSigned,
-        notableDiscoveries,
-        clubAffiliations,
+        numberOfPitches,
+        additionalFacilities: additionalFocus,
+        ageGroups: ageFocus,
+        trainingPrograms: programFocus,
+        website,
+        instagram,
+        twitter,
       });
       onNext();
     }
   };
 
+  const BadgeToggle = ({ label, selected, onClick }) => (
+    <Button
+      variant="outline"
+      className="py-3 px-6 text-base font-medium  cursor-pointer rounded-lg transition-all"
+      style={{
+        backgroundColor: selected
+          ? `${theme.colors.primaryCyan}33`
+          : theme.colors.backgroundDark,
+        borderColor: selected
+          ? `${theme.colors.primaryCyan}30`
+          : `${theme.colors.primaryCyan}22`,
+        color: "white",
+        borderWidth: "2px",
+      }}
+      onClick={onClick}
+    >
+      {label}
+    </Button>
+  );
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {/* Header */}
-      <div className="text-center mb-10">
+      <div className="text-center ">
         <div
           className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6"
           style={{
             background: `linear-gradient(135deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
           }}
         >
-          <Trophy className="w-10 h-10 text-white" />
+          <Building className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-3">
-          Experience & Track Record
+        <h2 className="text-3xl font-bold text-white mb-3">
+          Facilities & Programs
         </h2>
-        <p className="text-gray-400 text-base">
-          Share your scouting achievements
+        <p className="text-gray-400 text-lg">
+          Tell us about your facilities, training programs
         </p>
       </div>
 
       {/* Main Form Card */}
-      {/* Players Discovered & Contracts Signed */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="rounded-2xl p-8 space-y-10">
+        {/* Number of Training Pitches */}
         <div>
-          <Label className="text-gray-400 text-sm mb-4 block">
-            Players Discovered *
+          <Label className="text-gray-300 text-sm mb-4 flex items-center gap-2">
+            Number of Training Pitches *
           </Label>
-          <Select
-            value={playersDiscovered}
-            onValueChange={setPlayersDiscovered}
-          >
-            <SelectTrigger
-              className="h-14 text-base"
-              style={{
-                backgroundColor: theme.colors.backgroundDark,
-                borderColor: `${theme.colors.primaryCyan}66`,
-                color: "white",
-              }}
-            >
-              <SelectValue placeholder="Select Range" />
-            </SelectTrigger>
-            <SelectContent
-              style={{ borderColor: `${theme.colors.primaryCyan}66` }}
-            >
-              {rangeOptions.map((range) => (
-                <SelectItem key={range} value={range}>
-                  {range}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label className="text-gray-400 text-sm mb-4 block">
-            Contracts Signed *
-          </Label>
-          <Select
-            value={contractsSigned}
-            onValueChange={setContractsSigned}
+          <Input
+            placeholder=""
+            className="h-12"
+            value={numberOfPitches}
+            onChange={(e) => setNumberOfPitches(e.target.value)}
             style={{
               backgroundColor: theme.colors.backgroundDark,
             }}
-          >
-            <SelectTrigger
-              className="h-14 text-base"
-              style={{
-                backgroundColor: theme.colors.backgroundDark,
-                borderColor: `${theme.colors.primaryCyan}66`,
-                color: "white",
-              }}
-            >
-              <SelectValue placeholder="Select Range" />
-            </SelectTrigger>
-            <SelectContent>
-              {rangeOptions.map((range) => (
-                <SelectItem key={range} value={range}>
-                  {range}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
-      </div>
 
-      {/* Notable Discoveries */}
-      <div>
-        <Label className="text-gray-400 text-sm mb-4 pt-4 block">
-          Notable Discoveries (Optional)
-        </Label>
-        <Textarea
-          placeholder="List any notable players you've discovered or worked with"
-          value={notableDiscoveries}
-          onChange={(e) => setNotableDiscoveries(e.target.value)}
-          className="min-h-32 resize-none text-base"
-          style={{
-            backgroundColor: theme.colors.backgroundDark,
-            borderColor: `${theme.colors.primaryCyan}66`,
-            color: "white",
-            placeholder: { color: "#9ca3af" },
-          }}
-        />
-      </div>
+        {/* Additional Training Facilities */}
+        <div>
+          <Label className="text-gray-300 text-sm  mb-4">
+            Additional Training Facilities
+          </Label>
+          <div className="grid grid-cols-2 md:grid-cols-3  gap-4">
+            {additionalFacilities.map((facility) => (
+              <BadgeToggle
+                key={facility}
+                label={facility}
+                selected={additionalFocus.includes(facility)}
+                onClick={() =>
+                  toggleSelection(additionalFocus, setAdditionalFocus, facility)
+                }
+              />
+            ))}
+          </div>
+        </div>
 
-      {/* Club Affiliations */}
-      <div>
-        <Label className="text-gray-400 text-sm mb-4 block pt-4">
-          Club Affiliations (Optional)
-        </Label>
-        <Textarea
-          placeholder="List clubs you've worked with or have relationships with"
-          value={clubAffiliations}
-          onChange={(e) => setClubAffiliations(e.target.value)}
-          className="min-h-32 resize-none text-base"
-          style={{
-            backgroundColor: theme.colors.backgroundDark,
-            borderColor: `${theme.colors.primaryCyan}66`,
-            color: "white",
-          }}
-        />
+        {/* Age Group Focus */}
+        <div>
+          <Label className="text-gray-300 text-sm  mb-4">
+            Age Groups We Work With (that apply)
+          </Label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+            {ageGroups.map((age) => (
+              <BadgeToggle
+                key={age}
+                label={age}
+                selected={ageFocus.includes(age)}
+                onClick={() => toggleSelection(ageFocus, setAgeFocus, age)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Training Programs */}
+        <div>
+          <Label className="text-gray-300 text-sm  mb-4">
+            Training Programs We Offer
+          </Label>
+          <div className="grid grid-cols-1 gap-4 mt-2">
+            {trainingPrograms.map((program) => (
+              <BadgeToggle
+                key={program}
+                label={program}
+                selected={programFocus.includes(program)}
+                onClick={() =>
+                  toggleSelection(programFocus, setProgramFocus, program)
+                }
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Social Media */}
+        <div>
+          <Label className="text-gray-300 text-sm  mb-4">
+            Social Media (Optional)
+          </Label>
+          <div className="space-y-4 mt-2">
+            <div className="relative">
+              <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                placeholder="https://yourclub.com"
+                className="h-12 pl-10"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                style={{
+                  backgroundColor: theme.colors.backgroundDark,
+                }}
+              />
+            </div>
+            <div className="relative">
+              <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                placeholder="https://instagram.com/yourclub"
+                className="h-12 pl-10"
+                value={instagram}
+                onChange={(e) => setInstagram(e.target.value)}
+                style={{
+                  backgroundColor: theme.colors.backgroundDark,
+                }}
+              />
+            </div>
+            <div className="relative">
+              <Twitter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                placeholder="https://twitter.com/yourclub"
+                className="h-12 pl-10"
+                value={twitter}
+                onChange={(e) => setTwitter(e.target.value)}
+                style={{
+                  backgroundColor: theme.colors.backgroundDark,
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
