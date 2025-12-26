@@ -8,10 +8,10 @@ import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 
-import ScoutComplete4 from "@/components/scout/complete-profile/ScoutComplete4";
 import ClubComplete1 from "@/components/club/complete-profile/ClubComplete1";
 import ClubComplete2 from "@/components/club/complete-profile/ClubComplete2";
 import ClubComplete3 from "@/components/club/complete-profile/ClubComplete3";
+import ClubComplete4 from "@/components/club/complete-profile/ClubComplete4";
 
 export default function ClubOnboardingPage() {
   const theme = useSelector((state) => state.theme);
@@ -90,7 +90,7 @@ export default function ClubOnboardingPage() {
 
           {/* Step 4: Privacy & Consent */}
           {step === 4 && (
-            <ScoutComplete4
+            <ClubComplete4
               formData={formData}
               updateFormData={updateFormData}
             />

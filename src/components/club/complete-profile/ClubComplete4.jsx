@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Label } from "@/components/ui/label";
-import { Upload, Shield } from "lucide-react";
+import { Upload, Shield, AlertCircle } from "lucide-react";
 
 export default function ClubComplete4({
   formData,
@@ -15,27 +15,35 @@ export default function ClubComplete4({
 }) {
   const theme = useSelector((state) => state.theme);
 
-  const [licenseFile, setLicenseFile] = useState(null);
-  const [idFile, setIdFile] = useState(null);
+  const [verificationDocument, setVerificationDocument] = useState(null);
+  const [logo, setLogo] = useState(null);
   const [dataConsent, setDataConsent] = useState(false);
-  const [codeOfConduct, setCodeOfConduct] = useState(false);
+  const [termsAcceptance, setTermsAcceptance] = useState(false);
 
   // Required: both files uploaded + both checkboxes checked
-  const isComplete = licenseFile && idFile && dataConsent && codeOfConduct;
+  const isComplete =
+    verificationDocument && logo && dataConsent && termsAcceptance;
 
   const handleContinue = () => {
     if (isComplete) {
       updateFormData({
-        licenseFile,
-        idFile,
+        verificationDocument,
+        logo,
         dataConsent,
-        codeOfConduct,
+        termsAcceptance,
       });
       onNext();
     }
   };
 
-  const FileUploadBox = ({ title, subtitle, file, setFile }) => (
+  const FileUploadBox = ({
+    title,
+    subtitle,
+    file,
+    setFile,
+    formats,
+    maxSize,
+  }) => (
     <div
       className="rounded-2xl p-8 border-2 border-dashed transition-all hover:border-cyan-500/70 cursor-pointer text-center"
       style={{
@@ -45,7 +53,9 @@ export default function ClubComplete4({
           : `${theme.colors.primaryCyan}33`,
       }}
       onClick={() =>
-        document.getElementById(`${title.toLowerCase()}-input`).click()
+        document
+          .getElementById(`${title.toLowerCase().replace(/\s/g, "")}-input`)
+          .click()
       }
     >
       <Upload
@@ -70,12 +80,18 @@ export default function ClubComplete4({
         </Button>
       )}
 
-      <p className="text-gray-500 text-xs mt-4">PDF, JPG, PNG (Max 10MB)</p>
+      <p className="text-gray-500 text-xs mt-4">
+        {formats} (Max {maxSize})
+      </p>
 
       <input
-        id={`${title.toLowerCase()}-input`}
+        id={`${title.toLowerCase().replace(/\s/g, "")}-input`}
         type="file"
-        accept=".pdf,.jpg,.jpeg,.png"
+        accept={formats
+          .toLowerCase()
+          .replace(/\s/g, "")
+          .replace(/pdf,jpg,png/g, ".pdf,.jpg,.png")
+          .replace(/png,jpg/g, ".png,.jpg")}
         className="hidden"
         onChange={(e) => {
           if (e.target.files?.[0]) setFile(e.target.files[0]);
@@ -88,46 +104,71 @@ export default function ClubComplete4({
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-10">
-        <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6">
+        <div
+          className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6"
+          style={{
+            background: `linear-gradient(135deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
+          }}
+        >
           <Shield className="w-10 h-10 text-white" />
         </div>
         <h2 className="text-3xl font-bold text-white mb-3">
-          Experience & Track Record
+          Verification & Consent
         </h2>
         <p className="text-gray-400 text-lg">
-          Share your scouting achievements
+          Upload verification documents and accept terms
+        </p>
+      </div>
+
+      {/* Top Info box */}
+      <div
+        className="p-4 rounded-lg bg-[#FFA5001A] mb-6 flex border text-xs gap-4"
+        style={{
+          borderColor: `${theme.colors.primaryCyan}33`,
+        }}
+      >
+        <AlertCircle className="w-8 h-8 text-[#FFA500]" />
+        <p className="text-sm text-gray-300 mb-4">
+          <strong>Important!</strong>
+          <br />
+          Upload verification documents to verify your platform account. Please
+          provide high-quality, official documents.
         </p>
       </div>
 
       {/* Main Form Card */}
-      <div className="rounded-2xl  space-y-10">
-        {/* Scout License / Certification */}
+      <div className="rounded-2xl space-y-10">
+        {/* Official Verification Document */}
         <div>
           <Label className="text-gray-300 text-sm mb-6 block">
-            Scout License or Certification *
+            Official Verification Document *
           </Label>
           <FileUploadBox
-            title="Upload License/Certification"
-            subtitle="FIFA license, UEFA certification, or professional credentials"
-            file={licenseFile}
-            setFile={setLicenseFile}
+            title="Upload Verification Document"
+            subtitle="Business registration certificate or official letter"
+            file={verificationDocument}
+            setFile={setVerificationDocument}
+            formats="PDF, JPG, PNG"
+            maxSize="5MB"
           />
         </div>
 
-        {/* Government-issued ID */}
+        {/* Club/Academy Logo */}
         <div>
           <Label className="text-gray-300 text-sm mb-6 block">
-            Government-issued ID *
+            Club/Academy Logo *
           </Label>
           <FileUploadBox
-            title="Upload ID Document"
-            subtitle="Passport, National ID, or Driver's License"
-            file={idFile}
-            setFile={setIdFile}
+            title="Upload Your Logo"
+            subtitle=""
+            file={logo}
+            setFile={setLogo}
+            formats="PNG, JPG"
+            maxSize="2MB"
           />
         </div>
 
-        {/* Legal Agreement & Code of Conduct */}
+        {/* Legal Terms & Consent */}
         <div
           className="space-y-6 p-4 rounded-lg border"
           style={{
@@ -136,11 +177,11 @@ export default function ClubComplete4({
           }}
         >
           <Label className="text-gray-300 text-sm block">
-            Legal Agreement & Code of Conduct
+            Legal Terms & Consent
           </Label>
 
           <div
-            className="flex items-start gap-4 p-5 rounded-xl"
+            className="flex items-start gap-4 p-5 rounded-xl border"
             style={{
               background: `linear-gradient(180deg, ${theme.colors.primaryCyan}10, ${theme.colors.primaryMagenta}10)`,
               borderColor: `${theme.colors.primaryCyan}33`,
@@ -149,27 +190,45 @@ export default function ClubComplete4({
           >
             <Checkbox checked={dataConsent} onCheckedChange={setDataConsent} />
             <p className="text-gray-300 text-sm">
-              <strong>Data Processing Consent:</strong> I consent to NextGen
-              Pros processing and publishing my professional information.
+              <strong>Data Processing Consent:</strong> I consent to NextGen Pro
+              processing my personal data, including organization information,
+              contact, for providing services, ensuring privacy and security.
             </p>
           </div>
 
           <div
-            className="flex items-start gap-4 p-5 rounded-xl"
+            className="flex items-start gap-4 p-5 rounded-xl border"
             style={{
-              backgroundColor: `${theme.colors.backgroundCard}cc`,
+              background: `linear-gradient(180deg, ${theme.colors.primaryCyan}10, ${theme.colors.primaryMagenta}10)`,
+              borderColor: `${theme.colors.primaryCyan}33`,
             }}
-            onClick={() => setCodeOfConduct(!codeOfConduct)}
+            onClick={() => setTermsAcceptance(!termsAcceptance)}
           >
             <Checkbox
-              checked={codeOfConduct}
-              onCheckedChange={setCodeOfConduct}
+              checked={termsAcceptance}
+              onCheckedChange={setTermsAcceptance}
             />
             <p className="text-gray-300 text-sm">
-              <strong>Code of Conduct:</strong> I agree to uphold professional
-              standards and comply with all regulations.
+              <strong>Terms Acceptance:</strong> I confirm that I have read and
+              accept this service's Terms and Privacy Policy.
             </p>
           </div>
+        </div>
+
+        {/* Bottom Info box */}
+        <div
+          className="p-4 rounded-lg bg-[#FFA5001A] mb-6 flex border text-xs gap-4"
+          style={{
+            borderColor: `${theme.colors.primaryCyan}33`,
+          }}
+        >
+          <AlertCircle className="w-8 h-8 text-[#FFA500]" />
+          <p className="text-sm text-gray-300 mb-4">
+            <strong>Verification Process</strong>
+            <br />
+            After submission, our team will review your documents within 24-48
+            hours. You'll receive an email notification once verified.
+          </p>
         </div>
       </div>
     </div>

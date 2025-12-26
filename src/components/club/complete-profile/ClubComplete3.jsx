@@ -6,6 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Building, Globe, Instagram, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/player/select";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 const additionalFacilities = [
   "Indoor Training Facilities",
@@ -117,21 +125,29 @@ export default function ClubComplete3({ formData, updateFormData, onNext }) {
       </div>
 
       {/* Main Form Card */}
-      <div className="rounded-2xl p-8 space-y-10">
+      <div className="rounded-2xl p-8 space-y-6">
         {/* Number of Training Pitches */}
         <div>
           <Label className="text-gray-300 text-sm mb-4 flex items-center gap-2">
             Number of Training Pitches *
           </Label>
-          <Input
-            placeholder=""
-            className="h-12"
-            value={numberOfPitches}
-            onChange={(e) => setNumberOfPitches(e.target.value)}
-            style={{
-              backgroundColor: theme.colors.backgroundDark,
-            }}
-          />
+          <Select value={numberOfPitches} onValueChange={setNumberOfPitches}>
+            <SelectTrigger
+              className="w-full h-12"
+              style={{
+                backgroundColor: theme.colors.backgroundDark,
+              }}
+            >
+              <SelectValue placeholder="Select number of pitches" />
+            </SelectTrigger>
+            <SelectContent>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                <SelectItem key={num} value={num.toString()}>
+                  {num}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Additional Training Facilities */}
@@ -139,16 +155,56 @@ export default function ClubComplete3({ formData, updateFormData, onNext }) {
           <Label className="text-gray-300 text-sm  mb-4">
             Additional Training Facilities
           </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3  gap-4">
+          <div className="flex flex-col gap-4 pt-1">
             {additionalFacilities.map((facility) => (
-              <BadgeToggle
+              <div
                 key={facility}
-                label={facility}
-                selected={additionalFocus.includes(facility)}
+                className="flex items-center gap-3 p-3 py-4 rounded-lg cursor-pointer"
+                style={{
+                  backgroundColor: additionalFocus.includes(facility)
+                    ? `${theme.colors.primaryCyan}33`
+                    : theme.colors.backgroundDark,
+                  border: `2px solid ${
+                    additionalFocus.includes(facility)
+                      ? `${theme.colors.primaryCyan}30`
+                      : `${theme.colors.primaryCyan}22`
+                  }`,
+                }}
                 onClick={() =>
                   toggleSelection(additionalFocus, setAdditionalFocus, facility)
                 }
-              />
+              >
+                <div
+                  className="w-5 h-5 rounded border flex items-center justify-center"
+                  style={{
+                    borderColor: theme.colors.primaryCyan,
+                    backgroundColor: additionalFocus.includes(facility)
+                      ? theme.colors.primaryCyan
+                      : "transparent",
+                  }}
+                >
+                  <Checkbox
+                    checked={additionalFocus.includes(facility)}
+                    onCheckedChange={() =>
+                      toggleSelection(
+                        additionalFocus,
+                        setAdditionalFocus,
+                        facility
+                      )
+                    }
+                    className="absolute opacity-0 w-5 h-5"
+                  />
+                  {additionalFocus.includes(facility) && (
+                    <div className="w-3 h-3 bg-white rounded-sm" />
+                  )}
+                </div>
+                <div>
+                  <span className="text-white">{facility}</span>
+                  <div className="text-xs text-gray-400">
+                    Gymnasium, indoor courts,
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -175,16 +231,52 @@ export default function ClubComplete3({ formData, updateFormData, onNext }) {
           <Label className="text-gray-300 text-sm  mb-4">
             Training Programs We Offer
           </Label>
-          <div className="grid grid-cols-1 gap-4 mt-2">
+          <div className="flex flex-col gap-4 pt-1">
             {trainingPrograms.map((program) => (
-              <BadgeToggle
+              <div
                 key={program}
-                label={program}
-                selected={programFocus.includes(program)}
+                className="flex items-center gap-3 p-3 py-4 rounded-lg cursor-pointer"
+                style={{
+                  backgroundColor: programFocus.includes(program)
+                    ? `${theme.colors.primaryCyan}33`
+                    : theme.colors.backgroundDark,
+                  border: `2px solid ${
+                    programFocus.includes(program)
+                      ? `${theme.colors.primaryCyan}30`
+                      : `${theme.colors.primaryCyan}22`
+                  }`,
+                }}
                 onClick={() =>
                   toggleSelection(programFocus, setProgramFocus, program)
                 }
-              />
+              >
+                <div
+                  className="w-5 h-5 rounded border flex items-center justify-center"
+                  style={{
+                    borderColor: theme.colors.primaryCyan,
+                    backgroundColor: programFocus.includes(program)
+                      ? theme.colors.primaryCyan
+                      : "transparent",
+                  }}
+                >
+                  <Checkbox
+                    checked={programFocus.includes(program)}
+                    onCheckedChange={() =>
+                      toggleSelection(programFocus, setProgramFocus, program)
+                    }
+                    className="absolute opacity-0 w-5 h-5"
+                  />
+                  {programFocus.includes(program) && (
+                    <div className="w-3 h-3 bg-white rounded-sm" />
+                  )}
+                </div>
+                <div>
+                  <span className="text-white">{program}</span>
+                  <div className="text-xs text-gray-400">
+                    Training description
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -195,11 +287,14 @@ export default function ClubComplete3({ formData, updateFormData, onNext }) {
             Social Media (Optional)
           </Label>
           <div className="space-y-4 mt-2">
-            <div className="relative">
-              <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="relative flex items-center gap-2">
+              <Globe
+                className=" w-6 h-6"
+                style={{ color: theme.colors.primaryCyan }}
+              />
               <Input
                 placeholder="https://yourclub.com"
-                className="h-12 pl-10"
+                className="py-4 pl-3"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 style={{
@@ -207,11 +302,14 @@ export default function ClubComplete3({ formData, updateFormData, onNext }) {
                 }}
               />
             </div>
-            <div className="relative">
-              <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="relative flex items-center gap-2">
+              <Instagram
+                className=" w-6 h-6"
+                style={{ color: theme.colors.primaryCyan }}
+              />
               <Input
                 placeholder="https://instagram.com/yourclub"
-                className="h-12 pl-10"
+                className="py-4 pl-3"
                 value={instagram}
                 onChange={(e) => setInstagram(e.target.value)}
                 style={{
@@ -219,11 +317,14 @@ export default function ClubComplete3({ formData, updateFormData, onNext }) {
                 }}
               />
             </div>
-            <div className="relative">
-              <Twitter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="relative flex items-center gap-2">
+              <Twitter
+                className=" w-6 h-6"
+                style={{ color: theme.colors.primaryCyan }}
+              />
               <Input
                 placeholder="https://twitter.com/yourclub"
-                className="h-12 pl-10"
+                className="py-4 pl-3"
                 value={twitter}
                 onChange={(e) => setTwitter(e.target.value)}
                 style={{
