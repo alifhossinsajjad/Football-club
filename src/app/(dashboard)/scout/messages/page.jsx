@@ -2,257 +2,258 @@
 
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Send, ArrowLeft } from "lucide-react";
+import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import PlayerTitle from "@/components/player/playerTitle";
 
-const conversations = [
-  {
-    id: 1,
-    name: "FC Barcelona Youth",
-    logo: "https://1000logos.net/wp-content/uploads/2016/10/Barcelona-Logo.png",
-    lastMessage: "We are interested in your profile...",
-    time: "2h ago",
-    unread: 2,
-    active: true,
-    messages: [
-      {
-        text: "Hello John, we reviewed your profile and we are very impressed!",
-        time: "10:30 AM",
-        incoming: true,
-      },
-      {
-        text: "Thank you! I am very interested in your academy.",
-        time: "10:45 AM",
-        incoming: false,
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Mike Scout",
-    logo: "https://logos-world.net/wp-content/uploads/2020/06/atletico-madrid-Logo.png", // placeholder scout logo
-    lastMessage: "Great highlight reel!",
-    time: "5h ago",
-    unread: 1,
-    active: false,
-    messages: [
-      { text: "Great highlight reel!", time: "9:15 AM", incoming: true },
-    ],
-  },
-  {
-    id: 3,
-    name: "Real Madrid Academy",
-    logo: "https://static.vecteezy.com/system/resources/thumbnails/010/994/249/small/real-madrid-logo-symbol-design-spain-football-european-countries-football-teams-illustration-free-vector.jpg",
-    lastMessage: "Thank you for your interest...",
-    time: "1d ago",
-    unread: 0,
-    active: false,
-    messages: [
-      {
-        text: "We would like to invite you to our upcoming trial on September 15th.",
-        time: "11:30 AM",
-        incoming: true,
-      },
-      {
-        text: "That sounds great! What do I need to prepare?",
-        time: "11:15 AM",
-        incoming: false,
-      },
-    ],
-  },
-];
-
-export default function MessagingPage() {
+export default function ScoutMessagingPage() {
   const theme = useSelector((state) => state.theme);
-  const [selectedConversation, setSelectedConversation] = useState(
-    conversations[0]
-  );
+  const [selectedConversation, setSelectedConversation] = useState(0);
   const [messageInput, setMessageInput] = useState("");
-  const [isMobileView, setIsMobileView] = useState(false);
+  const [conversations, setConversations] = useState([
+    {
+      id: 0,
+      name: "Alex Johnson",
+      avatar: "/user_pp.jpg",
+      lastMessage: "Available for a trial next week",
+      time: "2h ago",
+      unread: 2,
+      active: true,
+      status: "Active now",
+      messages: [
+        {
+          text: "Hi, I heard you were looking for midfielders for your team.",
+          time: "10:30 AM",
+          sender: "them",
+        },
+        {
+          text: "Yes, I'm always looking for talented players. Can you tell me more about yourself?",
+          time: "10:45 AM",
+          sender: "me",
+        },
+      ],
+    },
+    {
+      id: 1,
+      name: "Sarah Player",
+      avatar: "/sarah_player.jpg", // placeholder player
+      lastMessage: "I can provide full match footage",
+      time: "5h ago",
+      unread: 1,
+      active: false,
+      status: "Active 2h ago",
+      messages: [
+        {
+          text: "Hi, I'm a forward looking for opportunities.",
+          time: "9:15 AM",
+          sender: "them",
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: "Youth Academy FC",
+      avatar: "/Barcelona_Youth_Trial.png",
+      lastMessage: "Trial session scheduled for next Monday",
+      time: "1d ago",
+      unread: 0,
+      active: false,
+      status: "Active 1d ago",
+      messages: [
+        {
+          text: "We'd like to invite some of your recommended players for a trial.",
+          time: "11:30 AM",
+          sender: "them",
+        },
+        {
+          text: "Great! I have a few players in mind who would be perfect for your team.",
+          time: "11:15 AM",
+          sender: "me",
+        },
+      ],
+    },
+  ]);
 
   const handleSendMessage = () => {
     if (messageInput.trim()) {
-      console.log("Sending:", messageInput);
+      // Create a new message object
+      const newMessage = {
+        text: messageInput,
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }), // Current time
+        sender: "me",
+      };
+
+      // Update the selected conversation with the new message
+      const updatedConversations = [...conversations];
+      updatedConversations[selectedConversation] = {
+        ...updatedConversations[selectedConversation],
+        messages: [
+          ...updatedConversations[selectedConversation].messages,
+          newMessage,
+        ],
+        lastMessage: messageInput, // Update last message
+        time: "Just now", // Update time
+      };
+
+      setConversations(updatedConversations);
       setMessageInput("");
     }
   };
 
   return (
-    <section>
-      <PlayerTitle title="Messaging" />
+    <div className="h-[calc(100vh-120px)] flex gap-6">
+      {/* Conversations List */}
       <div
-        className="h-[calc(80vh)]  flex flex-col lg:flex-row rounded-xl overflow-hidden"
-        style={{ backgroundColor: theme.colors.backgroundCard }}
+        className="w-full lg:w-96 border rounded-lg flex flex-col"
+        style={{
+          backgroundColor: theme.colors.backgroundCard,
+          borderColor: `${theme.colors.primaryCyan}33`,
+        }}
       >
-        {/* Conversations List - Hidden on mobile when chat is open */}
         <div
-          className={`w-full lg:w-96 border-r ${
-            isMobileView && selectedConversation ? "hidden" : "block"
-          }`}
+          className="p-6 border-b"
           style={{ borderColor: `${theme.colors.primaryCyan}33` }}
         >
-          <div className="p-6">
-            <h1 className="text-xl font-bold text-white">Conversations</h1>
-          </div>
-          <div className="space-y-2 overflow-y-auto h-full pb-32 lg:pb-0">
-            {conversations.map((conv) => (
-              <button
-                key={conv.id}
-                onClick={() => {
-                  setSelectedConversation(conv);
-                  setIsMobileView(true); // Simulate mobile behavior
-                }}
-                className={`w-full flex items-center gap-4 p-4 rounded-lg transition-all hover:opacity-90 ${
-                  selectedConversation.id === conv.id ? "opacity-100" : ""
-                }`}
-                style={{
-                  backgroundColor:
-                    selectedConversation.id === conv.id
-                      ? `${theme.colors.primaryCyan}1A`
-                      : "transparent",
-                }}
-              >
-                <div className="relative">
-                  <img
-                    src={conv.logo}
-                    alt={conv.name}
-                    className="w-12 h-12 rounded-full object-contain"
-                    style={{ backgroundColor: "#1e1e3f" }}
-                  />
-                  {conv.unread > 0 && (
-                    <span
-                      className="absolute -top-1 -right-1 min-w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                      style={{ backgroundColor: theme.colors.primaryMagenta }}
-                    >
-                      {conv.unread}
-                    </span>
-                  )}
-                  {conv.active && (
-                    <span
-                      className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-backgroundCard"
-                      style={{ backgroundColor: "#05DF72" }}
-                    />
-                  )}
-                </div>
-                <div className="flex-1 text-left">
-                  <h3 className="font-medium text-white">{conv.name}</h3>
-                  <p className="text-sm text-gray-400 truncate">
-                    {conv.lastMessage}
-                  </p>
-                </div>
-                <span className="text-xs text-gray-500">{conv.time}</span>
-              </button>
-            ))}
-          </div>
+          <h2 className="text-xl font-bold text-white">Conversations</h2>
         </div>
 
-        {/* Chat View */}
-        <div
-          className={`flex-1 flex flex-col ${
-            !isMobileView && selectedConversation ? "hidden lg:flex" : "flex"
-          }`}
-        >
-          {selectedConversation ? (
-            <>
-              {/* Chat Header */}
-              <div
-                className="p-4 lg:p-6 border-b flex items-center gap-4"
-                style={{ borderColor: `${theme.colors.primaryCyan}33` }}
-              >
-                {isMobileView && (
-                  <button onClick={() => setIsMobileView(false)}>
-                    <ArrowLeft className="w-6 h-6 text-white" />
-                  </button>
-                )}
+        <div className="flex-1 overflow-y-auto">
+          {conversations.map((conversation) => (
+            <button
+              key={conversation?.id}
+              onClick={() => setSelectedConversation(conversation?.id)}
+              className="w-full p-4 flex items-center gap-3 border-b transition-colors"
+              style={{
+                backgroundColor:
+                  selectedConversation === conversation?.id
+                    ? `${theme.colors.backgroundDark}80`
+                    : "transparent",
+                borderColor: `${theme.colors.primaryCyan}1A`,
+              }}
+            >
+              <div className="relative flex-shrink-0">
                 <img
-                  src={selectedConversation.logo}
-                  alt={selectedConversation.name}
-                  className="w-10 h-10 rounded-full object-contain"
-                  style={{ backgroundColor: "#1e1e3f" }}
+                  src={conversation?.avatar}
+                  alt={conversation?.name}
+                  className="w-12 h-12 rounded-full object-cover"
                 />
-                <div>
-                  <h2 className="font-semibold text-white">
-                    {selectedConversation.name}
-                  </h2>
-                  {selectedConversation.active && (
-                    <span className="text-sm" style={{ color: "#05DF72" }}>
-                      Active now
-                    </span>
-                  )}
-                </div>
+                {conversation?.unread > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                    style={{ backgroundColor: theme.colors.primaryMagenta }}
+                  >
+                    {conversation?.unread}
+                  </span>
+                )}
               </div>
 
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
-                {selectedConversation.messages.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex ${
-                      msg.incoming ? "justify-start" : "justify-end"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
-                        msg.incoming
-                          ? "rounded-tl-none bg-gray-800"
-                          : "rounded-tr-none"
-                      }`}
-                      style={{
-                        backgroundColor: msg.incoming
-                          ? theme.colors.backgroundDark
-                          : theme.colors.primaryMagenta,
-                      }}
-                    >
-                      <p className="text-white text-sm lg:text-base">
-                        {msg.text}
-                      </p>
-                      <span className="text-xs opacity-70 text-white block mt-1">
-                        {msg.time}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Message Input */}
-              <div
-                className="p-4 lg:p-6 border-t"
-                style={{ borderColor: `${theme.colors.primaryCyan}33` }}
-              >
-                <div className="flex gap-3">
-                  <Input
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                    placeholder="Type a message..."
-                    className="flex-1 rounded-full text-white"
-                    style={{
-                      backgroundColor: theme.colors.backgroundDark,
-                      borderColor: `${theme.colors.primaryCyan}33`,
-                    }}
-                  />
-                  <Button
-                    variant="common"
-                    onClick={handleSendMessage}
-                    className="rounded-full w-12 h-12 p-0"
-                    style={{
-                      boxShadow: "0 4px 15px rgba(0, 229, 255, 0.3)",
-                    }}
-                  >
-                    <Send className="w-5 h-5" />
-                  </Button>
+              <div className="flex-1 text-left">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-white font-semibold text-sm">
+                    {conversation?.name}
+                  </p>
+                  <span className="text-xs text-gray-400">
+                    {conversation?.time}
+                  </span>
                 </div>
+                <p className="text-sm text-gray-400 truncate">
+                  {conversation?.lastMessage}
+                </p>
               </div>
-            </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-500">
-              Select a conversation to start messaging
-            </div>
-          )}
+            </button>
+          ))}
         </div>
       </div>
-    </section>
+
+      {/* Chat Area */}
+      <div
+        className="hidden lg:flex flex-1 border rounded-lg flex-col"
+        style={{
+          backgroundColor: theme.colors.backgroundCard,
+          borderColor: `${theme.colors.primaryCyan}33`,
+        }}
+      >
+        {/* Chat Header */}
+        <div
+          className="p-4 border-b flex items-center gap-3"
+          style={{ borderColor: `${theme.colors.primaryCyan}33` }}
+        >
+          <img
+            src={conversations[selectedConversation].avatar}
+            alt={conversations[selectedConversation].name}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <p className="text-white font-semibold">
+              {conversations[selectedConversation].name}
+            </p>
+            <p className="text-xs text-gray-400">
+              {conversations[selectedConversation].status}
+            </p>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div
+          className="flex-1 p-6 overflow-y-auto space-y-4"
+          style={{ backgroundColor: theme.colors.backgroundDark }}
+        >
+          {conversations[selectedConversation].messages.map(
+            (message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.sender === "me" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className="max-w-md px-4 py-3 rounded-lg"
+                  style={{
+                    backgroundColor:
+                      message.sender === "me"
+                        ? theme.colors.primaryMagenta
+                        : theme.colors.backgroundCard,
+                  }}
+                >
+                  <p className="text-white text-sm mb-1">{message.text}</p>
+                  <p className="text-xs opacity-70 text-white">
+                    {message.time}
+                  </p>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+
+        {/* Message Input */}
+        <div
+          className="p-4 border-t"
+          style={{ borderColor: `${theme.colors.primaryCyan}33` }}
+        >
+          <div className="flex gap-3">
+            <Input
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+              placeholder="Type a message..."
+              className="flex-1"
+              style={{
+                backgroundColor: theme.colors.backgroundDark,
+                borderColor: `${theme.colors.primaryCyan}33`,
+              }}
+            />
+            <button
+              onClick={handleSendMessage}
+              className="p-3 rounded-lg transition-all"
+              style={{ backgroundColor: theme.colors.neonAccent }}
+            >
+              <Send className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

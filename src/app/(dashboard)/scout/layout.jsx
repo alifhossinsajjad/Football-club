@@ -5,6 +5,7 @@ import ScoutSidebar from "@/components/scout/layout/ScoutSidebar";
 import ScoutTopbar from "@/components/scout/layout/ScoutTopbar";
 import ScoutFooter from "@/components/scout/layout/ScoutFooter";
 import { usePathname } from "next/navigation";
+import ScoutTopBar from "@/components/scout/layout/ScoutTopbar";
 
 export default function ScoutLayout({ children }) {
   const theme = useSelector((state) => state.theme);
@@ -21,7 +22,7 @@ export default function ScoutLayout({ children }) {
       {isAuth || (
         <>
           <ScoutSidebar />
-          <ScoutTopbar />
+          <ScoutTopBar />
         </>
       )}
 

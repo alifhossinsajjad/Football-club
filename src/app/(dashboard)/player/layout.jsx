@@ -5,6 +5,7 @@ import PlayerSidebar from "@/components/player/layout/playerSidebar";
 import TopBar from "@/components/player/layout/TopBar";
 import { usePathname } from "next/navigation";
 import ScoutFooter from "@/components/scout/layout/ScoutFooter";
+import PlayerTopBar from "@/components/player/layout/player/PlayerTopBar";
 
 export default function AdminLayout({ children }) {
   const theme = useSelector((state) => state.theme);
@@ -21,7 +22,7 @@ export default function AdminLayout({ children }) {
       {isAuth || (
         <>
           <PlayerSidebar />
-          <TopBar />
+          <PlayerTopBar />
         </>
       )}
 

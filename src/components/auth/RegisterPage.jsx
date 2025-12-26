@@ -181,22 +181,27 @@ export default function RegisterPageComponent({
             {/* Date of Birth */}
             <div className="relative">
               <div className="flex pb-2 items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-gray-400" />
+                {/* <Calendar className="w-4 h-4 text-gray-400" /> */}
                 <span>Date of Birth *</span>
               </div>
-              <Input
-                type="text"
-                placeholder="dd/mm/yyyy"
-                className="h-14 rounded-xl"
-                style={{
-                  backgroundColor: theme.colors.backgroundDark,
-                  borderColor: `${theme.colors.primaryCyan}33`,
-                }}
-                value={formData.dob}
-                onChange={(e) =>
-                  setFormData({ ...formData, dob: e.target.value })
-                }
-              />
+              <div className="relative">
+                <Input
+                  type="date"
+                  className="h-14 rounded-xl appearance-none  pr-12"
+                  value={formData.dob}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dob: e.target.value })
+                  }
+                />
+
+                <Calendar
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 cursor-pointer"
+                  style={{ color: theme.colors.primaryCyan }}
+                  onClick={() =>
+                    document.querySelector('input[type="date"]').showPicker()
+                  }
+                />
+              </div>
             </div>
 
             {/* Nationality */}

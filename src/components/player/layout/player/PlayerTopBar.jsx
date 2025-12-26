@@ -12,15 +12,33 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-export default function ScoutTopBar() {
+export default function PlayerTopBar() {
   const theme = useSelector((state) => state.theme);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Mock scout data - replace with real data from Redux/auth later
-  const scoutName = "Roberto Martinez";
-  const scoutInitials = "RM";
+  // Mock player data - replace with real data from Redux/auth context later
+  const playerName = "John Doe";
+  const playerInitials = "JD";
 
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
+
+  // Close dropdown when clicking outside
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".dropdown-container")) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  // Optional: close on Escape key
+  // useEffect(() => {
+  //   if (isDropdownOpen) {
+  //     document.addEventListener("mousedown", handleClickOutside);
+  //     document.addEventListener("keydown", (e) => e.key === "Escape" && setIsDropdownOpen(false));
+  //     return () => {
+  //       document.removeEventListener("mousedown", handleClickOutside);
+  //     };
+  //   }
+  // }, [isDropdownOpen]);
 
   return (
     <header
@@ -36,7 +54,7 @@ export default function ScoutTopBar() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           <input
             type="search"
-            placeholder="Search players, clubs, events..."
+            placeholder="Search events, scouts, clubs..."
             className="w-full h-12 pl-11 pr-5 rounded-xl text-white placeholder:text-gray-500 focus:outline-none transition-all duration-200"
             style={{
               backgroundColor: theme.colors.backgroundDark,
@@ -54,7 +72,7 @@ export default function ScoutTopBar() {
         </div>
       </div>
 
-      {/* Right Side: Notifications + Scout Dropdown */}
+      {/* Right Side: Notifications + Player Dropdown */}
       <div className="flex items-center gap-4 lg:gap-6">
         {/* Notifications */}
         <button
@@ -69,24 +87,24 @@ export default function ScoutTopBar() {
           />
         </button>
 
-        {/* Scout Avatar + Dropdown Trigger */}
+        {/* Player Avatar + Dropdown Trigger */}
         <div className="relative dropdown-container">
           <button
             onClick={toggleDropdown}
             className="flex items-center gap-3 rounded-xl p-2 transition-all duration-200 hover:bg-gray-800/50 focus:outline-none"
-            aria-label="Scout menu"
+            aria-label="Player menu"
             aria-expanded={isDropdownOpen}
           >
             <Avatar className="w-10 h-10 lg:w-12 lg:h-12">
-              <AvatarImage src="/Scout/martinez.png" alt={scoutName} />
+              <AvatarImage src="/player/profile/profile.png" alt={playerName} />
               <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-magenta-500 text-white font-bold text-lg">
-                {scoutInitials}
+                {playerInitials}
               </AvatarFallback>
             </Avatar>
 
             <div className="hidden lg:block text-left">
-              <p className="text-sm font-semibold text-white">{scoutName}</p>
-              <p className="text-xs text-gray-400">Talent Scout</p>
+              <p className="text-sm font-semibold text-white">{playerName}</p>
+              <p className="text-xs text-gray-400">Player</p>
             </div>
 
             <ChevronDown
@@ -104,21 +122,21 @@ export default function ScoutTopBar() {
                 backgroundColor: theme.colors.backgroundCard,
                 borderColor: `${theme.colors.primaryCyan}33`,
               }}
-              onClick={() => setIsDropdownOpen(false)} // Close on menu item click
+              onClick={() => setIsDropdownOpen(false)} // Close on any menu click
             >
-              {/* Scout Header */}
+              {/* Player Header */}
               <div
                 className="px-5 py-4 border-b"
                 style={{ borderColor: `${theme.colors.primaryCyan}1A` }}
               >
-                <p className="font-semibold text-white text-lg">{scoutName}</p>
-                <p className="text-sm text-gray-400">Talent Scout</p>
+                <p className="font-semibold text-white text-lg">{playerName}</p>
+                <p className="text-sm text-gray-400">Professional Player</p>
               </div>
 
               {/* Menu Items */}
               <div className="py-2">
                 <a
-                  href="/scout/profile"
+                  href="/player/profile"
                   className="flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gray-800/50 transition-colors"
                 >
                   <User className="w-5 h-5" />
@@ -126,7 +144,7 @@ export default function ScoutTopBar() {
                 </a>
 
                 <a
-                  href="/scout/settings"
+                  href="/player/settings"
                   className="flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gray-800/50 transition-colors"
                 >
                   <Settings className="w-5 h-5" />
@@ -140,8 +158,7 @@ export default function ScoutTopBar() {
 
                 <button
                   onClick={() => {
-                    // Add real logout logic later (clear session, etc.)
-                    window.location.href = "/login?role=Scout";
+                    window.location.href = "/login?role=Player";
                   }}
                   className="w-full flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-900/20 transition-colors"
                 >
@@ -154,7 +171,7 @@ export default function ScoutTopBar() {
         </div>
       </div>
 
-      {/* Mobile Overlay */}
+      {/* Optional: Overlay when dropdown is open (for mobile feel) */}
       {isDropdownOpen && (
         <div
           className="fixed inset-0 z-40 lg:hidden"
