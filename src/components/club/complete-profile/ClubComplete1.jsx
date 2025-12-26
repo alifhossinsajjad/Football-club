@@ -2,14 +2,7 @@
 
 import { useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/player/select";
-import { ShieldCheck, Info, ChevronDown, AlertCircle } from "lucide-react";
+import { Info } from "lucide-react";
 
 export default function ClubComplete1({
   formData,
@@ -18,24 +11,6 @@ export default function ClubComplete1({
   onBack,
 }) {
   const theme = useSelector((state) => state.theme);
-
-  const specializations = [
-    "Youth Scouting",
-    "Professional Scouting",
-    "International Scouting",
-    "Technical Analysis",
-    "Performance Analysis",
-    "Player Representation",
-  ];
-
-  const toggleSpecialization = (value) => {
-    const exists = formData.specialization?.includes(value);
-    updateFormData({
-      specialization: exists
-        ? formData.specialization.filter((v) => v !== value)
-        : [...(formData.specialization || []), value],
-    });
-  };
 
   return (
     <div
@@ -53,14 +28,12 @@ export default function ClubComplete1({
             background: `linear-gradient(180deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
           }}
         >
-          <ShieldCheck className="w-8 h-8 text-white" />
+          <Info className="w-8 h-8 text-white" />
         </div>
 
-        <h2 className="text-2xl font-bold text-white">
-          Professional Credentials
-        </h2>
+        <h2 className="text-2xl font-bold text-white">Organization Details</h2>
         <p className="text-gray-400 mt-1">
-          Tell us about your professional qualifications
+          Tell us about your club or academy.
         </p>
       </div>
 
@@ -71,126 +44,96 @@ export default function ClubComplete1({
           borderColor: `${theme.colors.primaryCyan}33`,
         }}
       >
-        <AlertCircle className="w-8 h-8 text-[#2B7FFF]" />
+        <Info className="w-8 h-8 text-[#2B7FFF]" />
         <p className="text-sm text-gray-300 mb-4">
-          <strong>Professional Verification</strong>
-          <br />
-          This information will be verified to ensure the credibility of our
-          scouting network.
+          Official Information Required for Verification Purposes. This
+          information will be used to verify your organization's legitimacy.
         </p>
       </div>
 
       {/* Form */}
       <div className="space-y-6">
-        {/* License Type */}
+        {/* Full Address */}
         <div>
           <label className="text-sm text-gray-300 mb-2 block">
-            License Type *
+            Full Address *
           </label>
-          <Select
-            value={formData.licenseType || ""}
-            onValueChange={(value) => updateFormData({ licenseType: value })}
-          >
-            <SelectTrigger
-              className="w-full h-12 rounded-md border border-gray-700 text-gray-400 px-4"
-              style={{
-                backgroundColor: theme.colors.backgroundDark,
-              }}
-            >
-              <SelectValue placeholder="Select License Type" />
-            </SelectTrigger>
-            <SelectContent
-              style={{
-                backgroundColor: theme.colors.backgroundDark,
-                borderColor: theme.colors.primaryCyan + "33",
-              }}
-            >
-              <SelectItem value="FIFA" style={{ color: 'white' }}>FIFA</SelectItem>
-              <SelectItem value="National" style={{ color: 'white' }}>National Federation</SelectItem>
-              <SelectItem value="Club" style={{ color: 'white' }}>Club License</SelectItem>
-            </SelectContent>
-          </Select>
+          <Input
+            placeholder="Street address, building number, district"
+            className="h-12"
+            value={formData.fullAddress || ""}
+            onChange={(e) => updateFormData({ fullAddress: e.target.value })}
+            style={{
+              backgroundColor: theme.colors.backgroundDark,
+            }}
+          />
         </div>
 
-        {/* License Number + Agency */}
+        {/* Postal Code + Established Year */}
         <div className="grid grid-cols-2 gap-6">
-          <Input
-            placeholder="License Number (e.g. FIFA-12345)"
-            className="h-12"
-            value={formData.licenseNumber || ""}
-            onChange={(e) => updateFormData({ licenseNumber: e.target.value })}
-            style={{
-              backgroundColor: theme.colors.backgroundDark,
-            }}
-          />
-          <Input
-            placeholder="Agency Name (if applicable)"
-            className="h-12"
-            value={formData.agencyName || ""}
-            onChange={(e) => updateFormData({ agencyName: e.target.value })}
-            style={{
-              backgroundColor: theme.colors.backgroundDark,
-            }}
-          />
-        </div>
-
-        {/* Agency Affiliation */}
-        <div>
-          <label className="text-sm text-gray-300 mb-2 block">
-            Agency Affiliation
-          </label>
-          <Select
-            value={formData.affiliation || ""}
-            onValueChange={(value) => updateFormData({ affiliation: value })}
-          >
-            <SelectTrigger
-              className="w-full h-12 rounded-md border border-gray-700 text-gray-400 px-4"
+          <div>
+            <label className="text-sm text-gray-300 mb-2 block">
+              Postal Code *
+            </label>
+            <Input
+              placeholder="08028"
+              className="h-12"
+              value={formData.postalCode || ""}
+              onChange={(e) => updateFormData({ postalCode: e.target.value })}
               style={{
                 backgroundColor: theme.colors.backgroundDark,
               }}
-            >
-              <SelectValue placeholder="Select Affiliation" />
-            </SelectTrigger>
-            <SelectContent
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-300 mb-2 block">
+              Established Year *
+            </label>
+            <Input
+              placeholder="1979"
+              className="h-12"
+              value={formData.establishedYear || ""}
+              onChange={(e) =>
+                updateFormData({ establishedYear: e.target.value })
+              }
               style={{
                 backgroundColor: theme.colors.backgroundDark,
-                borderColor: theme.colors.primaryCyan + "33",
               }}
-            >
-              <SelectItem value="Independent" style={{ color: 'white' }}>Independent</SelectItem>
-              <SelectItem value="Agency" style={{ color: 'white' }}>Agency</SelectItem>
-              <SelectItem value="Club" style={{ color: 'white' }}>Club</SelectItem>
-            </SelectContent>
-          </Select>
+            />
+          </div>
         </div>
 
-        {/* Specialization */}
-        <div>
-          <label className="text-sm text-gray-300 mb-3 block">
-            Specialization * (Select all that apply)
-          </label>
-
-          <div className="grid grid-cols-2 gap-4">
-            {specializations.map((item) => {
-              const active = formData.specialization?.includes(item);
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => toggleSpecialization(item)}
-                  className="h-12 rounded-lg text-sm border transition"
-                  style={{
-                    backgroundColor: active
-                      ? theme.colors.primaryCyan
-                      : "transparent",
-                    borderColor: active ? theme.colors.primaryCyan : "#374151",
-                    color: active ? "#000" : "#9ca3af",
-                  }}
-                >
-                  {item}
-                </button>
-              );
-            })}
+        {/* Registration Number + Tax ID */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="text-sm text-gray-300 mb-2 block">
+              Registration Number *
+            </label>
+            <Input
+              placeholder="Registration Number #"
+              className="h-12"
+              value={formData.registrationNumber || ""}
+              onChange={(e) =>
+                updateFormData({ registrationNumber: e.target.value })
+              }
+              style={{
+                backgroundColor: theme.colors.backgroundDark,
+              }}
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-300 mb-2 block">
+              Tax ID (Optional)
+            </label>
+            <Input
+              placeholder="Tax Identification number"
+              className="h-12"
+              value={formData.taxId || ""}
+              onChange={(e) => updateFormData({ taxId: e.target.value })}
+              style={{
+                backgroundColor: theme.colors.backgroundDark,
+              }}
+            />
           </div>
         </div>
       </div>

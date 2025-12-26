@@ -187,7 +187,7 @@ export default function RegisterPageComponent({
               <div className="relative">
                 <Input
                   type="date"
-                  className="h-14 rounded-xl appearance-none  pr-12"
+                  className="h-14 rounded-xl appearance-none   pr-12"
                   value={formData.dob}
                   onChange={(e) =>
                     setFormData({ ...formData, dob: e.target.value })
