@@ -80,16 +80,16 @@ const Navbar = () => {
             <div className="hidden lg:flex items-center gap-3">
               <Button
                 onClick={() => router.push("/auth/login")}
-                className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center"
+                className="px-6 py-1.5 border border-purple-600 text-white bg-transparent rounded-full font-medium  text-sm transition w-28 text-center hover:bg-purple-500 hover:scale-105"
               >
                 Log in
               </Button>
-              <button
+              <Button
                 onClick={() => router.push("/auth/register-option")}
-                className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center"
+                className="px-6 py-1.5 border border-purple-600 text-white bg-transparent rounded-full font-medium transition w-28 text-center hover:bg-purple-500 hover:scale-105"
               >
                 Sign up
-              </button>
+              </Button>
               <button
                 className="px-2 text-primary rounded-md transition w-12 h-8 flex items-center justify-center"
                 style={{
