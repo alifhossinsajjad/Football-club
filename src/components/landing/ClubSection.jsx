@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { useSelector } from "react-redux";
+import HomeButton from "../ui/HomeButton";
 
 const clubs = [
   {
@@ -249,17 +250,12 @@ export default function ClubsSection() {
 
         {/* View All Button */}
         <div className="flex justify-center mt-12">
-          <button
-            className="px-10 py-4 rounded-full font-medium transition-all flex items-center gap-3 hover:scale-105"
-            style={{
-              border: `2px solid ${theme.colors.primaryMagenta}`,
-              color: "white",
-              backgroundColor: `${theme.colors.primaryMagenta}20`,
-            }}
-          >
-            View All {activeTab === "clubs" ? "Clubs" : "Academies"}
-            <Lock size={18} />
-          </button>
+          <HomeButton
+            text={`View All ${activeTab === "clubs" ? "Clubs" : "Academies"}`}
+            icon={<Lock size={18} />}
+            variant="outline"
+            theme={theme}
+          />
         </div>
       </div>
     </section>
