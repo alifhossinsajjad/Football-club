@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import SectionTitel from "./ReUseable/SectionTitle";
 import Image from "next/image";
+import HomeButton from "../ui/HomeButton";
 
 export default function LatestNews() {
   const theme = useSelector((state) => state.theme);
@@ -33,10 +34,10 @@ export default function LatestNews() {
             >
               {/* TOP INFO */}
               <div className="flex items-center justify-between mb-6">
-                <span className="text-landing-number text-sm uppercase tracking-wider">
+                <span className="text-landing-number text-white text-sm uppercase tracking-wider">
                   Training
                 </span>
-                <span className="text-landing-number font-medium text-sm">
+                <span className="text-landing-number text-white font-medium text-sm">
                   3 min read
                 </span>
               </div>
@@ -70,14 +71,13 @@ export default function LatestNews() {
           </div>
         </div>
 
-        <div className="flex justify-center mt-10">
-          <button
-            onClick={handleViewAllNews}
-            className="px-8 py-2 border border-purple/50 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2"
-            style={{ borderColor: theme.colors.primaryMagenta }}
-          >
-            View All News <Lock size={14} />
-          </button>
+        <div className="flex justify-center items-center w-full">
+          <HomeButton
+            text={`View All News`}
+            icon={<Lock size={18} />}
+            variant="outline"
+            theme={theme}
+          />
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { Lock, Clock, MapPin, Users, Mail, Phone } from "lucide-react";
 import SectionTitel from "./ReUseable/SectionTitle";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
+import HomeButton from "../ui/HomeButton";
 
 export default function UpcomingEvent() {
   const theme = useSelector((state) => state.theme);
@@ -132,10 +133,12 @@ export default function UpcomingEvent() {
         </div>
 
         <div className="flex justify-center">
-          <button className="inline-flex items-center gap-2 px-8 py-3 border-2 border-purple-600 hover:bg-purple-600 text-white font-semibold rounded-full transition-all duration-300">
-            View All Events
-            <Lock className="w-4 h-4" />
-          </button>
+          <HomeButton
+            text={`View All Events`}
+            icon={<Lock size={18} />}
+            variant="outline"
+            theme={theme}
+          />
         </div>
       </div>
     </div>

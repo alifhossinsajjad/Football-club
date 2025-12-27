@@ -108,7 +108,7 @@ const Banner = () => {
         >
           <Link
             href="/auth/login"
-            className="px-6 py-2 text-black rounded-full text-lg sm:text-xl font-semibold"
+            className="px-6 py-2 text-black rounded-full text-lg sm:text-xl font-semibold  hover:scale-105"
             style={{ backgroundColor: theme.colors.primaryCyan }}
           >
             Join Now
@@ -116,7 +116,7 @@ const Banner = () => {
 
           <Link
             href="/auth/login"
-            className="px-6 py-2 border-2 text-white rounded-full text-lg sm:text-xl font-semibold"
+            className="px-6 py-2 border-2 text-white rounded-full text-lg sm:text-xl font-semibold hover:bg-purple-500 hover:scale-105"
             style={{ borderColor: theme.colors.primaryMagenta }}
           >
             Join Now

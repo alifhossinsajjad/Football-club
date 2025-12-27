@@ -3,6 +3,7 @@
 import { Lock } from "lucide-react";
 import { useSelector } from "react-redux";
 import SectionTitel from "./ReUseable/SectionTitle";
+import HomeButton from "../ui/HomeButton";
 
 const players = [
   {
@@ -48,23 +49,6 @@ const FeaturedPlayers = () => {
   return (
     <section className="py-20 px-4 ">
       <div className="container mx-auto">
-        {/* Header */}
-        {/* <div className="text-center mb-12">
-          <h2  className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
-                        style={{
-                            backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                            color: "transparent",
-                        }}>
-            FEATURED PLAYERS
-          </h2>
-          <p className="text-muted-foreground text-sm md:text-base">
-            Browse top football talent and explore detailed player profiles.
-          </p>
-        </div> */}
-
         <SectionTitel
           title="FEATURED PLAYERS"
           subtitle="Browse top football talent and explore detailed player profiles."
@@ -108,15 +92,15 @@ const FeaturedPlayers = () => {
           ))}
         </div>
 
-   
-
         <div className="flex justify-center mt-10">
-          <button className="px-8 py-2 border border-purple/50 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2"
-           style={{ borderColor: theme.colors.primaryMagenta }}
-          >
-            View All Clubs <Lock size={14} />
-          </button>
+          <HomeButton
+            text={`View All Clubs`}
+            icon={<Lock size={18} />}
+            variant="outline"
+            theme={theme}
+          />
         </div>
+      
       </div>
     </section>
   );
