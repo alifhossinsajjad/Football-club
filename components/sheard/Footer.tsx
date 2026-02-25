@@ -1,10 +1,11 @@
+import React from "react";
+
 const Footer = () => {
   return (
-    <footer className="bg-black text-white py-8">
-      <div className="container mx-auto px-4 text-center">
-        <p>&copy; {new Date().getFullYear()} NextGen Pros. All rights reserved.</p>
-      </div>
-    </footer>
+    <div>
+      Footer
+      <h2>this ia a fooer</h2>
+    </div>
   );
 };
 
