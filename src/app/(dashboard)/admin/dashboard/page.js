@@ -1,207 +1,284 @@
-"use client";
+// 'use client'
 
-import { useSelector } from "react-redux";
-import { Users, Calendar, DollarSign, TrendingUp } from "lucide-react";
+// import { useSelector } from 'react-redux'
+// import { Users, Calendar, DollarSign, TrendingUp, MessageSquare } from 'lucide-react'
 
-export default function DashboardPage() {
-  const theme = useSelector((state) => state.theme);
+// const StatCard = ({ icon: Icon, title, value, change, changeType, theme }) => (
+//   <div 
+//     className="border rounded-lg p-4 lg:p-6 hover:opacity-90 transition-all"
+//     style={{
+//       backgroundColor: theme.colors.backgroundCard,
+//       borderColor: `${theme.colors.primaryCyan}33`,
+//     }}
+//   >
+//     <div className="flex items-center justify-between mb-3 lg:mb-4">
+//       <div 
+//         className="p-2 lg:p-3 rounded-lg"
+//         style={{
+//           background: `linear-gradient(to bottom right, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
+//         }}
+//       >
+//         <Icon 
+//           className="w-5 h-5 lg:w-6 lg:h-6" 
+//           style={{ color: theme.colors.primaryCyan }}
+//         />
+//       </div>
+//       {change && (
+//         <span className={`text-xs lg:text-sm font-medium ${changeType === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+//           {changeType === 'up' ? '+' : ''}{change}%
+//         </span>
+//       )}
+//     </div>
+//     <h3 className="text-xl lg:text-2xl font-bold text-white mb-1">{value}</h3>
+//     <p className="text-xs lg:text-sm text-gray-400">{title}</p>
+//   </div>
+// )
 
-  const stats = [
-    {
-      id: 1,
-      icon: Users,
-      label: "Total Users",
-      value: "12,456",
-      change: "+12%",
-      isPositive: true,
-      gradientId: "gradient-users",
-    },
-    {
-      id: 2,
-      icon: Calendar,
-      label: "Active Events",
-      value: "48",
-      change: "+8%",
-      isPositive: true,
-      gradientId: "gradient-calendar",
-    },
-    {
-      id: 3,
-      icon: DollarSign,
-      label: "Monthly Revenue",
-      value: "€24,890",
-      change: "+23%",
-      isPositive: true,
-      gradientId: "gradient-dollar",
-    },
-    {
-      id: 4,
-      icon: TrendingUp,
-      label: "Subscriptions",
-      value: "3,842",
-      change: "+15%",
-      isPositive: true,
-      gradientId: "gradient-trending",
-    },
-  ];
+// const MessageItem = ({ name, message, time, unread, theme }) => (
+//   <div 
+//     className="flex items-start gap-3 lg:gap-4 p-3 lg:p-4 rounded-lg transition-all cursor-pointer"
+//     style={{
+//       backgroundColor: 'transparent',
+//     }}
+//     onMouseEnter={(e) => {
+//       e.currentTarget.style.backgroundColor = `${theme.colors.backgroundDark}80`
+//     }}
+//     onMouseLeave={(e) => {
+//       e.currentTarget.style.backgroundColor = 'transparent'
+//     }}
+//   >
+//     <div 
+//       className="w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm lg:text-base flex-shrink-0"
+//       style={{
+//         background: `linear-gradient(to bottom right, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
+//       }}
+//     >
+//       {name.charAt(0)}
+//     </div>
+//     <div className="flex-1 min-w-0">
+//       <div className="flex items-center justify-between mb-1">
+//         <p className="text-xs lg:text-sm font-semibold text-white truncate pr-2">{name}</p>
+//         <span className="text-xs text-gray-400 flex-shrink-0">{time}</span>
+//       </div>
+//       <p className="text-xs lg:text-sm text-gray-400 truncate">{message}</p>
+//     </div>
+//     {unread && (
+//       <span 
+//         className="w-2 h-2 rounded-full flex-shrink-0 mt-2"
+//         style={{
+//           backgroundColor: theme.colors.primaryMagenta,
+//         }}
+//       ></span>
+//     )}
+//   </div>
+// )
 
-  const recentActivities = [
-    {
-      id: 1,
-      title: "New user registered",
-      subtitle: "John Doe (Player)",
-      time: "5 minutes ago",
-    },
-    {
-      id: 2,
-      title: "Event published",
-      subtitle: "FC Barcelona Youth",
-      time: "1 hour ago",
-    },
-    {
-      id: 3,
-      title: "Subscription purchased",
-      subtitle: "Sarah Player",
-      time: "2 hours ago",
-    },
-    {
-      id: 4,
-      title: "Profile updated",
-      subtitle: "Mike Scout",
-      time: "3 hours ago",
-    },
-  ];
+// const EventItem = ({ title, date, location, status, theme }) => (
+//   <div 
+//     className="flex items-center justify-between p-3 lg:p-4 rounded-lg transition-all cursor-pointer gap-3"
+//     style={{
+//       backgroundColor: 'transparent',
+//     }}
+//     onMouseEnter={(e) => {
+//       e.currentTarget.style.backgroundColor = `${theme.colors.backgroundDark}80`
+//     }}
+//     onMouseLeave={(e) => {
+//       e.currentTarget.style.backgroundColor = 'transparent'
+//     }}
+//   >
+//     <div className="flex items-center gap-3 lg:gap-4 flex-1 min-w-0">
+//       <div 
+//         className="p-2 lg:p-3 rounded-lg flex-shrink-0"
+//         style={{
+//           backgroundColor: `${theme.colors.primaryCyan}1A`,
+//         }}
+//       >
+//         <Calendar 
+//           className="w-4 h-4 lg:w-5 lg:h-5" 
+//           style={{ color: theme.colors.primaryCyan }}
+//         />
+//       </div>
+//       <div className="min-w-0">
+//         <p className="text-xs lg:text-sm font-semibold text-white mb-0.5 lg:mb-1 truncate">{title}</p>
+//         <p className="text-xs text-gray-400 truncate">{date} • {location}</p>
+//       </div>
+//     </div>
+//     <span 
+//       className="px-2 lg:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
+//       style={{
+//         backgroundColor: status === 'upcoming' 
+//           ? `${theme.colors.primaryCyan}33` 
+//           : status === 'ongoing' 
+//           ? 'rgba(34, 197, 94, 0.2)' 
+//           : 'rgba(107, 114, 128, 0.2)',
+//         color: status === 'upcoming' 
+//           ? theme.colors.primaryCyan 
+//           : status === 'ongoing' 
+//           ? 'rgb(74, 222, 128)' 
+//           : 'rgb(156, 163, 175)',
+//       }}
+//     >
+//       {status.charAt(0).toUpperCase() + status.slice(1)}
+//     </span>
+//   </div>
+// )
 
+// export default function AdminDashboard() {
+//   const theme = useSelector(state => state.theme)
+
+//   return (
+//     <div className="space-y-6 lg:space-y-8">
+//       {/* Page Header */}
+//       <div>
+//         <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Dashboard</h1>
+//         <p className="text-sm lg:text-base text-gray-400">Welcome back, Nolan! Here's what's happening today.</p>
+//       </div>
+
+//       {/* Stats Grid */}
+//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+//         <StatCard 
+//           icon={Users} 
+//           title="Total Users" 
+//           value="12,458" 
+//           change={12.5}
+//           changeType="up"
+//           theme={theme}
+//         />
+//         <StatCard 
+//           icon={Calendar} 
+//           title="Active Events" 
+//           value="24" 
+//           change={8.2}
+//           changeType="up"
+//           theme={theme}
+//         />
+//         <StatCard 
+//           icon={DollarSign} 
+//           title="Revenue" 
+//           value="$48,392" 
+//           change={15.3}
+//           changeType="up"
+//           theme={theme}
+//         />
+//         <StatCard 
+//           icon={TrendingUp} 
+//           title="Growth Rate" 
+//           value="23%" 
+//           change={-2.1}
+//           changeType="down"
+//           theme={theme}
+//         />
+//       </div>
+
+//       {/* Messages & Events */}
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+//         {/* Messages Panel */}
+//         <div 
+//           className="border rounded-lg p-4 lg:p-6"
+//           style={{
+//             backgroundColor: theme.colors.backgroundCard,
+//             borderColor: `${theme.colors.primaryCyan}33`,
+//           }}
+//         >
+//           <div className="flex items-center justify-between mb-4 lg:mb-6">
+//             <div className="flex items-center gap-2 lg:gap-3">
+//               <MessageSquare 
+//                 className="w-4 h-4 lg:w-5 lg:h-5" 
+//                 style={{ color: theme.colors.primaryCyan }}
+//               />
+//               <h2 className="text-base lg:text-lg font-bold text-white">Recent Messages</h2>
+//             </div>
+//             <button 
+//               className="text-xs lg:text-sm hover:underline"
+//               style={{ color: theme.colors.primaryCyan }}
+//             >
+//               View All
+//             </button>
+//           </div>
+//           <div className="space-y-1 lg:space-y-2">
+//             <MessageItem 
+//               name="Marcus Johnson"
+//               message="Hello, I have a question about my profile..."
+//               time="5m ago"
+//               unread={true}
+//               theme={theme}
+//             />
+//             <MessageItem 
+//               name="Sarah Williams"
+//               message="Thank you for approving my event!"
+//               time="1h ago"
+//               unread={true}
+//               theme={theme}
+//             />
+//             <MessageItem 
+//               name="David Brown"
+//               message="When will the next scouting event be?"
+//               time="3h ago"
+//               unread={false}
+//               theme={theme}
+//             />
+//           </div>
+//         </div>
+
+//         {/* Events Panel */}
+//         <div 
+//           className="border rounded-lg p-4 lg:p-6"
+//           style={{
+//             backgroundColor: theme.colors.backgroundCard,
+//             borderColor: `${theme.colors.primaryCyan}33`,
+//           }}
+//         >
+//           <div className="flex items-center justify-between mb-4 lg:mb-6">
+//             <div className="flex items-center gap-2 lg:gap-3">
+//               <Calendar 
+//                 className="w-4 h-4 lg:w-5 lg:h-5" 
+//                 style={{ color: theme.colors.primaryCyan }}
+//               />
+//               <h2 className="text-base lg:text-lg font-bold text-white">Upcoming Events</h2>
+//             </div>
+//             <button 
+//               className="text-xs lg:text-sm hover:underline"
+//               style={{ color: theme.colors.primaryCyan }}
+//             >
+//               View All
+//             </button>
+//           </div>
+//           <div className="space-y-1 lg:space-y-2">
+//             <EventItem 
+//               title="Youth Talent Showcase"
+//               date="Dec 15, 2025"
+//               location="London Stadium"
+//               status="upcoming"
+//               theme={theme}
+//             />
+//             <EventItem 
+//               title="Scout Training Session"
+//               date="Dec 12, 2025"
+//               location="Manchester Arena"
+//               status="ongoing"
+//               theme={theme}
+//             />
+//             <EventItem 
+//               title="Club Networking Event"
+//               date="Dec 8, 2025"
+//               location="Birmingham FC"
+//               status="completed"
+//               theme={theme}
+//             />
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+'use client'
+
+export default function UsersPage() {
   return (
-    <div className="min-h-screen p-4 lg:p-8">
-      {/* Hidden SVG for Gradients */}
-      <svg width="0" height="0" style={{ position: "absolute" }}>
-        <defs>
-          {stats.map((stat) => (
-            <linearGradient
-              key={stat.gradientId}
-              id={stat.gradientId}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
-              <stop offset="0%" stopColor={theme.colors.primaryCyan} />
-              <stop offset="100%" stopColor={theme.colors.primaryMagenta} />
-            </linearGradient>
-          ))}
-        </defs>
-      </svg>
-
-      {/* Page Title */}
-      <h1
-        className="text-3xl lg:text-4xl font-bold mb-8"
-        style={{
-          background: `linear-gradient(90deg, ${theme.colors.primaryCyan} 0%, ${theme.colors.primaryMagenta} 100%)`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-          color: "transparent",
-          display: "inline-block",
-        }}
-      >
-        Dashboard Overview
-      </h1>
-
-      {/* Stats Grid - Updated Style */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.id}
-              className="rounded-lg border p-6 transition-all hover:scale-[1.02]"
-              style={{
-                backgroundColor: theme.colors.backgroundCard,
-                borderColor: `${theme.colors.primaryCyan}33`,
-              }}
-            >
-              {/* Icon and Change Badge */}
-              <div className="flex items-start justify-between mb-4">
-                {/* Icon with Gradient Background */}
-                <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center"
-                  style={{
-                    background: `linear-gradient(180deg, ${theme.colors.primaryCyan}33 0%, ${theme.colors.primaryMagenta}33 100%)`,
-                  }}
-                >
-                  <Icon
-                    className="w-6 h-6"
-                    style={{ color: theme.colors.primaryCyan }}
-                  />
-                </div>
-
-                {/* Change Badge */}
-                <span
-                  className="text-xs font-semibold px-2 py-1 rounded"
-                  style={{
-                    backgroundColor: stat.isPositive
-                      ? "rgba(5, 223, 114, 0.2)"
-                      : "rgba(239, 68, 68, 0.2)",
-                    color: stat.isPositive
-                      ? "rgba(5, 223, 114, 1)"
-                      : "rgba(239, 68, 68, 1)",
-                  }}
-                >
-                  {stat.change}
-                </span>
-              </div>
-
-              {/* Label */}
-              <p className="text-gray-400 text-sm mb-2">{stat.label}</p>
-
-              {/* Value */}
-              <p className="text-white text-2xl lg:text-3xl font-bold">
-                {stat.value}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Recent Activity Section */}
-      <div
-        className="rounded-lg border p-6"
-        style={{
-          backgroundColor: theme.colors.backgroundCard,
-          borderColor: `${theme.colors.primaryCyan}33`,
-        }}
-      >
-        <h2 className="text-xl lg:text-2xl font-semibold text-white mb-6">
-          Recent Activity
-        </h2>
-
-        <div className="space-y-4">
-          {recentActivities.map((activity, index) => (
-            <div
-              key={activity.id}
-              className={`rounded-lg p-4 transition-all hover:scale-[1.01] ${
-                index !== recentActivities.length - 1 ? "mb-3" : ""
-              }`}
-              style={{
-                backgroundColor: theme.colors.backgroundDark,
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-white font-medium mb-1">
-                    {activity.title}
-                  </p>
-                  <p className="text-gray-400 text-sm">{activity.subtitle}</p>
-                </div>
-                <p className="text-gray-500 text-sm whitespace-nowrap ml-4">
-                  {activity.time}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="space-y-4">
+      <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+      <p className="text-gray-400">Coming Soon...</p>
     </div>
-  );
+  )
 }

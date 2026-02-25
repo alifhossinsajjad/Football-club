@@ -2,7 +2,6 @@
 "use client"
 import { UserPlus, FileText, Heart, Trophy } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import SectionTitel from './ReUseable/SectionTitle';
 
 const steps = [
     {
@@ -31,7 +30,7 @@ const HowItWorks = () => {
         <section className="py-10 px-4 ">
             <div className="container mx-auto px-4">
                 {/* Header */}
-                {/* <div className="text-center mb-16">
+                <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
                         style={{
                             backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
@@ -46,9 +45,7 @@ const HowItWorks = () => {
                     <p className="text-landing mt-2">
                         Your journey to professional football starts with three simple steps.
                     </p>
-                </div> */}
-
-                <SectionTitel title=" HOW IT WORKS" subtitle=" Your journey to professional football starts with three simple steps."/>
+                </div>
 
                 {/* Steps */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
