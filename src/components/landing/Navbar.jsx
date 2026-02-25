@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, ChevronDown } from "lucide-react";
-import Image from "next/image";
-import { useSelector } from "react-redux";
-import gsap from "gsap";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Menu, X, Globe, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+import { useSelector } from 'react-redux';
+import gsap from 'gsap';
 
 const navLinks = [
   { name: "Home", href: "#" },
@@ -76,31 +75,25 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Desktop Buttons */}
-            <div className="hidden lg:flex items-center gap-3">
-              <Button
-                onClick={() => router.push("/auth/login")}
-                className="px-6 py-1.5 border border-purple-600 text-white bg-transparent rounded-full font-medium  text-sm transition w-28 text-center hover:bg-purple-500 hover:scale-105"
-              >
-                Log in
-              </Button>
-              <Button
-                onClick={() => router.push("/auth/register-option")}
-                className="px-6 py-1.5 border border-purple-600 text-white bg-transparent rounded-full font-medium transition w-28 text-center hover:bg-purple-500 hover:scale-105"
-              >
-                Sign up
-              </Button>
-              <button
-                className="px-2 text-primary rounded-md transition w-12 h-8 flex items-center justify-center"
-                style={{
-                  backgroundColor: "#04B5A3",
-                  backgroundImage: "none",
-                }}
-              >
-                <Globe className="w-5 h-5 mr-1 text-black" />
-                <ChevronDown className="w-5 h-5 text-black" />
-              </button>
-            </div>
+                    {/* Desktop Buttons */}
+                    <div className="hidden lg:flex items-center gap-3">
+                        <button className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center">
+                            Log in
+                        </button>
+                        <button className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center">
+                            Sign up
+                        </button>
+                        <button
+                            className="px-2 text-primary rounded-md transition w-12 h-8 flex items-center justify-center"
+                            style={{
+                                backgroundColor: '#04B5A3',
+                                backgroundImage: 'none',
+                            }}
+                        >
+                            <Globe className="w-5 h-5 mr-1 text-black" />
+                            <ChevronDown className="w-5 h-5 text-black" />
+                        </button>
+                    </div>
 
             {/* Mobile Button */}
             <button
