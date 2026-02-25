@@ -1,5 +1,6 @@
+import { StoreProvider } from '@/redux/reduxProvider/StoreProvider'
 import './globals.css'
-import { StoreProvider } from '@/store/StoreProvider'
+
 
 export const metadata = {
   title: 'NextGen Pros - Admin Dashboard',
@@ -11,8 +12,9 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <StoreProvider>
-          {children}
+ {children}
         </StoreProvider>
+       
       </body>
     </html>
   )

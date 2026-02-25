@@ -6,6 +6,7 @@ import { Menu, X, Globe, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import gsap from 'gsap';
+import Link from 'next/link';
 
 const navLinks = [
     { name: 'Home', href: '#' },
@@ -74,9 +75,9 @@ const Navbar = () => {
                         <button className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center">
                             Log in
                         </button>
-                        <button className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center">
+                        <Link href={'/register'} className="px-6 py-1.5 border border-[#084559] text-white bg-transparent rounded-full font-medium transition w-28 text-center">
                             Sign up
-                        </button>
+                        </Link>
                         <button
                             className="px-2 text-primary rounded-md transition w-12 h-8 flex items-center justify-center"
                             style={{
