@@ -46,9 +46,8 @@ To create a seamless digital ecosystem that connects football talent with opport
 ### 🎯 Multi-Dashboard System
 
 #### Admin Dashboard ✅ **(In Development)**
-
 - **User Management**: Comprehensive user role management and permissions
-- **Settings Module**:
+- **Settings Module**: 
   - General settings with platform branding
   - User management with registration controls
   - Monetization settings
@@ -61,24 +60,21 @@ To create a seamless digital ecosystem that connects football talent with opport
 - **Dynamic Theme Customization**: Real-time brand color management via Redux
 - **Analytics Dashboard**: Key metrics and performance indicators
 
-#### Player Dashboard _(In Development)_
-
+#### Player Dashboard *(In Development)*
 - Personal profile management
 - Event registration and tracking
 - Club/scout communication
 - Performance analytics
 - Profile visibility controls
 
-#### Scout Dashboard _(In Development)_
-
+#### Scout Dashboard *(In Development)*
 - Player discovery and search
 - Shortlisted players management
 - Event attendance tracking
 - Communication with players
 - Scouting reports
 
-#### Club Dashboard _(In Development)_
-
+#### Club Dashboard *(In Development)*
 - Event management and creation
 - Player applications review
 - Academy management
@@ -86,15 +82,13 @@ To create a seamless digital ecosystem that connects football talent with opport
 - Analytics and insights
 
 ### 🎨 Advanced Design System
-
 - **Dynamic Theming**: Redux-powered theme management with real-time updates
 - **Gradient Aesthetics**: Modern gradient-based UI components
 - **Dark Mode First**: Optimized for dark theme with carefully chosen color palettes
 - **Responsive Design**: Mobile-first approach with seamless desktop scaling
 - **Smooth Animations**: Tailwind-powered transitions and hover effects
 
-### 🔐 Security & Authentication _(Planned)_
-
+### 🔐 Security & Authentication *(Planned)*
 - Role-based access control (RBAC)
 - NextAuth.js integration
 - Secure session management
@@ -105,25 +99,21 @@ To create a seamless digital ecosystem that connects football talent with opport
 ## 🛠️ Tech Stack
 
 ### Core Technologies
-
 - **[Next.js 15](https://nextjs.org/)** - React framework with App Router
 - **[React 19](https://react.dev/)** - UI library with latest features
-- **[TypeScript](https://www.typescriptlang.org/)** - Type-safe development _(Optional)_
+- **[TypeScript](https://www.typescriptlang.org/)** - Type-safe development *(Optional)*
 
 ### Styling & UI
-
 - **[Tailwind CSS v3.4](https://tailwindcss.com/)** - Utility-first CSS framework
 - **[shadcn/ui](https://ui.shadcn.com/)** - High-quality React components
 - **[Lucide React](https://lucide.dev/)** - Beautiful icon library
 - **[Poppins Font](https://fonts.google.com/specimen/Poppins)** - Modern typography
 
 ### State Management & Data
-
 - **[Redux Toolkit](https://redux-toolkit.js.org/)** - Predictable state container
 - **[React Redux](https://react-redux.js.org/)** - Official React bindings for Redux
 
 ### Development Tools
-
 - **[ESLint](https://eslint.org/)** - Code linting
 - **[PostCSS](https://postcss.org/)** - CSS transformation
 - **[Autoprefixer](https://github.com/postcss/autoprefixer)** - CSS vendor prefixing
@@ -231,35 +221,31 @@ nextgen-pros/
 ### Installation
 
 1. **Clone the repository**
-
    ```bash
    git clone <repository-url>
    cd nextgen-pros
    ```
 
 2. **Install dependencies**
-
    ```bash
    npm install
    ```
 
 3. **Add required assets**
-
+   
    Place the following images in the `/public` folder:
-
    - `logo.png` - Platform logo
    - `user_pp.jpg` - Admin profile picture
    - Player images (MarcusSilva-1.jpg, etc.)
    - Event images (Barcelona_Youth_Trial.png, etc.)
 
 4. **Run the development server**
-
    ```bash
    npm run dev
    ```
 
 5. **Open your browser**
-
+   
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ### Build for Production
@@ -282,7 +268,7 @@ The platform uses a dynamic theming system managed through Redux. All colors are
 
 ```javascript
 {
-  primaryCyan: '#04B5A3',      // Primary accent, icons, borders
+  primaryCyan: '#00E5FF',      // Primary accent, icons, borders
   primaryMagenta: '#9C27B0',   // Secondary accent, gradients
   backgroundDark: '#0B0D2C',   // Main background, inputs
   backgroundCard: '#12143A'    // Cards, sidebar, panels
@@ -292,19 +278,16 @@ The platform uses a dynamic theming system managed through Redux. All colors are
 ### Gradient Patterns
 
 #### Heading Gradient
-
 ```javascript
-background: linear-gradient(90deg, #04B5A3 0%, #9C27B0 100%)
+background: linear-gradient(90deg, #00E5FF 0%, #9C27B0 100%)
 ```
 
 #### Icon Background Gradient
-
 ```javascript
 background: linear-gradient(180deg, rgba(0, 229, 255, 0.2) 0%, rgba(156, 39, 176, 0.2) 100%)
 ```
 
 #### Active Sidebar Item
-
 ```javascript
 background: linear-gradient(90deg, rgba(0, 229, 255, 0.20) 0%, rgba(156, 39, 176, 0.20) 100%)
 border-top: 1.25px solid rgba(0, 229, 255, 0.3)
@@ -319,22 +302,18 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 ### Component Patterns
 
 #### Stats Card
-
 ```jsx
-<div
+<div 
   className="rounded-lg p-6 border"
   style={{
     backgroundColor: theme.colors.backgroundCard,
-    borderColor: `${theme.colors.primaryCyan}33`,
+    borderColor: `${theme.colors.primaryCyan}33`
   }}
 >
   {/* Icon with gradient */}
-  <div
-    style={{
-      background:
-        "linear-gradient(180deg, rgba(0, 229, 255, 0.2) 0%, rgba(156, 39, 176, 0.2) 100%)",
-    }}
-  >
+  <div style={{
+    background: 'linear-gradient(180deg, rgba(0, 229, 255, 0.2) 0%, rgba(156, 39, 176, 0.2) 100%)'
+  }}>
     <Icon />
   </div>
   <div className="text-3xl font-bold">{value}</div>
@@ -342,12 +321,11 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 ```
 
 #### Primary Button
-
 ```jsx
-<button
+<button 
   style={{
-    backgroundColor: "#04B5A3",
-    backgroundImage: "none",
+    backgroundColor: '#04B5A3',
+    backgroundImage: 'none'
   }}
 >
   Action
@@ -361,7 +339,6 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 ### ✅ Completed Features
 
 #### Admin Dashboard (In Development.)
-
 - [x] Main dashboard with analytics
 - [x] User management
 - [x] Settings module
@@ -381,28 +358,24 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 ### 🚧 In Development
 
 #### Player Dashboard (0%)
-
 - [ ] Profile management
 - [ ] Event registration
 - [ ] Messages
 - [ ] Settings
 
 #### Scout Dashboard (0%)
-
 - [ ] Player discovery
 - [ ] Shortlisted players
 - [ ] Events
 - [ ] Messages
 
 #### Club Dashboard (0%)
-
 - [ ] Event management
 - [ ] Player applications
 - [ ] Messages
 - [ ] Settings
 
 #### Landing Page (0%)
-
 - [ ] Hero section
 - [ ] Features showcase
 - [ ] Testimonials
@@ -410,7 +383,6 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 - [ ] Footer
 
 ### 🔮 Planned Features
-
 - [ ] Authentication system (NextAuth.js)
 - [ ] Real-time messaging
 - [ ] Video upload and playback
@@ -427,27 +399,24 @@ border-top: 1.25px solid rgba(0, 229, 255, 0.3)
 ### Code Style
 
 1. **Use Redux for Theme Colors**
-
    ```javascript
-   const theme = useSelector((state) => state.theme);
+   const theme = useSelector(state => state.theme)
    // Use theme.colors.primaryCyan, etc.
    ```
 
 2. **Client Components**
-
    ```javascript
-   "use client"; // Add at top for interactive components
+   'use client' // Add at top for interactive components
    ```
 
 3. **Responsive Design**
-
    ```javascript
-   className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6";
+   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
    ```
 
 4. **shadcn/ui Components**
    ```javascript
-   import { Button } from "@/components/ui/button";
+   import { Button } from '@/components/ui/button'
    ```
 
 ### Best Practices
