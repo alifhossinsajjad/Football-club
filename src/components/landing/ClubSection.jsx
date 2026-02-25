@@ -1,104 +1,31 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
-import { useSelector } from "react-redux";
-import HomeButton from "../ui/HomeButton";
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 const clubs = [
-  {
-    name: "Arsenal",
-    league: "EPL",
-    team: "Arsenal",
-    logo: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
-  },
-  {
-    name: "Benfica FC",
-    league: "Liga Portugal",
-    team: "Benfica",
-    logo: "https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
-  },
-  {
-    name: "Atlético de Madrid",
-    league: "La Liga",
-    team: "Atlético de Madrid",
-    logo: "https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
-  },
-  {
-    name: "Porto",
-    league: "Liga Portugal",
-    team: "Porto",
-    logo: "https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
-  },
-  {
-    name: "Chelsea",
-    league: "EPL",
-    team: "Chelsea",
-    logo: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
-  },
-  {
-    name: "Real Madrid",
-    league: "La Liga",
-    team: "Real Madrid",
-    logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
-  },
-];
-
-const academies = [
-  {
-    name: "La Masia",
-    league: "Barcelona Youth",
-    team: "FC Barcelona",
-    logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
-  }, // placeholder
-  {
-    name: "Ajax Academy",
-    league: "Eredivisie Youth",
-    team: "Ajax",
-    logo: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
-  }, // placeholder
-  {
-    name: "Sporting CP Academy",
-    league: "Portugal Youth",
-    team: "Sporting CP",
-    logo: "https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
-  },
-  {
-    name: "Manchester City Academy",
-    league: "Premier League 2",
-    team: "Man City",
-    logo: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
-  },
-  {
-    name: "Benfica Campus",
-    league: "Portugal Youth",
-    team: "Benfica",
-    logo: "https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
-  },
-  {
-    name: "Atlético Youth",
-    league: "Spain Youth",
-    team: "Atlético Madrid",
-    logo: "https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
-  },
+  { name: 'Arsenal', league: 'EPL', team: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
+  { name: 'Benfica FC', league: 'Liga Portugal', team: 'Benfica', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg' },
+  { name: 'Atlético de Madrid', league: 'La Liga', team: 'Atlético de Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg' },
+  { name: 'Porto', league: 'Liga Portugal', team: 'Porto', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg' },
+  { name: 'Chelsea', league: 'EPL', team: 'Chelsea', logo: 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg' },
+  { name: 'Real Madrid', league: 'La Liga', team: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
 ];
 
 export default function ClubsSection() {
-  const [activeTab, setActiveTab] = useState("clubs");
+  const [activeTab, setActiveTab] = useState('clubs');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(4);
   const [mounted, setMounted] = useState(false);
 
-  const theme = useSelector((state) => state.theme);
-
-  // Data source based on active tab
-  const data = activeTab === "clubs" ? clubs : academies;
+  const theme = useSelector(state => state.theme)
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Responsive visible count
+  // Update visibleCount based on screen width
   useEffect(() => {
     if (!mounted) return;
 
@@ -110,70 +37,49 @@ export default function ClubsSection() {
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [mounted]);
-
-  // Reset carousel index when switching tabs
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [activeTab]);
 
   if (!mounted) return null;
 
-  const maxIndex = Math.max(data.length - visibleCount, 0);
+  // Make sure maxIndex is never negative
+  const maxIndex = Math.max(clubs.length - visibleCount, 0);
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1 > maxIndex ? 0 : prev + 1));
+    setCurrentIndex(prev => (prev + 1 > maxIndex ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 < 0 ? maxIndex : prev - 1));
+    setCurrentIndex(prev => (prev - 1 < 0 ? maxIndex : prev - 1));
   };
 
-  const visibleItems = data.slice(currentIndex, currentIndex + visibleCount);
+  // Always return an array
+  const visibleClubs = clubs.slice(currentIndex, currentIndex + visibleCount);
 
   return (
-    <section className="py-16">
+    <section className="py-16 ">
       <div className="container mx-auto px-4">
         {/* Tabs */}
         <div className="flex justify-center mb-6">
-          <div
-            className="flex bg-[#12143A] rounded-lg overflow-hidden border px-2"
-            style={{
-              backgroundColor: theme.colors.backgroundDark,
-              borderColor: `${theme.colors.primaryCyan}33`,
-            }}
-          >
+          <div className="flex bg-navy-800 rounded-lg overflow-hidden border border-[#1D1445] px-2">
             <button
-              onClick={() => setActiveTab("clubs")}
-              className={`px-6 py-3 text-sm font-medium transition-all rounded-md mx-1 ${
-                activeTab === "clubs"
-                  ? "text-white"
-                  : "text-gray-500 hover:text-white"
+              onClick={() => setActiveTab('clubs')}
+              className={`px-6 py-2 text-sm font-medium transition-colors  ${
+                activeTab === 'clubs'
+                  ? 'bg-navy-700 text-foreground border-b-2 rounded-md border-[#1D1445] m-2'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
-              style={{
-                backgroundColor:
-                  activeTab === "clubs"
-                    ? theme.colors.backgroundCard
-                    : "transparent",
-              }}
             >
               Clubs
             </button>
             <button
-              onClick={() => setActiveTab("academies")}
-              className={`px-6 py-3 text-sm font-medium transition-all rounded-md mx-1 ${
-                activeTab === "academies"
-                  ? "text-white"
-                  : "text-gray-500 hover:text-white"
+              onClick={() => setActiveTab('academies')}
+              className={`px-6 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'academies'
+                  ? 'bg-navy-700 text-foreground border-b border-[#1D1445] m-2  rounded-md'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
-              style={{
-                backgroundColor:
-                  activeTab === "academies"
-                    ? theme.colors.backgroundCard
-                    : "transparent",
-              }}
             >
               Academies
             </button>
@@ -181,9 +87,8 @@ export default function ClubsSection() {
         </div>
 
         {/* Subtitle */}
-        <p className="text-center text-gray-400 mb-10 text-lg">
-          Connect with top {activeTab === "clubs" ? "clubs" : "academies"} from
-          around the world.
+        <p className="text-center text-landing mb-10">
+          Connect with top clubs and academies from around the world.
         </p>
 
         {/* Carousel */}
@@ -191,44 +96,31 @@ export default function ClubsSection() {
           {maxIndex > 0 && (
             <button
               onClick={prevSlide}
-              className="absolute left-0 lg:left-10 z-10 w-12 h-12 flex items-center justify-center rounded-full transition-all hover:scale-110"
-              style={{
-                backgroundColor: `${theme.colors.backgroundCard}cc`,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-              }}
+              className="absolute left-10 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors bg-slate-900 rounded-full"
             >
-              <ChevronLeft size={28} className="text-gray-300" />
+              <ChevronLeft size={24} />
             </button>
           )}
 
-          <div className="flex gap-6 justify-center mx-auto w-full overflow-hidden px-12">
-            {visibleItems.map((item, i) => (
+          <div className="flex gap-4 justify-center mx-4 w-full overflow-hidden">
+            {visibleClubs.map((club, i) => (
               <div
                 key={i}
-                className="flex-shrink-0 bg-card rounded-2xl p-6 text-center transition-all hover:scale-105 hover:shadow-xl"
-                style={{
-                  backgroundColor: theme.colors.backgroundCard,
-                  width:
-                    visibleCount === 1
-                      ? "100%"
-                      : visibleCount === 2
-                      ? "45%"
-                      : "22%",
-                  maxWidth: "280px",
-                }}
+                className="flex-1 min-w-[150px] sm:min-w-[180px] md:min-w-[220px] bg-navy-800 rounded-xl p-4 sm:p-6 text-center transition-colors"
+               style={{
+          backgroundColor: theme.colors.backgroundCard,
+        }}
               >
-                <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center bg-gray-800 rounded-2xl">
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <img
-                    src={item.logo}
-                    alt={item.name}
-                    className="max-w-full max-h-full object-contain p-2"
+                    src={club.logo}
+                    alt={club.name}
+                    className="max-w-full max-h-full object-contain"
                   />
                 </div>
-                <h3 className="font-bold text-white text-lg mb-2">
-                  {item.name}
-                </h3>
-                <p className="text-gray-400 text-sm">
-                  {item.league} • {item.team}
+                <h3 className="font-display text-cyan text-sm mb-1">{club.name}</h3>
+                <p className="text-muted-foreground text-xs">
+                  {club.league} • {club.team}
                 </p>
               </div>
             ))}
@@ -237,25 +129,20 @@ export default function ClubsSection() {
           {maxIndex > 0 && (
             <button
               onClick={nextSlide}
-              className="absolute right-0 lg:right-10 z-10 w-12 h-12 flex items-center justify-center rounded-full transition-all hover:scale-110"
-              style={{
-                backgroundColor: `${theme.colors.backgroundCard}cc`,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-              }}
+              className="absolute right-10 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors bg-slate-900 rounded-full"
             >
-              <ChevronRight size={28} className="text-gray-300" />
+              <ChevronRight size={24} />
             </button>
           )}
         </div>
 
         {/* View All Button */}
-        <div className="flex justify-center mt-12">
-          <HomeButton
-            text={`View All ${activeTab === "clubs" ? "Clubs" : "Academies"}`}
-            icon={<Lock size={18} />}
-            variant="outline"
-            theme={theme}
-          />
+        <div className="flex justify-center mt-10">
+          <button className="px-8 py-2 border border-purple/50 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2"
+           style={{ borderColor: theme.colors.primaryMagenta }}
+          >
+            View All Clubs <Lock size={14} />
+          </button>
         </div>
       </div>
     </section>
