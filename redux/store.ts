@@ -11,39 +11,36 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import themeReducer from "./features/themeSlice";
+import { baseApi } from "./api/baseApi"; // <- import your baseApi
 
-// Persist configs
 const authPersistConfig = {
   key: "auth",
   storage,
   whitelist: ["user", "accessToken"],
 };
 
-// Placeholder auth reducer (replace with actual auth reducer when available)
 const authReducer = (state = { user: null, accessToken: null }, action: any) => {
   return state;
 };
 
-// Persisted reducers
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 
-// Configure store
 export const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
     theme: themeReducer,
+    // ✅ Add baseApi reducer here
+    [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(baseApi.middleware), // ✅ add RTK Query middleware
 });
 
-// Types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
-// Persistor
 export const persistor = persistStore(store);

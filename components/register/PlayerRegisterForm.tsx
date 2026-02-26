@@ -92,16 +92,39 @@ const RegisterPage = () => {
     else if (step === 2) setStep(1);
   };
 
-  const onSubmit = async (data: FormData) => {
-    const payload: any = { ...data };
-    if (!isMinor) {
-      delete payload.parent_guardian_first_name;
-      delete payload.parent_guardian_last_name;
-      delete payload.parent_id_number;
+ const onSubmit = async (data: FormData) => {
+  const payload: any = { ...data };
+
+  // Add confirm_password
+  payload.confirm_password = data.password;
+
+  // If not minor, remove parent fields
+  if (!isMinor) {
+    delete payload.parent_guardian_first_name;
+    delete payload.parent_guardian_last_name;
+    delete payload.parent_id_number;
+    payload.parent_guardian_digital_signature = null;
+  } else {
+    // Make sure digital signature is present even if null
+    if (!payload.parent_guardian_digital_signature) {
+      payload.parent_guardian_digital_signature = null;
     }
-    await registerPlayer(payload);
-    alert("Registration Completed");
-  };
+  }
+
+  // Adjust types if needed
+  payload.height = parseFloat(payload.height as any);
+  payload.weight = parseFloat(payload.weight as any);
+
+  // Capitalize enum fields if backend is case-sensitive
+  payload.playing_position = payload.playing_position.charAt(0).toUpperCase() + payload.playing_position.slice(1);
+  payload.preferred_foot = payload.preferred_foot.charAt(0).toUpperCase() + payload.preferred_foot.slice(1);
+
+  console.log("Payload being sent:", payload);
+
+  const result = await registerPlayer(payload);
+  console.log("Server response:", result);
+  alert("Registration Completed");
+};
 
   const NextButton = ({ disabled, onClick, children }: { disabled: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button
