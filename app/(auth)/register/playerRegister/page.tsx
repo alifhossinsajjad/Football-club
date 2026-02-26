@@ -1,5 +1,4 @@
 import PlayerRegisterForm from '@/components/register/PlayerRegisterForm'
-import React from 'react'
 
 const PlayerRegisterPage = () => {
   return (
