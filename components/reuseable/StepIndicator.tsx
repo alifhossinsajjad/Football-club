@@ -14,7 +14,10 @@ const StepIndicator = ({ step, isMinor }: Props) => {
 
   const visibleStepIndex = isMinor ? step : step === 4 ? 3 : step;
 
-  const percentage = Math.round((visibleStepIndex / effectiveTotalSteps) * 100);
+  // Only count fully completed steps towards the percentage.
+  // So while you are on step 1, progress is 0%.
+  const completedSteps = Math.max(0, visibleStepIndex - 1);
+  const percentage = Math.round((completedSteps / effectiveTotalSteps) * 100);
 
   const steps = isMinor
     ? [
