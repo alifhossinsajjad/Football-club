@@ -32,7 +32,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReduxProviderWrapper>
+        
+          <Navbar />
+
           {children}
+
+          <Footer />
 
           <Toaster position="top-right" />
         </ReduxProviderWrapper>
