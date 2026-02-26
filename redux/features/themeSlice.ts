@@ -3,8 +3,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface ThemeState {
   colors: {
     primaryCyan: string;
-    primaryMagenta: string; // added for gradients/borders
+    primaryMagenta: string;
     primaryGreen: string;
+    backgroundCard: string;  
   };
   platformName: string;
 }
@@ -12,11 +13,13 @@ interface ThemeState {
 const initialState: ThemeState = {
   colors: {
     primaryCyan: "#00E5FF",
-    primaryMagenta: "#B026FF", // magenta/purple used in designs
+    primaryMagenta: "#B026FF",
     primaryGreen: "#084559",
+    backgroundCard: "#0F172A",
   },
   platformName: "NextGen Pros",
 };
+
 
 const themeSlice = createSlice({
   name: "theme",
