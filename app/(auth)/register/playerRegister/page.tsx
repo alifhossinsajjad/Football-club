@@ -1,9 +1,10 @@
+import PlayerRegisterForm from '@/components/register/PlayerRegisterForm'
 import React from 'react'
 
 const PlayerRegisterPage = () => {
   return (
-    <div>
-      <h1>player register</h1>
+    <div className=''>
+      <PlayerRegisterForm/>
     </div>
   )
 }

@@ -1,12 +1,26 @@
-# TODO List - Navbar Fix
+# TODO - Player Registration Form Updates
 
-## Tasks:
-- [x] 1. Create `redux/features/themeSlice.ts` - Add theme state with colors
-- [x] 2. Fix `redux/store.ts` - Add themeReducer, fix missing imports  
-- [x] 3. Fix `components/ui/button.tsx` - Add "nav" and "navFilled" variants
-- [x] 4. Fix `components/sheard/Navbar.tsx` - Remove broken code, use static colors
-- [x] 5. Check/create Footer component (imported in layout but empty)
-- [x] 6. Add missing theme colors (primaryMagenta) and fix Banner gradient/btn
-- [x] 7. Correct banner logo path and add overlay for contrast
+## Plan Approved - Implementation Completed
 
-## Status: Completed - Navbar and banner styling improvements
+### Step 1: Update StepIndicator.tsx ✅
+- [x] Create percentage-based progress indicator with "wow" UI
+- [x] Add animated progress bar with gradient
+- [x] Add glow effects and smooth transitions
+
+### Step 2: Update PlayerRegisterForm.tsx ✅
+- [x] Add validation rules to useForm for each step
+- [x] Create validateStep function
+- [x] Disable Next button until all required fields are filled
+- [x] Add beautiful button styling
+
+### Step 3: Update DarkInput.tsx ✅
+- [x] Add focus glow effect
+- [x] Add shake animation on error
+- [x] Improve placeholder styling
+
+### Step 4: Update DarkSelect.tsx ✅
+- [x] Add focus glow effect
+- [x] Improve styling consistency
+
+### Step 5: Add CSS Animations ✅
+- [x] Add shimmer and shake animations to globals.css
