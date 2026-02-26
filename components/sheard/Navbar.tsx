@@ -6,6 +6,7 @@ import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { useAppSelector } from "@/redux/hooks";
 import gsap from "gsap";
+import Link from "next/link";
 
 const navLinks = [
   { name: "Home", href: "#" },
@@ -29,15 +30,12 @@ const Navbar = () => {
         ease: "power3.out",
       });
     });
-    
+
     return () => ctx.revert(); // Cleanup for React 18 strict mode
   }, []);
 
   return (
-    <nav
-      ref={navRef}
-      className="fixed top-8 left-0 right-0 w-full z-50 "
-    >
+    <nav ref={navRef} className="fixed top-8 left-0 right-0 w-full z-50 ">
       <div className="container mx-auto px-4 lg:px-6 relative  bg-white/10 backdrop-blur-md rounded-xl">
         <div className="flex items-center justify-between h-20 lg:h-24">
           {/* Logo - Left */}
@@ -69,12 +67,16 @@ const Navbar = () => {
 
           {/* Desktop Right Section - Log in, Sign up, Language */}
           <div className="hidden lg:flex items-center gap-3">
+            <Link href="/login">
             <Button variant="nav" size="default" className="px-6">
               Log in
             </Button>
-            <Button variant="navFilled" size="default" className="px-6">
-              Sign up
-            </Button>
+            </Link>
+            <Link href="/register">
+              <Button variant="navFilled" size="default" className="px-6">
+                Sign up
+              </Button>
+            </Link>
             <button className="flex items-center gap-1 px-3 py-2 rounded-md bg-[#00E5FF]/90 hover:bg-[#00cce6] transition-colors">
               <Globe className="w-4 h-4 text-black" />
               <span className="text-black font-medium text-sm">EN</span>
