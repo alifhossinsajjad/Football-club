@@ -1,4 +1,8 @@
-export type UserRole = "PLAYER" | "ADMIN" | "COACH";
+export type UserRole =
+  | "PLAYER"
+  | "ADMIN"
+  | "SCOUT_AGENT"
+  | "CLUB_ACADEMY";
 
 export interface User {
   id: number;
@@ -15,6 +19,17 @@ export interface AuthTokens {
 }
 
 export interface PlayerRegisterResponse {
+  message: string;
+  user: User;
+  tokens: AuthTokens;
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
   message: string;
   user: User;
   tokens: AuthTokens;

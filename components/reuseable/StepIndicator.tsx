@@ -14,11 +14,24 @@ interface Props {
 }
 
 const StepIndicator = ({ step, isMinor, stepsOverride }: Props) => {
-  // When player is a minor, there are 4 visible steps.
-  // When not a minor, we skip the Parent step, so there are effectively 3 steps.
-  const effectiveTotalSteps = isMinor ? 4 : 3;
+  const hasOverride = !!stepsOverride && stepsOverride.length > 0;
 
-  const visibleStepIndex = isMinor ? step : step === 4 ? 3 : step;
+  // When a custom step configuration is provided (e.g. scout registration),
+  // use its length for both the total steps and the visible index.
+  // Otherwise, fall back to the player/minor logic.
+  const effectiveTotalSteps = hasOverride
+    ? stepsOverride!.length
+    : isMinor
+      ? 4
+      : 3;
+
+  const visibleStepIndex = hasOverride
+    ? Math.min(step, effectiveTotalSteps)
+    : isMinor
+      ? step
+      : step === 4
+        ? 3
+        : step;
 
   // Only count fully completed steps towards the percentage.
   // So while you are on step 1, progress is 0%.
@@ -93,7 +106,7 @@ const StepIndicator = ({ step, isMinor, stepsOverride }: Props) => {
                       : "bg-[#1a2332] text-gray-500 border border-gray-700"
                 }`}
               >
-                {step > item.num ? (
+                {visibleStepIndex > itemIndex ? (
                   <svg
                     className="w-4 h-4"
                     fill="none"

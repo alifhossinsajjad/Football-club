@@ -6,36 +6,46 @@ import toast from "react-hot-toast";
 
 import DarkInput from "../reuseable/DarkInput";
 import StepIndicator from "../reuseable/StepIndicator";
-import { useRegisterScoutMutation } from "@/redux/features/auth/scoutRegistretionApi";
-import { ScoutRegisterPayload } from "@/types/scout";
+import { useRegisterClubMutation } from "@/redux/features/auth/clubRegistretaionApi";
+import { ClubRegisterPayload } from "@/types/club";
 import Link from "next/link";
 
 interface FormData {
   email: string;
   password: string;
   confirm_password: string;
-  first_name: string;
-  last_name: string;
-  date_of_birth: string;
-  nationality: string;
+
+  organization_name: string;
+  organization_type: string;
+  country: string;
+  city: string;
+  website: string;
   phone_number: string;
-  license_type: string;
-  license_number: string;
-  agency_name: string;
-  agency_affiliation: string;
-  specialization: string;
-  primary_scouting_regions: string;
-  secondary_scouting_regions: string;
-  age_group_focus: string;
-  position_focus: string;
-  languages_spoken: string;
-  players_discovered: string;
-  contracts_signed: string;
-  notable_discoveries: string;
-  club_affiliations: string;
-  scout_license_document?: string;
-  government_issued_id?: string;
-  legal_agreement_accepted: boolean;
+  full_address: string;
+  postal_code: string;
+  established_year: string;
+  registration_number: string;
+  tax_id: string;
+
+  contact_full_name: string;
+  contact_role_position: string;
+  contact_email: string;
+  contact_phone_number: string;
+
+  number_of_training_fields: string;
+  additional_facilities: string;
+  age_groups_work_with: string;
+  training_programs: string;
+
+  club_website: string;
+  facebook: string;
+  instagram: string;
+  twitter: string;
+
+  official_verification_documents?: string;
+  club_academy_logo?: string;
+
+  legal_terms_accepted: boolean;
 }
 
 const splitToArray = (value: string): string[] =>
@@ -44,7 +54,7 @@ const splitToArray = (value: string): string[] =>
     .map((item) => item.trim())
     .filter((item) => item.length > 0);
 
-const ScoutRegistretionForm = () => {
+const ClubRegisterForm = () => {
   const [step, setStep] = useState(1);
 
   const {
@@ -58,69 +68,81 @@ const ScoutRegistretionForm = () => {
     mode: "onChange",
   });
 
-  const [registerScout, { isLoading }] = useRegisterScoutMutation();
+  const [registerClub, { isLoading }] = useRegisterClubMutation();
 
   const formValues = watch();
 
   const canProceedStep1 = !!(
-    formValues.first_name &&
-    formValues.last_name &&
     formValues.email &&
-    formValues.phone_number &&
     formValues.password &&
-    formValues.confirm_password
+    formValues.confirm_password &&
+    formValues.organization_name &&
+    formValues.organization_type
   );
 
   const canProceedStep2 = !!(
-    formValues.license_type &&
-    formValues.license_number &&
-    formValues.agency_name &&
-    formValues.agency_affiliation
+    formValues.country &&
+    formValues.city &&
+    formValues.phone_number &&
+    formValues.full_address &&
+    formValues.postal_code &&
+    formValues.established_year &&
+    formValues.registration_number &&
+    formValues.tax_id
   );
 
   const canProceedStep3 = !!(
-    formValues.specialization &&
-    formValues.primary_scouting_regions &&
-    formValues.age_group_focus &&
-    formValues.position_focus &&
-    formValues.languages_spoken
+    formValues.contact_full_name &&
+    formValues.contact_role_position &&
+    formValues.contact_email &&
+    formValues.contact_phone_number &&
+    formValues.number_of_training_fields &&
+    formValues.additional_facilities &&
+    formValues.age_groups_work_with &&
+    formValues.training_programs
   );
 
   const canProceedStep4 = !!(
-    formValues.players_discovered &&
-    formValues.contracts_signed &&
-    formValues.notable_discoveries &&
-    formValues.club_affiliations &&
-    formValues.legal_agreement_accepted
+    formValues.club_website &&
+    formValues.facebook &&
+    formValues.instagram &&
+    formValues.twitter &&
+    formValues.legal_terms_accepted
   );
 
   const handleNextStep = async () => {
     if (step === 1) {
       const valid = await trigger([
-        "first_name",
-        "last_name",
         "email",
-        "phone_number",
         "password",
         "confirm_password",
+        "organization_name",
+        "organization_type",
       ]);
       if (valid && canProceedStep1) setStep(2);
     } else if (step === 2) {
       const valid = await trigger([
-        "license_type",
-        "license_number",
-        "agency_name",
-        "agency_affiliation",
+        "country",
+        "city",
+        "website",
+        "phone_number",
+        "full_address",
+        "postal_code",
+        "established_year",
+        "registration_number",
+        "tax_id",
       ]);
       if (valid && canProceedStep2) setStep(3);
     } else if (step === 3) {
       const valid = await trigger([
-        "specialization",
-        "primary_scouting_regions",
-        "secondary_scouting_regions",
-        "age_group_focus",
-        "position_focus",
-        "languages_spoken",
+        "contact_full_name",
+        "contact_role_position",
+        "contact_email",
+        "contact_phone_number",
+        "number_of_training_fields",
+        "additional_facilities",
+        "age_groups_work_with",
+        "training_programs",
       ]);
       if (valid && canProceedStep3) setStep(4);
     }
@@ -133,50 +155,51 @@ const ScoutRegistretionForm = () => {
   };
 
   const onSubmit = async (data: FormData) => {
-    const payload: ScoutRegisterPayload = {
+    const payload: ClubRegisterPayload = {
       email: data.email,
       password: data.password,
       confirm_password: data.confirm_password,
-      first_name: data.first_name,
-      last_name: data.last_name,
-      date_of_birth: data.date_of_birth,
-      nationality: data.nationality,
+      organization_name: data.organization_name,
+      organization_type: data.organization_type,
+      country: data.country,
+      city: data.city,
+      website: data.website,
       phone_number: data.phone_number,
-      license_type: data.license_type,
-      license_number: data.license_number,
-      agency_name: data.agency_name,
-      agency_affiliation: data.agency_affiliation,
-      specialization: splitToArray(data.specialization),
-      primary_scouting_regions: splitToArray(
-        data.primary_scouting_regions || "",
-      ),
-      secondary_scouting_regions: splitToArray(
-        data.secondary_scouting_regions || "",
-      ),
-      age_group_focus: splitToArray(data.age_group_focus || ""),
-      position_focus: splitToArray(data.position_focus || ""),
-      languages_spoken: splitToArray(data.languages_spoken || ""),
-      players_discovered: data.players_discovered,
-      contracts_signed: data.contracts_signed,
-      notable_discoveries: data.notable_discoveries,
-      club_affiliations: data.club_affiliations,
-      scout_license_document: data.scout_license_document || null,
-      government_issued_id: data.government_issued_id || null,
-      legal_agreement_accepted: data.legal_agreement_accepted,
+      full_address: data.full_address,
+      postal_code: data.postal_code,
+      established_year: Number(data.established_year),
+      registration_number: data.registration_number,
+      tax_id: data.tax_id,
+      contact_full_name: data.contact_full_name,
+      contact_role_position: data.contact_role_position,
+      contact_email: data.contact_email,
+      contact_phone_number: data.contact_phone_number,
+      number_of_training_fields: Number(data.number_of_training_fields),
+      additional_facilities: splitToArray(data.additional_facilities || ""),
+      age_groups_work_with: splitToArray(data.age_groups_work_with || ""),
+      training_programs: splitToArray(data.training_programs || ""),
+      club_website: data.club_website,
+      facebook: data.facebook,
+      instagram: data.instagram,
+      twitter: data.twitter,
+      official_verification_documents:
+        data.official_verification_documents || null,
+      club_academy_logo: data.club_academy_logo || null,
+      legal_terms_accepted: data.legal_terms_accepted,
     };
 
     try {
-      const result = await registerScout(payload).unwrap();
-      console.log("Scout registration response:", result);
+      const result = await registerClub(payload).unwrap();
+      console.log("Club registration response:", result);
 
       toast.success(
-        "Scout registration successful! Please check your email for verification.",
+        "Club registration successful! Please check your email for verification."
       );
 
       reset();
       setStep(1);
     } catch (error: unknown) {
-      console.error("Scout registration failed:", error);
+      console.error("Club registration failed:", error);
 
       type ErrorResponse = {
         data?: {
@@ -190,7 +213,7 @@ const ScoutRegistretionForm = () => {
       const message =
         err.data?.detail ||
         err.data?.message ||
-        "Scout registration failed. Please try again.";
+        "Club registration failed. Please try again.";
       toast.error(message);
     }
   };
@@ -221,10 +244,10 @@ const ScoutRegistretionForm = () => {
   );
 
   const stepLabels = [
-    { num: 1, label: "Basic" },
-    { num: 2, label: "Professional" },
-    { num: 3, label: "Scouting Focus" },
-    { num: 4, label: "Legal" },
+    { num: 1, label: "Account" },
+    { num: 2, label: "Organization" },
+    { num: 3, label: "Training" },
+    { num: 4, label: "Social & Legal" },
   ];
 
   return (
@@ -236,37 +259,17 @@ const ScoutRegistretionForm = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-6 relative z-10"
         >
-          {/* STEP 1 - BASIC INFO */}
           {step === 1 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-white">
-                Scout Basic Info
+                Club Account Details
               </h2>
-              <DarkInput
-                label="First Name"
-                name="first_name"
-                register={register}
-                error={errors.first_name?.message}
-              />
-              <DarkInput
-                label="Last Name"
-                name="last_name"
-                register={register}
-                error={errors.last_name?.message}
-              />
               <DarkInput
                 label="Email"
                 name="email"
                 type="email"
                 register={register}
                 error={errors.email?.message}
-              />
-              <DarkInput
-                label="Phone Number"
-                name="phone_number"
-                type="tel"
-                register={register}
-                error={errors.phone_number?.message}
               />
               <DarkInput
                 label="Password"
@@ -283,17 +286,17 @@ const ScoutRegistretionForm = () => {
                 error={errors.confirm_password?.message}
               />
               <DarkInput
-                label="Date of Birth"
-                name="date_of_birth"
-                type="date"
+                label="Organization Name"
+                name="organization_name"
                 register={register}
-                error={errors.date_of_birth?.message}
+                error={errors.organization_name?.message}
               />
               <DarkInput
-                label="Nationality"
-                name="nationality"
+                label="Organization Type"
+                name="organization_type"
                 register={register}
-                error={errors.nationality?.message}
+                error={errors.organization_type?.message}
+                placeholder="e.g. academy, club, school"
               />
 
               <NextButton disabled={!canProceedStep1} onClick={handleNextStep}>
@@ -302,35 +305,65 @@ const ScoutRegistretionForm = () => {
             </div>
           )}
 
-          {/* STEP 2 - PROFESSIONAL INFO */}
           {step === 2 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-white">
-                Professional Details
+                Location & Legal
               </h2>
               <DarkInput
-                label="License Type"
-                name="license_type"
+                label="Country"
+                name="country"
                 register={register}
-                error={errors.license_type?.message}
+                error={errors.country?.message}
               />
               <DarkInput
-                label="License Number"
-                name="license_number"
+                label="City"
+                name="city"
                 register={register}
-                error={errors.license_number?.message}
+                error={errors.city?.message}
               />
               <DarkInput
-                label="Agency Name"
-                name="agency_name"
+                label="Website"
+                name="website"
                 register={register}
-                error={errors.agency_name?.message}
+                error={errors.website?.message}
               />
               <DarkInput
-                label="Agency Affiliation"
-                name="agency_affiliation"
+                label="Phone Number"
+                name="phone_number"
                 register={register}
-                error={errors.agency_affiliation?.message}
+                error={errors.phone_number?.message}
+              />
+              <DarkInput
+                label="Full Address"
+                name="full_address"
+                register={register}
+                error={errors.full_address?.message}
+              />
+              <DarkInput
+                label="Postal Code"
+                name="postal_code"
+                register={register}
+                error={errors.postal_code?.message}
+              />
+              <DarkInput
+                label="Established Year"
+                name="established_year"
+                type="number"
+                register={register}
+                error={errors.established_year?.message}
+              />
+              <DarkInput
+                label="Registration Number"
+                name="registration_number"
+                register={register}
+                error={errors.registration_number?.message}
+              />
+              <DarkInput
+                label="Tax ID"
+                name="tax_id"
+                register={register}
+                error={errors.tax_id?.message}
               />
 
               <div className="flex gap-3">
@@ -353,76 +386,76 @@ const ScoutRegistretionForm = () => {
             </div>
           )}
 
-          {/* STEP 3 - SCOUTING FOCUS */}
           {step === 3 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-white">
-                Scouting Focus & Regions
+                Contact & Training
               </h2>
 
+              <DarkInput
+                label="Contact Full Name"
+                name="contact_full_name"
+                register={register}
+                error={errors.contact_full_name?.message}
+              />
+              <DarkInput
+                label="Contact Role / Position"
+                name="contact_role_position"
+                register={register}
+                error={errors.contact_role_position?.message}
+              />
+              <DarkInput
+                label="Contact Email"
+                name="contact_email"
+                type="email"
+                register={register}
+                error={errors.contact_email?.message}
+              />
+              <DarkInput
+                label="Contact Phone Number"
+                name="contact_phone_number"
+                register={register}
+                error={errors.contact_phone_number?.message}
+              />
+
+              <DarkInput
+                label="Number of Training Fields"
+                name="number_of_training_fields"
+                type="number"
+                register={register}
+                error={errors.number_of_training_fields?.message}
+              />
+
               <div className="space-y-1">
                 <label className="text-sm text-gray-300 font-medium">
-                  Specialization (comma-separated)
+                  Additional Facilities (comma-separated)
                 </label>
                 <textarea
-                  {...register("specialization")}
+                  {...register("additional_facilities")}
                   className="w-full bg-[#050B14]/80 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF]"
-                  placeholder="e.g. youth_scouting, international_scouting"
+                  placeholder="e.g. indoor_training_facilities, medical_staff_facilities"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-sm text-gray-300 font-medium">
-                  Primary Scouting Regions (comma-separated)
+                  Age Groups You Work With (comma-separated)
                 </label>
                 <textarea
-                  {...register("primary_scouting_regions")}
+                  {...register("age_groups_work_with")}
                   className="w-full bg-[#050B14]/80 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF]"
-                  placeholder="e.g. spain, france, italy"
+                  placeholder="e.g. U-8, U-10, U-12, U-14"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-sm text-gray-300 font-medium">
-                  Secondary Scouting Regions (comma-separated)
+                  Training Programs (comma-separated)
                 </label>
                 <textarea
-                  {...register("secondary_scouting_regions")}
+                  {...register("training_programs")}
                   className="w-full bg-[#050B14]/80 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF]"
-                  placeholder="e.g. belgium, portugal"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm text-gray-300 font-medium">
-                  Age Group Focus (comma-separated)
-                </label>
-                <textarea
-                  {...register("age_group_focus")}
-                  className="w-full bg-[#050B14]/80 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF]"
-                  placeholder="e.g. U-16, U-18, U-21"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm text-gray-300 font-medium">
-                  Position Focus (comma-separated)
-                </label>
-                <textarea
-                  {...register("position_focus")}
-                  className="w-full bg-[#050B14]/80 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF]"
-                  placeholder="e.g. forward, midfielder"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm text-gray-300 font-medium">
-                  Languages Spoken (comma-separated)
-                </label>
-                <textarea
-                  {...register("languages_spoken")}
-                  className="w-full bg-[#050B14]/80 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF]"
-                  placeholder="e.g. spanish, english, french"
+                  placeholder="e.g. technical_skill, tactical_training, physical_conditioning"
                 />
               </div>
 
@@ -446,47 +479,59 @@ const ScoutRegistretionForm = () => {
             </div>
           )}
 
-          {/* STEP 4 - LEGAL & EXPERIENCE */}
           {step === 4 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-white">
-                Experience & Legal
+                Online Presence & Legal
               </h2>
 
               <DarkInput
-                label="Players Discovered"
-                name="players_discovered"
+                label="Club Website"
+                name="club_website"
                 register={register}
-                error={errors.players_discovered?.message}
+                error={errors.club_website?.message}
               />
               <DarkInput
-                label="Contracts Signed"
-                name="contracts_signed"
+                label="Facebook"
+                name="facebook"
                 register={register}
-                error={errors.contracts_signed?.message}
+                error={errors.facebook?.message}
               />
               <DarkInput
-                label="Notable Discoveries"
-                name="notable_discoveries"
+                label="Instagram"
+                name="instagram"
                 register={register}
-                error={errors.notable_discoveries?.message}
+                error={errors.instagram?.message}
               />
               <DarkInput
-                label="Club Affiliations"
-                name="club_affiliations"
+                label="Twitter / X"
+                name="twitter"
                 register={register}
-                error={errors.club_affiliations?.message}
+                error={errors.twitter?.message}
+              />
+
+              <DarkInput
+                label="Official Verification Documents (optional URL)"
+                name="official_verification_documents"
+                register={register}
+                error={errors.official_verification_documents?.toString()}
+              />
+              <DarkInput
+                label="Club / Academy Logo (optional URL)"
+                name="club_academy_logo"
+                register={register}
+                error={errors.club_academy_logo?.toString()}
               />
 
               <div className="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
                 <input
                   type="checkbox"
-                  {...register("legal_agreement_accepted")}
+                  {...register("legal_terms_accepted")}
                   className="mt-1 w-4 h-4 rounded border-gray-600 text-cyan-500 focus:ring-cyan-500"
                 />
                 <span className="text-sm text-gray-300">
                   I confirm that all information provided is accurate and I
-                  accept the legal terms of engagement as a scout/agent.
+                  accept the legal terms and privacy policy.
                 </span>
               </div>
 
@@ -514,14 +559,15 @@ const ScoutRegistretionForm = () => {
           )}
         </form>
 
+
         <div className="flex justify-center items-center mt-3 bg-red-500 p-4 rounded-xl">
-          <Link href="/register" className="text-blue-400 hover:underline">
-            Back to Register
-          </Link>
-        </div>
+        <Link href="/register" className="text-blue-400 hover:underline">
+          Back to Register
+        </Link>
+      </div>
       </div>
     </div>
   );
 };
 
-export default ScoutRegistretionForm;
+export default ClubRegisterForm;

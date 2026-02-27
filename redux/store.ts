@@ -11,16 +11,13 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import themeReducer from "./features/themeSlice";
+import authReducer from "./features/auth/authSlice";
 import { baseApi } from "./api/baseApi"; // <- import your baseApi
 
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["user", "accessToken"],
-};
-
-const authReducer = (state = { user: null, accessToken: null }, action: any) => {
-  return state;
+  whitelist: ["user", "accessToken", "refreshToken"],
 };
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);

@@ -1,11 +1,15 @@
-import React from 'react'
+"use client";
+
+import ClubRegisterForm from "@/components/register/ClubRegisterForm";
+
 
 const ClubRegisterPage = () => {
   return (
     <div>
-      <h1>club register</h1>
+      <ClubRegisterForm />
+      
     </div>
-  )
-}
+  );
+};
 
-export default ClubRegisterPage
+export default ClubRegisterPage;
