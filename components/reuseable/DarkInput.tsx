@@ -21,6 +21,10 @@ const DarkInput = ({
 }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isPasswordField = type === "password";
+  const resolvedType = isPasswordField ? (showPassword ? "text" : "password") : type;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setHasValue(e.target.value.length > 0);
@@ -38,12 +42,14 @@ const DarkInput = ({
       <div className="relative">
         <input
           {...register(name)}
-          type={type}
+          type={resolvedType}
           placeholder={placeholder || `Enter ${label.toLowerCase()}`}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onChange={handleChange}
-          className={`w-full bg-[#050B14]/80 border rounded-lg px-4 py-2.5 text-white outline-none transition-all duration-300 placeholder:text-gray-600
+          className={`w-full bg-[#050B14]/80 border rounded-lg px-4 py-2.5 text-white outline-none transition-all duration-300 placeholder:text-gray-600 ${
+            (!error && hasValue) || isPasswordField ? "pr-12" : ""
+          }
           ${error 
             ? "border-red-500 focus:border-red-500 animate-shake" 
             : isFocused 
@@ -60,12 +66,63 @@ const DarkInput = ({
           </div>
         )}
         
-        {/* Success indicator */}
-        {!error && hasValue && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+        {/* Right-side affordances (success + password toggle) */}
+        {((!error && hasValue) || isPasswordField) && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            {!error && hasValue && (
+              <svg
+                className="w-5 h-5 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            )}
+
+            {isPasswordField && (
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                {showPassword ? (
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.78 21.78 0 0 1 5.06-6.94" />
+                    <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.78 21.78 0 0 1-2.11 3.38" />
+                    <path d="M14.12 14.12a3 3 0 0 1-4.24-4.24" />
+                    <path d="M1 1l22 22" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            )}
           </div>
         )}
       </div>

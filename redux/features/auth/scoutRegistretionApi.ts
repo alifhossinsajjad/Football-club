@@ -3,7 +3,7 @@ import { ScoutRegisterPayload } from "@/types/scout";
 
 export const scoutRegistretionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    registerScout: builder.mutation<any, ScoutRegisterPayload>({
+    registerScout: builder.mutation<unknown, ScoutRegisterPayload>({
       query: (data) => ({
         url: "/account/scout-agent-registration/",
         method: "POST",

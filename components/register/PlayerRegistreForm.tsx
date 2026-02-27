@@ -7,6 +7,8 @@ import DarkInput from "../reuseable/DarkInput";
 import DarkSelect from "../reuseable/DarkSelect";
 import { useRegisterPlayerMutation } from "@/redux/features/auth/playerRegistraionApi";
 import toast from "react-hot-toast";
+import { PlayerRegisterPayload } from "@/types/player";
+import Link from "next/link";
 
 interface FormData {
   email: string;
@@ -123,35 +125,42 @@ const RegisterPage = () => {
   };
 
   const onSubmit = async (data: FormData) => {
-    const payload: any = { ...data };
+    const payload: PlayerRegisterPayload = {
+      email: data.email,
+      password: data.password,
+      confirm_password: data.password,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      date_of_birth: data.date_of_birth,
+      nationality: data.nationality,
+      phone_number: data.phone_number,
+      playing_position:
+        data.playing_position.charAt(0).toUpperCase() +
+        data.playing_position.slice(1),
+      preferred_foot:
+        data.preferred_foot.charAt(0).toUpperCase() +
+        data.preferred_foot.slice(1),
+      height: parseFloat(data.height),
+      weight: parseFloat(data.weight),
+      city: data.city,
+      country: data.country,
+      current_club_academy: data.current_club_academy,
+      type_of_commitment: data.type_of_commitment,
+      contract_valid_until: data.contract_valid_until,
+      parent_guardian_first_name: data.parent_guardian_first_name,
+      parent_guardian_last_name: data.parent_guardian_last_name,
+      parent_id_number: data.parent_id_number,
+      parent_guardian_digital_signature:
+        data.parent_guardian_digital_signature ?? null,
+    };
 
-    // Add confirm_password
-    payload.confirm_password = data.password;
-
-    // If not minor, remove parent fields
+    // If not minor, drop parent fields from the payload object before sending.
     if (!isMinor) {
       delete payload.parent_guardian_first_name;
       delete payload.parent_guardian_last_name;
       delete payload.parent_guardian_digital_signature;
       delete payload.parent_id_number;
-    } else {
-      // Make sure digital signature is present even if null
-      if (!payload.parent_guardian_digital_signature) {
-        payload.parent_guardian_digital_signature = null;
-      }
     }
-
-    // Adjust types if needed
-    payload.height = parseFloat(payload.height as any);
-    payload.weight = parseFloat(payload.weight as any);
-
-    // Capitalize enum fields if backend is case-sensitive
-    payload.playing_position =
-      payload.playing_position.charAt(0).toUpperCase() +
-      payload.playing_position.slice(1);
-    payload.preferred_foot =
-      payload.preferred_foot.charAt(0).toUpperCase() +
-      payload.preferred_foot.slice(1);
 
     console.log("Payload being sent:", payload);
 
@@ -166,11 +175,21 @@ const RegisterPage = () => {
       // Reset form and step after successful registration
       reset();
       setStep(1);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Registration failed:", error);
+
+      type ErrorResponse = {
+        data?: {
+          detail?: string;
+          message?: string;
+        };
+      };
+
+      const err = error as ErrorResponse;
+
       const message =
-        error?.data?.detail ||
-        error?.data?.message ||
+        err.data?.detail ||
+        err.data?.message ||
         "Registration failed. Please try again.";
       toast.error(message);
     }
@@ -469,6 +488,11 @@ const RegisterPage = () => {
             </div>
           )}
         </form>
+          <div className="flex justify-center items-center mt-3 bg-red-500 p-4 rounded-xl">
+                <Link href="/register" className="text-blue-400 hover:underline">
+                  Back to Register
+                </Link>
+              </div>
       </div>
     </div>
   );
