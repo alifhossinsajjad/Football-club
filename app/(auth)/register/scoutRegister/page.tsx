@@ -1,11 +1,7 @@
-import React from 'react'
+import ScoutRegistretionForm from "@/components/register/ScoutRegistretionForm";
 
 const ScoutRegisterPage = () => {
-  return (
-    <div>
-      <h1>scout regiter</h1>
-    </div>
-  )
-}
+  return <ScoutRegistretionForm />;
+};
 
-export default ScoutRegisterPage
+export default ScoutRegisterPage;
