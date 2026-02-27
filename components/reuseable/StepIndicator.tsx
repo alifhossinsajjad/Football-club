@@ -2,12 +2,18 @@
 
 import React from "react";
 
+interface StepConfig {
+  num: number;
+  label: string;
+}
+
 interface Props {
   step: number;
   isMinor: boolean;
+  stepsOverride?: StepConfig[];
 }
 
-const StepIndicator = ({ step, isMinor }: Props) => {
+const StepIndicator = ({ step, isMinor, stepsOverride }: Props) => {
   // When player is a minor, there are 4 visible steps.
   // When not a minor, we skip the Parent step, so there are effectively 3 steps.
   const effectiveTotalSteps = isMinor ? 4 : 3;
@@ -19,18 +25,20 @@ const StepIndicator = ({ step, isMinor }: Props) => {
   const completedSteps = Math.max(0, visibleStepIndex - 1);
   const percentage = Math.round((completedSteps / effectiveTotalSteps) * 100);
 
-  const steps = isMinor
-    ? [
-        { num: 1, label: "Basic" },
-        { num: 2, label: "Player" },
-        { num: 3, label: "Parent" },
-        { num: 4, label: "Privacy" },
-      ]
-    : [
-        { num: 1, label: "Basic" },
-        { num: 2, label: "Player" },
-        { num: 3, label: "Privacy" },
-      ];
+  const steps: StepConfig[] =
+    stepsOverride ||
+    (isMinor
+      ? [
+          { num: 1, label: "Basic" },
+          { num: 2, label: "Player" },
+          { num: 3, label: "Parent" },
+          { num: 4, label: "Privacy" },
+        ]
+      : [
+          { num: 1, label: "Basic" },
+          { num: 2, label: "Player" },
+          { num: 3, label: "Privacy" },
+        ]);
 
   return (
     <div className="mb-8">
