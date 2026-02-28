@@ -9,6 +9,11 @@ import { setCredentials } from "@/redux/features/auth/authSlice";
 import { LoginPayload } from "@/types/auth";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import Image from "next/image";
+import { FaMessage } from "react-icons/fa6";
+import { MdOutlineEmail } from "react-icons/md";
+import { IoLockClosedOutline } from "react-icons/io5";
 
 interface FormData {
   email: string;
@@ -59,21 +64,25 @@ const LoginPage = () => {
     <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
       <div className="bg-[#020617] max-w-md w-full">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center mb-4 shadow-[0_0_40px_rgba(0,229,255,0.4)]">
-            <span className="text-2xl font-extrabold text-white">NX</span>
-          </div>
+          <Image
+            src="/images/login-logo.png"
+            width={200}
+            height={200}
+            alt="Logo"
+          />
           <h1 className="text-2xl md:text-3xl font-bold text-white">
             Welcome Back
           </h1>
           <p className="mt-2 text-sm text-gray-400">
-            Sign in to access your dashboard
+            Sign in to access your player dashboard
           </p>
         </div>
 
         <div className="bg-[#050B14] border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl">
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-1">
-              <label className="text-sm text-gray-300 font-medium">
+              <label className="flex items-center gap-1 text-sm text-gray-300 font-medium">
+                <MdOutlineEmail size={20}/>
                 Email Address<span className="text-red-500"> *</span>
               </label>
               <input
@@ -90,7 +99,8 @@ const LoginPage = () => {
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-gray-300 font-medium">
+              <label className="flex items-center gap-1 text-sm text-gray-300 font-medium">
+                <IoLockClosedOutline size={20}/>
                 Password<span className="text-red-500"> *</span>
               </label>
               <div className="relative">
@@ -107,33 +117,10 @@ const LoginPage = () => {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   {showPassword ? (
-                    <svg
-                      className="w-5 h-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.78 21.78 0 0 1 5.06-6.94" />
-                      <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.78 21.78 0 0 1-2.11 3.38" />
-                      <path d="M14.12 14.12a3 3 0 0 1-4.24-4.24" />
-                      <path d="M1 1l22 22" />
-                    </svg>
+                    <FaRegEye/>
                   ) : (
-                    <svg
-                      className="w-5 h-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
+                   
+                     <FaRegEyeSlash/>
                   )}
                 </button>
               </div>
