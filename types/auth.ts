@@ -11,6 +11,7 @@ export interface User {
   player_id: number;
   first_name: string;
   last_name: string;
+  profile_image?: string | null;
 }
 
 export interface AuthTokens {

@@ -1,6 +1,7 @@
 import React from 'react'
+import PlayerDashboard from '@/components/playerDashboard/PlayerDashboard'
 
-const PlayerDashboard = () => {
+const PlayerDashboardPage = () => {
   return (
     <div>
      <PlayerDashboard/>
@@ -8,4 +9,4 @@ const PlayerDashboard = () => {
   )
 }
 
-export default PlayerDashboard
+export default PlayerDashboardPage
