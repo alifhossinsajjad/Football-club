@@ -9,7 +9,7 @@ interface StepConfig {
 
 interface Props {
   step: number;
-  isMinor: boolean;
+  isMinor: boolean; 
   stepsOverride?: StepConfig[];
 }
 
