@@ -29,6 +29,8 @@ import Image from "next/image";
 import { logout } from "@/redux/features/auth/authSlice";
 import Logo from "../reuseable/Logo";
 import { BsCalendar4Event } from "react-icons/bs";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
 export type MenuItem = {
   label: string;
@@ -63,6 +65,7 @@ const isAnyChildActive = (pathname: string, children?: MenuItem[]) => {
 const PlayerSideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathname = usePathname();
+  const theme = useAppSelector((state: RootState) => state.theme);
 
   const menuItems: MenuItem[] = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/player" },
@@ -135,7 +138,10 @@ const PlayerSideBar: React.FC = () => {
       {/* Mobile Menu Toggle */}
       <button
         onClick={handleToggle}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-lg"
+         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg"
+        style={{
+          backgroundColor: theme.colors.backgroundCard,
+        }}
         aria-label={isOpen ? "Close menu" : "Open menu"}
         type="button"
       >
@@ -159,7 +165,7 @@ const PlayerSideBar: React.FC = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-58.75 bg-[#12143A] text-white z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-58.75 border-2 border-[#00E5FF1A] bg-[#12143A] text-white z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >

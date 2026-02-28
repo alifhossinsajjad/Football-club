@@ -8,7 +8,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <PlayerSideBar/>
       <div className="lg:ml-58.75 min-h-screen flex flex-col">
         <PlayerTopBar/>
-        <main className="flex-1 p-4 lg:p-8">
+        <main className="flex-1 p-4 lg:p-8 bg-[#0B0D2C]">
           {children}
         </main>
       </div>

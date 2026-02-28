@@ -48,11 +48,11 @@ const PlayerTopBar: React.FC = () => {
     dispatch(logout());
     setProfileDropdownOpen(false);
     toast.success("Logged out successfully");
-    router.push("/auth/login");
+    router.push("/login");
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-black/10">
+    <header className="sticky top-0 z-30 bg-[#12143A]  border-2 border-[#00E5FF1A]">
       <div className="flex items-center justify-end px-4 lg:px-8 py-3">
         {/* Right Actions */}
         <div className="flex items-center gap-4">
@@ -89,12 +89,10 @@ const PlayerTopBar: React.FC = () => {
 
                 {/* Name + Role */}
                 <div className="hidden lg:block text-left">
-                  <p className="text-sm font-medium text-gray-700 truncate">
+                  <p className="text-sm font-medium text-white truncate">
                     {user?.first_name} {user?.last_name}
                   </p>
-                  <p className="text-xs text-gray-500 capitalize">
-                    {user?.role}
-                  </p>
+                  <p className="text-xs text-white  capitalize">{user?.role}</p>
                 </div>
               </button>
             </div>
