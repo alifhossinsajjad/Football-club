@@ -2,7 +2,7 @@
 
 import { baseApi } from "@/redux/api/baseApi";
 
-export const profileAndSettingApi = baseApi.injectEndpoints({
+export const profileAndEditApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // ✅ GET PROFILE
     getMyProfile: builder.query<any, void>({
@@ -25,7 +25,5 @@ export const profileAndSettingApi = baseApi.injectEndpoints({
   }),
 });
 
-export const {
-  useGetMyProfileQuery,
-  useUpdateProfileMutation,
-} = profileAndSettingApi;
+export const { useGetMyProfileQuery, useUpdateProfileMutation } =
+profileAndEditApi

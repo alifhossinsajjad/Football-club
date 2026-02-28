@@ -1,6 +1,6 @@
 "use client";
 
-import { useUpdateProfileMutation } from "@/redux/features/playerProfileAndSetting/profileAndSettingApi";
+import { useUpdateProfileMutation } from "@/redux/features/playerProfileAndEdit/profileAndEditApi";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
