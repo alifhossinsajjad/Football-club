@@ -2,6 +2,7 @@ import { baseApi } from "@/redux/api/baseApi";
 import { AccountSettings, AllSettings, ChangePasswordPayload, DownloadDataResponse, NotificationSettings, PrivacySettings } from "@/types/setting";
 
 
+
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const settingApi = baseApi.injectEndpoints({
