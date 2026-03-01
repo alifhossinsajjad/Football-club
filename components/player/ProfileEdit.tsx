@@ -1,6 +1,17 @@
 "use client";
 
-import { useUpdateProfileMutation } from "@/redux/features/playerProfileAndEdit/profileAndEditApi";
+import {
+  useUpdateProfileMutation,
+  useAddPlayingHistoryMutation,
+  useUpdatePlayingHistoryMutation,
+  useDeletePlayingHistoryMutation,
+  useAddAchievementMutation,
+  useUpdateAchievementMutation,
+  useDeleteAchievementMutation,
+  useAddHighlightVideoMutation,
+  useUpdateHighlightVideoMutation,
+  useDeleteHighlightVideoMutation,
+} from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -48,14 +59,15 @@ interface FormValues {
   skill_technical: number;
   // Dynamic
   playing_history: {
+    id?: number;
     club_name: string;
     position: string;
     start_year: string;
     end_year: string;
     achievements: string;
   }[];
-  achievements: { title: string; description: string; date_achieved: string }[];
-  highlight_videos: { title: string; video_url: string; description: string }[];
+  achievements: { id?: number; title: string; description: string; date_achieved: string }[];
+  highlight_videos: { id?: number; title: string; video_url: string; description: string }[];
 }
 
 // ────────────── Styled primitives ──────────────
@@ -88,6 +100,9 @@ const sectionTitle = {
   marginBottom: 14,
   letterSpacing: "0.3px",
 };
+
+import { useAppDispatch } from "@/redux/hooks";
+import { updateUserAvatar } from "@/redux/features/auth/authSlice";
 
 const card = {
   background: "#11163C",
@@ -166,7 +181,18 @@ function SkillSlider({
 }
 
 export default function ProfileEdit({ profile, onCancel }: Props) {
-  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const dispatch = useAppDispatch();
+  const [updateProfile] = useUpdateProfileMutation();
+  const [addPlayingHistory] = useAddPlayingHistoryMutation();
+  const [updatePlayingHistory] = useUpdatePlayingHistoryMutation();
+  const [deletePlayingHistory] = useDeletePlayingHistoryMutation();
+  const [addAchievement] = useAddAchievementMutation();
+  const [updateAchievement] = useUpdateAchievementMutation();
+  const [deleteAchievement] = useDeleteAchievementMutation();
+  const [addHighlightVideo] = useAddHighlightVideoMutation();
+  const [updateHighlightVideo] = useUpdateHighlightVideoMutation();
+  const [deleteHighlightVideo] = useDeleteHighlightVideoMutation();
+  const [isSaving, setIsSaving] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [coverPreview, setCoverPreview] = useState<string>(
@@ -244,6 +270,7 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
       skill_technical: profile.skills?.technical || 50,
       playing_history:
         profile.playing_history?.map((h: any) => ({
+          id: h.id,
           club_name: h.club_name || "",
           position: h.position || "",
           start_year: String(h.start_year || ""),
@@ -252,12 +279,14 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
         })) || [],
       achievements:
         profile.achievements?.map((a: any) => ({
+          id: a.id,
           title: a.title || "",
           description: a.description || "",
           date_achieved: a.date_achieved || "",
         })) || [],
       highlight_videos:
         profile.highlight_videos?.map((v: any) => ({
+          id: v.id,
           title: v.title || "",
           video_url: v.video_url || "",
           description: v.description || "",
@@ -280,6 +309,7 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
   };
 
   const onSubmit = async (data: FormValues) => {
+    setIsSaving(true);
     const formData = new FormData();
     if (coverFile) formData.append("cover_image", coverFile);
     if (avatarFile) formData.append("profile_image", avatarFile);
@@ -327,18 +357,66 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
     formData.append("skill_physical", String(data.skill_physical));
     formData.append("skill_technical", String(data.skill_technical));
 
-    // Arrays as JSON string (backend may need adjustment)
-    formData.append("playing_history", JSON.stringify(data.playing_history));
-    formData.append("achievements", JSON.stringify(data.achievements));
-    formData.append("highlight_videos", JSON.stringify(data.highlight_videos));
-
     try {
-      await updateProfile(formData).unwrap();
+      let updatedProfileRes: any = null;
+      if (Array.from(formData.keys()).length > 0) {
+        updatedProfileRes = await updateProfile(formData).unwrap();
+        
+        // Sync Redux Auth State with the newly uploaded image (if any)
+        if (updatedProfileRes && updatedProfileRes.profile_image) {
+          dispatch(updateUserAvatar(updatedProfileRes.profile_image));
+        }
+      }
       
+      const promises = [];
+
+      // Playing History
+      const prevHistIds = new Set<number>((profile.playing_history || []).map((i: any) => i.id).filter(Boolean));
+      const currHistIds = new Set<number>(data.playing_history.filter(i => i.id).map(i => i.id as number));
+      for (const id of Array.from(prevHistIds)) {
+        if (!currHistIds.has(id)) {
+          promises.push(deletePlayingHistory(id));
+        }
+      }
+      for (const item of data.playing_history) {
+        const { id, ...rest } = item;
+        if (id) promises.push(updatePlayingHistory({ id, data: rest }));
+        else promises.push(addPlayingHistory(rest));
+      }
+
+      // Achievements
+      const prevAchIds = new Set<number>((profile.achievements || []).map((i: any) => i.id).filter(Boolean));
+      const currAchIds = new Set<number>(data.achievements.filter(i => i.id).map(i => i.id as number));
+      for (const id of Array.from(prevAchIds)) {
+        if (!currAchIds.has(id)) promises.push(deleteAchievement(id));
+      }
+      for (const item of data.achievements) {
+        const { id, ...rest } = item;
+        if (id) promises.push(updateAchievement({ id, data: rest }));
+        else promises.push(addAchievement(rest));
+      }
+
+      // Highlight Videos
+      const prevVidIds = new Set<number>((profile.highlight_videos || []).map((i: any) => i.id).filter(Boolean));
+      const currVidIds = new Set<number>(data.highlight_videos.filter(i => i.id).map(i => i.id as number));
+      for (const id of Array.from(prevVidIds)) {
+        if (!currVidIds.has(id)) promises.push(deleteHighlightVideo(id));
+      }
+      for (const item of data.highlight_videos) {
+        const { id, ...rest } = item;
+        if (id) promises.push(updateHighlightVideo({ id, data: rest }));
+        else promises.push(addHighlightVideo(rest));
+      }
+
+      await Promise.all(promises);
+
       onCancel();
       toast.success("Profile updated successfully");
     } catch (err) {
       console.error("Update failed", err);
+      toast.error("Failed to update profile pieces");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1031,8 +1109,8 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
               <button type="button" className="btn-cancel" onClick={onCancel}>
                 Cancel
               </button>
-              <button type="submit" className="btn-save" disabled={isLoading}>
-                {isLoading ? "Saving..." : "💾 Save Changes"}
+              <button type="submit" className="btn-save" disabled={isSaving}>
+                {isSaving ? "Saving..." : "💾 Save Changes"}
               </button>
             </div>
           </div>
