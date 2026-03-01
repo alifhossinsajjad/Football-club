@@ -1,6 +1,7 @@
 "use client";
 
-import { useChangePasswordMutation, useDeleteAccountMutation, useDownloadDataMutation, useGetAllSettingsQuery, useUpdateAccountSettingsMutation, useUpdateNotificationSettingsMutation, useUpdatePrivacySettingsMutation } from "@/redux/features/setting/settingApi";
+
+import { useChangePasswordMutation, useDeleteAccountMutation, useDownloadDataMutation, useGetAllSettingsQuery, useUpdateAccountSettingsMutation, useUpdateNotificationSettingsMutation, useUpdatePrivacySettingsMutation } from "@/redux/features/player/setting/settingApi";
 import { AccountSettings, NotificationSettings, PrivacySettings } from "@/types/setting";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";

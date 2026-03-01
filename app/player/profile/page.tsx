@@ -2,7 +2,7 @@
 
 import ProfileEdit from "@/components/player/ProfileEdit";
 import ProfileView from "@/components/player/ProfileView";
-import { useGetMyProfileQuery } from "@/redux/features/playerProfileAndEdit/profileAndEditApi";
+import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 import { useState } from "react";
 
 export default function ProfilePage() {
