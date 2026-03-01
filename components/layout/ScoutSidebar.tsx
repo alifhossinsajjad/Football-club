@@ -4,12 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   X,
   LogOut,
-
-
   Menu,
-
   LucideIcon,
-
   ChevronDown,
   Calendar,
   LayoutDashboard,
@@ -72,21 +68,21 @@ const ScoutSideBar: React.FC = () => {
       href: "/scout/playerDiscovery",
     },
     { icon: Building2, label: "Club Directory", href: "/scout/clubDirectory" },
-      {
+    {
       icon: Calendar,
       label: "Events",
       href: "/scout/events",
     },
-      {
+    {
       icon: Calendar,
       label: "Scout Directory",
       href: "/scout/scoutDirectory",
     },
     { icon: MessageSquareCheck, label: "Messaging", href: "/scout/messaging" },
-  
+
     { icon: Settings, label: " Settings", href: "/scout/scoutSettings" },
   ];
-  
+
   // ✅ stable key for groups even without href
   const groupKey = (item: MenuItem, index: number) =>
     item.href ?? `group-${index}`;
@@ -146,7 +142,7 @@ const ScoutSideBar: React.FC = () => {
       {/* Mobile Menu Toggle */}
       <button
         onClick={handleToggle}
-         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg"
         style={{
           backgroundColor: theme.colors.backgroundCard,
         }}
