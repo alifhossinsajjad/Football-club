@@ -1,7 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
-import { AccountSettings, AllSettings, ChangePasswordPayload, NotificationSettings, PrivacySettings } from "@/types/setting";
-
-
+import { AccountSettings, AllSettings, ChangePasswordPayload, DownloadDataResponse, NotificationSettings, PrivacySettings } from "@/types/setting";
 
 
 // ─── API ──────────────────────────────────────────────────────────────────────
@@ -54,18 +52,16 @@ export const settingApi = baseApi.injectEndpoints({
     }),
 
     // POST change password
-    changePassword: builder.mutation<{ message: string }, ChangePasswordPayload>(
-      {
-        query: (body) => ({
-          url: "/players/settings/change_password/",
-          method: "POST",
-          body,
-        }),
-      }
-    ),
+    changePassword: builder.mutation<{ message: string }, ChangePasswordPayload>({
+      query: (body) => ({
+        url: "/players/settings/change_password/",
+        method: "POST",
+        body,
+      }),
+    }),
 
-    // POST download data
-    downloadData: builder.mutation<{ download_url: string }, void>({
+    // POST download data — returns full profile JSON
+    downloadData: builder.mutation<DownloadDataResponse, void>({
       query: () => ({
         url: "/players/settings/download_data/",
         method: "POST",
