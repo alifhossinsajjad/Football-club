@@ -7,9 +7,7 @@ export interface AuthState {
   refreshToken: string | null;
 }
 
-// ─── Fix: Rehydrate from localStorage on page refresh ───────────
-// Redux state resets on every refresh. Without this,
-// accessToken becomes null → no auth header → 404 from backend.
+
 const getInitialState = (): AuthState => {
   if (typeof window === "undefined") {
     // SSR — no localStorage available

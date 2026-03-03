@@ -1,6 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
 
-// types/scout/clubTypes.ts
 
 export interface Club {
   id: number;
@@ -24,12 +23,12 @@ export interface ClubListResponse {
 export const clubDirectoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllClubs: builder.query<ClubListResponse, void>({
-      query: () => ({
-        url: "/scout-agent/club-directory/",
-        method: "GET",
-      }),
+      query: () => "/scout-agent/club-directory/",
+    }),
+    getClub: builder.query<Club, number>({
+      query: (id) => `/scout-agent/club-directory/${id}/`,
     }),
   }),
 });
 
-export const { useGetAllClubsQuery } = clubDirectoryApi;
+export const { useGetAllClubsQuery, useGetClubQuery } = clubDirectoryApi;
