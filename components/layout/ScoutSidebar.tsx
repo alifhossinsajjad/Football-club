@@ -67,7 +67,7 @@ const ScoutSideBar: React.FC = () => {
       label: "Player Discovery",
       href: "/scout/playerDiscovery",
     },
-    { icon: Building2, label: "Club Directory", href: "/scout/clubDirectory" },
+    { icon: Building2, label: "Club Directory", href: "/scout/club-directory" },
     {
       icon: Calendar,
       label: "Events",
