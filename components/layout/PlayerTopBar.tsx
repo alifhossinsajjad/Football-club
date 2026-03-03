@@ -110,6 +110,15 @@ const PlayerTopBar: React.FC = () => {
                 </div>
 
                 <Link
+                  href="/player"
+                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={() => setProfileDropdownOpen(false)}
+                >
+                  <UserIcon className="mr-3 h-4 w-4 text-gray-500" />
+                  Dashboard
+                </Link>
+
+                <Link
                   href="/player/profile"
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   onClick={() => setProfileDropdownOpen(false)}

@@ -53,7 +53,25 @@ const LoginPage = () => {
       );
 
       toast.success("Login successful");
-      router.push("/");
+      
+      // Role-based redirection
+      switch (response.user.role) {
+        case "ADMIN":
+          router.push("/admin");
+          break;
+        case "PLAYER":
+          router.push("/player");
+          break;
+        case "SCOUT_AGENT":
+          router.push("/scout");
+          break;
+        case "CLUB_ACADEMY":
+          router.push("/club");
+          break;
+        default:
+          router.push("/");
+          break;
+      }
     } catch (error: unknown) {
       console.error("Login failed:", error);
       toast.error("Invalid credentials. Please try again.");
