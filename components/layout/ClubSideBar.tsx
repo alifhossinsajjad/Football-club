@@ -136,9 +136,9 @@ const ScoutSideBar: React.FC = () => {
   return (
     <>
       {/* Mobile Menu Toggle */}
-      <button
+       <button
         onClick={handleToggle}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg "
         style={{
           backgroundColor: theme.colors.backgroundCard,
         }}
@@ -146,9 +146,9 @@ const ScoutSideBar: React.FC = () => {
         type="button"
       >
         {isOpen ? (
-          <X size={24} className="text-gray-900" />
+          <X size={24} className="text-white font-bold cursor-pointer" />
         ) : (
-          <Menu size={24} className="text-gray-900" />
+          <Menu size={24} className="text-white font-bold cursor-pointer" />
         )}
       </button>
 
