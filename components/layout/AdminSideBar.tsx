@@ -84,29 +84,27 @@ const ScoutSideBar: React.FC = () => {
       label: "Subscription Tracking",
       href: "/admin/subscriptionTracking",
     },
-  
+
     {
       icon: CircleDollarSign,
       label: "Monetization",
       href: "/admin/monetization",
     },
     {
-      icon:  ChartNoAxesCombined,
+      icon: ChartNoAxesCombined,
       label: "Analytics",
       href: "/admin/analytics",
     },
     {
-      icon:  Newspaper,
+      icon: Newspaper,
       label: "News Management",
       href: "/admin/newsManagement",
     },
     {
-      icon:  TrendingUp,
+      icon: TrendingUp,
       label: "Profile Boosting",
       href: "/admin/profileBoosting",
     },
-    
-  
 
     { icon: Settings, label: " Settings", href: "/admin/adminSettings" },
   ];
@@ -170,7 +168,7 @@ const ScoutSideBar: React.FC = () => {
       {/* Mobile Menu Toggle */}
       <button
         onClick={handleToggle}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg "
         style={{
           backgroundColor: theme.colors.backgroundCard,
         }}
@@ -178,9 +176,9 @@ const ScoutSideBar: React.FC = () => {
         type="button"
       >
         {isOpen ? (
-          <X size={24} className="text-gray-900" />
+          <X size={24} className="text-white font-bold cursor-pointer" />
         ) : (
-          <Menu size={24} className="text-gray-900" />
+          <Menu size={24} className="text-white font-bold cursor-pointer" />
         )}
       </button>
 

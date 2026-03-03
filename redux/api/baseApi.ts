@@ -24,6 +24,15 @@ export const baseApi = createApi({
     },
   }),
 
-  tagTypes: ["Profile", "Settings","Dashboard","Discovery"],
+    tagTypes: [
+    "Profile",
+    "Settings",
+    "Dashboard",
+    "Discovery",
+    "Events",
+    "Registrations",
+    "Clubs",
+    "ScoutProfile",
+  ],
   endpoints: () => ({}),
 });

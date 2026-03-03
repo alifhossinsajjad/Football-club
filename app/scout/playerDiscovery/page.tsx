@@ -10,102 +10,7 @@ import {
   PlayerDiscoveryFilters,
 } from "@/types/scout/playerDicoverType";
 
-// ─── Fallback data ────────────────────────────────────────────────────────────
 
-const FALLBACK_PLAYERS: DiscoveryPlayer[] = [
-  {
-    id: 1,
-    first_name: "John",
-    last_name: "Doe",
-    designation: "Midfielder",
-    nationality: "Spain",
-    age: 19,
-    preferred_foot: "RIGHT",
-    height: "1.80",
-    weight: "75",
-    current_club: "Real Madrid Academy",
-    availability_status: "AVAILABLE",
-    highlight_video_available: true,
-    profile_image: "",
-  },
-  {
-    id: 2,
-    first_name: "Sarah",
-    last_name: "Player",
-    designation: "Forward",
-    nationality: "Portugal",
-    age: 18,
-    preferred_foot: "LEFT",
-    height: "1.70",
-    weight: "62",
-    current_club: "Chelsea Academy",
-    availability_status: "AVAILABLE",
-    highlight_video_available: true,
-    profile_image: "",
-  },
-  {
-    id: 3,
-    first_name: "Mike",
-    last_name: "Johnson",
-    designation: "Defender",
-    nationality: "France",
-    age: 20,
-    preferred_foot: "RIGHT",
-    height: "1.85",
-    weight: "80",
-    current_club: "AC Milan Youth",
-    availability_status: "NOT_AVAILABLE",
-    highlight_video_available: false,
-    profile_image: "",
-  },
-  {
-    id: 4,
-    first_name: "Emma",
-    last_name: "Garcia",
-    designation: "Goalkeeper",
-    nationality: "Spain",
-    age: 17,
-    preferred_foot: "RIGHT",
-    height: "1.75",
-    weight: "68",
-    current_club: "São Paulo FC",
-    availability_status: "AVAILABLE",
-    highlight_video_available: true,
-    profile_image: "",
-  },
-  {
-    id: 5,
-    first_name: "Carlos",
-    last_name: "Silva",
-    designation: "Midfielder",
-    nationality: "Portugal",
-    age: 19,
-    preferred_foot: "LEFT",
-    height: "1.78",
-    weight: "73",
-    current_club: "Al Ahly SC",
-    availability_status: "AVAILABLE",
-    highlight_video_available: true,
-    profile_image: "",
-  },
-  {
-    id: 6,
-    first_name: "Anna",
-    last_name: "Müller",
-    designation: "Forward",
-    nationality: "Germany",
-    age: 18,
-    preferred_foot: "RIGHT",
-    height: "1.68",
-    weight: "60",
-    current_club: "PSG Academy",
-    availability_status: "NOT_AVAILABLE",
-    highlight_video_available: false,
-    profile_image: "",
-  },
-];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const FLAG: Record<string, string> = {
   Spain: "🇪🇸",
@@ -696,10 +601,10 @@ const PlayerDetailModal = ({
             )}
 
             {/* Send Message CTA */}
-            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-[#0a1218] font-bold text-sm transition-colors">
+            {/* <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-[#0a1218] font-bold text-sm transition-colors">
               <MessageIcon />
               Send Message
-            </button>
+            </button> */}
           </div>
         )}
       </div>
@@ -764,7 +669,7 @@ const PlayerDiscoveryPage = () => {
     useGetDiscoveryPlayersQuery(activeFilters);
 
   const players: DiscoveryPlayer[] =
-    data?.results && data.results.length > 0 ? data.results : FALLBACK_PLAYERS;
+    data?.results && data.results.length > 0 ? data.results : [];
 
   const hasMore = !!data?.next;
   const loading = isLoading || isFetching;

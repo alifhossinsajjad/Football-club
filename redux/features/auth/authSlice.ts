@@ -7,15 +7,25 @@ export interface AuthState {
   refreshToken: string | null;
 }
 
-const initialState: AuthState = {
-  user: null,
-  accessToken: null,
-  refreshToken: null,
+// ─── Fix: Rehydrate from localStorage on page refresh ───────────
+// Redux state resets on every refresh. Without this,
+// accessToken becomes null → no auth header → 404 from backend.
+const getInitialState = (): AuthState => {
+  if (typeof window === "undefined") {
+    // SSR — no localStorage available
+    return { user: null, accessToken: null, refreshToken: null };
+  }
+
+  return {
+    user: null, // user object is not persisted (too large / sensitive)
+    accessToken: localStorage.getItem("accessToken") ?? null,
+    refreshToken: localStorage.getItem("refreshToken") ?? null,
+  };
 };
 
 const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState: getInitialState,
   reducers: {
     setCredentials: (
       state,
@@ -29,7 +39,6 @@ const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
 
-      // optional: store in localStorage
       localStorage.setItem("accessToken", action.payload.accessToken);
       localStorage.setItem("refreshToken", action.payload.refreshToken);
     },
