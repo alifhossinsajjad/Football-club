@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { logout } from "@/redux/features/auth/authSlice";
 import toast from "react-hot-toast";
 
-const ScoutTopBar: React.FC = () => {
+const ClubTopBar: React.FC = () => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
@@ -110,7 +110,16 @@ const ScoutTopBar: React.FC = () => {
                 </div>
 
                 <Link
-                  href="/scout/scoutProfile"
+                  href="/club"
+                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={() => setProfileDropdownOpen(false)}
+                >
+                  <UserIcon className="mr-3 h-4 w-4 text-gray-500" />
+                  Dashboard
+                </Link>
+
+                <Link
+                  href="/club/clubSettings"
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   onClick={() => setProfileDropdownOpen(false)}
                 >
@@ -136,4 +145,4 @@ const ScoutTopBar: React.FC = () => {
   );
 };
 
-export default ScoutTopBar;
+export default ClubTopBar;
