@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { Star, MessageCircle } from "lucide-react";
-// or move getFlag to a shared utils
 import { DiscoveryPlayer } from "@/types/scout/playerDicoverType";
 import { Avatar } from "./Avatar";
 import { getFlag } from "@/app/scout/playerDiscovery/page";
+import {
+  useAddToShortlistMutation,
+  useRemoveFromShortlistMutation,
+} from "@/redux/features/scout/playerDiscoverApi";
+import { toast } from "react-hot-toast";
 
 interface PlayerCardProps {
   player: DiscoveryPlayer;
@@ -11,7 +15,34 @@ interface PlayerCardProps {
 }
 
 export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
-  const [starred, setStarred] = useState(false);
+  // Local UI state
+  const [starred, setStarred] = useState(player.is_shortlisted ?? false);
+  const [shortlistId, setShortlistId] = useState<number | undefined>(player.shortlist_id);
+
+  const [addToShortlist] = useAddToShortlistMutation();
+  const [removeFromShortlist] = useRemoveFromShortlistMutation();
+
+const handleStarClick = async () => {
+  const wasStarred = starred; 
+  setStarred(!wasStarred); 
+
+  try {
+    if (wasStarred && shortlistId) {
+      await removeFromShortlist(shortlistId).unwrap();
+      setShortlistId(undefined);
+      toast.success("Removed from shortlist!");
+    } else if (!wasStarred) {
+      const res = await addToShortlist({ player: player.id }).unwrap();
+      setShortlistId(res.id);
+      toast.success("Added to shortlist!");
+    }
+  } catch (err: any) {
+    console.error("Shortlist error:", err);
+    const errorDetail = err?.data?.detail || err?.error || "Something went wrong!";
+    toast.error(errorDetail);
+    setStarred(wasStarred); 
+  }
+};
 
   return (
     <div className="bg-[#12143A] border border-[#2DD4BF]/30 rounded-xl p-4 transition-all duration-200 hover:shadow-[0_0_20px_rgba(45,212,191,0.06)] flex flex-col">
@@ -27,16 +58,18 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => setStarred(!starred)}
-          className="flex-shrink-0 hover:scale-110 transition-transform"
-        >
-          <Star
-            size={15}
-            fill={starred ? "#2DD4BF" : "none"}
-            stroke={starred ? "#2DD4BF" : "#4A6480"}
-          />
-        </button>
+     <button
+  onClick={handleStarClick}
+  className={`flex-shrink-0 transition-transform p-1 rounded ${
+    starred ? "bg-[#2DD4BF]/20" : "bg-transparent"
+  } hover:scale-110`}
+>
+  <Star
+    size={15}
+    fill={starred ? "#2DD4BF" : "none"}
+    stroke={starred ? "#2DD4BF" : "#4A6480"}
+  />
+</button>
       </div>
 
       <div className="space-y-2 flex-1">
@@ -54,7 +87,9 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
           <span className="text-[11px] text-[#4A6480]">Highlight Video:</span>
           <span
             className={`text-[11px] font-medium ${
-              player.highlight_video_available ? "text-[#2DD4BF]" : "text-[#4A6480]"
+              player.highlight_video_available
+                ? "text-[#2DD4BF]"
+                : "text-[#4A6480]"
             }`}
           >
             {player.highlight_video_available ? "Available" : "Not available"}
@@ -71,7 +106,7 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
       <div className="flex items-center gap-2 mt-4">
         <button
           onClick={onViewProfile}
-          className="flex-1 py-2 rounded-lg bg-[#2DD4BF] text-white text-xs font-semibold  transition-all duration-200"
+          className="flex-1 py-2 rounded-lg bg-[#2DD4BF] text-white text-xs font-semibold transition-all duration-200"
         >
           View Profile
         </button>

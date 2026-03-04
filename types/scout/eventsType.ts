@@ -27,6 +27,7 @@ export interface Event {
   capacity_filled_percentage: number;
   is_full: boolean;
   location: string;  // ← Fix #2: was missing
+  country:string
 }
 
 export interface EventListResponse {

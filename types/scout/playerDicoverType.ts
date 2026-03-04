@@ -1,4 +1,4 @@
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 export interface DiscoveryPlayer {
   id: number;
@@ -14,7 +14,9 @@ export interface DiscoveryPlayer {
   current_club: string;
   availability_status: "AVAILABLE" | "NOT_AVAILABLE" | "UNKNOWN";
   highlight_video_available: boolean;
-  rating?: number; // out of 100, may not be in API
+  rating?: number;
+  is_shortlisted?: boolean;
+  shortlist_id?: number; // ADD THIS
 }
 
 export interface PlayerDiscoveryListResponse {
@@ -31,4 +33,7 @@ export interface PlayerDiscoveryFilters {
   age_max?: number;
   search?: string;
   page?: number;
+
 }
+
+
