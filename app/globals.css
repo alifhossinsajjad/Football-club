@@ -162,3 +162,8 @@
 .animate-shake {
   animation: shake 0.5s ease-in-out;
 }
+
+
+.input {
+  @apply w-full bg-[#0F172A] border border-[#1C2B40] rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-teal-400;
+}
