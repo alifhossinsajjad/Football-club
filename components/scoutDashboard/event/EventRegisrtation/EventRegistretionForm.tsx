@@ -7,7 +7,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { MapPin } from "lucide-react";
+import { MapPin, Calendar, ArrowRight, ArrowLeft, Check } from "lucide-react";
 
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
@@ -21,7 +21,7 @@ type FormValues = {
   phone_number: string;
   agency_name: string;
   event: number;
-  city: string
+  city: string;
 };
 
 type EventRegistrationFormProps = {
@@ -54,7 +54,8 @@ export default function EventRegistrationForm({
 
   const next = async () => {
     let fields: (keyof FormValues)[] = [];
-    if (step === 0) fields = ["first_name", "last_name", "email", "phone_number"];
+    if (step === 0)
+      fields = ["first_name", "last_name", "email", "phone_number"];
     if (step === 1) fields = ["agency_name"];
 
     const valid = await methods.trigger(fields);
@@ -85,31 +86,39 @@ export default function EventRegistrationForm({
 
       {/* Header Card */}
       <div
-        className="flex items-center justify-between p-6 rounded-lg"
+        className="flex items-center justify-between p-8 rounded-2xl mb-8 relative overflow-hidden"
         style={{
-          background: `linear-gradient(90deg, ${theme.colors.primaryCyan}33, ${theme.colors.primaryMagenta}33)`,
-          borderTop: `1.25px solid ${theme.colors.primaryCyan}4D`,
+          background: "linear-gradient(98.3deg, rgba(0, 229, 255, 0.1) 0%, rgba(176, 38, 255, 0.1) 100%)",
+          border: "1px solid rgba(255, 255, 255, 0.05)",
         }}
       >
-        <div>
-          <h1 className="text-3xl font-bold text-white">Event Registration</h1>
-          <h1 className="pt-2 text-white">{event.event_name}</h1>
-          <p className="flex text-white items-center gap-2 mt-2">
-            <span>{event.event_date}</span>
-            <MapPin className="w-5 h-5" />
-            {event.city}
-          </p>
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold text-white mb-4">Event Registration</h1>
+          <h2 className="text-xl font-semibold text-white/90 mb-3">{event.event_name}</h2>
+          <div className="flex flex-wrap items-center gap-6 text-white/60">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#00E5FF]" />
+              <span className="text-sm">{event.event_date}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-[#00E5FF]" />
+              <span className="text-sm">{event.city}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="text-right">
-          <p className="text-gray-400 text-sm">Registration Fee</p>
-          <p className="text-4xl font-bold" style={{ color: theme.colors.primaryCyan }}>
-            {event.registration_fee}
+        <div className="text-right relative z-10">
+          <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Registration Fee</p>
+          <p className="text-4xl font-black text-[#00E5FF]">
+            {event.registration_fee.toUpperCase() === "FREE" ? "FREE" : event.registration_fee}
           </p>
         </div>
+        
+        {/* Subtle decorative glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#00E5FF]/5 blur-[100px] -mr-32 -mt-32" />
       </div>
 
-      <div className="bg-[#0B1220] rounded-2xl border border-[#1C2B40] p-6 w-full my-8">
+      <div className="bg-[#050B14] border border-white/5 rounded-3xl p-8 w-full shadow-2xl">
         <Stepper steps={steps} currentStep={step} />
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -117,12 +126,12 @@ export default function EventRegistrationForm({
             {step === 1 && <StepTwo />}
             {step === 2 && <StepReview />}
 
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between mt-10 pt-6 border-t border-white/5">
               {step > 0 && (
                 <button
                   type="button"
                   onClick={prev}
-                  className="px-4 py-2 border border-[#1C2B40] rounded-lg text-gray-400"
+                  className="px-8 py-3 rounded-xl text-white font-medium bg-white/5 hover:bg-white/10 transition-all flex items-center gap-2"
                 >
                   Back
                 </button>
@@ -132,18 +141,20 @@ export default function EventRegistrationForm({
                 <button
                   type="button"
                   onClick={next}
-                  className="ml-auto px-6 py-2 bg-teal-400 text-black font-semibold rounded-lg"
+                  className="ml-auto px-8 py-3 bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black font-bold rounded-xl transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(0,229,255,0.2)]"
                 >
-                  Continue
+                  Next Step
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               )}
 
               {step === 2 && (
                 <button
                   type="submit"
-                  className="ml-auto px-6 py-2 bg-teal-400 text-black font-semibold rounded-lg"
+                  className="ml-auto px-8 py-3 bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black font-bold rounded-xl transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(0,229,255,0.2)]"
                 >
                   Confirm Registration
+                  <Check className="w-4 h-4" />
                 </button>
               )}
             </div>
