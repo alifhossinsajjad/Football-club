@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import gsap from "gsap";
 import Link from "next/link";
 import { logout } from "@/redux/features/auth/authSlice";
+import { UserRole } from "@/types/auth";
 
 const navLinks = [
   { name: "Home", href: "#" },
@@ -24,6 +25,21 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const navRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const getDashboardHref = (role?: UserRole) => {
+    switch (role) {
+      case "ADMIN":
+        return "/admin";
+      case "PLAYER":
+        return "/player";
+      case "SCOUT_AGENT":
+        return "/scout";
+      case "CLUB_ACADEMY":
+        return "/club";
+      default:
+        return "/";
+    }
+  };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -118,7 +134,7 @@ const Navbar = () => {
                   }`}
                 >
                   <Link
-                    href="/dashboard"
+                    href={getDashboardHref(auth.user?.role)}
                     onClick={() => setUserMenuOpen(false)}
                     className="block px-4 py-2 text-sm text-gray-200 hover:bg-white/5"
                   >
@@ -188,8 +204,9 @@ const Navbar = () => {
                       {auth.user.first_name} {auth.user.last_name}
                     </button>
                     <Link
-                      href="/dashboard"
+                      href={getDashboardHref(auth.user?.role)}
                       className="w-full px-4 py-3 rounded-md bg-white/5 text-center text-sm text-gray-200"
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Dashboard
                     </Link>
