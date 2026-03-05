@@ -28,6 +28,10 @@ export interface Event {
   is_full: boolean;
   location: string;  // ← Fix #2: was missing
   country:string
+  title?: string;  
+  fee?:string   
+city :string
+
 }
 
 export interface EventListResponse {
@@ -35,6 +39,7 @@ export interface EventListResponse {
   next: string | null;
   previous: string | null;
   results: Event[];
+
 }
 
 export interface ClubDetails {
@@ -99,3 +104,5 @@ export interface RegisterForEventResponse {
   scout: number;
   event: number;
 }
+
+

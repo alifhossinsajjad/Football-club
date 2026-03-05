@@ -187,7 +187,7 @@ const Page = () => {
               {/* Buttons */}
               <div className="flex gap-3">
                 <Link
-                  href="/scout/eventRegister"
+                   href={`/scout/eventRegister?eventId=${event.id}`}
                   className="flex-1 bg-[#04B5A3] hover:bg-[#2DD4BF] text-white text-sm font-semibold py-2.5 rounded-lg text-center transition-colors"
                 >
                   Register Now
