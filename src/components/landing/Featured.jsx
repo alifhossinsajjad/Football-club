@@ -1,7 +1,14 @@
 "use client"
 
+<<<<<<< HEAD
 import { Lock } from 'lucide-react';
 import { useSelector } from 'react-redux';
+=======
+import { Lock } from "lucide-react";
+import { useSelector } from "react-redux";
+import SectionTitel from "./ReUseable/SectionTitle";
+import HomeButton from "../ui/HomeButton";
+>>>>>>> 699ac9eb32942f2d41fe3de5c376fcc4a5c188ec
 
 const players = [
   {
@@ -45,6 +52,7 @@ const theme = useSelector(state => state.theme);
   return (
     <section className="py-20 px-4 ">
       <div className="container mx-auto">
+<<<<<<< HEAD
         {/* Header */}
         <div className="text-center mb-12">
           <h2  className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
@@ -61,6 +69,12 @@ const theme = useSelector(state => state.theme);
             Browse top football talent and explore detailed player profiles.
           </p>
         </div>
+=======
+        <SectionTitel
+          title="FEATURED PLAYERS"
+          subtitle="Browse top football talent and explore detailed player profiles."
+        />
+>>>>>>> 699ac9eb32942f2d41fe3de5c376fcc4a5c188ec
 
         {/* Players Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -96,13 +110,24 @@ const theme = useSelector(state => state.theme);
           ))}
         </div>
 
+<<<<<<< HEAD
         {/* View All Button */}
         <div className="text-center">
           <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-muted-foreground/50 text-foreground text-sm font-medium hover:border-cyan-400 hover:text-cyan-400 transition-colors duration-300">
             View All Players
             <Lock className="w-4 h-4" />
           </button>
+=======
+        <div className="flex justify-center mt-10">
+          <HomeButton
+            text={`View All Clubs`}
+            icon={<Lock size={18} />}
+            variant="outline"
+            theme={theme}
+          />
+>>>>>>> 699ac9eb32942f2d41fe3de5c376fcc4a5c188ec
         </div>
+      
       </div>
     </section>
   );

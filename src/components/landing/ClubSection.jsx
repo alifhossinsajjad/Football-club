@@ -1,8 +1,15 @@
 'use client'
 
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { useSelector } from 'react-redux';
+=======
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
+import { useSelector } from "react-redux";
+import HomeButton from "../ui/HomeButton";
+>>>>>>> 699ac9eb32942f2d41fe3de5c376fcc4a5c188ec
 
 const clubs = [
   { name: 'Arsenal', league: 'EPL', team: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
@@ -137,12 +144,22 @@ export default function ClubsSection() {
         </div>
 
         {/* View All Button */}
+<<<<<<< HEAD
         <div className="flex justify-center mt-10">
           <button className="px-8 py-2 border border-purple/50 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2"
            style={{ borderColor: theme.colors.primaryMagenta }}
           >
             View All Clubs <Lock size={14} />
           </button>
+=======
+        <div className="flex justify-center mt-12">
+          <HomeButton
+            text={`View All ${activeTab === "clubs" ? "Clubs" : "Academies"}`}
+            icon={<Lock size={18} />}
+            variant="outline"
+            theme={theme}
+          />
+>>>>>>> 699ac9eb32942f2d41fe3de5c376fcc4a5c188ec
         </div>
       </div>
     </section>

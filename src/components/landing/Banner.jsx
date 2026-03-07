@@ -79,6 +79,7 @@ const Banner = () => {
                     LEVEL UP YOUR PLAY
                 </h1>
 
+<<<<<<< HEAD
                 {/* Text */}
                 <p
                     ref={textRef}
@@ -110,6 +111,32 @@ const Banner = () => {
             </div>
         </section>
     );
+=======
+        {/* Buttons */}
+        <div
+          ref={btnRef}
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
+        >
+          <Link
+            href="/auth/login"
+            className="px-6 py-2 text-black rounded-full text-lg sm:text-xl font-semibold  hover:scale-105"
+            style={{ backgroundColor: theme.colors.primaryCyan }}
+          >
+            Join Now
+          </Link>
+
+          <Link
+            href="/auth/login"
+            className="px-6 py-2 border-2 text-white rounded-full text-lg sm:text-xl font-semibold hover:bg-purple-500 hover:scale-105"
+            style={{ borderColor: theme.colors.primaryMagenta }}
+          >
+            Join Now
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+>>>>>>> 699ac9eb32942f2d41fe3de5c376fcc4a5c188ec
 };
 
 export default Banner;
