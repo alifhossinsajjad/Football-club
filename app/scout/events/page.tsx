@@ -2,6 +2,7 @@
 
 import EventFilters from "@/components/scoutDashboard/event/EventFilterSelect";
 import { useGetAllEventsQuery } from "@/redux/features/scout/eventsApi";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useMemo, useEffect } from "react";
 import { SlLocationPin } from "react-icons/sl";
@@ -16,25 +17,22 @@ const Page = () => {
 
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-
   const filters = useMemo(() => {
     const params: any = { page };
     if (eventType) params.event_type = eventType;
-    if (date) params.event_date = date; 
+    if (date) params.event_date = date;
     if (debouncedSearch) params.search = debouncedSearch;
-  
+
     return params;
   }, [eventType, date, debouncedSearch, page]);
 
   const { data, isLoading, error } = useGetAllEventsQuery(filters);
 
-  
   const eventTypes = useMemo(() => {
     if (!data?.results) return [];
     const types = new Set(data.results.map((e) => e.event_type));
     return Array.from(types);
   }, [data]);
-
 
   const countries = [
     "Spain",
@@ -46,7 +44,6 @@ const Page = () => {
     "Italy",
   ];
 
-
   const handleReset = () => {
     setCountry("");
     setEventType("");
@@ -54,7 +51,6 @@ const Page = () => {
     setSearch("");
     setPage(1);
   };
-
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -107,17 +103,32 @@ const Page = () => {
             className="bg-[#12143A] rounded-xl border border-[#00E5FF]/20 overflow-hidden hover:border-[#00E5FF]/40 transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,229,255,0.1)]"
           >
             {/* Top bar with tags */}
-            <div className="relative h-32 bg-gradient-to-br from-[#1a1f4f] to-[#0f1238] border-b border-[#00E5FF]/20">
+            {/* Event Image Banner */}
+            <div className="relative h-44 w-full">
+              <Image
+                src="/images/event-card.jpg"
+                alt="event card image"
+                fill
+                className="object-cover"
+              />
+
+              {/* Gradient overlay for readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#12143A] via-transparent to-transparent" />
+
+              {/* Tags */}
               <div className="absolute top-3 left-3 flex gap-2">
-                <span className="bg-[#09d2ff] text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg">
+                <span className="bg-[#1DA1F2] text-white text-xs font-semibold px-3 py-1 rounded-md">
                   {event.event_type}
                 </span>
-                {event.is_featured && (
-                  <span className="bg-[#0b142d] text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#2DD4BF]/30 shadow-lg">
+              </div>
+
+              {event.is_featured && (
+                <div className="absolute top-3 right-3">
+                  <span className="bg-[#2DD4BF] text-[#0f1238] text-xs font-semibold px-3 py-1 rounded-md">
                     Featured
                   </span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="p-5">
@@ -127,7 +138,12 @@ const Page = () => {
 
               {/* Club & location */}
               <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-white flex-shrink-0" />
+                <Image
+                  src={"/images/club-logo.png"}
+                  alt="club logo"
+                  width={50}
+                  height={50}
+                />
                 <div>
                   <p className="text-white font-medium">{event.venue_name}</p>
                   <p className="text-gray-400 text-sm flex items-center gap-1 mt-0.5">
@@ -187,7 +203,7 @@ const Page = () => {
               {/* Buttons */}
               <div className="flex gap-3">
                 <Link
-                   href={`/scout/eventRegister?eventId=${event.id}`}
+                  href={`/scout/eventRegister?eventId=${event.id}`}
                   className="flex-1 bg-[#04B5A3] hover:bg-[#2DD4BF] text-white text-sm font-semibold py-2.5 rounded-lg text-center transition-colors"
                 >
                   Register Now
