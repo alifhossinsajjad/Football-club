@@ -2,12 +2,12 @@ import AdminSideBar from "@/components/layout/AdminSideBar";
 import AdminTopBar from "@/components/layout/AdminTopBar";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import React from "react";
-
+import { poppins } from "../font";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <ProtectedRoute allowedRole="ADMIN">
-      <div className="min-h-screen bg-gray-50 font-['Inter']">
+      <div className={`min-h-screen bg-gray-50 ${poppins.className} `}>
         <AdminSideBar />
         <div className="lg:ml-58.75 min-h-screen flex flex-col">
           <AdminTopBar />
