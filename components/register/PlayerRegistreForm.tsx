@@ -6,9 +6,12 @@ import StepIndicator from "../reuseable/StepIndicator";
 import DarkInput from "../reuseable/DarkInput";
 import DarkSelect from "../reuseable/DarkSelect";
 import { useRegisterPlayerMutation } from "@/redux/features/auth/playerRegistraionApi";
-import toast from "react-hot-toast";
+import Swal from "sweetalert2";
+import { showRegistrationError } from "@/lib/registrationErrors";
 import { PlayerRegisterPayload } from "@/types/player";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 interface FormData {
   email: string;
@@ -38,6 +41,7 @@ interface FormData {
 
 const RegisterPage = () => {
   const [step, setStep] = useState(1);
+  const router = useRouter();
 
   const {
     register,
@@ -165,33 +169,24 @@ const RegisterPage = () => {
     console.log("Payload being sent:", payload);
 
     try {
-      const result = await registerPlayer(payload).unwrap();
-      console.log("Server response:", result);
+      await registerPlayer(payload).unwrap();
 
-      toast.success(
-        "Registration successful! Please check your email for verification."
-      );
+      await Swal.fire({
+        title: "Registration Successful",
+        text: "Please check your email for verification. Redirecting to dashboard...",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0ea5e9",
+      });
 
-      // Reset form and step after successful registration
       reset();
       setStep(1);
+      router.push("/player");
     } catch (error: unknown) {
       console.error("Registration failed:", error);
-
-      type ErrorResponse = {
-        data?: {
-          detail?: string;
-          message?: string;
-        };
-      };
-
-      const err = error as ErrorResponse;
-
-      const message =
-        err.data?.detail ||
-        err.data?.message ||
-        "Registration failed. Please try again.";
-      toast.error(message);
+      await showRegistrationError(error, {
+        onGoToLogin: () => router.push("/login"),
+      });
     }
   };
 
@@ -489,7 +484,7 @@ const RegisterPage = () => {
           )}
         </form>
           <div className="flex justify-center items-center mt-3 bg-red-500 p-4 rounded-xl">
-                <Link href="/register" className="text-blue-400 hover:underline">
+                <Link href="/register" className="text-white hover:underline">
                   Back to Register
                 </Link>
               </div>

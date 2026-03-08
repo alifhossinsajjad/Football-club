@@ -9,7 +9,6 @@ import {
   ChevronDown,
   Calendar,
   LayoutDashboard,
-  MessageSquareCheck,
   Settings,
   User,
   Building2,

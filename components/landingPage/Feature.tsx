@@ -1,9 +1,7 @@
-"use client"
+"use client";
 
-import { Lock } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { useAppSelector } from "@/redux/hooks";
 import { Lock } from "lucide-react";
+import { useAppSelector } from "@/redux/hooks";
 
 const players = [
   {
@@ -40,37 +38,19 @@ const players = [
   }
 ];
 
-const FeaturedPlayers = () => {
-
-
-const theme = useSelector(state => state.theme);
 const Feature = () => {
   const theme = useAppSelector((state) => state.theme);
+  const gradient = `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`;
+
   return (
     <section className="py-20 px-4 bg-[#07142b] text-white">
       <div className="container mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2  className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
-                        style={{
-                            backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                            color: "transparent",
-                        }}>
-            FEATURED PLAYERS
-          </h2>
-          <p className="text-muted-foreground text-sm md:text-base">
-            Browse top football talent and explore detailed player profiles.
-          </p>
-        </div>
-        {/* Header */}
-        <div className="text-center mb-12">
           <h2
             className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
             style={{
-              backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
+              backgroundImage: gradient,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -96,7 +76,7 @@ const Feature = () => {
                 <h3
                   className="font-display text-lg font-semibold mb-2"
                   style={{
-                    backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
+                    backgroundImage: gradient,
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -125,12 +105,6 @@ const Feature = () => {
           ))}
         </div>
 
-        {/* View All Button */}
-        <div className="text-center">
-          <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-muted-foreground/50 text-foreground text-sm font-medium hover:border-cyan-400 hover:text-cyan-400 transition-colors duration-300">
-            View All Players
-            <Lock className="w-4 h-4" />
-          </button>
         {/* View All Button */}
         <div className="text-center">
           <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full border text-white text-sm font-medium border-cyan-400 text-cyan-400 transition-colors duration-300">

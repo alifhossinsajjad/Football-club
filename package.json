@@ -21,6 +21,8 @@
     "next": "16.0.8",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "react-hot-toast": "^2.6.0",
+    "sweetalert2": "^11.15.0",
     "react-hook-form": "^7.71.2",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
@@ -29,6 +31,9 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "25.3.5",
+    "@types/react": "19.2.14",
     "autoprefixer": "10.4.19",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
