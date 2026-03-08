@@ -2,11 +2,11 @@ import React from "react";
 import ClubSidebar from "@/components/layout/ClubSideBar";
 import ClubTopBar from "@/components/layout/ClubTopBar";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
-
+import { poppins } from "../font";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <ProtectedRoute allowedRole="CLUB_ACADEMY">
-      <div className="min-h-screen bg-gray-50 font-['Inter']">
+      <div className={`min-h-screen bg-gray-50 ${poppins.className} `}>
       <ClubSidebar/>
         <div className="lg:ml-58.75 min-h-screen flex flex-col">
           <ClubTopBar/>
