@@ -191,7 +191,7 @@ const achievements = [
           <div className="flex-shrink-0">
             <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden shadow-xl bg-white">
               <Image
-                src={club.club_logo || "/default-club-logo.png"}
+                src={"/images/logo.png"}
                 alt={club.club_name}
                 fill
                 className="object-cover"
