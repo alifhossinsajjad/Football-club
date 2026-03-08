@@ -1,7 +1,9 @@
 "use client";
 
 import { Lock } from "lucide-react";
-import { useAppSelector } from "@/redux/hooks";
+import { useSelector } from "react-redux";
+import SectionTitel from "./ReUseable/SectionTitle";
+import HomeButton from "../ui/HomeButton";
 
 const players = [
   {
@@ -45,24 +47,10 @@ const Feature = () => {
   return (
     <section className="py-20 px-4 bg-[#07142b] text-white">
       <div className="container mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2
-            className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
-            style={{
-              backgroundImage: gradient,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
-          >
-            FEATURED PLAYERS
-          </h2>
-          <p className="text-muted-foreground text-sm md:text-base">
-            Browse top football talent and explore detailed player profiles.
-          </p>
-        </div>
+        <SectionTitel
+          title="FEATURED PLAYERS"
+          subtitle="Browse top football talent and explore detailed player profiles."
+        />
 
         {/* Players Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -105,13 +93,15 @@ const Feature = () => {
           ))}
         </div>
 
-        {/* View All Button */}
-        <div className="text-center">
-          <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full border text-white text-sm font-medium border-cyan-400 text-cyan-400 transition-colors duration-300">
-            View All Players
-            <Lock className="w-4 h-4" />
-          </button>
+        <div className="flex justify-center mt-10">
+          <HomeButton
+            text={`View All Clubs`}
+            icon={<Lock size={18} />}
+            variant="outline"
+            theme={theme}
+          />
         </div>
+      
       </div>
     </section>
   );
