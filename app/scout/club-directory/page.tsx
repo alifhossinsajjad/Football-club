@@ -15,6 +15,7 @@ const countries = ["USA", "UK", "Germany", "France", "Spain"]; // Example countr
 
 const ClubDirectoryPage = () => {
   const { data, isLoading, error } = useGetAllClubsQuery();
+  console.log(data)
 
   // Filters & search state
   const [countryFilter, setCountryFilter] = useState("");

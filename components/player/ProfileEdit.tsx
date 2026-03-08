@@ -443,14 +443,16 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
         .pe-inp:focus { border-color: #00E5FF !important; }
         .pe-inp::placeholder { color: #3A4270; }
         .pe-inp option { background: #0A0F2C; }
-        input[type=range]::-webkit-slider-runnable-track { background: linear-gradient(90deg, #B026FF, #00E5FF); border-radius: 4px; }
+        input[type=range]::-webkit-slider-runnable-track { background: #1E2554; border-radius: 4px; height: 6px; }
+        input[type=range]::-webkit-slider-thumb { background: #00E5FF; border-radius: 50%; height: 14px; width: 14px; margin-top: -4px; }
+        input[type=range] { background: linear-gradient(to right, #00E5FF 0%, #00E5FF var(--value), #1E2554 var(--value), #1E2554 100%); background-size: 100% 6px; }
         .add-btn { display: flex; align-items: center; gap: 6px; background: rgba(0,229,255,0.08); border: 1px dashed #00E5FF; color: #00E5FF; font-size: 12px; font-weight: 600; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-family: 'Barlow', sans-serif; margin-top: 12px; }
         .remove-btn { background: rgba(255,59,48,0.1); border: 1px solid rgba(255,59,48,0.3); color: #FF3B30; border-radius: 6px; padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: 'Barlow', sans-serif; font-weight: 600; }
         .dynamic-row { background: #0A0F2C; border: 1px solid #1E2554; border-radius: 10px; padding: 14px; margin-bottom: 10px; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
         .section-badge { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); color: #00E5FF; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
         .save-bar { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
-        .btn-save { background: linear-gradient(135deg, #B026FF, #00BCD4); border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 700; padding: 11px 28px; cursor: pointer; font-family: 'Barlow', sans-serif; }
+        .btn-save { background: #00E5FF; border: none; border-radius: 10px; color: #080D28; font-size: 14px; font-weight: 700; padding: 11px 28px; cursor: pointer; font-family: 'Barlow', sans-serif; }
         .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-cancel { background: #1E2554; border: none; border-radius: 10px; color: #9BA3C8; font-size: 14px; font-weight: 600; padding: 11px 24px; cursor: pointer; font-family: 'Barlow', sans-serif; }
       `}</style>
@@ -638,12 +640,12 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
                     placeholder="23"
                   />
                 </Field>
-                <Field label="Height (m)">
+                <Field label="Height (cm)">
                   <input
                     {...register("height")}
                     className="pe-inp"
                     style={inp}
-                    placeholder="1.80"
+                    placeholder="180"
                   />
                 </Field>
                 <Field label="Weight (kg)">
@@ -744,6 +746,8 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
                     placeholder="+44 ..."
                   />
                 </Field>
+              </div>
+              <div style={{ ...grid4, marginBottom: 0 }}>
                 <Field label="Instagram URL">
                   <input
                     {...register("instagram")}
@@ -752,8 +756,6 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
                     placeholder="https://instagram.com/..."
                   />
                 </Field>
-              </div>
-              <div style={{ ...grid3, marginBottom: 0 }}>
                 <Field label="Twitter / X URL">
                   <input
                     {...register("twitter")}

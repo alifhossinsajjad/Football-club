@@ -182,13 +182,15 @@ const MessagingPage = () => {
   }, [messages]);
 
   return (
-    <div className="min-h-screen bg-[#1A2049] text-white flex flex-col">
-      {/* Top Header - Messaging */}
-      <div className="p-4 border-b border-[#2A3560]/60 bg-[#1A2049]">
+    <div>
         <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
           Messaging
         </h1>
-      </div>
+      <div className="min-h-screen bg-[#1A2049] text-white flex flex-col">
+      {/* Top Header - Messaging */}
+      {/* <div className="p-4 border-b border-[#2A3560]/60 bg-[#1A2049]">
+      
+      </div> */}
 
       {/* Main Content - flex row */}
       <div className="flex flex-1 overflow-hidden">
@@ -318,6 +320,7 @@ const MessagingPage = () => {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };
