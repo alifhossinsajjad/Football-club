@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+
 import Link from "next/link";
 import { CiLocationOn } from "react-icons/ci";
 import { FaUsers } from "react-icons/fa";
@@ -9,13 +9,12 @@ import { FaMessage } from "react-icons/fa6";
 import { GoTrophy } from "react-icons/go";
 import { PiBuildingOfficeLight } from "react-icons/pi";
 import { useGetAllClubsQuery } from "@/redux/features/scout/clubDireactoryApi";
+import Image from "next/image";
 
 const countries = ["USA", "UK", "Germany", "France", "Spain"]; // Example countries, replace as needed
 
 const ClubDirectoryPage = () => {
   const { data, isLoading, error } = useGetAllClubsQuery();
-
- 
 
   // Filters & search state
   const [countryFilter, setCountryFilter] = useState("");
@@ -36,7 +35,6 @@ const ClubDirectoryPage = () => {
         return a.established_year - b.established_year;
       return 0;
     });
- 
 
   if (isLoading) return <p className="text-white">Loading...</p>;
   if (error) return <p className="text-red-500">Something went wrong</p>;
@@ -98,15 +96,15 @@ const ClubDirectoryPage = () => {
             key={club.id}
             className="bg-[#11163C] rounded-xl p-5 shadow-lg hover:scale-105 transition border border-[#04B5A3]/30 flex flex-col space-y-4"
           >
-            
             {/* Logo & Info */}
             <div className="flex items-center gap-4">
               {club.club_logo ? (
                 <Image
-                  src={club.club_logo}
+                  src={'/images/logo.png'}
                   alt={club.club_name}
                   width={60}
                   height={60}
+                  sizes="60px"
                   className="rounded-full object-cover"
                 />
               ) : (
