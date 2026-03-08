@@ -11,9 +11,9 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import Image from "next/image";
-import { FaMessage } from "react-icons/fa6";
 import { MdOutlineEmail } from "react-icons/md";
 import { IoLockClosedOutline } from "react-icons/io5";
+import { ArrowLeft } from "lucide-react";
 
 interface FormData {
   email: string;
@@ -49,11 +49,11 @@ const LoginPage = () => {
           user: response.user,
           accessToken: response.tokens.access,
           refreshToken: response.tokens.refresh,
-        })
+        }),
       );
 
       toast.success("Login successful");
-      
+
       // Role-based redirection
       switch (response.user.role) {
         case "ADMIN":
@@ -80,6 +80,11 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
+      <div className="flex items-center gap-2 absolute top-4 left-4 cursor-pointer">
+        <Link href="/" className="text-white">
+          <ArrowLeft className="text-white" size={20} />
+        </Link>
+      </div>
       <div className="bg-[#020617] max-w-md w-full">
         <div className="flex flex-col items-center mb-8">
           <Image
@@ -100,7 +105,7 @@ const LoginPage = () => {
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-1">
               <label className="flex items-center gap-1 text-sm text-gray-300 font-medium">
-                <MdOutlineEmail size={20}/>
+                <MdOutlineEmail size={20} />
                 Email Address<span className="text-red-500"> *</span>
               </label>
               <input
@@ -118,13 +123,15 @@ const LoginPage = () => {
 
             <div className="space-y-1">
               <label className="flex items-center gap-1 text-sm text-gray-300 font-medium">
-                <IoLockClosedOutline size={20}/>
+                <IoLockClosedOutline size={20} />
                 Password<span className="text-red-500"> *</span>
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  {...register("password", { required: "Password is required" })}
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
                   className="w-full bg-[#020617] border border-white/10 rounded-lg px-4 py-2.5 pr-12 text-sm text-white outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                   placeholder="••••••••"
                 />
@@ -134,12 +141,7 @@ const LoginPage = () => {
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
                 >
-                  {showPassword ? (
-                    <FaRegEye/>
-                  ) : (
-                   
-                     <FaRegEyeSlash/>
-                  )}
+                  {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
                 </button>
               </div>
               {errors.password && (
@@ -164,8 +166,11 @@ const LoginPage = () => {
               >
                 Forgot Password?
               </button> */}
-              <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-medium">
-               Back To Register 
+              <Link
+                href="/register"
+                className="text-cyan-400 hover:text-cyan-300 font-medium"
+              >
+                Back To Register
               </Link>
             </div>
 

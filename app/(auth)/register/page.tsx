@@ -8,6 +8,7 @@ import { FaUserTie } from "react-icons/fa";
 
 import gsap from "gsap";
 import { useAppSelector } from "@/redux/hooks";
+import { ArrowLeft } from "lucide-react";
 
 const RegisterPage = () => {
   const theme = useAppSelector((state) => state.theme);
@@ -43,6 +44,11 @@ const RegisterPage = () => {
       className="min-h-screen flex flex-col items-center justify-center px-4"
       style={{ backgroundColor: colors.backgroundCard }}
     >
+      <div className="flex items-center gap-2 absolute top-4 left-4 cursor-pointer">
+        <Link href="/" className="text-white">
+          <ArrowLeft className="text-white" size={20} />
+        </Link>
+      </div>
       {/* Header */}
       <div ref={headerRef} className="text-center mb-14">
         <h1

@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-
+import Swal from "sweetalert2";
+import { showRegistrationError } from "@/lib/registrationErrors";
 import DarkInput from "../reuseable/DarkInput";
 import StepIndicator from "../reuseable/StepIndicator";
 import { useRegisterClubMutation } from "@/redux/features/auth/clubRegistretaionApi";
 import { ClubRegisterPayload } from "@/types/club";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   email: string;
@@ -56,6 +57,7 @@ const splitToArray = (value: string): string[] =>
 
 const ClubRegisterForm = () => {
   const [step, setStep] = useState(1);
+  const router = useRouter();
 
   const {
     register,
@@ -189,32 +191,24 @@ const ClubRegisterForm = () => {
     };
 
     try {
-      const result = await registerClub(payload).unwrap();
-      console.log("Club registration response:", result);
+      await registerClub(payload).unwrap();
 
-      toast.success(
-        "Club registration successful! Please check your email for verification."
-      );
+      await Swal.fire({
+        title: "Registration Successful",
+        text: "Please check your email for verification. Redirecting to dashboard...",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0ea5e9",
+      });
 
       reset();
       setStep(1);
+      router.push("/club");
     } catch (error: unknown) {
       console.error("Club registration failed:", error);
-
-      type ErrorResponse = {
-        data?: {
-          detail?: string;
-          message?: string;
-        };
-      };
-
-      const err = error as ErrorResponse;
-
-      const message =
-        err.data?.detail ||
-        err.data?.message ||
-        "Club registration failed. Please try again.";
-      toast.error(message);
+      await showRegistrationError(error, {
+        onGoToLogin: () => router.push("/login"),
+      });
     }
   };
 
@@ -561,7 +555,7 @@ const ClubRegisterForm = () => {
 
 
         <div className="flex justify-center items-center mt-3 bg-red-500 p-4 rounded-xl">
-        <Link href="/register" className="text-blue-400 hover:underline">
+        <Link href="/register" className="text-white hover:underline">
           Back to Register
         </Link>
       </div>
