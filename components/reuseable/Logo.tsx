@@ -7,7 +7,7 @@ const Logo = () => {
       <Image
         src="/images/logo.png"
         alt="NextGen Pros Logo"
-        width={40}
+        width={140}
         height={40}
         priority
       />

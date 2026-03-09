@@ -20,10 +20,14 @@ export default function LatestNews() {
   return (
     <div className="  bg-[#07142b] text-white">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <SectionTitel
+        <div className="text-center mb-9">
+          <SectionTitel
+        
           title="LATEST NEWS"
           subtitle="Stay updated with training tips, nutrition advice, and gear reviews."
+          
         />
+        </div>
 
         <div className="mb-12">
           <div className="grid md:grid-cols-2 gap-8 items-stretch">

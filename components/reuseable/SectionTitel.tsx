@@ -7,7 +7,7 @@ type SectionTitleProps = {
 
 const SectionTitel = ({ title, subtitle }: SectionTitleProps) => {
   return (
-    <div className="text-center mb-10">
+    <div className="">
       <h2 className="text-6xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">{title}</h2>
 
       {subtitle && (

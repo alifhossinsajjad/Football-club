@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
+
 import { showRegistrationError } from "@/lib/registrationErrors";
 import DarkInput from "../reuseable/DarkInput";
 import StepIndicator from "../reuseable/StepIndicator";
@@ -10,6 +10,7 @@ import { useRegisterClubMutation } from "@/redux/features/auth/clubRegistretaion
 import { ClubRegisterPayload } from "@/types/club";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface FormData {
   email: string;
@@ -193,13 +194,7 @@ const ClubRegisterForm = () => {
     try {
       await registerClub(payload).unwrap();
 
-      await Swal.fire({
-        title: "Registration Successful",
-        text: "Please check your email for verification. Redirecting to dashboard...",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0ea5e9",
-      });
+      toast.success("Registration successfully");
 
       reset();
       setStep(1);
@@ -553,12 +548,11 @@ const ClubRegisterForm = () => {
           )}
         </form>
 
-
         <div className="flex justify-center items-center mt-3 bg-red-500 p-4 rounded-xl">
-        <Link href="/register" className="text-white hover:underline">
-          Back to Register
-        </Link>
-      </div>
+          <Link href="/register" className="text-white hover:underline">
+            Back to Register
+          </Link>
+        </div>
       </div>
     </div>
   );
