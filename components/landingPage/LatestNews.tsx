@@ -1,14 +1,16 @@
 "use client";
 
-import { Lock } from "lucide-react";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import SectionTitel from "./ReUseable/SectionTitle";
+
 import Image from "next/image";
-import HomeButton from "../ui/HomeButton";
+
+import SectionTitel from "@/components/reuseable/SectionTitel";
+import { useAppSelector } from "@/redux/hooks";
+import { Lock } from "lucide-react";
+import HomeButton from "../reuseable/HomeButton";
 
 export default function LatestNews() {
-  const theme = useSelector((state) => state.theme);
+  const theme = useAppSelector((state) => state.theme);
   const router = useRouter();
 
   const handleViewAllNews = () => {
@@ -16,7 +18,7 @@ export default function LatestNews() {
   };
 
   return (
-    <div className="text-white">
+    <div className="  bg-[#07142b] text-white">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <SectionTitel
           title="LATEST NEWS"
@@ -62,9 +64,11 @@ export default function LatestNews() {
             {/* IMAGE */}
             <div className="relative w-full h-48 md:h-80 lg:h-[400px] rounded-xl overflow-hidden">
               <Image
-                src="/footballPlayer.png"
+                src="/images/event-banner.jpg"
                 alt="Young football player on field"
                 fill
+                priority
+                sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -72,13 +76,14 @@ export default function LatestNews() {
         </div>
 
         <div className="flex justify-center items-center w-full">
-          <HomeButton
-            text={`View All News`}
-            icon={<Lock size={18} />}
-            variant="outline"
-            theme={theme}
-          />
+          <div className="flex justify-center mt-10">
+            <button className="px-8 py-2 border border-purple-700 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2 text-white ">
+              View All Clubs <Lock size={14} />
+            </button>
+          </div>
         </div>
+
+        
       </div>
     </div>
   );
