@@ -24,6 +24,7 @@ const buttonVariants = cva(
           "bg-[#00E5FF] text-black rounded-full font-semibold transition w-28 text-center hover:bg-[#00cce6] shadow-md",
         login:
           "px-9 py-2 text-white rounded-full font-bold border border-[#8727A2] hover:bg-[#8727A2]",
+        common: "text-white width-full font-bold bg-[#04B5A3]",
       },
 
       size: {
