@@ -41,10 +41,14 @@ export default function UpcomingEvent() {
   return (
     <div className="py-16 bg-[#07142b] text-white">
       <div className="max-w-7xl mx-auto px-4  sm:px-6 lg:px-8">
-        <SectionTitel
-          title="UPCOMING EVENTS"
-          subtitle="Stay updated on football trials, comps, tournaments, and happening near you. Discover event details, participation fees, and contact  organisers directly."
+        <div className="text-center mb-9">
+          <SectionTitel
+        
+          title="LATEST NEWS"
+          subtitle="Stay updated with training tips, nutrition advice, and gear reviews."
+          
         />
+        </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {events.map((event) => (

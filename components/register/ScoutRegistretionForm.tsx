@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
+
 import { showRegistrationError } from "@/lib/registrationErrors";
 import DarkInput from "../reuseable/DarkInput";
 import StepIndicator from "../reuseable/StepIndicator";
@@ -10,6 +10,7 @@ import { useRegisterScoutMutation } from "@/redux/features/auth/scoutRegistretio
 import { ScoutRegisterPayload } from "@/types/scout";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface FormData {
   email: string;
@@ -170,13 +171,13 @@ const ScoutRegistretionForm = () => {
     try {
       await registerScout(payload).unwrap();
 
-      await Swal.fire({
-        title: "Registration Successful",
-        text: "Please check your email for verification. Redirecting to dashboard...",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0ea5e9",
-      });
+    
+toast.success(
+  "Registration successful! Please check your email for verification.",
+  {
+    duration: 4000,
+  }
+);
 
       reset();
       setStep(1);
