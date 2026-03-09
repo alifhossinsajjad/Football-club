@@ -20,6 +20,7 @@ import { CiLock, CiUser } from "react-icons/ci";
 import { FaRegBell, FaRegBellSlash } from "react-icons/fa";
 import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
 import { GoShieldLock } from "react-icons/go";
+import SectionTitel from "@/components/reuseable/SectionTitel";
 
 // ─── Icons (emoji fallback — you can replace with lucide-react) ──────────────
 
@@ -30,21 +31,12 @@ const Trash = () => <span className="text-red-400 text-xl">🗑️</span>;
 const Globe = () => <span className="text-[#00E5FF] text-xl">🌐</span>;
 const Clock = () => <span className="text-[#00E5FF] text-xl">🕒</span>;
 const ChevronRight = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <polyline points="9 18 15 12 9 6" />
-  </svg>
+  <span className="text-[#00E5FF] text-lg font-light">→</span>
 );
 
 // ─── Reusable Components ──────────────────────────────────────────────────────
 
-// ✅ UPDATED TAB COMPONENT: icon, gradient background, bottom active underline
+// ✅ UPDATED TAB COMPONENT: Matches new Figma design (flat, side-by-side with distinct backgrounds)
 const Tab = ({
   active,
   onClick,
@@ -58,44 +50,24 @@ const Tab = ({
 }) => (
   <button
     onClick={onClick}
-    className={`
-        relative flex items-center  px-6 py-3 text-sm font-medium transition-all duration-300
-         overflow-hidden group
-        ${
-          active
-            ? "text-white shadow-lg shadow-cyan-500/20"
-            : "text-[#A0AEC0] hover:text-white"
-        }
-      `}
+  className={`
+flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all duration-300
+${
+  active
+    ? "text-white border-b-2 border-cyan-400 bg-gradient-to-r from-[#00E5FF33] to-[#9C27B033]"
+    : "text-[#8A9ABF] hover:text-white"
+}
+`}
   >
-    {/* Gradient background (only visible when active) */}
-    <span
-      className={`
-          absolute inset-0 bg-gradient-to-r from-[#00E5FF]/70  to-[#9C27B0]/70 
-          opacity-0 group-hover:opacity-10 transition-opacity duration-300
-          ${active ? "opacity-30" : ""}
-        `}
-    />
- <div className="flex items-center gap-2">
-     <span >{icon}</span>
-
-    {/* Content */}
-    <span className="relative z-10">{children}</span>
- </div>
-
-    {/* Bottom gradient underline (active state) */}
-    <span
-      className={`
-          absolute bottom-0 left-0 right-0 h-[3px] bg-[#00E5FF]
-          transform scale-x-0 transition-transform duration-300 origin-left
-          ${active ? "scale-x-100" : "group-hover:scale-x-100"}
-        `}
-    />
+    <span>{icon}</span>
+    <span>{children}</span>
   </button>
 );
 
 const SectionHeader = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-white  text-xl font-bold mb-6">{children}</h3>
+  <h3 className="text-white text-[15px] font-bold mb-4 mt-6 first:mt-0">
+    {children}
+  </h3>
 );
 
 const Row = ({
@@ -112,16 +84,16 @@ const Row = ({
   onClick?: () => void;
 }) => (
   <div
-    className={`flex items-center justify-between space-y-6 bg-[#0B0D2C] p-2 mb-2
-       transition-colors rounded-lg ${onClick ? "cursor-pointer" : ""}`}
+    className={`flex items-center justify-between bg-[#0F122B] p-5 mb-3 border border-white/5
+       transition-colors rounded-xl ${onClick ? "cursor-pointer hover:border-white/10" : ""}`}
     onClick={onClick}
   >
-    <div className="flex items-start gap-3.5 flex-1 ">
-      {icon && <div className="mt-0.5 text-xl">{icon}</div>}
+    <div className="flex items-center gap-4 flex-1">
+      {icon && <div className="text-xl flex-shrink-0">{icon}</div>}
       <div>
-        <p className="text-white text-sm font-medium">{title}</p>
+        <p className="text-white text-sm font-semibold">{title}</p>
         {description && (
-          <p className="text-xs text-[#8A9ABF] mt-0.5 leading-relaxed">
+          <p className="text-xs text-[#8A9ABF] mt-1 leading-relaxed">
             {description}
           </p>
         )}
@@ -144,14 +116,44 @@ const Toggle = ({
     aria-checked={checked}
     onClick={onChange}
     className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-      checked ? "bg-[#FFFFFF]" : "bg-[#2A3555]"
+      checked ? "bg-white" : "bg-[#1E2554]"
     }`}
   >
     <span
       className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-black shadow ring-0 transition duration-200 ease-in-out ${
-        checked ? "translate-x-5" : "translate-x-0.5"
+        checked ? "translate-x-5" : "translate-x-0"
       }`}
     />
+  </button>
+);
+
+const SquareCheckbox = ({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onChange}
+    className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+      checked
+        ? "bg-[#00E5FF] border-[#00E5FF]"
+        : "bg-transparent border-[#00E5FF]"
+    }`}
+  >
+    {checked && (
+      <svg
+        className="w-3.5 h-3.5 text-black"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={3}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    )}
   </button>
 );
 
@@ -167,7 +169,7 @@ const SaveBtn = ({
   <button
     onClick={onClick}
     disabled={loading}
-    className="w-full mt-8 py-3.5 bg-[#04B5A3]  text-white font-semibold rounded-xl transition-all  disabled:opacity-60 disabled:cursor-not-allowed"
+    className="w-full mt-4 py-4 bg-[#04B5A3] hover:bg-[#039b8b] text-white font-bold rounded-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed"
   >
     {loading ? "Saving..." : label}
   </button>
@@ -342,26 +344,30 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080D28] text-white pb-12">
+    <div className="min-h-screen text-white font-sans p-6 md:p-8">
       {/* Page Title */}
-      <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
-        Settings
+      <h1 className="text-4xl">
+        <SectionTitel title="Settings" />
       </h1>
 
-      <div className="bg-[#12143A] p-3 rounded-xl border border-[#1E2554] ">
-        {/* ✅ UPDATED TABS: icons + gradient background + bottom underline */}
-        <div className="flex flex-wrap gap-2.5 mb-6  border-b-[#1E2554] ">
+      <div className="bg-[#12143A] rounded-2xl border border-[#04B5A3]/20 overflow-hidden shadow-2xl">
+        {/* Tabs Header */}
+        <div className="flex bg-[#12143A] border-b border-[#04B5A3]/20 ">
           {[
-            { key: "Account", icon: <CiUser  size={20}/> , label: "Account" },
-            { key: "Privacy", icon: <GoShieldLock size={20}/>, label: "Privacy" },
+            { key: "Account", icon: <CiUser size={18} />, label: "Account" },
+            {
+              key: "Privacy",
+              icon: <GoShieldLock size={18} />,
+              label: "Privacy",
+            },
             {
               key: "Notifications",
-              icon: <IoNotificationsOutline size={20}/>,
+              icon: <IoNotificationsOutline size={18} />,
               label: "Notifications",
             },
             {
               key: "Preferences",
-              icon: <IoSettingsOutline size={20}/>,
+              icon: <IoSettingsOutline size={18} />,
               label: "Preferences",
             },
           ].map((tab) => (
@@ -376,332 +382,380 @@ export default function SettingsPage() {
           ))}
         </div>
 
-        {/* Main Content Card */}
-        <div className="rounded-2xl p-6 shadow-xl shadow-black/30">
+        {/* Content Area within borders */}
+        <div className="p-6">
           {activeTab === "Account" && (
-            <>
-              <SectionHeader>Account Actions</SectionHeader>
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div>
+                <SectionHeader>Account Actions</SectionHeader>
+                <Row
+                  icon={<IoSettingsOutline className="text-[#00E5FF]" />}
+                  title="Change Password"
+                  description="Update your account password"
+                  control={<ChevronRight />}
+                  onClick={() => setPwdModal(true)}
+                />
+                <Row
+                  icon={<Mail />}
+                  title="Email Preferences"
+                  description="Manage your email settings"
+                  control={<ChevronRight />}
+                />
+              </div>
 
-              <Row
-                icon={<Lock />}
-                title="Change Password"
-                description="Update your account password"
-                control={<ChevronRight />}
-                onClick={() => setPwdModal(true)}
+              <div>
+                <SectionHeader>Active Sessions</SectionHeader>
+                <Row
+                  title="Chrome on Windows"
+                  description="Madrid, Spain • Current session"
+                  control={
+                    <span className="text-[#00E5FF] text-xs">
+                      Current session
+                    </span>
+                  }
+                />
+                <Row
+                  title="Safari on iPhone"
+                  description="Barcelona, Spain"
+                  control={
+                    <button className="text-red-400 hover:text-red-300 text-[11px] font-bold tracking-wider uppercase">
+                      Revoke
+                    </button>
+                  }
+                />
+              </div>
+
+              <div>
+                <Row
+                  icon={<Trash />}
+                  title="Delete Account"
+                  description="Permanently delete your account and data"
+                  control={<span className="text-gray-500">→</span>}
+                  onClick={() => setDeleteModal(true)}
+                />
+              </div>
+
+              <SaveBtn
+                onClick={handleSaveAccount}
+                loading={savingAccount}
+                label="Save Account Settings"
               />
-
-              <Row
-                icon={<Mail />}
-                title="Email Preferences"
-                description="Manage your email settings"
-                control={<ChevronRight />}
-              />
-
-              <Row
-                icon={<Star />}
-                title="Subscription"
-                description="Manage your plan and billing"
-                control={<ChevronRight />}
-              />
-
-              <SectionHeader>Delete Account</SectionHeader>
-
-              <Row
-                icon={<Trash />}
-                title="Delete Account"
-                description="Permanently delete your account and data"
-                control={<ChevronRight />}
-                onClick={() => setDeleteModal(true)}
-              />
-
-              <SaveBtn onClick={handleSaveAccount} loading={savingAccount} />
-            </>
+            </div>
           )}
 
           {activeTab === "Privacy" && (
-            <>
-              <SectionHeader>Profile Visibility</SectionHeader>
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div>
+                <SectionHeader>Profile Visibility</SectionHeader>
 
-              <Row
-                title="Make my profile visible to clubs"
-                description="Allow clubs to view complete profile"
-                control={
-                  <Toggle
-                    checked={privacy.visible_to_clubs}
-                    onChange={() =>
-                      setPrivacy((p) => ({
-                        ...p,
-                        visible_to_clubs: !p.visible_to_clubs,
-                      }))
-                    }
-                  />
-                }
+                <Row
+                  title="Make my profile visible to clubs"
+                  description="Allow clubs to view your complete profile"
+                  control={
+                    <SquareCheckbox
+                      checked={privacy.visible_to_clubs}
+                      onChange={() =>
+                        setPrivacy((p) => ({
+                          ...p,
+                          visible_to_clubs: !p.visible_to_clubs,
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <Row
+                  title="Make my profile visible to scouts"
+                  description="Allow scouts to discover your profile"
+                  control={
+                    <SquareCheckbox
+                      checked={privacy.visible_to_scouts}
+                      onChange={() =>
+                        setPrivacy((p) => ({
+                          ...p,
+                          visible_to_scouts: !p.visible_to_scouts,
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <Row
+                  title="Show my age publicly"
+                  description="Display your age on your profile"
+                  control={
+                    <SquareCheckbox
+                      checked={privacy.show_age_publicly}
+                      onChange={() =>
+                        setPrivacy((p) => ({
+                          ...p,
+                          show_age_publicly: !p.show_age_publicly,
+                        }))
+                      }
+                    />
+                  }
+                />
+              </div>
+
+              <div>
+                <SectionHeader>Contact Privacy</SectionHeader>
+
+                <Row
+                  title="Show contact details publicly"
+                  description="Display email and phone on your profile"
+                  control={
+                    <SquareCheckbox
+                      checked={privacy.show_contact_publicly}
+                      onChange={() =>
+                        setPrivacy((p) => ({
+                          ...p,
+                          show_contact_publicly: !p.show_contact_publicly,
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <Row
+                  title="Allow direct messages"
+                  description="Receive messages from clubs and scouts"
+                  control={
+                    <SquareCheckbox
+                      checked={privacy.allow_direct_messages}
+                      onChange={() =>
+                        setPrivacy((p) => ({
+                          ...p,
+                          allow_direct_messages: !p.allow_direct_messages,
+                        }))
+                      }
+                    />
+                  }
+                />
+              </div>
+
+              <div>
+                <SectionHeader>Data & Privacy</SectionHeader>
+                <Row
+                  icon={<GoShieldLock className="text-[#00E5FF]" />}
+                  title="Download My Data"
+                  description="Export all your personal data"
+                  control={
+                    <button
+                      onClick={handleDownloadData}
+                      className="text-[#00E5FF] hover:text-[#00c9e0] text-sm font-semibold transition-colors"
+                    >
+                      Download
+                    </button>
+                  }
+                />
+              </div>
+
+              <SaveBtn
+                onClick={handleSavePrivacy}
+                loading={savingPrivacy}
+                label="Save Privacy Settings"
               />
-
-              <Row
-                title="Make my profile visible to scouts"
-                description="Allow scouts to discover your profile"
-                control={
-                  <Toggle
-                    checked={privacy.visible_to_scouts}
-                    onChange={() =>
-                      setPrivacy((p) => ({
-                        ...p,
-                        visible_to_scouts: !p.visible_to_scouts,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <Row
-                title="Show my age publicly"
-                description="Display your age on your profile"
-                control={
-                  <Toggle
-                    checked={privacy.show_age_publicly}
-                    onChange={() =>
-                      setPrivacy((p) => ({
-                        ...p,
-                        show_age_publicly: !p.show_age_publicly,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <SectionHeader>Contact Privacy</SectionHeader>
-
-              <Row
-                title="Show contact details publicly"
-                description="Display email and phone on your profile"
-                control={
-                  <Toggle
-                    checked={privacy.show_contact_publicly}
-                    onChange={() =>
-                      setPrivacy((p) => ({
-                        ...p,
-                        show_contact_publicly: !p.show_contact_publicly,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <Row
-                title="Allow direct messages"
-                description="Receive messages from clubs and scouts"
-                control={
-                  <Toggle
-                    checked={privacy.allow_direct_messages}
-                    onChange={() =>
-                      setPrivacy((p) => ({
-                        ...p,
-                        allow_direct_messages: !p.allow_direct_messages,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <SaveBtn onClick={handleSavePrivacy} loading={savingPrivacy} />
-            </>
+            </div>
           )}
 
           {activeTab === "Notifications" && (
-            <>
-              <SectionHeader>Email Notifications</SectionHeader>
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div>
+                <SectionHeader>Email Notifications</SectionHeader>
+                <Row
+                  title="New message notifications"
+                  description="Get notified when you receive new messages"
+                  control={
+                    <Toggle
+                      checked={notif.email_new_messages}
+                      onChange={() =>
+                        setNotif((n) => ({
+                          ...n,
+                          email_new_messages: !n.email_new_messages,
+                        }))
+                      }
+                    />
+                  }
+                />
+                <Row
+                  title="Event reminders"
+                  description="Receive reminders for upcoming events"
+                  control={
+                    <Toggle
+                      checked={notif.email_event_reminders}
+                      onChange={() =>
+                        setNotif((n) => ({
+                          ...n,
+                          email_event_reminders: !n.email_event_reminders,
+                        }))
+                      }
+                    />
+                  }
+                />
+                <Row
+                  title="Profile views"
+                  description="Know when clubs or scouts view your profile"
+                  control={
+                    <Toggle
+                      checked={notif.email_profile_views}
+                      onChange={() =>
+                        setNotif((n) => ({
+                          ...n,
+                          email_profile_views: !n.email_profile_views,
+                        }))
+                      }
+                    />
+                  }
+                />
+                <Row
+                  title="News & updates"
+                  description="Receive platform news and training content"
+                  control={
+                    <Toggle
+                      checked={notif.email_news_updates}
+                      onChange={() =>
+                        setNotif((n) => ({
+                          ...n,
+                          email_news_updates: !n.email_news_updates,
+                        }))
+                      }
+                    />
+                  }
+                />
+              </div>
 
-              <Row
-                title="New message notifications"
-                description="Get notified when you receive new messages"
-                control={
-                  <Toggle
-                    checked={notif.email_new_messages}
-                    onChange={() =>
-                      setNotif((n) => ({
-                        ...n,
-                        email_new_messages: !n.email_new_messages,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <Row
-                title="Event reminders"
-                description="Receive reminders for upcoming events"
-                control={
-                  <Toggle
-                    checked={notif.email_event_reminders}
-                    onChange={() =>
-                      setNotif((n) => ({
-                        ...n,
-                        email_event_reminders: !n.email_event_reminders,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <Row
-                title="Profile views"
-                description="Know when clubs or scouts view your profile"
-                control={
-                  <Toggle
-                    checked={notif.email_profile_views}
-                    onChange={() =>
-                      setNotif((n) => ({
-                        ...n,
-                        email_profile_views: !n.email_profile_views,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <Row
-                title="News & updates"
-                description="Receive platform news and training content"
-                control={
-                  <Toggle
-                    checked={notif.email_news_updates}
-                    onChange={() =>
-                      setNotif((n) => ({
-                        ...n,
-                        email_news_updates: !n.email_news_updates,
-                      }))
-                    }
-                  />
-                }
-              />
-
-              <SectionHeader>Push Notifications</SectionHeader>
-
-              <Row
-                title="Enable push notifications"
-                description="Receive real-time notifications"
-                control={
-                  <Toggle
-                    checked={notif.push_enabled}
-                    onChange={() =>
-                      setNotif((n) => ({ ...n, push_enabled: !n.push_enabled }))
-                    }
-                  />
-                }
-              />
-
-              <Row
-                title="Sound for notifications"
-                description="Play sound when notifications arrive"
-                control={
-                  <Toggle
-                    checked={notif.push_sound}
-                    onChange={() =>
-                      setNotif((n) => ({ ...n, push_sound: !n.push_sound }))
-                    }
-                  />
-                }
-              />
+              <div>
+                <SectionHeader>Push Notifications</SectionHeader>
+                <Row
+                  title="Enable push notifications"
+                  description="Receive real-time notifications"
+                  control={
+                    <Toggle
+                      checked={notif.push_enabled}
+                      onChange={() =>
+                        setNotif((n) => ({
+                          ...n,
+                          push_enabled: !n.push_enabled,
+                        }))
+                      }
+                    />
+                  }
+                />
+                <Row
+                  title="Sound for notifications"
+                  description="Play sound when notifications arrive"
+                  control={
+                    <Toggle
+                      checked={notif.push_sound}
+                      onChange={() =>
+                        setNotif((n) => ({ ...n, push_sound: !n.push_sound }))
+                      }
+                    />
+                  }
+                />
+              </div>
 
               <SaveBtn
                 onClick={handleSaveNotifications}
                 loading={savingNotif}
+                label="Save Notification Settings"
               />
-            </>
+            </div>
           )}
 
           {activeTab === "Preferences" && (
-            <>
-              <SectionHeader>Language & Region</SectionHeader>
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div>
+                <SectionHeader>Language & Region</SectionHeader>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-                <div>
-                  <label className="block text-xs text-[#6B74A8] mb-2">
-                    Language
-                  </label>
-                  <select
-                    value={account.language}
-                    onChange={(e) =>
-                      setAccount((a) => ({ ...a, language: e.target.value }))
-                    }
-                    className="w-full bg-[#0A0F2C] border border-[#1E2554] rounded-lg px-4 py-3 text-white focus:border-[#00E5FF] outline-none appearance-none"
-                  >
-                    <option>English</option>
-                    <option>Spanish</option>
-                    <option>French</option>
-                  </select>
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+                  <div className="space-y-2">
+                    <label className="text-xs text-[#8A9ABF]">Language</label>
+                    <select
+                      value={account.language}
+                      onChange={(e) =>
+                        setAccount((a) => ({ ...a, language: e.target.value }))
+                      }
+                      className="w-full bg-[#0F122B] border border-white/5 rounded-lg px-4 py-3 text-white text-sm outline-none appearance-none hover:border-white/10"
+                    >
+                      <option>English</option>
+                      <option>Spanish</option>
+                      <option>French</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-xs text-[#6B74A8] mb-2">
-                    Timezone
-                  </label>
-                  <select
-                    value={account.timezone}
-                    onChange={(e) =>
-                      setAccount((a) => ({ ...a, timezone: e.target.value }))
-                    }
-                    className="w-full bg-[#0A0F2C] border border-[#1E2554] rounded-lg px-4 py-3 text-white focus:border-[#00E5FF] outline-none appearance-none"
-                  >
-                    <option>GMT+1 (Madrid)</option>
-                    <option>UTC</option>
-                    <option>GMT+6 (Dhaka)</option>
-                  </select>
+                  <div className="space-y-2">
+                    <label className="text-xs text-[#8A9ABF]">Timezone</label>
+                    <select
+                      value={account.timezone}
+                      onChange={(e) =>
+                        setAccount((a) => ({ ...a, timezone: e.target.value }))
+                      }
+                      className="w-full bg-[#0F122B] border border-white/5 rounded-lg px-4 py-3 text-white text-sm outline-none appearance-none hover:border-white/10"
+                    >
+                      <option>GMT+1 (Madrid)</option>
+                      <option>UTC</option>
+                      <option>GMT+6 (Dhaka)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              <SectionHeader>Search Preferences</SectionHeader>
+              <div>
+                <SectionHeader>Search Preferences</SectionHeader>
 
-              <Row
-                title="Save search history"
-                description="Remember your recent searches"
-                control={
-                  <input
-                    type="checkbox"
-                    checked={account.save_search_history}
-                    onChange={() =>
-                      setAccount((a) => ({
-                        ...a,
-                        save_search_history: !a.save_search_history,
-                      }))
-                    }
-                    className="w-5 h-5 accent-[#00E5FF] rounded border-[#1E2554]"
-                  />
-                }
+                <Row
+                  title="Save search history"
+                  description="Remember your recent searches"
+                  control={
+                    <SquareCheckbox
+                      checked={account.save_search_history}
+                      onChange={() =>
+                        setAccount((a) => ({
+                          ...a,
+                          save_search_history: !a.save_search_history,
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <Row
+                  title="Show event recommendations"
+                  description="Get personalized event suggestions"
+                  control={
+                    <SquareCheckbox
+                      checked={account.show_event_recommendations}
+                      onChange={() =>
+                        setAccount((a) => ({
+                          ...a,
+                          show_event_recommendations:
+                            !a.show_event_recommendations,
+                        }))
+                      }
+                    />
+                  }
+                />
+              </div>
+
+              <SaveBtn
+                onClick={handleSaveAccount}
+                loading={savingAccount}
+                label="Save Preferences"
               />
-
-              <Row
-                title="Show event recommendations"
-                description="Get personalized event suggestions"
-                control={
-                  <input
-                    type="checkbox"
-                    checked={account.show_event_recommendations}
-                    onChange={() =>
-                      setAccount((a) => ({
-                        ...a,
-                        show_event_recommendations:
-                          !a.show_event_recommendations,
-                      }))
-                    }
-                    className="w-5 h-5 accent-[#00E5FF] rounded border-[#1E2554]"
-                  />
-                }
-              />
-
-              <SaveBtn onClick={handleSaveAccount} loading={savingAccount} />
-            </>
+            </div>
           )}
         </div>
       </div>
 
-      {/* ── Change Password Modal (your original logic kept) ────────────────────── */}
+      {/* ── Change Password Modal ────────────────────── */}
       {pwdModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0B132B] border border-[#1E2554] rounded-2xl p-7 w-full max-w-md shadow-2xl shadow-black/50">
+          <div className="bg-[#0F122B] border border-white/5 rounded-2xl p-7 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Change Password</h2>
+              <h2 className="text-[17px] font-bold text-white">
+                Change Password
+              </h2>
               <button
                 onClick={() => setPwdModal(false)}
                 className="text-[#8A9ABF] hover:text-white"
@@ -712,7 +766,7 @@ export default function SettingsPage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-sm text-[#A3BFFA] mb-1.5">
+                <label className="block text-xs text-[#8A9ABF] mb-2">
                   Current Password
                 </label>
                 <input
@@ -721,13 +775,13 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setPwdForm((f) => ({ ...f, old_password: e.target.value }))
                   }
-                  className="w-full bg-[#0A0F2C] border border-[#1E2554] rounded-lg px-4 py-3 text-white focus:border-[#00E5FF] outline-none"
+                  className="w-full bg-[#1A1D36] border border-white/5 rounded-lg px-4 py-3 text-white text-sm focus:border-[#00E5FF] outline-none placeholder-gray-500"
                   placeholder="••••••••"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-[#A3BFFA] mb-1.5">
+                <label className="block text-xs text-[#8A9ABF] mb-2">
                   New Password
                 </label>
                 <input
@@ -736,13 +790,13 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setPwdForm((f) => ({ ...f, new_password: e.target.value }))
                   }
-                  className="w-full bg-[#0A0F2C] border border-[#1E2554] rounded-lg px-4 py-3 text-white focus:border-[#00E5FF] outline-none"
+                  className="w-full bg-[#1A1D36] border border-white/5 rounded-lg px-4 py-3 text-white text-sm focus:border-[#00E5FF] outline-none placeholder-gray-500"
                   placeholder="••••••••"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-[#A3BFFA] mb-1.5">
+                <label className="block text-xs text-[#8A9ABF] mb-2">
                   Confirm New Password
                 </label>
                 <input
@@ -754,14 +808,14 @@ export default function SettingsPage() {
                       confirm_password: e.target.value,
                     }))
                   }
-                  className="w-full bg-[#0A0F2C] border border-[#1E2554] rounded-lg px-4 py-3 text-white focus:border-[#00E5FF] outline-none"
+                  className="w-full bg-[#1A1D36] border border-white/5 rounded-lg px-4 py-3 text-white text-sm focus:border-[#00E5FF] outline-none placeholder-gray-500"
                   placeholder="••••••••"
                 />
               </div>
 
-              {pwdError && <p className="text-red-400 text-sm">{pwdError}</p>}
+              {pwdError && <p className="text-red-400 text-xs">{pwdError}</p>}
               {pwdSuccess && (
-                <p className="text-[#00E5FF] text-sm">
+                <p className="text-[#00E5FF] text-xs">
                   Password updated successfully!
                 </p>
               )}
@@ -769,7 +823,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleChangePassword}
                 disabled={changingPwd}
-                className="w-full mt-4 py-3.5 bg-[#00E5FF] hover:bg-[#00D4FF] text-[#080D28] font-semibold rounded-xl transition-all disabled:opacity-60"
+                className="w-full mt-2 py-4 bg-[#00E5FF] hover:bg-[#00D4FF] text-black font-bold rounded-xl transition-all disabled:opacity-60 text-sm"
               >
                 {changingPwd ? "Updating..." : "Update Password"}
               </button>
@@ -778,29 +832,29 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Delete modal – your original logic kept */}
+      {/* Delete modal */}
       {deleteModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0B132B] border border-[#1E2554] rounded-2xl p-7 w-full max-w-md">
-            <h2 className="text-xl font-bold text-white mb-5">
+          <div className="bg-[#0F122B] border border-white/5 rounded-2xl p-7 w-full max-w-md">
+            <h2 className="text-[17px] font-bold text-white mb-2">
               Delete Account
             </h2>
-            <p className="text-red-300 mb-6">
+            <p className="text-xs text-[#8A9ABF] mb-6 leading-relaxed">
               This action cannot be undone. All your data will be permanently
               deleted.
             </p>
             <div className="flex gap-4">
               <button
                 onClick={() => setDeleteModal(false)}
-                className="flex-1 py-3 bg-[#1E2554] hover:bg-[#2A3555] rounded-xl text-white"
+                className="flex-1 py-4 bg-transparent border border-white/5 hover:bg-white/5 rounded-xl text-white text-sm font-semibold transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteAccount}
-                className="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded-xl text-white font-medium"
+                className="flex-1 py-4 bg-red-500 hover:bg-red-600 rounded-xl text-white text-sm font-bold transition-all"
               >
-                Delete Account
+                Delete
               </button>
             </div>
           </div>
