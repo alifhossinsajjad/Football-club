@@ -10,6 +10,7 @@ interface StepConfig {
 interface Props {
   step: number; // 0 to 4
   isMinor: boolean;
+  stepsOverride?: StepConfig[];
 }
 
 const StepIndicator = ({ step, isMinor }: Props) => {

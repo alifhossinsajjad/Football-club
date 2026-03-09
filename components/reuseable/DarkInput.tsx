@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 
 interface Props {
-  label: string;
+  label?: string;
   register: any;
   name: string;
   type?: string;
@@ -42,17 +42,21 @@ const DarkInput = ({
 
   return (
     <div className="space-y-2 relative">
-      <div className="flex items-center gap-2">
-        {icon && <span className="text-gray-400">{icon}</span>}
-        <label className="text-sm text-gray-300 font-medium">
-          {label} <span className="text-red-500">*</span>
-        </label>
-      </div>
+      {(label || icon) && (
+        <div className="flex items-center gap-2">
+          {icon && <span className="text-gray-400">{icon}</span>}
+          {label && (
+            <label className="text-sm text-gray-300 font-medium">
+              {label} <span className="text-red-500">*</span>
+            </label>
+          )}
+        </div>
+      )}
       <div className="relative">
         <input
           {...register(name)}
           type={resolvedType}
-          placeholder={placeholder || `Enter ${label.toLowerCase()}`}
+          placeholder={placeholder || (label ? `Enter ${label.toLowerCase()}` : "")}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onChange={handleChange}

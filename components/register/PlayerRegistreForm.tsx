@@ -191,7 +191,7 @@ const PlayerRegisterForm = () => {
           <div className="flex flex-col items-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="w-24 h-24 relative mb-6">
                 <Image 
-                  src="/images/logo.png" 
+                  src="/images/banner-log.png" 
                   alt="NextGen Pros" 
                   width={96} 
                   height={96}
@@ -289,12 +289,12 @@ const PlayerRegisterForm = () => {
                   Create Account
                 </button>
 
-                <div className="relative py-4 flex items-center justify-center">
+                {/* <div className="relative py-4 flex items-center justify-center">
                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
                    <span className="relative px-4 text-gray-500 text-xs bg-[#0b1221] uppercase tracking-widest">or continue with</span>
-                </div>
+                </div> */}
 
-                <div className="grid grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-2 gap-4">
                    <button type="button" className="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/5 rounded-2xl text-white text-sm hover:bg-white/10 transition-colors">
                       <div className="w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-xs font-bold">G</div>
                       Google
@@ -303,7 +303,7 @@ const PlayerRegisterForm = () => {
                       <div className="w-5 h-5 bg-[#1877F2] rounded-full flex items-center justify-center text-xs font-bold text-white">f</div>
                       Facebook
                    </button>
-                </div>
+                </div> */}
               </div>
             )}
 
