@@ -13,12 +13,12 @@ import {
 } from "lucide-react";
 import { useGetAdminDashboardDataQuery, AdminActivity } from "@/redux/features/admin/adminDashboardApi";
 
-// ─── Skeleton Loader ───────────────────────────────────────────────────────────
+// ─── Skeleton Loader 
 const Skeleton = ({ className }: { className: string }) => (
   <div className={`animate-pulse rounded bg-[#1a2e45] ${className}`} />
 );
 
-// ─── Stat Card Component ──────────────────────────────────────────────────────
+// ─── Stat Card Component 
 const StatCard = ({
   icon: Icon,
   label,
@@ -133,7 +133,7 @@ const AdminDashboard = () => {
             <p className="text-xs font-mono text-red-400">Error Details:</p>
             <pre className="text-[10px] font-mono text-slate-500 mt-2">{JSON.stringify(error, null, 2)}</pre>
           </div>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-6 px-6 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-colors"
           >
@@ -182,16 +182,11 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Admin Dashboard</h1>
-          <p className="text-slate-400 mt-1">Platform overview and performance metrics.</p>
+          <h1 className="text-3xl font-bold tracking-tight bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
+            Dashboard overview
+          </h1>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 rounded-xl bg-white/5 text-white text-sm font-medium hover:bg-white/10 transition-colors border border-white/10">
-            Export Report
-          </button>
-          <button className="px-4 py-2 rounded-xl bg-linear-to-r from-blue-600 to-purple-600 text-white text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20">
-            Platform Settings
-          </button>
         </div>
       </div>
 
@@ -202,59 +197,22 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Activities */}
-        <div className="lg:col-span-2 bg-[#0D1B2A]/50 border border-[#162d45] rounded-2xl overflow-hidden backdrop-blur-sm">
-          <div className="p-6 border-b border-[#162d45] flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white">Recent Activities</h2>
-            <button className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">View All</button>
-          </div>
-          <div className="divide-y divide-[#162d45]">
-            {data?.recent_activity?.length ? (
-              data.recent_activity.map((activity) => (
-                <ActivityItem key={activity.id} activity={activity} />
-              ))
-            ) : (
-              <div className="p-12 text-center">
-                <p className="text-slate-400">No recent activities found.</p>
-              </div>
-            )}
-          </div>
+      {/* Recent Activities */}
+      <div className="bg-[#0D1B2A]/50 border border-[#162d45] rounded-2xl overflow-hidden backdrop-blur-sm">
+        <div className="p-6 border-b border-[#162d45] flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">Recent Activities</h2>
+          <button className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">View All</button>
         </div>
-
-        {/* Platform Health/Notifications */}
-        <div className="space-y-6">
-          <div className="bg-linear-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/20 rounded-2xl p-6 relative overflow-hidden group">
-            <div className="relative z-10">
-              <div className="p-2 w-fit rounded-lg bg-blue-500/20 text-blue-400 mb-4">
-                <ShieldCheck size={20} />
-              </div>
-              <h3 className="text-lg font-bold text-white">Platform Health</h3>
-              <p className="text-3xl font-black text-white mt-1">Excellent</p>
-              <p className="text-sm text-blue-200/60 mt-2">All systems are running smoothly.</p>
-              <button className="w-full mt-6 py-2.5 rounded-xl bg-white text-blue-900 text-sm font-bold hover:bg-blue-50 transition-colors">
-                System Status
-              </button>
+        <div className="divide-y divide-[#162d45]">
+          {data?.recent_activity?.length ? (
+            data.recent_activity.map((activity) => (
+              <ActivityItem key={activity.id} activity={activity} />
+            ))
+          ) : (
+            <div className="p-12 text-center">
+              <p className="text-slate-400">No recent activities found.</p>
             </div>
-            {/* Decorative background element */}
-            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />
-          </div>
-
-          <div className="bg-[#0D1B2A]/50 border border-[#162d45] rounded-2xl p-6">
-            <h3 className="text-lg font-bold text-white mb-4">System Components</h3>
-            <div className="space-y-4">
-              {[
-                { label: "API Server", status: "Online", color: "text-emerald-400" },
-                { label: "Database", status: "Operational", color: "text-emerald-400" },
-                { label: "Storage", status: "92% Free", color: "text-blue-400" },
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">{item.label}</span>
-                  <span className={`text-sm font-mono font-medium ${item.color}`}>{item.status}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
