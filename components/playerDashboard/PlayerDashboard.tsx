@@ -141,7 +141,7 @@ export default function PlayerDashboard() {
 
           <div className="h-2 bg-[#1E2554] rounded-full overflow-hidden mb-4">
             <div
-              className="h-full bg-gradient-to-r from-[#00E5FF] to-[#B026FF] transition-all duration-1000"
+              className="h-full bg-[#00E5FF] transition-all duration-1000"
               style={{ width: `${completeness}%` }}
             />
           </div>
