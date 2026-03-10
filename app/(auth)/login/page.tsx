@@ -44,12 +44,12 @@ const LoginPage = () => {
     try {
       const response = await login(payload).unwrap();
 
-      dispatch(
+     dispatch(
         setCredentials({
           user: response.user,
-          accessToken: response.tokens.access,
-          refreshToken: response.tokens.refresh,
-        }),
+          accessToken: response.access,
+          refreshToken: response.refresh,
+        })
       );
 
       toast.success("Login successful");

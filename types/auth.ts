@@ -31,6 +31,8 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
+  refresh: string;
+  access: string;
   message: string;
   user: User;
   tokens: AuthTokens;
