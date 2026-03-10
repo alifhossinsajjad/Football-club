@@ -5,6 +5,11 @@ import {
   UpcomingEvent,
   useGetDashboardStatsQuery,
 } from "@/redux/features/player/playerDashboard/playerDashboardApi";
+import Link from "next/link";
+import { FaEye } from "react-icons/fa";
+import { FiMessageSquare } from "react-icons/fi";
+import { IoEyeOutline } from "react-icons/io5";
+import { SlCalender } from "react-icons/sl";
 
 // ─── Fallback / Mock Data ─────────────────────────────────────────────────────
 
@@ -168,8 +173,8 @@ export default function PlayerDashboard() {
         {/* Stats Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-[#11163C] rounded-xl p-5 border border-[#1E2554] flex items-center gap-4">
-            <div className="text-[#00E5FF] text-3xl">👁️</div>
-            <div>
+            <div className="space-y-3 py-5">
+              <IoEyeOutline size={30} className="text-[#00E5FF]" />
               <p className="text-sm text-[#9BA3C8]">Profile Views</p>
               <p className="text-3xl font-bold">
                 {stats?.profile_views ?? 342}
@@ -181,8 +186,8 @@ export default function PlayerDashboard() {
           </div>
 
           <div className="bg-[#11163C] rounded-xl p-5 border border-[#1E2554] flex items-center gap-4">
-            <div className="text-[#00E5FF] text-3xl">💬</div>
-            <div>
+            <div className="space-y-3 py-5">
+              <FiMessageSquare size={30} className="text-[#00E5FF]" />
               <p className="text-sm text-[#9BA3C8]">Messages</p>
               <p className="text-3xl font-bold">
                 {stats?.messages_count ?? 12}
@@ -194,8 +199,8 @@ export default function PlayerDashboard() {
           </div>
 
           <div className="bg-[#11163C] rounded-xl p-5 border border-[#1E2554] flex items-center gap-4">
-            <div className="text-[#00E5FF] text-3xl">🗓️</div>
-            <div>
+            <div className="space-y-3 py-5">
+              <SlCalender size={30} className="text-[#00E5FF]" />
               <p className="text-sm text-[#9BA3C8]">Events Registered</p>
               <p className="text-3xl font-bold">
                 {stats?.events_registered ?? 5}
@@ -251,11 +256,13 @@ export default function PlayerDashboard() {
                 ))}
           </div>
 
-          <div className="px-6 py-4 border-t border-[#1E2554] text-center">
-            <button className="text-[#00E5FF] hover:text-[#B026FF] font-medium transition-colors">
-              View All Events
-            </button>
-          </div>
+          <Link href={"/player/eventsDirectory"}>
+            <div className="px-6 py-4 border-t border-[#1E2554] text-center border">
+              <button className="text-[#00E5FF] border border-[#00E5FF] w-full p-2 rounded-lg  hover:text-[#B026FF] font-medium transition-colors">
+                View All Events
+              </button>
+            </div>
+          </Link>
         </div>
 
         {/* Recent Messages */}
@@ -292,9 +299,12 @@ export default function PlayerDashboard() {
           </div>
 
           <div className="px-6 py-4 border-t border-[#1E2554] text-center">
-            <button className="text-[#00E5FF] hover:text-[#B026FF] font-medium transition-colors">
-              View All Messages
-            </button>
+            <Link href={"/player/messaging"}>
+              {" "}
+              <button className="text-[#00E5FF] hover:text-[#B026FF]  border border-[#00E5FF] w-full p-2 rounded-lg   font-medium transition-colors">
+                View All Messages
+              </button>
+            </Link>
           </div>
         </div>
       </div>
