@@ -44,7 +44,7 @@ const LoginPage = () => {
     try {
       const response = await login(payload).unwrap();
 
-      dispatch(
+     dispatch(
         setCredentials({
           user: response.user,
           accessToken: response.access,

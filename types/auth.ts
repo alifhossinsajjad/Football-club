@@ -32,7 +32,9 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
-  message?: string;
+  refresh: string;
+  access: string;
+  message: string;
   user: User;
   access: string;
   refresh: string;
