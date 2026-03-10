@@ -1,24 +1,17 @@
-import React from "react";
-import {
-  Eye,
-  Star,
-  CalendarDays,
-  MessageSquare,
-  ChevronRight,
-  Clock,
-} from "lucide-react";
-import SectionTitel from "../reuseable/SectionTitel";
+"use client";
 
-// You can replace these with real data coming from props / context / API
-const placeholderPlayers = [
+import React from "react";
+import { Eye, Star, CalendarDays, MessageSquare } from "lucide-react";
+
+/* ─── Fake Data ─────────────────────────────────────────────── */
+const shortlistedPlayers = [
   {
     name: "John Doe",
     position: "Midfielder",
     nationality: "Spain",
     flag: "🇪🇸",
     age: 19,
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?w=300&h=400&fit=crop",
+    image: "https://randomuser.me/api/portraits/men/32.jpg",
   },
   {
     name: "Sarah Player",
@@ -26,8 +19,7 @@ const placeholderPlayers = [
     nationality: "Portugal",
     flag: "🇵🇹",
     age: 18,
-    image:
-      "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=300&h=400&fit=crop",
+    image: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
     name: "Mike Johnson",
@@ -35,247 +27,311 @@ const placeholderPlayers = [
     nationality: "France",
     flag: "🇫🇷",
     age: 20,
-    image:
-      "https://images.unsplash.com/photo-1624880357917-835c449dd5d0?w=300&h=400&fit=crop",
+    image: "https://randomuser.me/api/portraits/men/65.jpg",
   },
 ];
 
 const upcomingEvents = [
   {
-    club: "Elite Football Academy",
     title: "Elite Youth Trial",
+    club: "Elite Football Academy",
+    location: "Madrid, Spain",
     date: "15/09/2025",
     time: "10:00 AM",
-    location: "Madrid, Spain",
-    logo: "https://via.placeholder.com/48/000000/FFFFFF?text=EFA",
+    logo: "https://ui-avatars.com/api/?name=EFA&background=1a1a3e&color=00e5ff&size=48&bold=true",
   },
   {
-    club: "FC Barcelona Youth",
     title: "Football Academy Showcase",
+    club: "FC Barcelona Youth",
+    location: "Barcelona, Spain",
     date: "20/09/2025",
     time: "2:00 PM",
-    location: "Barcelona, Spain",
-    logo: "https://via.placeholder.com/48/fc0303/FFFFFF?text=FCB",
+    logo: "https://ui-avatars.com/api/?name=FCB&background=a50044&color=fff&size=48&bold=true",
   },
   {
-    club: "Portuguese FA",
     title: "Talent Scouting Day",
+    club: "Portuguese FA",
+    location: "Lisbon, Portugal",
     date: "25/09/2025",
     time: "9:00 AM",
-    location: "Lisbon, Portugal",
-    logo: "https://via.placeholder.com/48/006600/FFFFFF?text=FPF",
+    logo: "https://ui-avatars.com/api/?name=FPF&background=006600&color=fff&size=48&bold=true",
   },
 ];
 
+const recentViews = [
+  { name: "Player 1", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/11.jpg" },
+  { name: "Player 2", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/22.jpg" },
+  { name: "Player 3", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/33.jpg" },
+  { name: "Player 4", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/44.jpg" },
+];
+
+const recentMessages = [
+  {
+    name: "John Doe",
+    preview: "Thank you for reaching out...",
+    time: "2h ago",
+    unread: true,
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+  {
+    name: "FC Barcelona Youth",
+    preview: "We have updated the event...",
+    time: "5h ago",
+    unread: true,
+    avatar: "https://ui-avatars.com/api/?name=FCB&background=a50044&color=fff&size=48&bold=true",
+  },
+  {
+    name: "Sarah Player",
+    preview: "I appreciate your interest...",
+    time: "1d ago",
+    unread: false,
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+  },
+];
+
+/* ─── Stat Card ─────────────────────────────────────────────── */
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  sub: string;
+  iconColor: string;
+  subColor: string;
+}
+
+const StatCard = ({ icon, label, value, sub, iconColor, subColor }: StatCardProps) => (
+  <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5 flex flex-col gap-1">
+    <div className={`mb-1 ${iconColor}`}>{icon}</div>
+    <p className="text-xs text-white/50 uppercase tracking-wide">{label}</p>
+    <p className="text-3xl font-bold text-white">{value}</p>
+    <p className={`text-xs font-medium ${subColor}`}>{sub}</p>
+  </div>
+);
+
+/* ─── Main Component ─────────────────────────────────────────── */
 const ScoutDashboard: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#0B0D2C] text-slate-100 font-sans pb-12">
-      {/* Welcome + Stats */}
-      <SectionTitel title="Welcome Back"  />
+    <div className="min-h-screen bg-[#0B0D2C] text-white font-sans pb-12">
 
-      <section className="px-5 sm:px-6 lg:px-8 py-6 md:py-8 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 lg:gap-6">
-        
-        {/* Players Viewed */}
-        <div className="bg-gradient-to-br from-slate-900/80 to-[#0a0f1e] border border-slate-800/60 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <Eye className="text-cyan-400" size={28} />
-            <span className="text-cyan-400 text-xs font-medium">+48 this week</span>
-          </div>
-          <p className="text-slate-400 text-xs uppercase tracking-wide font-medium">
-            Players Viewed
-          </p>
-          <p className="text-3xl md:text-4xl font-bold text-white mt-1">342</p>
-        </div>
+      {/* Welcome Heading */}
+      <div className="px-6 pt-6 pb-2">
+        <h1 className="text-2xl font-bold">
+          Welcome Back,{" "}
+          <span className="bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
+            Mike!
+          </span>
+        </h1>
+      </div>
 
-        {/* Shortlisted Players */}
-        <div className="bg-gradient-to-br from-slate-900/80 to-[#0a0f1e] border border-slate-800/60 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <Star className="text-purple-400" size={28} />
-            <span className="text-purple-400 text-xs font-medium">12 active</span>
-          </div>
-          <p className="text-slate-400 text-xs uppercase tracking-wide font-medium">
-            Shortlisted Players
-          </p>
-          <p className="text-3xl md:text-4xl font-bold text-white mt-1">28</p>
-        </div>
-
-        {/* Upcoming Events */}
-        <div className="bg-gradient-to-br from-slate-900/80 to-[#0a0f1e] border border-slate-800/60 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <CalendarDays className="text-orange-400" size={28} />
-            <span className="text-orange-400 text-xs font-medium">Next: Sep 15</span>
-          </div>
-          <p className="text-slate-400 text-xs uppercase tracking-wide font-medium">
-            Upcoming Events
-          </p>
-          <p className="text-3xl md:text-4xl font-bold text-white mt-1">6</p>
-        </div>
-
-        {/* Active Conversations */}
-        <div className="bg-gradient-to-br from-slate-900/80 to-[#0a0f1e] border border-slate-800/60 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <MessageSquare className="text-emerald-400" size={28} />
-            <span className="text-emerald-400 text-xs font-medium">5 unread</span>
-          </div>
-          <p className="text-slate-400 text-xs uppercase tracking-wide font-medium">
-            Active Conversations
-          </p>
-          <p className="text-3xl md:text-4xl font-bold text-white mt-1">15</p>
-        </div>
+      {/* ── Stats ── */}
+      <section className="px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard
+          icon={<Eye size={24} />}
+          label="Players Viewed"
+          value={342}
+          sub="+48 this week"
+          iconColor="text-[#00E5FF]"
+          subColor="text-[#00E5FF]"
+        />
+        <StatCard
+          icon={<Star size={24} />}
+          label="Shortlisted Players"
+          value={28}
+          sub="12 active"
+          iconColor="text-[#9C27B0]"
+          subColor="text-[#9C27B0]"
+        />
+        <StatCard
+          icon={<CalendarDays size={24} />}
+          label="Upcoming Events"
+          value={6}
+          sub="Next: Sep 15"
+          iconColor="text-[#00E5FF]"
+          subColor="text-[#00E5FF]"
+        />
+        <StatCard
+          icon={<MessageSquare size={24} />}
+          label="Active Conversations"
+          value={15}
+          sub="5 unread"
+          iconColor="text-[#00E5FF]"
+          subColor="text-[#00E5FF]"
+        />
       </section>
 
-      {/* Shortlisted Players */}
-      <section className="px-5 sm:px-6 lg:px-8 mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2.5">
-            <Star className="text-yellow-400" size={24} fill="currentColor" />
-            Shortlisted Players
-          </h2>
-          <button className="text-cyan-400 text-sm font-medium hover:text-cyan-300 flex items-center gap-1 transition-colors">
-            View All <ChevronRight size={16} />
-          </button>
-        </div>
+      {/* ── Shortlisted Players ── */}
+      <section className="px-6 mb-6">
+        <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <Star size={18} className="text-yellow-400" fill="currentColor" />
+              <h2 className="text-base font-bold text-white">Shortlisted Players</h2>
+            </div>
+            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-3 py-1 rounded-md hover:bg-[#00E5FF]/10 transition-colors">
+              View All
+            </button>
+          </div>
 
-        <div className="flex overflow-x-auto gap-5 pb-6 snap-x snap-mandatory scrollbar-hide">
-          {placeholderPlayers.map((player) => (
-            <div
-              key={player.name}
-              className="min-w-[240px] sm:min-w-[260px] md:min-w-[280px] bg-gradient-to-b from-slate-900/90 to-[#0a0f1e] border border-slate-800/60 rounded-2xl overflow-hidden flex-shrink-0 snap-start"
-            >
-              <div className="h-56 relative">
-                <img
-                  src={player.image}
-                  alt={player.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D2C] via-transparent to-transparent pointer-events-none" />
-                <div className="absolute top-4 left-4 bg-cyan-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wide">
-                  Top Prospect
+          {/* Player Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {shortlistedPlayers.map((player) => (
+              <div
+                key={player.name}
+                className="bg-[#0B0D2C] border border-white/[0.07] rounded-xl p-4"
+              >
+                {/* Avatar + Star */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={player.image}
+                      alt={player.name}
+                      className="w-12 h-12 rounded-full object-cover border border-white/10"
+                    />
+                    <div>
+                      <p className="font-semibold text-sm text-white">{player.name}</p>
+                      <p className="text-xs text-white/50">{player.position}</p>
+                    </div>
+                  </div>
+                  <Star size={14} className="text-yellow-400 mt-1 flex-shrink-0" fill="currentColor" />
                 </div>
-              </div>
-              <div className="p-5">
-                <h3 className="font-bold text-lg mb-1">{player.name}</h3>
-                <p className="text-slate-400 text-sm">
-                  {player.position} • {player.flag} {player.nationality} • {player.age} years
-                </p>
-                <button className="w-full mt-5 py-3 bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-black font-semibold rounded-xl transition-colors">
+
+                {/* Details */}
+                <div className="space-y-1 mb-4">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-white/45">Nationality:</span>
+                    <span className="text-white/75">
+                      {player.flag} {player.nationality}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-white/45">Age:</span>
+                    <span className="text-white/75">{player.age} years</span>
+                  </div>
+                </div>
+
+                {/* Button */}
+                <button className="w-full py-2 rounded-lg border border-[#00E5FF]/50 text-[#00E5FF] text-xs font-medium hover:bg-[#00E5FF]/10 transition-colors">
                   View Full Profile
                 </button>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Upcoming Scouting Events */}
-      <section className="px-5 sm:px-6 lg:px-8 mb-12">
-        <SectionTitel title="Upcoming Scouting Events" />
+      {/* ── Upcoming Scouting Events ── */}
+      <section className="px-6 mb-6">
+        <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
+          <h2 className="text-base font-bold text-white mb-5">
+            Upcoming Scouting Events
+          </h2>
 
-        <div className="space-y-4">
-          {upcomingEvents.map((event) => (
-            <div
-              key={event.title}
-              className="bg-gradient-to-r from-slate-900/80 to-[#0a0f1e] border border-slate-800/60 rounded-2xl p-5 flex items-center gap-5 hover:border-cyan-500/40 transition-all group"
-            >
-              <div className="flex-shrink-0">
+          <div className="space-y-3">
+            {upcomingEvents.map((event) => (
+              <div
+                key={event.title}
+                className="flex items-center gap-4 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-4"
+              >
+                {/* Logo */}
                 <img
                   src={event.logo}
                   alt={event.club}
-                  className="w-16 h-16 rounded-xl object-contain bg-black/40 p-2 border border-slate-700/50"
+                  className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
                 />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-base group-hover:text-cyan-300 transition-colors truncate">
-                  {event.title}
-                </h3>
-                <p className="text-slate-400 text-sm mt-0.5">{event.club}</p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-2">
-                  <div className="flex items-center gap-1.5">
-                    <Clock size={14} />
-                    {event.date} • {event.time}
-                  </div>
-                  <div className="hidden sm:block">•</div>
-                  <div>{event.location}</div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-white">{event.title}</p>
+                  <p className="text-xs text-white/50">{event.club}</p>
+                  <p className="text-xs text-white/40 mt-0.5">{event.location}</p>
+                </div>
+
+                {/* Date & Time */}
+                <div className="text-right flex-shrink-0">
+                  <p className="text-xs text-[#00E5FF] font-medium">{event.date}</p>
+                  <p className="text-xs text-white/45">{event.time}</p>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="mt-6 text-center">
-          <button className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1.5 mx-auto transition-colors">
-            View All Events <ChevronRight size={18} />
-          </button>
+          {/* View All Events */}
+          <div className="mt-4 text-center">
+            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
+              View All Events
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* Recent Views & Messages */}
-      <section className="px-5 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-8 lg:gap-10 pb-12">
-        {/* Recent Player Views */}
-        <div>
-          <SectionTitel title="Recent Player Views" />
+      {/* ── Recent Views + Messages ── */}
+      <section className="px-6 grid md:grid-cols-2 gap-5">
 
-          <div className="space-y-4">
-            {Array.from({ length: 4 }).map((_, i) => (
+        {/* Recent Player Views */}
+        <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
+          <h2 className="text-base font-bold text-white mb-4">Recent Player Views</h2>
+
+          <div className="space-y-3">
+            {recentViews.map((player, i) => (
               <div
                 key={i}
-                className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-4 flex items-center gap-4 hover:bg-slate-800/60 transition-colors"
+                className="flex items-center gap-3 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-3"
               >
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex-shrink-0" />
+                <img
+                  src={player.avatar}
+                  alt={player.name}
+                  className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">Player {i + 1}</p>
-                  <p className="text-slate-500 text-sm">Midfielder • Spain</p>
+                  <p className="text-sm font-medium text-white">{player.name}</p>
+                  <p className="text-xs text-white/45">
+                    {player.position} • {player.nationality}
+                  </p>
                 </div>
-                <span className="text-xs text-slate-500 whitespace-nowrap">2h ago</span>
+                <span className="text-xs text-white/40 whitespace-nowrap">{player.time}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Recent Messages */}
-        <div>
-          <SectionTitel title="Recent Messages" />
+        <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
+          <h2 className="text-base font-bold text-white mb-4">Recent Messages</h2>
 
-          <div className="space-y-4">
-            {["John Doe", "FC Barcelona Youth", "Sarah Player"].map((name, i) => (
+          <div className="space-y-3">
+            {recentMessages.map((msg, i) => (
               <div
-                key={name}
-                className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-4 flex items-center gap-4 hover:bg-slate-800/60 transition-colors"
+                key={i}
+                className="flex items-start gap-3 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-3"
               >
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
-                  {name[0]}
-                </div>
+                <img
+                  src={msg.avatar}
+                  alt={msg.name}
+                  className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{name}</p>
-                  <p className="text-slate-400 text-sm truncate">
-                    {i === 0
-                      ? "Thank you for reaching out..."
-                      : i === 1
-                      ? "We have updated the event..."
-                      : "I appreciate your interest..."}
-                  </p>
+                  <p className="text-sm font-medium text-white">{msg.name}</p>
+                  <p className="text-xs text-white/45 truncate">{msg.preview}</p>
+                  <p className="text-xs text-white/30 mt-0.5">{msg.time}</p>
                 </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-xs text-slate-500">
-                    {i === 0 ? "2h" : i === 1 ? "5h" : "1d"} ago
-                  </span>
-                  {i === 0 && (
-                    <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full mt-1.5" />
-                  )}
-                </div>
+                {msg.unread && (
+                  <span className="w-2 h-2 bg-[#9C27B0] rounded-full mt-1.5 flex-shrink-0" />
+                )}
               </div>
             ))}
           </div>
 
-          <div className="mt-6 text-center">
-            <button className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+          <div className="mt-4 text-center">
+            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
               View All Messages
             </button>
           </div>
         </div>
       </section>
 
-      <footer className="px-6 py-8 text-center text-slate-600 text-sm border-t border-slate-800/40">
+      {/* Footer */}
+      <footer className="px-6 py-8 text-center text-white/25 text-xs">
         © 2025 NextGen Pros. All rights reserved.
       </footer>
     </div>
