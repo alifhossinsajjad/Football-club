@@ -43,6 +43,14 @@ export interface AdSlotResponse {
   adSlot: AdSlot;
 }
 
+export interface AdSlotAnalyticsResponse {
+  adSlotId: string;
+  totalClicks: number;
+  totalImpressions: number;
+  clickRate: string;
+  revenue: number;
+}
+
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const adminMonetizationApi = baseApi.injectEndpoints({
@@ -71,6 +79,17 @@ export const adminMonetizationApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard"],
     }),
+    deleteAdSlot: builder.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `/admin-dashboard/ad-slots/${id}/delete/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Dashboard"],
+    }),
+    getAdSlotAnalytics: builder.query<AdSlotAnalyticsResponse, string>({
+      query: (id) => `/admin-dashboard/ad-slots/${id}/analytics/`,
+      providesTags: (result, error, id) => [{ type: "Dashboard", id }],
+    }),
   }),
 });
 
@@ -79,4 +98,6 @@ export const {
   useGetAdSlotsQuery,
   useCreateAdSlotMutation,
   useUpdateAdSlotMutation,
+  useDeleteAdSlotMutation,
+  useGetAdSlotAnalyticsQuery,
 } = adminMonetizationApi;
