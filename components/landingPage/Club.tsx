@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
-import { useAppSelector } from "@/redux/hooks";
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 
 const clubs = [
   {

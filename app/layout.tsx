@@ -31,11 +31,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body  className={`${poppins.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${poppins.variable} antialiased`} suppressHydrationWarning>
         <ReduxProviderWrapper>
           {children}
-          <Toaster position="top-right" />
+           <Toaster position="top-right" />
         </ReduxProviderWrapper>
       </body>
     </html>

@@ -112,10 +112,9 @@ const Feature = () => {
         </div>
 
         {/* View All Button */}
-        <div className="text-center">
-          <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full border text-white text-sm font-medium border-cyan-400 text-cyan-400 transition-colors duration-300">
-            View All Players
-            <Lock className="w-4 h-4" />
+          <div className="flex justify-center mt-10">
+          <button className="px-8 py-2 border border-purple-700 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2 text-white ">
+            View All Clubs <Lock size={14} />
           </button>
         </div>
       </div>

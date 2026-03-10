@@ -11,9 +11,9 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import Image from "next/image";
-import { FaMessage } from "react-icons/fa6";
 import { MdOutlineEmail } from "react-icons/md";
 import { IoLockClosedOutline } from "react-icons/io5";
+import { ArrowLeft } from "lucide-react";
 
 interface FormData {
   email: string;
@@ -80,6 +80,11 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
+      <div className="flex items-center gap-2 absolute top-4 left-4 cursor-pointer">
+        <Link href="/" className="text-white">
+          <ArrowLeft className="text-white" size={20} />
+        </Link>
+      </div>
       <div className="bg-[#020617] max-w-md w-full">
         <div className="flex flex-col items-center mb-8">
           <Image
@@ -124,7 +129,9 @@ const LoginPage = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  {...register("password", { required: "Password is required" })}
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
                   className="w-full bg-[#020617] border border-white/10 rounded-lg px-4 py-2.5 pr-12 text-sm text-white outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                   placeholder="••••••••"
                 />
