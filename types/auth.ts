@@ -20,9 +20,10 @@ export interface AuthTokens {
 }
 
 export interface PlayerRegisterResponse {
-  message: string;
+  message?: string;
   user: User;
-  tokens: AuthTokens;
+  access?: string;
+  refresh?: string;
 }
 
 export interface LoginPayload {
@@ -31,7 +32,8 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
-  message: string;
+  message?: string;
   user: User;
-  tokens: AuthTokens;
+  access: string;
+  refresh: string;
 }

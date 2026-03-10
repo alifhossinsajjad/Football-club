@@ -47,13 +47,13 @@ const LoginPage = () => {
       dispatch(
         setCredentials({
           user: response.user,
-          accessToken: response.tokens.access,
-          refreshToken: response.tokens.refresh,
+          accessToken: response.access,
+          refreshToken: response.refresh,
         })
       );
 
       toast.success("Login successful");
-      
+
       // Role-based redirection
       switch (response.user.role) {
         case "ADMIN":
@@ -100,7 +100,7 @@ const LoginPage = () => {
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-1">
               <label className="flex items-center gap-1 text-sm text-gray-300 font-medium">
-                <MdOutlineEmail size={20}/>
+                <MdOutlineEmail size={20} />
                 Email Address<span className="text-red-500"> *</span>
               </label>
               <input
@@ -118,7 +118,7 @@ const LoginPage = () => {
 
             <div className="space-y-1">
               <label className="flex items-center gap-1 text-sm text-gray-300 font-medium">
-                <IoLockClosedOutline size={20}/>
+                <IoLockClosedOutline size={20} />
                 Password<span className="text-red-500"> *</span>
               </label>
               <div className="relative">
@@ -135,10 +135,10 @@ const LoginPage = () => {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   {showPassword ? (
-                    <FaRegEye/>
+                    <FaRegEye />
                   ) : (
-                   
-                     <FaRegEyeSlash/>
+
+                    <FaRegEyeSlash />
                   )}
                 </button>
               </div>
@@ -165,18 +165,17 @@ const LoginPage = () => {
                 Forgot Password?
               </button> */}
               <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-medium">
-               Back To Register 
+                Back To Register
               </Link>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 ${
-                isLoading
+              className={`w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 ${isLoading
                   ? "bg-cyan-800 text-white opacity-70 cursor-not-allowed"
                   : "bg-cyan-500 hover:bg-cyan-400 text-white shadow-lg shadow-cyan-500/40"
-              }`}
+                }`}
             >
               <span>{isLoading ? "Signing in..." : "Sign In"}</span>
             </button>
