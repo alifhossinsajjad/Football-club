@@ -32,6 +32,8 @@ export const baseApi = createApi({
     "Clubs",
     "ScoutProfile",
     "Users",
+    "Subscription",
+    "PaymentHistory"
   ],
   endpoints: () => ({}),
 });

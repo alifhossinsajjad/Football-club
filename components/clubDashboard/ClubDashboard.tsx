@@ -11,12 +11,12 @@ import {
 
 const ClubDashboard: React.FC = () => {
   return (
-    <div className="min-h-screen  text-white p-6 md:p-8">
+    <div className="min-h-screen  text-white p-6 md:p-2">
       <div className="mx-auto space-y-8">
         {/* Welcome Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h1 className="inline-block text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#00e5ff] to-[#9C27B0] bg-clip-text text-transparent">
-            Welcome Back, FC Barcelona Youth
+            Welcome Back
           </h1>
           <div className="text-sm text-slate-400">
             {new Date().toLocaleDateString("en-GB", {

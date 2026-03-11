@@ -4,7 +4,9 @@ import {
   RecentMessage,
   UpcomingEvent,
   useGetDashboardStatsQuery,
+  useGetUpcomingEventsQuery,
 } from "@/redux/features/player/playerDashboard/playerDashboardApi";
+import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa";
 import { FiMessageSquare } from "react-icons/fi";
@@ -112,16 +114,19 @@ const Cross = () => (
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
 export default function PlayerDashboard() {
-  const { data: stats, isLoading } = useGetDashboardStatsQuery();
+  const { data: stats } = useGetDashboardStatsQuery();
+  const { data: profile } = useGetMyProfileQuery();
+  const { data: upcomingEventsData, isLoading: isEventsLoading } = useGetUpcomingEventsQuery();
 
-  const completeness = stats?.profile_completeness ?? 80;
-  const upcomingEvents = stats?.upcoming_events?.length
-    ? stats.upcoming_events
-    : FALLBACK_EVENTS;
+  const completeness = profile?.profile_completeness ?? 0;
+  const upcomingEvents = upcomingEventsData ?? [];
 
   const recentMessages = stats?.recent_messages?.length
     ? stats.recent_messages
     : FALLBACK_MESSAGES;
+
+  const profileViews = profile?.insights?.profile_views ?? stats?.profile_views ?? 0;
+  const profileViewsWeekly = profile?.insights?.profile_views_this_week ?? 0;
 
   return (
     <div className="min-h-screen bg-[#080D28] text-white p-6 font-sans">
@@ -177,10 +182,10 @@ export default function PlayerDashboard() {
               <IoEyeOutline size={30} className="text-[#00E5FF]" />
               <p className="text-sm text-[#9BA3C8]">Profile Views</p>
               <p className="text-3xl font-bold">
-                {stats?.profile_views ?? 342}
+                {profileViews}
               </p>
               <p className="text-xs text-[#00E564]">
-                +{(stats?.profile_views ?? 342) - 318} this week
+                +{profileViewsWeekly} this week
               </p>
             </div>
           </div>
@@ -217,43 +222,47 @@ export default function PlayerDashboard() {
           </div>
 
           <div className="divide-y divide-[#1E2554]">
-            {isLoading
-              ? [...Array(2)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="px-6 py-4 flex items-center gap-4 animate-pulse"
-                  >
-                    <div className="w-10 h-10 bg-[#1E2554] rounded-full" />
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-3/5 bg-[#1E2554] rounded" />
-                      <div className="h-3 w-2/5 bg-[#1E2554] rounded" />
-                    </div>
-                    <div className="text-right space-y-2">
-                      <div className="h-4 w-20 bg-[#1E2554] rounded ml-auto" />
-                      <div className="h-3 w-16 bg-[#1E2554] rounded ml-auto" />
-                    </div>
+            {isEventsLoading ? (
+              [...Array(2)].map((_, i) => (
+                <div
+                  key={i}
+                  className="px-6 py-4 flex items-center gap-4 animate-pulse"
+                >
+                  <div className="w-10 h-10 bg-[#1E2554] rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-3/5 bg-[#1E2554] rounded" />
+                    <div className="h-3 w-2/5 bg-[#1E2554] rounded" />
                   </div>
-                ))
-              : upcomingEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    className="px-6 py-4 flex items-center gap-4 hover:bg-[#0A0F2C] transition-colors"
-                  >
-                    <Avatar name={event.title} logo={event.club_logo} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{event.title}</p>
-                      <p className="text-sm text-[#9BA3C8] flex items-center gap-1.5 mt-0.5">
-                        <span>📍</span> {event.location}
-                      </p>
-                    </div>
-                    <div className="text-right text-sm">
-                      <div className="font-medium text-[#00E5FF]">
-                        {event.date}
-                      </div>
-                      <div className="text-[#9BA3C8] mt-0.5">{event.time}</div>
-                    </div>
+                </div>
+              ))
+            ) : upcomingEvents.length > 0 ? (
+              upcomingEvents.map((event: any) => (
+                <div
+                  key={event.id}
+                  className="px-6 py-4 flex items-center gap-4 hover:bg-[#0A0F2C] transition-colors"
+                >
+                  <Avatar name={event.event_name || event.title} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{event.event_name || event.title}</p>
+                    <p className="text-sm text-[#9BA3C8] flex items-center gap-1.5 mt-0.5">
+                      <span>📍</span> {event.location || event.city || "Online / TBD"}
+                    </p>
                   </div>
-                ))}
+                  <div className="text-right text-sm">
+                    <div className="font-medium text-[#00E5FF]">
+                      {event.date || event.event_date}
+                    </div>
+                    {event.time && <div className="text-[#9BA3C8] mt-0.5">{event.time}</div>}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="px-6 py-10 flex flex-col items-center justify-center text-[#9BA3C8]">
+                <SlCalender size={40} className="opacity-20 mb-4" />
+                <p className="font-medium">No upcoming events found.</p>
+                <p className="text-sm mt-1">When you register for events, they will appear here.</p>
+              </div>
+            )}
           </div>
 
           <Link href={"/player/eventsDirectory"}>
