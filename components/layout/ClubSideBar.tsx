@@ -9,7 +9,7 @@ import {
   ChevronDown,
   Calendar,
   LayoutDashboard,
-  MessageSquareCheck,
+  MessageSquare,
   Settings,
   User,
   Building2,
@@ -74,7 +74,7 @@ const ScoutSideBar: React.FC = () => {
       href: "/club/eventManagement",
     },
     
-    { icon: MessageSquareCheck, label: "Messaging", href: "/club/messaging" },
+    { icon: MessageSquare, label: "Messaging", href: "/club/messaging" },
 
     { icon: Settings, label: " Settings", href: "/club/clubSettings" },
   ];

@@ -18,7 +18,6 @@ import {
   ChevronDown,
   Calendar,
   LayoutDashboard,
-  MessageSquareCheck,
   Settings,
 } from "lucide-react";
 import Link from "next/link";
@@ -74,7 +73,7 @@ const PlayerSideBar: React.FC = () => {
       label: "Events Directory",
       href: "/player/eventsDirectory",
     },
-    { icon: MessageSquareCheck, label: "Messaging", href: "/player/messaging" },
+    { icon: MessageSquare, label: "Messaging", href: "/player/messaging" },
     { icon: CreditCard, label: "Subscriptions", href: "/player/subscription" },
     { icon: Settings, label: "Profile Settings", href: "/player/profileSetting" },
   ];

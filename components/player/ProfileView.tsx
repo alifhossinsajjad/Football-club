@@ -25,7 +25,7 @@ const SkillBar = ({ label, value }: { label: string; value: number }) => (
         style={{
           height: "100%",
           width: `${value}%`,
-          background: "linear-gradient(90deg, #B026FF, #00E5FF)",
+          background: "#00E5FF",
           borderRadius: 4,
         }}
       />
@@ -86,8 +86,39 @@ const StatCard = ({
   </div>
 );
 
+const SmallStat = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) => (
+  <div
+    style={{
+      background: "#0D1235",
+      borderRadius: 8,
+      padding: "6px 8px",
+      textAlign: "center",
+      border: "1px solid #1E2554",
+    }}
+  >
+    <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>{value}</div>
+    <div
+      style={{
+        fontSize: 10,
+        color: "#6B74A8",
+        textTransform: "uppercase",
+        letterSpacing: "0.5px",
+        fontWeight: 600,
+      }}
+    >
+      {label}
+    </div>
+  </div>
+);
+
 export default function ProfileView({ profile, onEdit }: Props) {
-    console.log("profile log dichi",profile)
+  console.log("profile log dichi", profile);
   if (!profile) return null;
 
   const fmt = (d?: string) => {
@@ -115,22 +146,15 @@ export default function ProfileView({ profile, onEdit }: Props) {
         .avatar-row { display: flex; align-items: flex-end; gap: 14px; margin-top: -44px; margin-bottom: 12px; }
         .avatar { width: 88px; height: 88px; border-radius: 50%; border: 3px solid #11163C; object-fit: cover; position: relative; z-index: 1; flex-shrink: 0; }
         .avatar-fb { width: 88px; height: 88px; border-radius: 50%; border: 3px solid #11163C; background: linear-gradient(135deg, #B026FF, #00E5FF); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; flex-shrink: 0; z-index: 1; }
-        .hero-name { font-size: 20px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; }
+        .hero-name { font-size: 20px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; background: linear-gradient(135deg, #00E5FF, #B026FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-desig { font-size: 13px; color: #8B93C4; margin-top: 2px; }
         .hero-loc { font-size: 12px; color: #6B74A8; margin-top: 3px; }
         .badge-avail { background: rgba(0,229,100,0.15); border: 1px solid #00E564; color: #00E564; border-radius: 6px; font-size: 11px; font-weight: 700; padding: 4px 10px; }
         .btn-edit { background: linear-gradient(135deg, #B026FF, #00BCD4); border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; padding: 8px 16px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap; }
-        .stats-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #1E2554; }
-        .sstat { background: #11163C; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .sstat-val { font-size: 14px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; }
-        .sstat-lbl { font-size: 10px; color: #6B74A8; text-transform: uppercase; text-align: center; }
         .career-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
-        .hist-item { position: relative; padding-left: 20px; padding-bottom: 18px; }
-        .hist-item::before { content: ''; position: absolute; left: 6px; top: 14px; bottom: -4px; width: 2px; background: #1E2554; }
-        .hist-item:last-child::before { display: none; }
-        .hist-dot { position: absolute; left: 0; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #B026FF, #00E5FF); border: 2px solid #11163C; }
+        .hist-item { padding-bottom: 18px; }
         .hist-club { font-size: 14px; font-weight: 700; }
-        .hist-period { font-size: 11px; color: #00E5FF; font-weight: 600; background: rgba(0,229,255,0.08); padding: 2px 8px; border-radius: 4px; }
+        .hist-period { font-size: 11px; color: #00E5FF; font-weight: 600; background: rgba(0,229,255,0.08); padding: 2px 8px; border-radius: 4px; margin-left: 8px; }
         .hist-pos { font-size: 12px; color: #6B74A8; margin-top: 2px; }
         .hist-ach { font-size: 11px; color: #6B74A8; margin-top: 4px; }
         .videos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -157,7 +181,7 @@ export default function ProfileView({ profile, onEdit }: Props) {
         .pref-row { margin-bottom: 10px; }
         .pref-lbl { font-size: 10px; color: #6B74A8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 3px; }
         .pref-val { font-size: 12px; color: #9BA3C8; }
-        @media(max-width:768px){ .pv-grid{grid-template-columns:1fr;} .stats-strip{grid-template-columns:repeat(4,1fr);} .career-grid{grid-template-columns:repeat(2,1fr);} }
+        @media(max-width:768px){ .pv-grid{grid-template-columns:1fr;} .career-grid{grid-template-columns:repeat(2,1fr);} }
       `}</style>
 
       <div className="pv-wrap">
@@ -209,22 +233,47 @@ export default function ProfileView({ profile, onEdit }: Props) {
                     </button>
                   </div>
                 </div>
-              </div>
-              <div className="stats-strip">
-                {[
-                  ["Age", profile.age ?? "—"],
-                  ["Height", profile.height ? `${profile.height}m` : "—"],
-                  ["Weight", profile.weight ? `${profile.weight}kg` : "—"],
-                  ["Nationality", profile.nationality || "—"],
-                  ["Pref. Foot", profile.preferred_foot || "—"],
-                  ["Date of Birth", fmt(profile.date_of_birth)],
-                  ["Jersey No.", profile.jersey_number ?? "—"],
-                ].map(([l, v]) => (
-                  <div key={l as string} className="sstat">
-                    <span className="sstat-val">{v}</span>
-                    <span className="sstat-lbl">{l}</span>
+                <div style={{ marginTop: 12 }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(4, 1fr)",
+                      gap: 8,
+                    }}
+                  >
+                    <SmallStat
+                      label="Age"
+                      value={`${profile.age || "—"} years`}
+                    />
+                    <SmallStat label="Height" value={profile.height || "—"} />
+                    <SmallStat label="Weight" value={profile.weight || "—"} />
+                    <SmallStat
+                      label="Nationality"
+                      value={profile.nationality || "—"}
+                    />
                   </div>
-                ))}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      gap: 8,
+                      marginTop: 8,
+                    }}
+                  >
+                    <SmallStat
+                      label="Preferred Foot"
+                      value={profile.preferred_foot || "—"}
+                    />
+                    <SmallStat
+                      label="Date of Birth"
+                      value={fmt(profile.date_of_birth)}
+                    />
+                    <SmallStat
+                      label="Jersey Number"
+                      value={profile.jersey_number ?? "—"}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -301,11 +350,12 @@ export default function ProfileView({ profile, onEdit }: Props) {
                   <div className="card-title">Playing History</div>
                   {profile.playing_history.map((h: any) => (
                     <div key={h.id} className="hist-item">
-                      <div className="hist-dot" />
                       <div
                         style={{
                           display: "flex",
-                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: 8,
+                          marginBottom: 4,
                         }}
                       >
                         <span className="hist-club">{h.club_name}</span>
@@ -319,6 +369,39 @@ export default function ProfileView({ profile, onEdit }: Props) {
                       )}
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Preferences */}
+            {(profile.preferred_leagues ||
+              profile.contract_status ||
+              profile.available_from) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="card-title">Preferences</div>
+                  {profile.preferred_leagues && (
+                    <div className="pref-row">
+                      <div className="pref-lbl">Preferred Leagues</div>
+                      <div className="pref-val">
+                        {profile.preferred_leagues}
+                      </div>
+                    </div>
+                  )}
+                  {profile.contract_status && (
+                    <div className="pref-row">
+                      <div className="pref-lbl">Contract Status</div>
+                      <div className="pref-val">{profile.contract_status}</div>
+                    </div>
+                  )}
+                  {profile.available_from && (
+                    <div className="pref-row">
+                      <div className="pref-lbl">Available From</div>
+                      <div className="pref-val">
+                        {fmt(profile.available_from)}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -363,7 +446,7 @@ export default function ProfileView({ profile, onEdit }: Props) {
                 <div className="card-title">Contact Information</div>
                 {profile.email && (
                   <div className="contact-item">
-                    <div className="c-icon">�</div>
+                    <div className="c-icon">📧</div>
                     <span className="c-text">{profile.email}</span>
                   </div>
                 )}
@@ -512,39 +595,6 @@ export default function ProfileView({ profile, onEdit }: Props) {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Preferences */}
-            {(profile.preferred_leagues ||
-              profile.contract_status ||
-              profile.available_from) && (
-              <div className="card">
-                <div className="card-body">
-                  <div className="card-title">Preferences</div>
-                  {profile.preferred_leagues && (
-                    <div className="pref-row">
-                      <div className="pref-lbl">Preferred Leagues</div>
-                      <div className="pref-val">
-                        {profile.preferred_leagues}
-                      </div>
-                    </div>
-                  )}
-                  {profile.contract_status && (
-                    <div className="pref-row">
-                      <div className="pref-lbl">Contract Status</div>
-                      <div className="pref-val">{profile.contract_status}</div>
-                    </div>
-                  )}
-                  {profile.available_from && (
-                    <div className="pref-row">
-                      <div className="pref-lbl">Available From</div>
-                      <div className="pref-val">
-                        {fmt(profile.available_from)}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
