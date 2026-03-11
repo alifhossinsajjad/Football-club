@@ -100,11 +100,11 @@ const ScoutSideBar: React.FC = () => {
       label: "News Management",
       href: "/admin/newsManagement",
     },
-    {
+    /* {
       icon: TrendingUp,
       label: "Profile Boosting",
       href: "/admin/profileBoosting",
-    },
+    }, */
 
     { icon: Settings, label: " Settings", href: "/admin/adminSettings" },
   ];
