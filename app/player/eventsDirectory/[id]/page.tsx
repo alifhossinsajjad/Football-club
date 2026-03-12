@@ -12,13 +12,15 @@ import {
   Mail,
   Phone,
   User,
-  CreditCard
+  CreditCard,
+  Clock
 } from "lucide-react";
 import { 
   useGetEventDetailsQuery, 
-  useCreateRegistrationMutation, 
+  useCreateRegistrationMutation,
   useCheckoutMutation, 
-  useVerifyPaymentMutation 
+  useVerifyPaymentMutation,
+  useGetRegistrationStatusQuery
 } from "../../../../redux/features/player/eventsDirectoryApi";
 import { useForm } from "react-hook-form";
 
@@ -31,8 +33,24 @@ const EventDetailsPage = () => {
 
   const [view, setView] = useState<ViewState>("DETAILS");
 
+  // Read registration_id from localStorage for this specific event
+  const [localRegistrationId] = useState<string | null>(() => {
+    try {
+      const map = JSON.parse(localStorage.getItem("playerRegistrations") || "{}");
+      return map[String(id)] || null;
+    } catch {
+      return null;
+    }
+  });
+
   const { data: event, isLoading: isDetailsLoading } = useGetEventDetailsQuery(id, {
     skip: !id,
+  });
+
+  // Fetch real-time registration status ONLY if we have a stored registration_id
+  const { data: registrationStatus } = useGetRegistrationStatusQuery(localRegistrationId!, {
+    skip: !localRegistrationId,
+    pollingInterval: 30000,
   });
 
   const handleBackToListing = () => {
@@ -74,21 +92,55 @@ const EventDetailsPage = () => {
         <ArrowLeft size={18} /> Back to Events Directory
       </button>
 
-      <EventDetailsView event={event} onRegister={handleRegister} />
+      <EventDetailsView 
+        event={event} 
+        onRegister={handleRegister} 
+        registrationStatus={registrationStatus?.data || registrationStatus}
+        isRegistered={!!localRegistrationId}
+      />
     </div>
   );
 };
 
-const EventDetailsView = ({ event, onRegister }: { event: any, onRegister: () => void }) => {
+const EventDetailsView = ({ 
+  event, 
+  onRegister, 
+  registrationStatus,
+  isRegistered = false,
+}: { 
+  event: any, 
+  onRegister: () => void,
+  registrationStatus?: any,
+  isRegistered?: boolean,
+}) => {
+  // Get the real status from the registration status API response
+  const rawStatus: string | null = 
+    registrationStatus?.registration_status || 
+    registrationStatus?.payment_status || 
+    null;
+
+  const isPending = rawStatus === "PENDING";
+  const status = rawStatus;
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-[#121433] border border-[#1E2550] rounded-[32px] p-8">
         <div className="flex justify-between items-start">
           <div>
              <h2 className="text-3xl font-bold text-white mb-2">{event.event_name}</h2>
-             <p className="text-gray-400 flex items-center gap-2">
+             <p className="text-gray-400 flex items-center gap-2 mb-4">
                <MapPin size={16} /> {event.venue_name}
              </p>
+             {isRegistered && (
+                <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border ${
+                  status === "PENDING" 
+                    ? "bg-amber-500/10 text-amber-500 border-amber-500/20" 
+                    : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                }`}>
+                  {status === "PENDING" ? <Clock size={14} /> : <Check size={14} />}
+                  Status: {status}
+                </div>
+              )}
           </div>
           <div className="text-right">
              <p className="text-xs text-gray-500 font-bold uppercase mb-1">Registration Fee</p>
@@ -204,13 +256,19 @@ const EventDetailsView = ({ event, onRegister }: { event: any, onRegister: () =>
             </div>
           </div>
 
-          {(event.registration_id || event.is_registered) ? (
-            <button 
-              disabled
-              className="w-full py-5 rounded-2xl bg-[#1E2550] text-[#8B97B5] font-black text-lg cursor-not-allowed uppercase tracking-widest shadow-inner border border-[#1E2548]"
-            >
-              Already Registered
-            </button>
+          {isRegistered ? (
+            <div className="space-y-4">
+              <button 
+                disabled
+                className="w-full py-5 rounded-2xl bg-[#0B0E1E] text-[#8B97B5] font-black text-lg cursor-not-allowed uppercase tracking-widest shadow-inner border border-[#1E2548] flex items-center justify-center gap-2"
+              >
+                {status === "PENDING" ? <Clock size={20} /> : <Check size={20} />}
+                {status === "PENDING" ? "Registration Pending" : "Already Registered"}
+              </button>
+              {status === "PENDING" && (
+                <p className="text-[10px] text-amber-500 text-center font-bold">Please complete your payment to finalize registration.</p>
+              )}
+            </div>
           ) : (
             <button 
               onClick={onRegister}
@@ -228,6 +286,7 @@ const EventDetailsView = ({ event, onRegister }: { event: any, onRegister: () =>
 const RegistrationFlow = ({ event, onBack, onComplete }: { event: any, onBack: () => void, onComplete: () => void }) => {
   const [step, setStep] = useState(1);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
 
   const [createRegistration] = useCreateRegistrationMutation();
   const [checkout] = useCheckoutMutation();
@@ -239,6 +298,7 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: any, onBack: (
     if (step === 1) {
       setStep(2);
     } else if (step === 2) {
+      setRegistrationError(null);
       try {
         const payload = {
           event_id: event.id,
@@ -254,10 +314,25 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: any, onBack: (
           allergies: data.allergies || "None",
         };
         const res = await createRegistration(payload).unwrap();
-        setRegistrationId(res?.data?.registration_id || res?.registration_id); 
+        const regId = res?.data?.registration_id || res?.registration_id;
+        setRegistrationId(regId);
+        // Store registration_id in localStorage keyed by event id
+        if (regId && event.id) {
+          try {
+            const existing = JSON.parse(localStorage.getItem("playerRegistrations") || "{}");
+            existing[String(event.id)] = regId;
+            localStorage.setItem("playerRegistrations", JSON.stringify(existing));
+          } catch {}
+        }
         setStep(3);
-      } catch (err) {
-        alert("Registration failed. Please try again.");
+      } catch (err: any) {
+        const errMsg = err?.data?.message || err?.data?.error || "Registration failed. Please try again.";
+        // Handle "Already registered" specifically
+        if (errMsg.toLowerCase().includes("already registered")) {
+          setRegistrationError("You are already registered for this event. Please check your registrations.");
+        } else {
+          setRegistrationError(errMsg);
+        }
       }
     } else if (step === 3) {
       setStep(4);
@@ -368,6 +443,25 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: any, onBack: (
 
               {step === 2 && (
                 <div className="space-y-8">
+                  {/* Error Banner for already-registered or other failures */}
+                  {registrationError && (
+                    <div className="flex items-start gap-4 p-5 bg-red-500/10 border border-red-500/30 rounded-2xl">
+                      <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-red-400 font-black text-xs">!</span>
+                      </div>
+                      <div>
+                        <p className="text-red-400 font-bold text-sm mb-1">Registration Blocked</p>
+                        <p className="text-red-300 text-xs leading-relaxed">{registrationError}</p>
+                        <button
+                          type="button"
+                          onClick={onBack}
+                          className="mt-3 text-xs text-red-400 underline hover:text-red-300 font-bold transition-colors"
+                        >
+                          ← Go back to event details
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <div className="space-y-6">
                     <h3 className="text-2xl font-bold text-white mb-8 border-b border-[#1E2550] pb-4">Emergency Contact</h3>
                     <div className="space-y-2">

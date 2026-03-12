@@ -31,7 +31,7 @@ export const clubEventManagementApi = baseApi.injectEndpoints({
     }),
     toggleFeaturedEvent: builder.mutation({
       query: (id) => ({
-        url: `/events/${id}/toggle-featured/`, 
+        url: `/club-academy/events/${id}/toggle-featured/`, 
         method: "POST",
       }),
       invalidatesTags: ["Events"],

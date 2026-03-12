@@ -63,6 +63,7 @@ type Event = {
 
 export default function EventManagementPage() {
   const { data: apiEvents, isLoading } = useGetClubEventsQuery(undefined);
+  console.log('create event data ', apiEvents)
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
   const [deleteEventApi] = useDeleteEventMutation();
@@ -81,7 +82,7 @@ export default function EventManagementPage() {
     // API might return a direct array or a paginated object with 'results'
     const sourceData = Array.isArray(apiEvents)
       ? apiEvents
-      : (apiEvents as any).results || [];
+      : (apiEvents as any).results || (apiEvents as any).data || (apiEvents as any).events || [];
 
     if (sourceData.length === 0) {
       return [];
@@ -124,8 +125,15 @@ export default function EventManagementPage() {
       };
     });
 
-    // Sorting: Newest first (highest numeric ID first)
-    return [...mapped].sort((a, b) => Number(b.id) - Number(a.id));
+    // Sorting: Try numeric ID first, fallback to date
+    return [...mapped].sort((a, b) => {
+      const idA = Number(a.id);
+      const idB = Number(b.id);
+      if (!isNaN(idA) && !isNaN(idB)) {
+        return idB - idA;
+      }
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
   }, [apiEvents]);
 
   const openView = (ev: Event) => {

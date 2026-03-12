@@ -6,9 +6,27 @@ export const subscriptionApi = baseApi.injectEndpoints({
       query: () => "/players/subscription/",
       providesTags: ["Subscription"],
     }),
-    getPaymentHistory: builder.query<any[], void>({
+    getPlans: builder.query<any, void>({
+      query: () => "/players/subscription/plans/",
+    }),
+    getPaymentHistory: builder.query<any, void>({
       query: () => "/players/subscription/payment-history/",
       providesTags: ["PaymentHistory"],
+    }),
+    createCheckout: builder.mutation<any, { plan_type: string; billing_cycle: string }>({
+      query: (data) => ({
+        url: "/players/subscription/create-checkout/",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    verifyPayment: builder.mutation<any, { session_id: string }>({
+      query: (data) => ({
+        url: "/players/subscription/verify-payment/",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Subscription", "PaymentHistory"],
     }),
     cancelSubscription: builder.mutation<any, void>({
       query: () => ({
@@ -19,8 +37,8 @@ export const subscriptionApi = baseApi.injectEndpoints({
     }),
     updatePaymentMethod: builder.mutation<any, any>({
       query: (data) => ({
-        url: "/players/subscription/update-payment/",
-        method: "POST",
+        url: "/players/subscription/payment-method/",
+        method: "PATCH",
         body: data,
       }),
       invalidatesTags: ["Subscription"],
@@ -30,7 +48,10 @@ export const subscriptionApi = baseApi.injectEndpoints({
 
 export const {
   useGetSubscriptionQuery,
+  useGetPlansQuery,
   useGetPaymentHistoryQuery,
+  useCreateCheckoutMutation,
+  useVerifyPaymentMutation,
   useCancelSubscriptionMutation,
   useUpdatePaymentMethodMutation,
 } = subscriptionApi;

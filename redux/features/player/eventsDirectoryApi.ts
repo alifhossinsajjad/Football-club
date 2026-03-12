@@ -30,6 +30,13 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    getRegistrationStatus: builder.query<any, string>({
+      query: (registrationId) => `/players/event-registration/status/${registrationId}/`,
+    }),
+    getMyRegistrations: builder.query<any[], void>({
+      query: () => `/players/event-registrations/`,
+      providesTags: ["Events"],
+    }),
   }),
 });
 
@@ -39,4 +46,6 @@ export const {
   useCreateRegistrationMutation,
   useCheckoutMutation,
   useVerifyPaymentMutation,
+  useGetRegistrationStatusQuery,
+  useGetMyRegistrationsQuery,
 } = eventsDirectoryApi;

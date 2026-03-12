@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import BoostProfileModal from "./BoostProfileModal";
 import { useGetBoostStatusQuery } from "@/redux/features/player/profileBoostingApi";
+import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 import { 
   MapPin, Edit, Zap, Mail, Phone, 
   Instagram, Twitter, Facebook, Youtube, 
