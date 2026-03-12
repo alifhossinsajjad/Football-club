@@ -19,7 +19,7 @@ import {
 
 // ── Single event card. Fetches its own status if a registrationId exists ──────
 const EventCard = ({ event, onViewDetails }: { event: any; onViewDetails: (id: any) => void }) => {
-  const [registrationId] = useState<string | null>(() => {
+  const [registration_id] = useState<string | null>(() => {
     try {
       const map = JSON.parse(localStorage.getItem("playerRegistrations") || "{}");
       return map[String(event.id)] || null;
@@ -29,8 +29,8 @@ const EventCard = ({ event, onViewDetails }: { event: any; onViewDetails: (id: a
   });
 
   // Fetch real-time status from the API only if we have a registration id
-  const { data: statusData } = useGetRegistrationStatusQuery(registrationId!, {
-    skip: !registrationId,
+  const { data: statusData } = useGetRegistrationStatusQuery(registration_id!, {
+    skip: !registration_id,
     pollingInterval: 30000, // refresh every 30 seconds
   });
 
@@ -39,7 +39,7 @@ const EventCard = ({ event, onViewDetails }: { event: any; onViewDetails: (id: a
     statusData?.registration_status ||
     null;
 
-  const isRegistered = !!registrationId;
+  const isRegistered = !!registration_id;
   const isPending = rawStatus === "PENDING";
 
   return (

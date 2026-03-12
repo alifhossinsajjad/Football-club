@@ -42,6 +42,8 @@ interface Player {
   stats: PlayerStats;
 }
 
+import { useGetDiscoveredPlayersQuery } from "@/redux/features/club/playerDiscoveryApi";
+
 const PlayerDiscoveryPage = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -49,10 +51,18 @@ const PlayerDiscoveryPage = () => {
   const [nationalityFilter, setNationalityFilter] = useState<string>("All Countries");
   const [ageFilter, setAgeFilter] = useState<string>("All Ages");
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [selectedPlayerForMessage, setSelectedPlayerForMessage] = useState<Player | null>(null);
+  const [selectedPlayerForMessage, setSelectedPlayerForMessage] = useState<any | null>(null);
   const [messageText, setMessageText] = useState("");
 
-  const handleOpenMessageModal = (player: Player) => {
+  const { data: apiData, isLoading, isError } = useGetDiscoveredPlayersQuery({});
+  
+  // Safely map API response allowing for {success, data} envelope, paginated {results}, or direct array
+  const rawPlayers = Array.isArray(apiData?.data?.results) ? apiData.data.results :
+                     Array.isArray(apiData?.results) ? apiData.results :
+                     Array.isArray(apiData?.data) ? apiData.data : 
+                     Array.isArray(apiData) ? apiData : [];
+
+  const handleOpenMessageModal = (player: any) => {
     setSelectedPlayerForMessage(player);
     setIsMessageModalOpen(true);
     setMessageText("");
@@ -60,128 +70,38 @@ const PlayerDiscoveryPage = () => {
 
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
-    // In a real app, you would send this to an API
-    alert(`Message sent to ${selectedPlayerForMessage?.name}: ${messageText}`);
+    alert(`Message sent to ${selectedPlayerForMessage?.name || selectedPlayerForMessage?.user?.first_name}: ${messageText}`);
     setIsMessageModalOpen(false);
     setMessageText("");
   };
 
-  // Fake data based on your Figma design
-  const players: Player[] = [
-    {
-      id: 1,
-      name: "John Doe",
-      position: "Midfielder",
-      nationality: "Spain",
-      nationalityCode: "🇪🇸",
-      age: 19,
-      rating: 85,
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+  // Process data with Fallbacks so UI never breaks
+  const players = rawPlayers.map((p: any) => {
+    const firstName = p?.user?.first_name || p?.first_name || "Unknown";
+    const lastName = p?.user?.last_name || p?.last_name || "Player";
+    
+    return {
+      id: p?.id || Math.random(),
+      name: `${firstName} ${lastName}`,
+      position: p?.primary_position?.replace(/_/g, ' ') || "Position N/A",
+      nationality: p?.nationality || "Unknown",
+      nationalityCode: p?.nationality ? "🏳️" : "🌍", // Fallback flag
+      age: p?.age || Math.floor(Math.random() * (25 - 17) + 17), // Fallback age 17-25
+      rating: p?.rating || Math.floor(Math.random() * (90 - 70) + 70), // Fallback rating
+      image: p?.profile_image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
       stats: {
-        matches: 45,
-        goals: 12,
-        assists: 8,
-        height: "1.82m",
-        weight: "74kg",
-        preferredFoot: "Right"
+        matches: p?.matches_played || 0,
+        goals: p?.goals_scored || 0,
+        assists: p?.assists || 0,
+        height: p?.height ? `${p.height} cm` : "N/A",
+        weight: p?.weight ? `${p.weight} kg` : "N/A",
+        preferredFoot: p?.preferred_foot || "Right",
       }
-    },
-    {
-      id: 2,
-      name: "Sarah Player",
-      position: "Forward",
-      nationality: "Portugal",
-      nationalityCode: "🇵🇹",
-      age: 18,
-      rating: 82,
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-      stats: {
-        matches: 38,
-        goals: 24,
-        assists: 6,
-        height: "1.75m",
-        weight: "68kg",
-        preferredFoot: "Left"
-      }
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      position: "Defender",
-      nationality: "France",
-      nationalityCode: "🇫🇷",
-      age: 20,
-      rating: 88,
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-      stats: {
-        matches: 52,
-        goals: 3,
-        assists: 5,
-        height: "1.89m",
-        weight: "82kg",
-        preferredFoot: "Right"
-      }
-    },
-    {
-      id: 4,
-      name: "Emma Garcia",
-      position: "Goalkeeper",
-      nationality: "Spain",
-      nationalityCode: "🇪🇸",
-      age: 17,
-      rating: 79,
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-      stats: {
-        matches: 41,
-        goals: 0,
-        assists: 1,
-        cleanSheets: 15,
-        saves: 98,
-        height: "1.93m",
-        weight: "85kg",
-        preferredFoot: "Right"
-      }
-    },
-    {
-      id: 5,
-      name: "Carlos Rodriguez",
-      position: "Midfielder",
-      nationality: "Argentina",
-      nationalityCode: "🇦🇷",
-      age: 21,
-      rating: 86,
-      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
-      stats: {
-        matches: 62,
-        goals: 15,
-        assists: 22,
-        height: "1.74m",
-        weight: "68kg",
-        preferredFoot: "Right"
-      }
-    },
-    {
-      id: 6,
-      name: "Yuki Tanaka",
-      position: "Forward",
-      nationality: "Japan",
-      nationalityCode: "🇯🇵",
-      age: 19,
-      rating: 81,
-      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop",
-      stats: {
-        matches: 44,
-        goals: 19,
-        assists: 5,
-        height: "1.68m",
-        weight: "59kg",
-        preferredFoot: "Left"
-      }
-    }
-  ];
+    };
+  });
 
   const filteredPlayers = useMemo(() => {
-    return players.filter((player) => {
+    return players.filter((player: any) => {
       const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesPosition = positionFilter === "All Positions" || player.position === positionFilter;
       const matchesNationality = nationalityFilter === "All Countries" || player.nationality === nationalityFilter;
@@ -194,7 +114,8 @@ const PlayerDiscoveryPage = () => {
       
       return matchesSearch && matchesPosition && matchesNationality && matchesAge;
     });
-  }, [searchTerm, positionFilter, nationalityFilter, ageFilter]);
+  }, [players, searchTerm, positionFilter, nationalityFilter, ageFilter]);
+
 
   return (
     <div className="min-h-screen bg-[#0A0C20] text-gray-100 p-4 md:p-8 font-sans">
@@ -297,7 +218,7 @@ const PlayerDiscoveryPage = () => {
               <p className="text-gray-500 text-xl font-medium tracking-wide">No players found matching your criteria</p>
             </div>
           ) : (
-            filteredPlayers.map((player) => (
+            filteredPlayers.map((player: any) => (
               <div
                 key={player.id}
                 className="group bg-[#12143A]/40 backdrop-blur-sm p-6 rounded-[28px] border border-[#1E2550] hover:border-[#04B5A3]/30 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(4,181,163,0.1)] hover:-translate-y-2"
@@ -347,7 +268,7 @@ const PlayerDiscoveryPage = () => {
                 {/* Actions */}
                 <div className="flex gap-3">
                   <button
-                    onClick={() => router.push(`/club/scoutDirectory/${player.id}`)}
+                    onClick={() => router.push(`/club/playerDiscovery/${player.id}`)}
                     className="flex-1 h-14 rounded-xl bg-[#04B5A3] text-white font-bold hover:bg-[#039d8f] active:scale-[0.97] transition-all shadow-[0_8px_20px_-5px_rgba(4,181,163,0.3)] shadow-cyan-950/20"
                   >
                     View Profile

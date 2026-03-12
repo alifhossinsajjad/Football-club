@@ -1,265 +1,364 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Bell, Shield, Cog, Lock, Globe, Clock, X } from "lucide-react";
 import {
-
-  Globe,
-  Bell,
-  Shield,
-  Lock,
-  Clock,
-  Cog,
-} from "lucide-react";
-import { MdSecurity } from "react-icons/md";
+  useGetGeneralSettingsQuery,
+  useUpdateGeneralSettingsMutation,
+  useGetPrivacySettingsQuery,
+  useUpdatePrivacySettingsMutation,
+  useGetNotificationSettingsQuery,
+  useUpdateNotificationSettingsMutation,
+  useChangePasswordMutation,
+  useSignOutAllSessionsMutation,
+} from "@/redux/features/club/clubSettingsApi";
+import { toast } from "react-hot-toast";
 
 type Tab = "security" | "notifications" | "preferences";
 
 const ClubSettingsPage = () => {
   const [activeTab, setActiveTab] = useState<Tab>("security");
 
-  // Toggle states – you can later connect to real data / API
-  const [toggles, setToggles] = useState({
-    profileVisibility: true,
-    contactRequests: true,
-    showOnlineStatus: false,
-    activityHistory: true,
+  // RTK Query Hooks
+  const { data: generalData, isLoading: generalLoading } = useGetGeneralSettingsQuery();
+  const [updateGeneral] = useUpdateGeneralSettingsMutation();
 
-    // Notifications
-    emailNewMatches: true,
-    emailEventUpdates: true,
-    emailPlayerViews: false,
-    emailMessages: true,
-    emailWeeklySummary: true,
-    emailPlatformUpdates: false,
+  const { data: privacyData, isLoading: privacyLoading } = useGetPrivacySettingsQuery();
+  const [updatePrivacy] = useUpdatePrivacySettingsMutation();
 
-    pushInstantMessages: true,
-    pushEventReminders: true,
-    pushShortlistUpdates: false,
+  const { data: notifData, isLoading: notifLoading } = useGetNotificationSettingsQuery();
+  const [updateNotif] = useUpdateNotificationSettingsMutation();
 
-    smsSecurityAlerts: true,
-    smsLoginVerification: true,
+  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
+  const [signOutAll] = useSignOutAllSessionsMutation();
 
-    // Preferences
-    saveSearchHistory: true,
-    searchSuggestions: true,
+  // Local State for Toggles
+  const [privacy, setPrivacy] = useState<Record<string, boolean>>({
+    public_profile: true,
+    show_contact_info: true,
+    accept_player_applications: true,
+    scout_access: true,
+    show_statistics: false,
   });
 
-  const toggle = (key: keyof typeof toggles) => {
-    setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+  const [notif, setNotif] = useState<Record<string, any>>({
+    email_new_applications: true,
+    email_event_updates: true,
+    email_scout_inquiries: true,
+    email_messages: true,
+    email_payment_confirmations: true,
+    email_event_reminders: true,
+    email_monthly_reports: false,
+    email_platform_updates: false,
+    email_marketing: false,
+
+    push_instant_messages: true,
+    push_application_alerts: true,
+    push_event_updates: true,
+    push_system_alerts: true,
+
+    sms_security_alerts: true,
+    sms_login_verification: true,
+    sms_event_reminders: false,
+
+    quiet_hours_start: "",
+    quiet_hours_end: "",
+  });
+
+  const [general, setGeneral] = useState<Record<string, any>>({
+    platform_language: "English (UK)",
+    time_zone: "GMT+1 (Madrid, Barcelona)",
+    date_format: "DD/MM/YYYY",
+    currency: "EUR",
+    default_event_duration: "2 hours",
+    auto_approve_applications: "Manual approval",
+    send_confirmation_emails: true,
+  });
+
+  // Password state
+  const [passwords, setPasswords] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+
+  // Sync APIs with local state
+  useEffect(() => {
+    if (privacyData?.data || privacyData) {
+      setPrivacy((prev) => ({ ...prev, ...(privacyData.data || privacyData) }));
+    }
+  }, [privacyData]);
+
+  useEffect(() => {
+    if (notifData?.data || notifData) {
+      setNotif((prev) => ({ ...prev, ...(notifData.data || notifData) }));
+    }
+  }, [notifData]);
+
+  useEffect(() => {
+    if (generalData?.data || generalData) {
+      setGeneral((prev) => ({ ...prev, ...(generalData.data || generalData) }));
+    }
+  }, [generalData]);
+
+  // Handle Toggles
+  const handlePrivacyToggle = async (key: string) => {
+    const newVal = !privacy[key];
+    setPrivacy((prev) => ({ ...prev, [key]: newVal }));
+    try {
+      await updatePrivacy({ ...privacy, [key]: newVal }).unwrap();
+      toast.success("Privacy settings updated");
+    } catch (err) {
+      setPrivacy((prev) => ({ ...prev, [key]: !newVal })); // revert
+      toast.error("Failed to update privacy settings");
+    }
   };
 
+  const handleNotifToggle = async (key: string) => {
+    const newVal = !notif[key];
+    setNotif((prev) => ({ ...prev, [key]: newVal }));
+    try {
+      await updateNotif({ ...notif, [key]: newVal }).unwrap();
+      toast.success("Notification settings updated");
+    } catch (err) {
+      setNotif((prev) => ({ ...prev, [key]: !newVal })); // revert
+      toast.error("Failed to update notifications");
+    }
+  };
+
+  const handleGeneralChange = async (key: string, val: any) => {
+    setGeneral((prev) => ({ ...prev, [key]: val }));
+    try {
+      await updateGeneral({ ...general, [key]: val }).unwrap();
+      toast.success("Preferences updated");
+    } catch (err) {
+      toast.error("Failed to update preferences");
+    }
+  };
+
+  // Password Update
+  const handleUpdatePassword = async () => {
+    if (passwords.new_password !== passwords.confirm_password) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+    if (!passwords.current_password || !passwords.new_password) {
+      toast.error("Please fill required fields");
+      return;
+    }
+    try {
+      await changePassword({
+        old_password: passwords.current_password,
+        new_password: passwords.new_password,
+      }).unwrap();
+      toast.success("Password updated successfully");
+      setPasswords({ current_password: "", new_password: "", confirm_password: "" });
+    } catch (err: any) {
+      toast.error(err?.data?.error || err?.data?.message || "Failed to update password");
+    }
+  };
+
+  // Logout All
+  const handleSignOutAll = async () => {
+    try {
+      await signOutAll().unwrap();
+      toast.success("Signed out of all other sessions");
+    } catch (err) {
+      toast.error("Failed to sign out other sessions");
+    }
+  };
+
+  const isLoadingScreen = generalLoading || privacyLoading || notifLoading;
+
+  if (isLoadingScreen) {
+    return (
+      <div className="min-h-screen bg-[#070B24] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-[3px] border-[#1A2160] border-t-[#00D9FF] animate-spin" />
+      </div>
+    );
+  }
+
+  // Common UI Elements
+  const ToggleSwitch = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+    <div
+      className={`w-11 h-6 rounded-full flex items-center p-1 cursor-pointer transition-colors ${
+        checked ? "bg-[#00D9FF]" : "bg-[#1A2160]"
+      }`}
+      onClick={onChange}
+    >
+      <div
+        className={`w-4 h-4 rounded-full bg-white transition-transform ${checked ? "translate-x-5" : "translate-x-0"}`}
+      />
+    </div>
+  );
+
   return (
-    <div className="min-h-screen  text-slate-100 pb-12 font-sans">
-      <div className=" mx-auto px-5 sm:px-6 lg:px-2 py-8">
-        {/* Top bar with title + Edit button */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="inline-block text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#00e5ff] to-[#9C27B0] bg-clip-text text-transparent">
-              Settings
-            </h1>
-            <p className="text-slate-400 mt-1">
-              Manage your account and preferences
-            </p>
-          </div>
-          <button className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
-            Edit
-          </button>
+    <div className="min-h-screen bg-[#070B24] text-white p-6 md:p-10 font-sans pb-20">
+      <div className=" w-full mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
+            Settings
+          </h1>
+          <p className="text-[#5B6397] text-sm mt-1">Manage your club account and preferences</p>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-slate-800 mb-10">
-          <div className="flex gap-8 text-sm font-medium">
+        <div className="flex gap-2 border-b border-[#1A2160] mb-6">
+          {(
+            [
+              { id: "security", label: "Security & Privacy", icon: Shield },
+              { id: "notifications", label: "Notifications", icon: Bell },
+              { id: "preferences", label: "Preferences", icon: Cog },
+            ] as const
+          ).map(({ id, label, icon: Icon }) => (
             <button
-              onClick={() => setActiveTab("security")}
-              className={`pb-4 px-1 relative flex gap-2 items-center ${
-                activeTab === "security"
-                  ? "text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 bg-gradient-to-r from-[#00e5ff57] to-[#9b27b06d] p-3 after:bg-teal-500"
-                  : "text-slate-400 hover:text-slate-300"
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`flex items-center gap-2 px-6 py-3 text-sm font-bold transition-colors ${
+                activeTab === id
+                  ? "text-white bg-gradient-to-r from-[#00E5FF33] to-[#9C27B033] border-b-2 border-[#00E5FF]"
+                  : "text-[#5B6397] hover:text-[#8891BB]"
               }`}
             >
-              <Shield size={20} className="" /> Security & Privacy
+              <Icon size={16} className={activeTab === id ? (id === "notifications" ? "text-purple-400" : "text-cyan-400") : ""} />
+              {label}
             </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`pb-4 flex items-center gap-2 px-1 relative ${
-                activeTab === "notifications"
-                  ? "text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 bg-gradient-to-r from-[#00e5ff57] to-[#9b27b06d] p-3 after:bg-teal-500"
-                  : "text-slate-400 hover:text-slate-300"
-              }`}
-            >
-              <Bell size={20} /> Notifications
-            </button>
-            <button
-              onClick={() => setActiveTab("preferences")}
-              className={`pb-4 flex items-center gap-2 px-1 relative ${
-                activeTab === "preferences"
-                  ? "text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-teal-500 bg-gradient-to-r from-[#00e5ff57] to-[#9b27b06d] p-3"
-                  : "text-slate-400 hover:text-slate-300"
-              }`}
-            >
-              <Cog size={20} />
-              Preferences
-            </button>
-          </div>
+          ))}
         </div>
 
-        {/* SECURITY & PRIVACY TAB */}
+        {/* ── Security & Privacy Tab ── */}
         {activeTab === "security" && (
-          <div className="space-y-10">
+          <div className="space-y-6">
             {/* Change Password */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl p-6 md:p-8">
-              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                <Lock size={20} className="text-teal-400" />
-                Change Password
-              </h2>
-
-              <div className="space-y-5">
+            <div className="bg-[#12143A] border border-[#1A2160] rounded-xl p-6 md:p-8 flex flex-col items-center">
+              <div className="w-full ">
+                <h2 className="text-white font-bold flex items-center gap-2 mb-6">
+                  <Lock size={16} className="text-cyan-400" />
+                  Change Password
+                </h2>
+                <div className="space-y-4 w-full">
                 <div>
-                  <label className="block text-slate-400 text-sm mb-2">
-                    Current Password
-                  </label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Current Password</label>
                   <input
                     type="password"
+                    value={passwords.current_password}
+                    onChange={(e) => setPasswords({ ...passwords, current_password: e.target.value })}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
                     placeholder="Enter current password"
-                    className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-slate-400 text-sm mb-2">
-                    New Password
-                  </label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">New Password</label>
                   <input
                     type="password"
+                    value={passwords.new_password}
+                    onChange={(e) => setPasswords({ ...passwords, new_password: e.target.value })}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
                     placeholder="Enter new password"
-                    className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60"
                   />
-                  <p className="text-slate-500 text-xs mt-2">
-                    Must be 8+ characters with uppercase, lowercase, numbers,
-                    and symbols
-                  </p>
+                  <p className="text-[9px] text-[#5B6397] mt-1.5">Must be at least 8 characters with uppercase, lowercase, and numbers</p>
                 </div>
-
                 <div>
-                  <label className="block text-slate-400 text-sm mb-2">
-                    Confirm New Password
-                  </label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Confirm New Password</label>
                   <input
                     type="password"
+                    value={passwords.confirm_password}
+                    onChange={(e) => setPasswords({ ...passwords, confirm_password: e.target.value })}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
                     placeholder="Confirm new password"
-                    className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60"
                   />
                 </div>
-
-                <button className="w-full md:w-auto bg-teal-600 hover:bg-teal-500 text-white font-medium px-8 py-3 rounded-lg transition-colors mt-4">
-                  Update Password
+                <button
+                  onClick={handleUpdatePassword}
+                  disabled={isChangingPassword}
+                  className="w-full py-2.5 bg-[#00D9FF] text-[#070B24] rounded-lg font-bold text-sm hover:bg-cyan-300 transition-colors mt-2"
+                >
+                  {isChangingPassword ? "Updating..." : "Update Password"}
                 </button>
+              </div>
               </div>
             </div>
 
             {/* Privacy Settings */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold mb-1">Privacy Settings</h2>
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
+              <div className="p-6 border-b border-[#1A2160]">
+                <h2 className="text-white font-bold">Privacy Settings</h2>
               </div>
-
-              <div className="divide-y divide-slate-800/70">
+              <div className="divide-y divide-[#1A2160]">
                 {[
                   {
-                    title: "Profile Visibility",
-                    desc: "Allow other users to view your profile",
-                    key: "profileVisibility",
+                    key: "public_profile",
+                    title: "Public Profile",
+                    desc: "Allow your club to be discovered in searches",
                   },
                   {
-                    title: "Contact Requests",
-                    desc: "Allow users and clubs to message you",
-                    key: "contactRequests",
+                    key: "show_contact_info",
+                    title: "Show Contact Information",
+                    desc: "Display phone and email on public profile",
                   },
                   {
-                    title: "Show Online Status",
-                    desc: "Let others see when you're active",
-                    key: "showOnlineStatus",
+                    key: "accept_player_applications",
+                    title: "Accept Player Applications",
+                    desc: "Allow players to apply directly to your events",
                   },
                   {
-                    title: "Activity History and player views",
-                    desc: "Track platform activity and player views",
-                    key: "activityHistory",
+                    key: "scout_access",
+                    title: "Scout Access",
+                    desc: "Allow scouts to view your events and contact you",
+                  },
+                  {
+                    key: "show_statistics",
+                    title: "Show Statistics",
+                    desc: "Display event attendance and success metrics",
                   },
                 ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex items-center justify-between px-6 md:px-8 py-5"
-                  >
+                  <div key={item.key} className="flex items-center justify-between p-6">
                     <div>
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">
-                        {item.desc}
-                      </p>
+                      <h3 className="text-sm font-semibold">{item.title}</h3>
+                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={toggles[item.key as keyof typeof toggles]}
-                        onChange={() =>
-                          toggle(item.key as keyof typeof toggles)
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                    </label>
+                    <ToggleSwitch checked={!!privacy[item.key]} onChange={() => handlePrivacyToggle(item.key)} />
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Active Sessions */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold mb-1">Active Sessions</h2>
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
+              <div className="p-6 border-b border-[#1A2160]">
+                <h2 className="text-white font-bold">Active Sessions</h2>
               </div>
-
-              <div className="p-6 md:p-8 space-y-5">
-                {[
-                  {
-                    device: "MacBook Pro",
-                    location: "London, UK • active now",
-                    icon: "laptop",
-                  },
-                  {
-                    device: "Chrome on Windows",
-                    location: "Manchester, UK • 3 days ago",
-                    icon: "monitor",
-                  },
-                ].map((session, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between bg-[#0B0D2C] border border-slate-800 rounded-lg px-5 py-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-teal-400">
-                        {session.icon === "laptop" ? (
-                          <Clock size={20} />
-                        ) : (
-                          <Clock size={20} />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium">{session.device}</p>
-                        <p className="text-slate-400 text-sm">
-                          {session.location}
-                        </p>
-                      </div>
+              <div className="p-6 space-y-3">
+                <div className="flex items-center justify-between bg-[#070B24] border border-[#1A2160] rounded-xl p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-[#111640] border border-[#1A2160] flex items-center justify-center text-cyan-400">
+                      <Globe size={18} />
                     </div>
-                    {i === 1 && (
-                      <button className="text-red-400 hover:text-red-300 text-sm">
-                        ×
-                      </button>
-                    )}
+                    <div>
+                      <p className="text-sm font-semibold flex items-center gap-2">
+                        Chrome on Windows
+                        <span className="px-2 py-0.5 bg-green-500/10 text-green-400 text-[9px] rounded font-bold uppercase">Current</span>
+                      </p>
+                      <p className="text-[11px] text-[#5B6397]">Barcelona, Spain • Active now</p>
+                    </div>
                   </div>
-                ))}
-
-                <button className="w-full mt-4 py-3 
-                 text-red-600 rounded-lg transition-colors border border-red-600">
+                </div>
+                <div className="flex items-center justify-between bg-[#070B24] border border-[#1A2160] rounded-xl p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-[#111640] border border-[#1A2160] flex items-center justify-center text-cyan-400">
+                      <Globe size={18} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">Safari on MacBook</p>
+                      <p className="text-[11px] text-[#5B6397]">Barcelona, Spain • 3 hours ago</p>
+                    </div>
+                  </div>
+                  <button className="text-red-400 hover:text-red-300 p-2"><X size={16} /></button>
+                </div>
+                <button
+                  onClick={handleSignOutAll}
+                  className="w-full mt-4 py-3 border border-red-500/20 text-red-400 font-bold text-sm rounded-xl hover:bg-red-500/10 transition-colors"
+                >
                   Sign Out All Other Sessions
                 </button>
               </div>
@@ -267,281 +366,225 @@ const ClubSettingsPage = () => {
           </div>
         )}
 
-        {/* NOTIFICATIONS TAB */}
+        {/* ── Notifications Tab ── */}
         {activeTab === "notifications" && (
-          <div className="space-y-10">
+          <div className="space-y-6">
             {/* Email Notifications */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <Bell size={20} className="text-teal-400" />
-                  Email Notifications
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
+              <div className="p-6 border-b border-[#1A2160]">
+                <h2 className="text-white font-bold flex items-center gap-2">
+                  <Bell size={16} className="text-cyan-400" /> Email Notifications
                 </h2>
               </div>
-              <div className="divide-y divide-slate-800/70">
+              <div className="divide-y divide-[#1A2160]">
                 {[
-                  {
-                    label: "New Player Matches",
-                    desc: "Get notified when new players match your search criteria",
-                    key: "emailNewMatches",
-                  },
-                  {
-                    label: "Event Updates",
-                    desc: "Receive updates about upcoming scouting events",
-                    key: "emailEventUpdates",
-                  },
-                  {
-                    label: "Player Profile Views",
-                    desc: "Know when players view your profile",
-                    key: "emailPlayerViews",
-                  },
-                  {
-                    label: "Message Notifications",
-                    desc: "Get notified about new messages",
-                    key: "emailMessages",
-                  },
-                  {
-                    label: "Weekly Summary",
-                    desc: "Receive a weekly summary of your activity",
-                    key: "emailWeeklySummary",
-                  },
-                  {
-                    label: "Platform Updates",
-                    desc: "Stay informed about new features and updates",
-                    key: "emailPlatformUpdates",
-                  },
+                  { key: "email_new_applications", title: "New Player Applications", desc: "Get notified when players apply to your events" },
+                  { key: "email_event_updates", title: "Event Registration Updates", desc: "Receive updates about event registrations" },
+                  { key: "email_scout_inquiries", title: "Scout Inquiries", desc: "Know when scouts contact you or view your events" },
+                  { key: "email_messages", title: "Message Notifications", desc: "Get notified about new messages" },
+                  { key: "email_payment_confirmations", title: "Payment Confirmations", desc: "Receive payment and transaction confirmations" },
+                  { key: "email_event_reminders", title: "Event Reminders", desc: "Reminders about upcoming events" },
+                  { key: "email_monthly_reports", title: "Monthly Reports", desc: "Receive monthly performance and analytics reports" },
+                  { key: "email_platform_updates", title: "Platform Updates", desc: "Stay informed about new features and updates" },
+                  { key: "email_marketing", title: "Marketing Communications", desc: "Promotional offers and tips" },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between px-6 md:px-8 py-5"
-                  >
+                  <div key={item.key} className="flex items-center justify-between p-6">
                     <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">
-                        {item.desc}
-                      </p>
+                      <h3 className="text-sm font-semibold text-gray-200">{item.title}</h3>
+                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={toggles[item.key as keyof typeof toggles]}
-                        onChange={() =>
-                          toggle(item.key as keyof typeof toggles)
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                    </label>
+                    <ToggleSwitch checked={!!notif[item.key]} onChange={() => handleNotifToggle(item.key)} />
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Push Notifications */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold">Push Notifications</h2>
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
+              <div className="p-6 border-b border-[#1A2160]">
+                <h2 className="text-white font-bold flex items-center gap-2">
+                  <Bell size={16} className="text-cyan-400" /> Push Notifications
+                </h2>
               </div>
-              <div className="divide-y divide-slate-800/70">
+              <div className="divide-y divide-[#1A2160]">
                 {[
-                  {
-                    label: "Instant Messages",
-                    desc: "Real-time notifications for new messages",
-                    key: "pushInstantMessages",
-                  },
-                  {
-                    label: "Event Reminders",
-                    desc: "Reminders before scouting events",
-                    key: "pushEventReminders",
-                  },
-                  {
-                    label: "Shortlist Updates",
-                    desc: "When shortlisted players update their profiles",
-                    key: "pushShortlistUpdates",
-                  },
+                  { key: "push_instant_messages", title: "Instant Messages", desc: "Real-time notifications for new messages" },
+                  { key: "push_application_alerts", title: "Application Alerts", desc: "Immediate alerts for new applications" },
+                  { key: "push_event_updates", title: "Event Updates", desc: "Updates about your events" },
+                  { key: "push_system_alerts", title: "System Alerts", desc: "Important system and security notifications" },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between px-6 md:px-8 py-5"
-                  >
+                  <div key={item.key} className="flex items-center justify-between p-6">
                     <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">
-                        {item.desc}
-                      </p>
+                      <h3 className="text-sm font-semibold text-gray-200">{item.title}</h3>
+                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={toggles[item.key as keyof typeof toggles]}
-                        onChange={() =>
-                          toggle(item.key as keyof typeof toggles)
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                    </label>
+                    <ToggleSwitch checked={!!notif[item.key]} onChange={() => handleNotifToggle(item.key)} />
                   </div>
                 ))}
               </div>
             </div>
 
             {/* SMS Notifications */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold">SMS Notifications</h2>
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
+              <div className="p-6 border-b border-[#1A2160]">
+                <h2 className="text-white font-bold flex items-center gap-2">
+                  <Bell size={16} className="text-cyan-400" /> SMS Notifications
+                </h2>
               </div>
-              <div className="divide-y divide-slate-800/70">
+              <div className="divide-y divide-[#1A2160]">
                 {[
-                  {
-                    label: "Security Alerts",
-                    desc: "Important security notifications",
-                    key: "smsSecurityAlerts",
-                  },
-                  {
-                    label: "Login Verification",
-                    desc: "Two-factor authentication codes",
-                    key: "smsLoginVerification",
-                  },
+                  { key: "sms_security_alerts", title: "Security Alerts", desc: "Critical security notifications" },
+                  { key: "sms_login_verification", title: "Login Verification", desc: "Two-factor authentication codes" },
+                  { key: "sms_event_reminders", title: "Event Reminders", desc: "SMS reminders for your events" },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between px-6 md:px-8 py-5"
-                  >
+                  <div key={item.key} className="flex items-center justify-between p-6">
                     <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">
-                        {item.desc}
-                      </p>
+                      <h3 className="text-sm font-semibold text-gray-200">{item.title}</h3>
+                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={toggles[item.key as keyof typeof toggles]}
-                        onChange={() =>
-                          toggle(item.key as keyof typeof toggles)
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                    </label>
+                    <ToggleSwitch checked={!!notif[item.key]} onChange={() => handleNotifToggle(item.key)} />
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* Quiet Hours */}
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl p-6">
+              <h2 className="text-white font-bold flex items-center gap-2 mb-2">
+                <Clock size={16} className="text-cyan-400" /> Quiet Hours
+              </h2>
+              <p className="text-[11px] text-[#5B6397] mb-6">Set times when you don't want to receive non-urgent notifications</p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Start Time</label>
+                  <input
+                    type="time"
+                    value={notif.quiet_hours_start}
+                    onChange={(e) => {
+                      setNotif({ ...notif, quiet_hours_start: e.target.value });
+                    }}
+                    onBlur={() => handleNotifToggle("quiet_hours_start")} // fake trigger to save
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">End Time</label>
+                  <input
+                    type="time"
+                    value={notif.quiet_hours_end}
+                    onChange={(e) => {
+                      setNotif({ ...notif, quiet_hours_end: e.target.value });
+                    }}
+                    onBlur={() => handleNotifToggle("quiet_hours_end")} // fake trigger to save
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
 
-        {/* PREFERENCES TAB */}
+        {/* ── Preferences Tab ── */}
         {activeTab === "preferences" && (
-          <div className="space-y-10">
-            {/* Language & Region */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl p-6 md:p-8">
-              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                <Globe size={20} className="text-teal-400" />
-                Language & Region
+          <div className="space-y-6">
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl p-6">
+              <h2 className="text-white font-bold flex items-center gap-2 mb-6">
+                <Globe size={16} className="text-cyan-400" /> Language & Region
               </h2>
-
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-slate-400 text-sm mb-2">
-                    Platform language
-                  </label>
-                  <select className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60">
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Platform Language</label>
+                  <select
+                    value={general.platform_language}
+                    onChange={(e) => handleGeneralChange("platform_language", e.target.value)}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  >
                     <option>English (UK)</option>
                     <option>English (US)</option>
-                    <option>Español</option>
-                    <option>Português</option>
+                    <option>Spanish</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="block text-slate-400 text-sm mb-2">
-                    Time Zone
-                  </label>
-                  <select className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60">
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Time Zone</label>
+                  <select
+                    value={general.time_zone}
+                    onChange={(e) => handleGeneralChange("time_zone", e.target.value)}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  >
                     <option>GMT+1 (Madrid, Barcelona)</option>
                     <option>GMT (London)</option>
-                    <option>GMT-5 (New York)</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="block text-slate-400 text-sm mb-2">
-                    Date Format
-                  </label>
-                  <select className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60">
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Date Format</label>
+                  <select
+                    value={general.date_format}
+                    onChange={(e) => handleGeneralChange("date_format", e.target.value)}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  >
                     <option>DD/MM/YYYY</option>
                     <option>MM/DD/YYYY</option>
-                    <option>YYYY-MM-DD</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="block text-slate-400 text-sm mb-2">
-                    Currency
-                  </label>
-                  <select className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60">
-                    <option>€ EUR</option>
-                    <option>£ GBP</option>
-                    <option>$ USD</option>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Currency</label>
+                  <select
+                    value={general.currency}
+                    onChange={(e) => handleGeneralChange("currency", e.target.value)}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  >
+                    <option value="EUR">€ EUR</option>
+                    <option value="USD">$ USD</option>
+                    <option value="GBP">£ GBP</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Search Preferences */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold">Search Preferences</h2>
-              </div>
-              <div className="divide-y divide-slate-800/70">
-                <div className="flex items-center justify-between px-6 md:px-8 py-5">
-                  <div>
-                    <p className="font-medium">Save Search History</p>
-                    <p className="text-slate-400 text-sm mt-0.5">
-                      Remember your recent searches and filters
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={toggles.saveSearchHistory}
-                      onChange={() => toggle("saveSearchHistory")}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                  </label>
+            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl p-6">
+              <h2 className="text-white font-bold mb-6">Event Preferences</h2>
+              <div className="space-y-5">
+                <div>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Default Event Duration</label>
+                  <select
+                    value={general.default_event_duration}
+                    onChange={(e) => handleGeneralChange("default_event_duration", e.target.value)}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-cyan-400"
+                  >
+                    <option>1 hour</option>
+                    <option>2 hours</option>
+                    <option>3 hours</option>
+                  </select>
                 </div>
-
-                <div className="flex items-center justify-between px-6 md:px-8 py-5">
+                <div>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Auto-approve Applications</label>
+                  <select
+                    value={general.auto_approve_applications}
+                    onChange={(e) => handleGeneralChange("auto_approve_applications", e.target.value)}
+                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-cyan-400"
+                  >
+                    <option>Manual approval</option>
+                    <option>Auto-approve all</option>
+                  </select>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-[#070B24] border border-[#1A2160] rounded-lg mt-2">
                   <div>
-                    <p className="font-medium">
-                      Search Suggestions based on activity
-                    </p>
-                    <p className="text-slate-400 text-sm mt-0.5">
-                      Show suggested players based on your activity
-                    </p>
+                    <h3 className="text-sm font-semibold">Send Confirmation Emails</h3>
+                    <p className="text-[11px] text-[#5B6397] mt-1">Automatically send confirmation to applicants</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={toggles.searchSuggestions}
-                      onChange={() => toggle("searchSuggestions")}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                  </label>
+                  <ToggleSwitch
+                    checked={!!general.send_confirmation_emails}
+                    onChange={() => handleGeneralChange("send_confirmation_emails", !general.send_confirmation_emails)}
+                  />
                 </div>
               </div>
             </div>
           </div>
         )}
-      </div>
 
-      {/* <footer className="text-center text-slate-600 text-sm py-8 border-t border-slate-800/40 mt-12">
-        © 2025 NextGen Pros. All rights reserved.
-      </footer> */}
+      </div>
     </div>
   );
 };
