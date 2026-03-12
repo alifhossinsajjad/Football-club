@@ -13,6 +13,7 @@ build:
     - docker:27-dind
 
   before_script:
+    - apk add --no-cache make
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
   script:
@@ -32,6 +33,7 @@ push:
     - docker:27-dind
 
   before_script:
+    - apk add --no-cache make
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
   script:
