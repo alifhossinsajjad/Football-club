@@ -36,6 +36,4 @@ export interface LoginResponse {
   access: string;
   message: string;
   user: User;
-  access: string;
-  refresh: string;
 }
