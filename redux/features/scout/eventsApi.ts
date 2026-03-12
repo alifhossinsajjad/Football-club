@@ -16,7 +16,7 @@ export const eventsApi = baseApi.injectEndpoints({
 
     getAllPlayersEventsRegister : builder.query<EventListResponse,void>({
       query: () => "/players/event-registrations/",
-      providesTags:['']
+      providesTags:['Events']
     }),
 
     // Return only the inner data to match the component type
