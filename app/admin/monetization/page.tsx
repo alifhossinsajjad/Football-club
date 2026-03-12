@@ -2,8 +2,8 @@
 
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGetMonetizationDataQuery, useGetAdSlotsQuery, AdSlot, useCreateAdSlotMutation } from '@/redux/features/admin/adminMonetizationApi';
-import { DollarSign, BarChart3, TrendingUp, LayoutGrid, MousePointerClick, Loader2, ExternalLink, Eye, X, Calendar, Monitor, User, Plus, Upload, ImageIcon, Pencil } from 'lucide-react';
+import { useGetMonetizationDataQuery, useGetAdSlotsQuery, AdSlot, useCreateAdSlotMutation, useDeleteAdSlotMutation } from '@/redux/features/admin/adminMonetizationApi';
+import { DollarSign, BarChart3, TrendingUp, LayoutGrid, MousePointerClick, Loader2, ExternalLink, Eye, X, Calendar, Monitor, User, Plus, Upload, ImageIcon, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // ─── Add Slot Modal ───────────────────────────────────────────────────────────
@@ -334,11 +334,24 @@ export default function MonetizationPage() {
   const [showAddSlot, setShowAddSlot] = useState(false);
   const router = useRouter();
 
+  const [deleteAdSlot, { isLoading: isDeleting }] = useDeleteAdSlotMutation();
+
   const metrics = metricsResp && 'data' in metricsResp ? (metricsResp as any).data : metricsResp;
   const adSlots = (() => {
     const raw = adSlotsResp && 'data' in adSlotsResp ? (adSlotsResp as any).data : adSlotsResp;
     return raw?.adSlots || [];
   })();
+
+  const handleDelete = async (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete the ad slot "${name}"?`)) {
+      try {
+        await deleteAdSlot(id).unwrap();
+        toast.success('Ad slot deleted successfully');
+      } catch (err: any) {
+        toast.error(err?.data?.message || 'Failed to delete ad slot');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0f111f] text-white p-6 md:p-8 font-sans">
@@ -436,6 +449,14 @@ export default function MonetizationPage() {
                         </button>
                         <button onClick={() => router.push(`/admin/monetization/${slot.adSlotId}/edit`)} className="p-2 rounded-lg text-amber-400 hover:bg-amber-500/10 transition-colors" title="Edit Slot">
                           <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(slot.adSlotId, slot.adName)}
+                          disabled={isDeleting}
+                          className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                          title="Delete Slot"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

@@ -189,7 +189,7 @@ export default function EditAdSlotPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto">
+      <div className="w-full">
         <form onSubmit={handleSubmit} className="bg-[#171b2f] border border-gray-800 rounded-3xl overflow-hidden shadow-2xl">
 
           <div className="grid grid-cols-1 lg:grid-cols-3">
