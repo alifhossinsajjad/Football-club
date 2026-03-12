@@ -61,10 +61,9 @@ type Event = {
   _raw?: any;
 };
 
-
-
 export default function EventManagementPage() {
   const { data: apiEvents, isLoading } = useGetClubEventsQuery(undefined);
+  console.log('create event data ', apiEvents)
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
   const [deleteEventApi] = useDeleteEventMutation();
@@ -79,21 +78,21 @@ export default function EventManagementPage() {
 
   const events = useMemo(() => {
     if (!apiEvents) return [];
-    
+
     // API might return a direct array or a paginated object with 'results'
-    const sourceData = Array.isArray(apiEvents) 
-      ? apiEvents 
-      : (apiEvents as any).results || [];
-    
+    const sourceData = Array.isArray(apiEvents)
+      ? apiEvents
+      : (apiEvents as any).results || (apiEvents as any).data || (apiEvents as any).events || [];
+
     if (sourceData.length === 0) {
       return [];
     }
-    
+
     const mapped = sourceData.map((apiEvent: any) => {
       // Robust mapping with fallbacks to ensure no empty fields
       const venue = apiEvent.venue_name || "Venue TBA";
       const addr = apiEvent.venue_address ? `, ${apiEvent.venue_address}` : "";
-      
+
       let rawFee = apiEvent.registration_fee?.toString() || "0.00";
       const fee = rawFee.startsWith("€") ? rawFee : `€${rawFee}`;
 
@@ -103,7 +102,8 @@ export default function EventManagementPage() {
         date: apiEvent.event_date || "Date TBA",
         location: `${venue}${addr}`,
         fee: fee,
-        registrations: apiEvent.registered_count ?? apiEvent.confirmed_count ?? 0,
+        registrations:
+          apiEvent.registered_count ?? apiEvent.confirmed_count ?? 0,
         status: apiEvent.status === "ACTIVE" ? "Active" : "Pending",
         featured: apiEvent.featured ?? apiEvent.is_featured ?? false,
         views: apiEvent.views ?? apiEvent.views_count ?? 0,
@@ -121,12 +121,19 @@ export default function EventManagementPage() {
         country: apiEvent.country || "",
         startTime: apiEvent.start_time || "10:00:00",
         endTime: apiEvent.end_time || "14:00:00",
-        _raw: apiEvent
+        _raw: apiEvent,
       };
     });
 
-    // Sorting: Newest first (highest numeric ID first)
-    return [...mapped].sort((a, b) => Number(b.id) - Number(a.id));
+    // Sorting: Try numeric ID first, fallback to date
+    return [...mapped].sort((a, b) => {
+      const idA = Number(a.id);
+      const idB = Number(b.id);
+      if (!isNaN(idA) && !isNaN(idB)) {
+        return idB - idA;
+      }
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
   }, [apiEvents]);
 
   const openView = (ev: Event) => {
@@ -169,7 +176,10 @@ export default function EventManagementPage() {
         start_time: updated.startTime || "10:00:00",
         end_time: updated.endTime || "14:00:00",
         venue_name: updated.location.split(",")[0] || "Venue Name",
-        street_address: updated.streetAddress || updated.location.split(",")[1]?.trim() || "Street Address",
+        street_address:
+          updated.streetAddress ||
+          updated.location.split(",")[1]?.trim() ||
+          "Street Address",
         city: updated.city || "City",
         postal_code: updated.postalCode || "00000",
         country: updated.country || "Country",
@@ -180,7 +190,7 @@ export default function EventManagementPage() {
         description: updated.description || "",
         contact_email: updated.contactEmail || "contact@club.com",
         contact_phone: updated.contactPhone || "+0000000000",
-        status: updated.status.toUpperCase()
+        status: updated.status.toUpperCase(),
       };
 
       await updateEvent({ id: updated.id, ...apiData }).unwrap();
@@ -191,6 +201,12 @@ export default function EventManagementPage() {
   };
 
   const handleCreateEvent = async (formData: any) => {
+    const today = new Date().toISOString().split("T")[0];
+    if (formData.date < today) {
+      alert("Event date cannot be in the past.");
+      return;
+    }
+
     try {
       const apiData = {
         event_name: formData.name,
@@ -210,13 +226,19 @@ export default function EventManagementPage() {
         description: formData.description,
         contact_email: formData.contactEmail,
         contact_phone: formData.contactPhone,
-        status: "ACTIVE"
+        status: "ACTIVE",
       };
 
       await createEvent(apiData).unwrap();
       setShowCreate(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create failed:", error);
+      const errorData = error?.data?.errors;
+      if (errorData?.non_field_errors) {
+        alert(errorData.non_field_errors[0]);
+      } else {
+        alert("Failed to create event. Please check your data.");
+      }
     }
   };
 
@@ -278,7 +300,11 @@ export default function EventManagementPage() {
                       <button
                         onClick={() => handleToggleFeatured(ev.id)}
                         className={`transition-all duration-300 hover:scale-110 ${ev.featured ? "text-yellow-400" : "text-gray-600 hover:text-yellow-400/50"}`}
-                        title={ev.featured ? "Remove from featured" : "Mark as featured"}
+                        title={
+                          ev.featured
+                            ? "Remove from featured"
+                            : "Mark as featured"
+                        }
                       >
                         <Star
                           size={20}
@@ -362,7 +388,12 @@ export default function EventManagementPage() {
       )}
 
       {/* ─── Create Multi-step Modal ────────────────────────────────── */}
-      {showCreate && <CreateEventModal onClose={() => setShowCreate(false)} onSave={handleCreateEvent} />}
+      {showCreate && (
+        <CreateEventModal
+          onClose={() => setShowCreate(false)}
+          onSave={handleCreateEvent}
+        />
+      )}
     </div>
   );
 }
@@ -884,9 +915,7 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                       Event Time
                     </p>
-                    <p className="text-white font-medium">
-                      10:00 AM - 4:00 PM
-                    </p>
+                    <p className="text-white font-medium">10:00 AM - 4:00 PM</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
@@ -1094,7 +1123,7 @@ function CreateEventModal({
     type: "Trial",
     minAge: "16",
     maxAge: "21",
-    date: "",
+    date: new Date().toISOString().split('T')[0],
     startTime: "",
     endTime: "",
     location: {
@@ -1212,10 +1241,11 @@ function CreateEventModal({
             />
           )}
           {step === 4 && (
-            <Step4
-              onPrev={prev}
-              onClose={onClose}
-              data={formData}
+            <Step4 
+              onPrev={prev} 
+              onClose={onClose} 
+              data={formData} 
+              setStep={setStep}
             />
           )}
         </div>
@@ -1288,13 +1318,17 @@ function Step1({
               <div className="relative">
                 <select
                   value={data.type}
-                  onChange={(e) => updateData({ ...data, type: e.target.value })}
+                  onChange={(e) =>
+                    updateData({ ...data, type: e.target.value })
+                  }
                   className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:border-cyan-400/50 transition-all font-medium"
                 >
                   <option value="Trial">Trial</option>
                   <option value="Showcase">Showcase</option>
                   <option value="Camp">Camp</option>
                   <option value="Tournament">Tournament</option>
+                  <option value="Tournament">Leauge</option>
+                  <option value="Tournament">National</option>
                 </select>
                 <ChevronRight
                   size={18}
@@ -1310,7 +1344,9 @@ function Step1({
                 </label>
                 <input
                   value={data.minAge}
-                  onChange={(e) => updateData({ ...data, minAge: e.target.value })}
+                  onChange={(e) =>
+                    updateData({ ...data, minAge: e.target.value })
+                  }
                   className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all"
                   placeholder="16"
                 />
@@ -1321,7 +1357,9 @@ function Step1({
                 </label>
                 <input
                   value={data.maxAge}
-                  onChange={(e) => updateData({ ...data, maxAge: e.target.value })}
+                  onChange={(e) =>
+                    updateData({ ...data, maxAge: e.target.value })
+                  }
                   className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all"
                   placeholder="21"
                 />
@@ -1334,7 +1372,7 @@ function Step1({
         <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] p-7">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
-              <Clock size={20} />
+              <Clock size={20} className="text-[#04B5A3]" />
             </div>
             <h3 className="text-xl font-bold text-white">Date & Time</h3>
           </div>
@@ -1346,6 +1384,7 @@ function Step1({
               </label>
               <input
                 type="date"
+                min={new Date().toISOString().split("T")[0]}
                 value={data.date}
                 onChange={(e) => updateData({ ...data, date: e.target.value })}
                 className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all"
@@ -1371,7 +1410,9 @@ function Step1({
               <input
                 type="time"
                 value={data.endTime}
-                onChange={(e) => updateData({ ...data, endTime: e.target.value })}
+                onChange={(e) =>
+                  updateData({ ...data, endTime: e.target.value })
+                }
                 className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all text-center"
               />
             </div>
@@ -1383,7 +1424,7 @@ function Step1({
         {/* Quick Tips */}
         <div className="bg-gradient-to-br from-[#121433] to-[#1a1f4d] border border-[#1E2550] rounded-[24px] p-7">
           <div className="w-12 h-12 bg-cyan-400/10 rounded-2xl flex items-center justify-center text-cyan-400 mb-6">
-            <Info size={24} />
+            <Info size={24} className="text-[#04B5A3]" />
           </div>
           <h4 className="text-lg font-bold text-white mb-4">Quick Tips</h4>
           <ul className="space-y-4">
@@ -1393,7 +1434,10 @@ function Step1({
               "Set realistic date and time",
               "Popular times: weekends 9AM-5PM",
             ].map((tip, i) => (
-              <li key={i} className="flex gap-3 text-sm text-gray-400 leading-relaxed">
+              <li
+                key={i}
+                className="flex gap-3 text-sm text-gray-400 leading-relaxed"
+              >
                 <span className="text-cyan-400 shrink-0 mt-1">•</span>
                 {tip}
               </li>
@@ -1418,11 +1462,11 @@ function Step1({
             </div>
             <div className="space-y-2 mt-4 pt-4 border-t border-[#1E2550]">
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Calendar size={14} />
+                <Calendar size={14} className="text-[#04B5A3]"/>
                 {data.date || "dd/mm/yyyy"}
               </div>
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Clock size={14} />
+                <Clock size={14} className="text-[#04B5A3]"/>
                 {data.startTime || "00:00"} - {data.endTime || "00:00"}
               </div>
             </div>
@@ -1451,7 +1495,7 @@ function Step2({
         <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] p-7">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-cyan-400/10 rounded-xl flex items-center justify-center text-cyan-400">
-              <MapPin size={20} />
+              <MapPin size={20} className="text-[#04B5A3]"/>
             </div>
             <h3 className="text-xl font-bold text-white">Venue Location</h3>
           </div>
@@ -1529,28 +1573,18 @@ function Step2({
               </div>
               <div>
                 <label className="block text-gray-400 text-sm mb-2.5">
-                  Country *
+                  Country
                 </label>
-                <div className="relative">
-                  <select
-                    value={data.location.country}
-                    onChange={(e) =>
-                      updateData({
-                        ...data,
-                        location: { ...data.location, country: e.target.value },
-                      })
-                    }
-                    className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:border-cyan-400/50 transition-all"
-                  >
-                    <option value="Spain">Spain</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="Germany">Germany</option>
-                  </select>
-                  <ChevronRight
-                    size={18}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-500 pointer-events-none"
-                  />
-                </div>
+                <input
+                  value={data.location.country}
+                  onChange={(e) =>
+                    updateData({
+                      ...data,
+                      location: { ...data.location, country: e.target.value },
+                    })
+                  }
+                  className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:border-cyan-400/50 transition-all"
+                />
               </div>
             </div>
           </div>
@@ -1621,7 +1655,10 @@ function Step2({
               "Consider parking availability",
               "Mention public transport options",
             ].map((tip, i) => (
-              <li key={i} className="flex gap-3 text-sm text-gray-400 leading-relaxed">
+              <li
+                key={i}
+                className="flex gap-3 text-sm text-gray-400 leading-relaxed"
+              >
                 <span className="text-cyan-400 shrink-0 mt-1">•</span>
                 {tip}
               </li>
@@ -1639,7 +1676,10 @@ function Step2({
               { label: "Tournaments:", price: "€80-€150" },
               { label: "Camps:", price: "€200-€500" },
             ].map((item, i) => (
-              <div key={i} className="flex items-center justify-between text-xs">
+              <div
+                key={i}
+                className="flex items-center justify-between text-xs"
+              >
                 <span className="text-gray-500">{item.label}</span>
                 <span className="text-white font-bold">{item.price}</span>
               </div>
@@ -1717,7 +1757,9 @@ function Step3({
             <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
               <Phone size={20} />
             </div>
-            <h3 className="text-xl font-bold text-white">Contact Information</h3>
+            <h3 className="text-xl font-bold text-white">
+              Contact Information
+            </h3>
           </div>
 
           <div className="grid grid-cols-2 gap-5 mb-5">
@@ -1756,7 +1798,9 @@ function Step3({
             <div className="relative">
               <input
                 value={data.website}
-                onChange={(e) => updateData({ ...data, website: e.target.value })}
+                onChange={(e) =>
+                  updateData({ ...data, website: e.target.value })
+                }
                 className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-9 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all"
                 placeholder="https://www.yourclub.com/event"
               />
@@ -1789,7 +1833,8 @@ function Step3({
                 // Mock upload
                 updateData({
                   ...data,
-                  banner: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200",
+                  banner:
+                    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200",
                 });
               }}
             >
@@ -1818,8 +1863,8 @@ function Step3({
               <h4 className="text-lg font-bold text-white">Featured Event</h4>
             </div>
             <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-              Get 3x more visibility with featured placement at the top of search
-              results.
+              Get 3x more visibility with featured placement at the top of
+              search results.
             </p>
             <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 mb-8 group-hover:bg-white/10 transition-all">
               <p className="text-2xl font-black text-white">+€49.99</p>
@@ -1834,7 +1879,10 @@ function Step3({
                 "3x more views",
                 "Email promotion",
               ].map((feature, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm text-gray-300">
+                <li
+                  key={i}
+                  className="flex items-center gap-3 text-sm text-gray-300"
+                >
                   <Check size={16} className="text-cyan-400 shrink-0" />
                   {feature}
                 </li>
@@ -1850,7 +1898,9 @@ function Step3({
           <div className="w-10 h-10 bg-cyan-400/10 rounded-xl flex items-center justify-center text-cyan-400 mb-6">
             <FileText size={20} />
           </div>
-          <h4 className="text-lg font-bold text-white mb-4">Description Tips</h4>
+          <h4 className="text-lg font-bold text-white mb-4">
+            Description Tips
+          </h4>
           <ul className="space-y-4">
             {[
               "Be clear and specific",
@@ -1859,7 +1909,10 @@ function Step3({
               "Include success stories",
               "Add requirements clearly",
             ].map((tip, i) => (
-              <li key={i} className="flex gap-3 text-sm text-gray-400 leading-relaxed">
+              <li
+                key={i}
+                className="flex gap-3 text-sm text-gray-400 leading-relaxed"
+              >
                 <span className="text-cyan-400 shrink-0 mt-1">•</span>
                 {tip}
               </li>
@@ -1875,17 +1928,22 @@ function Step4({
   onPrev,
   onClose,
   data,
+  setStep,
 }: {
   onPrev: () => void;
   onClose: () => void;
   data: any;
+  setStep: (s: number) => void;
 }) {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Banner Preview */}
       <div className="relative h-[240px] rounded-[32px] overflow-hidden border border-[#1E2550]">
         <img
-          src={data.banner || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"}
+          src={
+            data.banner ||
+            "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"
+          }
           alt="Event Banner"
           className="w-full h-full object-cover"
         />
@@ -1913,37 +1971,64 @@ function Step4({
               <div className="w-10 h-10 bg-cyan-400/10 rounded-xl flex items-center justify-center text-cyan-400">
                 <Calendar size={20} />
               </div>
-              <h4 className="text-lg font-bold text-white uppercase tracking-tight">Basic information</h4>
+              <h4 className="text-lg font-bold text-white uppercase tracking-tight">
+                Basic information
+              </h4>
             </div>
-            <button className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all">
+            <button 
+              onClick={() => setStep(1)}
+              className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all"
+            >
               <Edit size={14} /> Edit
             </button>
           </div>
 
           <div className="grid grid-cols-2 gap-y-8 gap-x-4">
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Event Name</p>
-              <p className="text-sm font-bold text-white">{data.name || "N/A"}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                Event Name
+              </p>
+              <p className="text-sm font-bold text-white">
+                {data.name || "N/A"}
+              </p>
             </div>
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Event Type</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                Event Type
+              </p>
               <p className="text-sm font-bold text-white">{data.type}</p>
             </div>
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Age Group</p>
-              <p className="text-sm font-bold text-white">{data.minAge}-{data.maxAge} years</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                Age Group
+              </p>
+              <p className="text-sm font-bold text-white">
+                {data.minAge}-{data.maxAge} years
+              </p>
             </div>
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Event Date</p>
-              <p className="text-sm font-bold text-white">{data.date || "N/A"}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                Event Date
+              </p>
+              <p className="text-sm font-bold text-white">
+                {data.date || "N/A"}
+              </p>
             </div>
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Start Time</p>
-              <p className="text-sm font-bold text-white">{data.startTime || "N/A"}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                Start Time
+              </p>
+              <p className="text-sm font-bold text-white">
+                {data.startTime || "N/A"}
+              </p>
             </div>
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">End Time</p>
-              <p className="text-sm font-bold text-white">{data.endTime || "N/A"}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                End Time
+              </p>
+              <p className="text-sm font-bold text-white">
+                {data.endTime || "N/A"}
+              </p>
             </div>
           </div>
         </div>
@@ -1955,9 +2040,14 @@ function Step4({
               <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
                 <MapPin size={20} />
               </div>
-              <h4 className="text-lg font-bold text-white uppercase tracking-tight">Venue & Location</h4>
+              <h4 className="text-lg font-bold text-white uppercase tracking-tight">
+                Venue & Location
+              </h4>
             </div>
-            <button className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all">
+            <button 
+              onClick={() => setStep(2)}
+              className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all"
+            >
               <Edit size={14} /> Edit
             </button>
           </div>
@@ -1968,23 +2058,38 @@ function Step4({
                 <MapPin size={20} />
               </div>
               <div>
-                <h5 className="text-white font-bold leading-tight mb-1">{data.location.venue || "Venue Name"}</h5>
-                <p className="text-xs text-gray-500">{data.location.address || "Street Address"}</p>
-                <p className="text-xs text-gray-500">{data.location.city}, {data.location.postalCode}, {data.location.country}</p>
+                <h5 className="text-white font-bold leading-tight mb-1">
+                  {data.location.venue || "Venue Name"}
+                </h5>
+                <p className="text-xs text-gray-500">
+                  {data.location.address || "Street Address"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {data.location.city}, {data.location.postalCode},{" "}
+                  {data.location.country}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#0B0E1E] rounded-2xl p-5 border border-[#1E2550]">
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Maximum Capacity</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                Maximum Capacity
+              </p>
               <p className="text-xl font-black text-white">{data.capacity}</p>
-              <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-tighter">participants</p>
+              <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-tighter">
+                participants
+              </p>
             </div>
             <div className="bg-[#0B0E1E] rounded-2xl p-5 border border-[#1E2550]">
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Registration Fee</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                Registration Fee
+              </p>
               <p className="text-xl font-black text-cyan-400">€{data.fee}</p>
-              <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-tighter">per participant</p>
+              <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-tighter">
+                per participant
+              </p>
             </div>
           </div>
         </div>
@@ -1997,16 +2102,23 @@ function Step4({
             <div className="w-10 h-10 bg-cyan-400/10 rounded-xl flex items-center justify-center text-cyan-400">
               <FileText size={20} />
             </div>
-            <h4 className="text-lg font-bold text-white uppercase tracking-tight">Event Details</h4>
+            <h4 className="text-lg font-bold text-white uppercase tracking-tight">
+              Event Details
+            </h4>
           </div>
-          <button className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all">
+          <button 
+            onClick={() => setStep(3)}
+            className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all"
+          >
             <Edit size={14} /> Edit
           </button>
         </div>
 
         <div className="space-y-8">
           <div>
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-3">Event Description</p>
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-3">
+              Event Description
+            </p>
             <p className="text-sm text-gray-400 leading-relaxed max-w-4xl">
               {data.description || "No description provided."}
             </p>
@@ -2014,7 +2126,9 @@ function Step4({
 
           {data.requirements && (
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-3">Requirements & What to Bring</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-3">
+                Requirements & What to Bring
+              </p>
               <div className="bg-[#0B0E1E] border border-[#1E2550] rounded-xl p-4 text-sm text-gray-400 leading-relaxed max-w-4xl">
                 {data.requirements}
               </div>
@@ -2022,19 +2136,27 @@ function Step4({
           )}
 
           <div>
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-4">Contact Information</p>
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-4">
+              Contact Information
+            </p>
             <div className="grid md:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 bg-[#0B0E1E] border border-[#1E2550] rounded-xl p-3.5">
                 <Mail size={16} className="text-cyan-400" />
-                <span className="text-xs font-bold text-gray-300 truncate">{data.contactEmail || "N/A"}</span>
+                <span className="text-xs font-bold text-gray-300 truncate">
+                  {data.contactEmail || "N/A"}
+                </span>
               </div>
               <div className="flex items-center gap-3 bg-[#0B0E1E] border border-[#1E2550] rounded-xl p-3.5">
                 <Phone size={16} className="text-cyan-400" />
-                <span className="text-xs font-bold text-gray-300">{data.contactPhone || "N/A"}</span>
+                <span className="text-xs font-bold text-gray-300">
+                  {data.contactPhone || "N/A"}
+                </span>
               </div>
               <div className="flex items-center gap-3 bg-[#0B0E1E] border border-[#1E2550] rounded-xl p-3.5">
                 <Globe size={16} className="text-cyan-400" />
-                <span className="text-xs font-bold text-cyan-400/80 truncate underline decoration-cyan-400/20">{data.website || "N/A"}</span>
+                <span className="text-xs font-bold text-cyan-400/80 truncate underline decoration-cyan-400/20">
+                  {data.website || "N/A"}
+                </span>
               </div>
             </div>
           </div>

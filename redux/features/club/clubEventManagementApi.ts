@@ -3,12 +3,12 @@ import { baseApi } from "@/redux/api/baseApi";
 export const clubEventManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getClubEvents: builder.query({
-      query: () => "/events/",
+      query: () => "/club-academy/events/",
       providesTags: ["Events"],
     }),
     createEvent: builder.mutation({
       query: (data) => ({
-        url: "/events/create/",
+        url: "/club-academy/events/create/",
         method: "POST",
         body: data,
       }),
@@ -16,7 +16,7 @@ export const clubEventManagementApi = baseApi.injectEndpoints({
     }),
     updateEvent: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/events/${id}/update/`,
+        url: `/club-academy/events/${id}/update/`,
         method: "PUT",
         body: data,
       }),
@@ -24,14 +24,14 @@ export const clubEventManagementApi = baseApi.injectEndpoints({
     }),
     deleteEvent: builder.mutation({
       query: (id) => ({
-        url: `/events/${id}/delete/`,
+        url: `/club-academy/events/${id}/delete/`,
         method: "DELETE",
       }),
       invalidatesTags: ["Events"],
     }),
     toggleFeaturedEvent: builder.mutation({
       query: (id) => ({
-        url: `/events/${id}/toggle-featured/`,
+        url: `/club-academy/events/${id}/toggle-featured/`, 
         method: "POST",
       }),
       invalidatesTags: ["Events"],
