@@ -31,7 +31,7 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
       }),
     }),
     getRegistrationStatus: builder.query<any, string>({
-      query: (registrationId) => `/players/event-registration/status/${registrationId}/`,
+      query: (registration_id) => `/players/event-registration/status/${registration_id}/`,
     }),
     getMyRegistrations: builder.query<any[], void>({
       query: () => `/players/event-registrations/`,
