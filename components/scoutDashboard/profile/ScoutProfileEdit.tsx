@@ -20,7 +20,7 @@ import { useUpdateProfileMutation } from "@/redux/features/scout/scoutProfileApi
 import { ScoutProfile, Achievement } from "@/types/scout/profileType";
 
 // Form types
-interface FormValues {
+export interface FormValues {
   first_name: string;
   last_name: string;
   bio: string;
