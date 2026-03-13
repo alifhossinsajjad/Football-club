@@ -3,83 +3,116 @@ stages:
   - push
   - deploy
 
+# Global variables
 variables:
   DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
 
-build:
-  stage: build
+# DRY template
+.default_docker:
   image: docker:27
+
   services:
-    - docker:27-dind
+    - name: docker:27-dind
+      command: ["--tls=false"]
 
   before_script:
+    # Fail fast (important)
+    - set -e
+
+    # Install tools
     - apk add --no-cache make
+
+    # Docker login
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-  script:
-    - make test 
-
-  only:
-    - main
+    # Debug check
+    - docker info
 
 
 # -------------------------
-# PUSH IMAGE
+# BUILD
+# -------------------------
+build:
+  stage: build
+
+  extends:
+    - .default_docker
+
+  script:
+    - make test
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+
+# -------------------------
+# PUSH
 # -------------------------
 push:
   stage: push
-  image: docker:27
-  services:
-    - docker:27-dind
 
-  before_script:
-    - apk add --no-cache make
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  extends:
+    - .default_docker
 
   script:
     - make push
 
-  only:
-    - main
-
   needs:
     - build
 
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
 
 # -------------------------
-# DEPLOY VPS
+# DEPLOY
 # -------------------------
 deploy:
   stage: deploy
-  image: alpine:latest
+
+  image: alpine:3.21
 
   before_script:
-    # Install ssh tools
+
+    - set -e
+
+    # Install ssh
     - apk add --no-cache openssh-client rsync
 
-    # Setup ssh key
+    # Setup ssh
     - mkdir -p ~/.ssh
-    - echo "$VPS_SSH_KEY" > ~/.ssh/id_rsa
+
+    # Fix newline formatting issue (very important)
+    - echo "$VPS_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+
     - chmod 600 ~/.ssh/id_rsa
 
-    # Disable host checking (simple pipeline)
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+    # Known hosts (better than disabling check)
+    - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
 
   script:
 
-    # Copy compose file
-    - scp docker-compose.yaml $VPS_USER@$VPS_HOST:/home/$VPS_USER/app/
+    # Copy compose
+    - rsync -avz docker-compose.yaml $VPS_USER@$VPS_HOST:/home/$VPS_USER/app/
 
-    # Run deployment
+    # Deploy
     - |
       ssh $VPS_USER@$VPS_HOST "
-        cd /home/$VPS_USER/app &&
-        docker compose pull &&
-        docker compose up -d
-      "
+        set -e
 
-  only:
-    - main
+        cd /home/$VPS_USER/app
+
+        docker compose pull
+
+        docker compose up -d
+
+        docker image prune -f
+      "
 
   needs:
     - push
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
