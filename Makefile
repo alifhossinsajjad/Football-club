@@ -1,11 +1,26 @@
 test:
 	@echo "Running tests..."
-	docker build --no-cache -t softvence/caroline-admin:latest .
+	docker compose --profile prod build --no-cache
+
 build:
 	@echo "Building..."
 	docker compose --profile prod build --no-cache
 
-prod:
+prod-push: test
 	@echo "Building production image..."
-	docker compose --profile prod up -d
+	docker compose --profile prod push
 
+prod-up:
+	@echo "Starting production..."
+	cd ~/admin
+	docker compose --profile prod up -d
+deploy:
+	@echo "Deploying..."
+	cd ~/admin
+	docker compose --profile prod down --remove-orphans
+	docker compose --profile prod rm -f
+	docker compose --profile prod pull
+	docker compose --profile prod up -d
+	docker image prune -f
+	docker system prune -af
+	systemctl restart caddy
