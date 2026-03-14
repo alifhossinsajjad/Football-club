@@ -48,3 +48,4 @@ temp_interactive_push.bat
 .env.*
 .env*
 .env.local
+.env.production
