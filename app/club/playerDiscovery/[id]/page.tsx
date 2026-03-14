@@ -11,6 +11,19 @@ import {
 import { useGetPlayerDetailsQuery } from "@/redux/features/club/playerDiscoveryApi";
 import DraggableCoverPhoto from "@/components/reuseable/DraggableCoverPhoto";
 
+interface PlayingHistory {
+  team: string;
+  duration: string;
+  role: string;
+  detail: string;
+}
+
+interface HighlightVideo {
+  title: string;
+  duration: string;
+  thumb: string;
+}
+
 export default function PlayerDiscoveryDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -247,7 +260,7 @@ export default function PlayerDiscoveryDetailsPage() {
              <div className="bg-[#12143A] rounded-2xl border border-[#1A2160] p-6 lg:p-8">
                <h3 className="text-white font-bold mb-6">Playing History</h3>
                <div className="space-y-4">
-                 {playingHistory.map((history: any, i: number) => (
+                 {playingHistory.map((history: PlayingHistory, i: number) => (
                    <div key={i} className="bg-[#0B0D2A] border border-[#1A2160] rounded-xl p-5 flex flex-col md:flex-row md:items-start justify-between gap-4">
                      <div>
                        <h4 className="text-white font-bold text-[15px] mb-1">{history?.team}</h4>
@@ -267,7 +280,7 @@ export default function PlayerDiscoveryDetailsPage() {
                  <Video size={20} className="text-[#00E5FF]" />
                </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                 {highlightVideos.map((vid: any, i: number) => (
+                 {highlightVideos.map((vid: HighlightVideo, i: number) => (
                    <div key={i} className="group cursor-pointer">
                      <div className="w-full aspect-video rounded-xl overflow-hidden border border-[#1A2160] relative mb-3">
                        <Image src={vid.thumb} alt={vid.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />

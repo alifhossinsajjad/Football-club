@@ -20,8 +20,40 @@ import {
   useCreateCheckoutMutation,
   useVerifyPaymentMutation
 } from "../../../redux/features/player/subscriptionApi";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+
+interface Plan {
+  id: number;
+  planName?: string;
+  plan_name?: string;
+  plan_type?: string;
+  price: string | number;
+  billingInterval?: string;
+  billing_cycle?: string;
+  features: string[];
+}
+
+interface ActiveSubscription {
+  plan_name: string;
+  plan_type: string;
+  amount: string | number;
+  billing_cycle: string;
+  next_billing_date: string;
+  card_brand: string;
+  card_last_four: string;
+  auto_renewal: boolean;
+  features: string[];
+}
+
+interface PaymentHistoryItem {
+  id: number;
+  payment_date: string;
+  description: string;
+  currency: string;
+  amount: string | number;
+  status: string;
+}
 
 const CheckIcon = () => (
   <div className="w-5 h-5 rounded-full bg-[#00D4AA]/20 flex items-center justify-center">
@@ -29,59 +61,15 @@ const CheckIcon = () => (
   </div>
 );
 
-const SuccessModal = ({ data, onClose }: { data: any, onClose: () => void }) => {
-  return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-500">
-      <div className="relative w-full max-w-xl bg-[#12143A]/80 border border-cyan-400/20 rounded-[48px] p-12 text-center shadow-[0_0_80px_rgba(34,211,238,0.15)] overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-cyan-400/10 to-transparent pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="relative space-y-8">
-          <div className="w-24 h-24 bg-gradient-to-tr from-[#00D4AA] to-cyan-400 rounded-[32px] flex items-center justify-center text-white mx-auto shadow-[0_12px_40px_rgba(0,212,170,0.3)] rotate-3">
-            <Check size={48} strokeWidth={3} />
-          </div>
-          
-          <div className="space-y-4">
-            <h3 className="text-4xl font-black text-white uppercase tracking-tighter leading-none italic">
-              Welcome to {data.plan_name}!
-            </h3>
-            <p className="text-gray-400 font-medium text-lg">
-              Your subscription is now active. Get ready to elevate your career.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4 text-left">
-            <div className="p-6 bg-[#0B0D2C]/50 rounded-[24px] border border-white/5">
-              <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Plan Type</p>
-              <p className="text-white font-bold">{data.plan_type} ({data.billing_cycle_name})</p>
-            </div>
-            <div className="p-6 bg-[#0B0D2C]/50 rounded-[24px] border border-white/5">
-              <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Next Billing</p>
-              <p className="text-white font-bold">{data.next_billing_date}</p>
-            </div>
-          </div>
-
-          <button 
-            onClick={onClose}
-            className="w-full py-6 rounded-[24px] bg-gradient-to-r from-cyan-400 to-purple-500 text-white font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
-          >
-            Access My Dashboard
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const SubscriptionPage = () => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [successData, setSuccessData] = useState<any>(null);
 
-  const searchParams = useSearchParams();
+
   const router = useRouter();
-  const sessionId = searchParams.get("session_id");
 
   const { data: subscription, isLoading: isSubLoading } = useGetSubscriptionQuery();
   const { data: plansData, isLoading: isPlansLoading } = useGetPlansQuery();
@@ -91,52 +79,52 @@ const SubscriptionPage = () => {
   const [cancelSubscription, { isLoading: isCancelling }] = useCancelSubscriptionMutation();
   const [updatePaymentMethod, { isLoading: isUpdating }] = useUpdatePaymentMethodMutation();
 
-  const activeSub = subscription?.data;
-  const plans = plansData?.data || [];
-  const paymentHistory = historyRes?.data || [];
+  const activeSub: ActiveSubscription | null = subscription?.data || null;
+  const plans: Plan[] = plansData?.data || [];
+  const paymentHistory: PaymentHistoryItem[] = historyRes?.data || [];
 
-  // Use either the real subscription data or the success details from the verification
-  const displaySub = activeSub || successData;
+  const displaySub = activeSub;
 
-  React.useEffect(() => {
-    if (sessionId) {
-      const verify = async () => {
-        try {
-          const res = await verifyPayment({ session_id: sessionId }).unwrap();
-          if (res.status === "success") {
-            setSuccessData(res.data);
-            toast.success("Subscription activated!");
-            // Clean up the URL
-            router.replace("/player/subscription");
-          }
-        } catch (err: any) {
-          toast.error(err?.data?.message || "Verification failed");
-        }
-      };
-      verify();
-    }
-  }, [sessionId, verifyPayment, router]);
-
-  const handleSubscribe = async (plan: any) => {
+  const handleSubscribe = async (plan: Plan) => {
     try {
-      const res = await createCheckout({
-        plan_type: "BASIC", 
-        billing_cycle: "ANNUAL"
-      }).unwrap();
+      const baseUrl = window.location.origin;
+      
+      // Aggressively match known plan types from whatever string the backend provided
+      const rawName = String(plan.plan_type || plan.plan_name || plan.planName || "BASIC").toUpperCase();
+      let pType = "BASIC";
+      if (rawName.includes("PRO") || rawName.includes("PREMIUM")) pType = "PRO";
+      else if (rawName.includes("ELITE")) pType = "ELITE";
+      else if (rawName.includes("BASIC")) pType = "BASIC";
+      else pType = rawName; // Fallback to sending what we have
+      
+      const rawCycle = String(plan.billing_cycle || plan.billingInterval || "ANNUAL").toUpperCase();
+      let bCycle = rawCycle.includes("MONTH") ? "MONTHLY" : "ANNUAL";
+      
+      const payload = {
+        plan_type: pType, 
+        billing_cycle: bCycle
+      };
+      
+      console.log("Sending checkout payload:", payload);
+      
+      const res = await createCheckout(payload).unwrap();
       
       if (res.checkout_url) {
         window.location.href = res.checkout_url;
       }
     } catch (err: any) {
-      toast.error("Failed to initiate checkout");
+      console.error("Checkout error:", err);
+      const errMsg = err?.data?.plan_type?.[0] || err?.data?.message || "Failed to initiate checkout";
+      toast.error(errMsg);
     }
   };
 
   const handleCancelSubscription = async () => {
     try {
-      const res = await cancelSubscription().unwrap();
+      const res = await cancelSubscription({ reason: cancelReason }).unwrap();
       toast.success(res.message || "Subscription cancelled.");
       setIsCancelModalOpen(false);
+      setCancelReason("");
     } catch (err) {
       toast.error("Failed to cancel subscription.");
     }
@@ -184,10 +172,10 @@ const SubscriptionPage = () => {
               )}
               
               <div className="mb-8">
-                <h3 className="text-xl font-bold text-white mb-2">{plan.planName}</h3>
+                <h3 className="text-xl font-bold text-white mb-2">{plan.plan_name || plan.planName || plan.plan_type}</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-white">€{plan.price}</span>
-                  <span className="text-gray-500 font-bold text-xs">/{plan.billingInterval.toLowerCase()}</span>
+                  <span className="text-gray-500 font-bold text-xs">/{(plan.billing_cycle || plan.billingInterval || "").toLowerCase()}</span>
                 </div>
               </div>
 
@@ -213,7 +201,7 @@ const SubscriptionPage = () => {
           ))}
         </div>
 
-        {successData && <SuccessModal data={successData} onClose={() => setSuccessData(null)} />}
+
       </div>
     );
   }
@@ -320,7 +308,7 @@ const SubscriptionPage = () => {
               </tr>
             </thead>
             <tbody>
-              {paymentHistory.map((item: any) => (
+              {paymentHistory.map((item: PaymentHistoryItem) => (
                 <tr key={item.id} className="group border-b border-white/[0.02] last:border-0 hover:bg-white/[0.01] transition-colors">
                   <td className="py-6 text-sm text-gray-300 font-bold">{new Date(item.payment_date).toLocaleDateString()}</td>
                   <td className="py-6 text-sm text-gray-400">{item.description}</td>
@@ -348,7 +336,7 @@ const SubscriptionPage = () => {
       </div>
 
       {/* --- Modals --- */}
-      {successData && <SuccessModal data={successData} onClose={() => setSuccessData(null)} />}
+
 
       {/* Cancel Modal */}
       {isCancelModalOpen && (
@@ -362,6 +350,16 @@ const SubscriptionPage = () => {
                No refund. Your subscription will stay active until <span className="text-white font-bold">{displaySub.next_billing_date}</span>, then it will not renew.
              </p>
              
+             <div className="space-y-4 mb-8 text-left">
+                <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Reason for cancelling (optional)</label>
+                <textarea 
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="Tell us why you're leaving..."
+                  className="w-full bg-[#0B0D2C] border border-white/5 rounded-2xl px-4 py-3 text-white focus:outline-none focus:border-red-500/50 transition-all text-sm min-h-[100px] resize-none"
+                />
+             </div>
+
              <div className="space-y-4 mb-10 text-left bg-[#0B0D2C] p-6 rounded-2xl border border-white/5">
                 {displaySub.features.map((perk: string, i: number) => (
                   <div key={i} className="flex items-center gap-3 text-xs text-gray-500">
