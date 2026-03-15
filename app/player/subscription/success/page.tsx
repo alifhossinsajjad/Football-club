@@ -1,134 +1,140 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Check, XCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import React, { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useVerifyPaymentMutation } from "../../../../redux/features/player/subscriptionApi";
+import { Check, ArrowRight, Loader2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
-interface SubscriptionData {
-  plan_name: string;
-  plan_type: string;
-  billing_cycle_name: string;
-  next_billing_date: string;
-  features?: string[];
-}
-
-export default function SubscriptionSuccessPage() {
-  const searchParams = useSearchParams();
+const SuccessContent = () => {
   const router = useRouter();
-
-  const session_id = searchParams.get("session_id");
-
-  const [verifyPayment, { isLoading }] = useVerifyPaymentMutation();
-  const [status, setStatus] = useState<"VERIFYING" | "SUCCESS" | "FAILED">("VERIFYING");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [planData, setPlanData] = useState<SubscriptionData | null>(null);
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get("session_id");
+console.log('session id ', sessionId)
+  const [verifyPayment, { isLoading: isVerifying }] = useVerifyPaymentMutation();
+  const [successData, setSuccessData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!session_id) {
-      setStatus("FAILED");
-      setErrorMsg("Missing required payment information in the URL.");
-      return;
+    if (sessionId) {
+      verifyPayment({ session_id: sessionId })
+        .unwrap()
+        .then((res) => {
+          setSuccessData(res.data);
+          toast.success("Payment verified successfully!");
+        })
+        .catch((err) => {
+          console.error("Verification failed:", err);
+          setError("Failed to verify payment. Please contact support.");
+          toast.error("Verification failed.");
+        });
+    } else {
+      setError("No session ID found.");
     }
+  }, [sessionId, verifyPayment]);
 
-    const verify = async () => {
-      try {
-        const res = await verifyPayment({ session_id }).unwrap();
-        setPlanData(res.data);
-        setStatus("SUCCESS");
-      } catch (err: any) {
-        setStatus("FAILED");
-        const errMsg = err?.data?.message || err?.data?.detail || "Payment verification failed. Please contact support.";
-        setErrorMsg(errMsg);
-      }
-    };
+  if (isVerifying) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+        <div className="relative">
+          <div className="w-24 h-24 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" />
+          <Loader2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-cyan-400 animate-pulse" size={32} />
+        </div>
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-black text-white uppercase italic tracking-widest">Verifying Payment</h2>
+          <p className="text-gray-500 font-medium">Please wait while we confirm your subscription...</p>
+        </div>
+      </div>
+    );
+  }
 
-    verify();
-  }, [session_id, verifyPayment]);
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center space-y-8">
+        <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center text-red-500 border border-red-500/20">
+          <Check size={40} className="rotate-45" />
+        </div>
+        <div className="space-y-4">
+          <h2 className="text-3xl font-black text-white uppercase italic">Something went wrong</h2>
+          <p className="text-gray-400 max-w-md mx-auto">{error}</p>
+        </div>
+        <button 
+          onClick={() => router.push("/player/subscription")}
+          className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all"
+        >
+          Back to Subscription
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-6">
-      <div className="bg-[#121433] border border-[#1E2550] rounded-[32px] p-10 max-w-lg w-full text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        
-        {status === "VERIFYING" && (
-          <div className="flex flex-col items-center justify-center py-6 space-y-6">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-cyan-400"></div>
-            <div>
-              <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">Verifying Subscription</h3>
-              <p className="text-gray-400">Please wait while we confirm your payment...</p>
-            </div>
-          </div>
-        )}
+    <div className="flex flex-col items-center justify-center min-h-[70vh] p-8 animate-in fade-in zoom-in duration-700">
+      <div className="relative mb-12">
+        <div className="absolute inset-0 bg-cyan-400 blur-3xl opacity-20 animate-pulse" />
+        <div className="relative w-32 h-32 bg-gradient-to-br from-[#00D4AA] to-cyan-500 rounded-[40px] flex items-center justify-center text-white shadow-[0_20px_50px_rgba(0,212,170,0.4)] rotate-3">
+          <Check size={64} strokeWidth={3} />
+        </div>
+      </div>
 
-        {status === "SUCCESS" && (
-          <div className="flex flex-col items-center justify-center py-4 space-y-8">
-            <div className="w-24 h-24 bg-[#04B5A3]/10 text-[#04B5A3] rounded-full flex items-center justify-center border-2 border-[#04B5A3]/30 animate-bounce">
-              <Check size={48} strokeWidth={3} />
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-3xl font-black text-white uppercase tracking-tighter">Subscription Active!</h3>
-              <p className="text-gray-400 max-w-sm mx-auto">Welcome to {planData?.plan_name || 'your new plan'}! Your payment was successful.</p>
+      <div className="text-center space-y-6 max-w-2xl">
+        <div className="space-y-2">
+          <h1 className="text-5xl md:text-6xl font-black text-white uppercase italic leading-none tracking-tighter">
+            Payment <br />
+            <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Successful!</span>
+          </h1>
+          <p className="text-xl text-gray-400 font-medium">Welcome to the elite league.</p>
+        </div>
+
+        {successData && (
+          <div className="bg-[#12143A]/50 border border-white/5 rounded-[32px] p-8 backdrop-blur-xl space-y-6">
+            <div className="flex justify-between items-center border-b border-white/5 pb-6">
+              <div className="text-left">
+                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Active Plan</p>
+                <h3 className="text-2xl font-black text-cyan-400 uppercase italic">{successData.plan_name}</h3>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Billing Cycle</p>
+                <p className="text-white font-bold">{successData.billing_cycle}</p>
+              </div>
             </div>
             
-            {planData && (
-              <div className="bg-[#0B0E1E] border border-cyan-400/20 rounded-2xl p-6 w-full space-y-4 text-left">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-500 font-bold uppercase tracking-widest">Plan Type</span>
-                  <span className="text-white font-bold">{planData.plan_name} ({planData.billing_cycle_name})</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-500 font-bold uppercase tracking-widest">Next Billing</span>
-                  <span className="text-cyan-400 font-mono">{planData.next_billing_date}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-500 font-bold uppercase tracking-widest">Status</span>
-                  <span className="text-[#04B5A3] font-bold uppercase px-3 py-1 bg-[#04B5A3]/10 rounded-full tracking-wider">Active</span>
-                </div>
-                
-                {planData.features && planData.features.length > 0 && (
-                  <div className="pt-4 border-t border-white/5 space-y-3">
-                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Included Features</p>
-                    <div className="grid grid-cols-1 gap-2">
-                       {planData.features.map((feature: string, i: number) => (
-                         <div key={i} className="flex items-center gap-2 text-xs text-gray-400">
-                           <div className="w-1.5 h-1.5 rounded-full bg-cyan-400/50" />
-                           {feature}
-                         </div>
-                       ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <button 
-              onClick={() => router.push("/player/subscription")}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#04B5A3] to-[#039d8f] text-white font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-[0_12px_24px_-8px_rgba(4,181,163,0.4)]"
-            >
-              Manage Subscription <ArrowRight size={20} />
-            </button>
+            <div className="flex items-center gap-4 text-sm text-gray-400 font-medium bg-[#0B0D2C]/50 p-4 rounded-2xl border border-white/5">
+              <div className="w-2 h-2 rounded-full bg-[#00D4AA] shadow-[0_0_10px_#00D4AA]" />
+              Your premium features are now active on your profile.
+            </div>
           </div>
         )}
 
-        {status === "FAILED" && (
-          <div className="flex flex-col items-center justify-center py-4 space-y-8">
-            <div className="w-24 h-24 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center border-2 border-red-500/30">
-              <XCircle size={48} strokeWidth={3} />
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-3xl font-black text-white uppercase tracking-tighter">Verification Failed</h3>
-              <p className="text-red-400 max-w-sm mx-auto">{errorMsg}</p>
-            </div>
-            <button 
-              onClick={() => router.push("/player/subscription")}
-              className="w-full py-4 rounded-xl border border-[#1E2550] text-gray-300 font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/5 transition-all"
-            >
-              <ArrowLeft size={20} /> Back to Plans
-            </button>
-          </div>
-        )}
-
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+          <button 
+            onClick={() => router.push("/player/dashboard")}
+            className="px-10 py-5 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-2xl text-white font-black uppercase tracking-widest text-xs shadow-[0_10px_30px_rgba(0,212,170,0.3)] hover:scale-105 transition-all flex items-center justify-center gap-2 group"
+          >
+            Go to Dashboard
+            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+          
+          <button 
+            onClick={() => router.push("/player/subscription")}
+            className="px-10 py-5 bg-white/5 border border-white/10 rounded-2xl text-white font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all"
+          >
+            Manage Billing
+          </button>
+        </div>
       </div>
     </div>
+  );
+};
+
+export default function SubscriptionSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00D4AA]"></div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }
