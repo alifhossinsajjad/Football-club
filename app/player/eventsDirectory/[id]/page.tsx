@@ -24,6 +24,28 @@ import {
 } from "../../../../redux/features/player/eventsDirectoryApi";
 import { useForm } from "react-hook-form";
 
+interface EventData {
+  id: number;
+  event_name: string;
+  venue_name: string;
+  venue_address?: string;
+  registration_fee: string;
+  description?: string;
+  event_date: string;
+  event_time?: string;
+  minimum_age: number;
+  maximum_age: number;
+  maximum_capacity: number;
+}
+
+interface RegistrationStatusData {
+  registration_status?: string;
+  payment_status?: string;
+  data?: {
+    registration_status?: string;
+  };
+}
+
 type ViewState = "DETAILS" | "REGISTRATION";
 
 const EventDetailsPage = () => {
@@ -108,9 +130,9 @@ const EventDetailsView = ({
   registrationStatus,
   isRegistered = false,
 }: { 
-  event: any, 
+  event: EventData, 
   onRegister: () => void,
-  registrationStatus?: any,
+  registrationStatus?: RegistrationStatusData,
   isRegistered?: boolean,
 }) => {
   // Get the real status from the registration status API response
@@ -283,7 +305,7 @@ const EventDetailsView = ({
   );
 };
 
-const RegistrationFlow = ({ event, onBack, onComplete }: { event: any, onBack: () => void, onComplete: () => void }) => {
+const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onBack: () => void, onComplete: () => void }) => {
   const [step, setStep] = useState(1);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
@@ -338,7 +360,16 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: any, onBack: (
       setStep(4);
     } else if (step === 4) {
       try {
-        const res = await checkout({ registration_id: registrationId! }).unwrap();
+        const baseUrl = window.location.origin;
+        const successUrl = `${baseUrl}/player/eventsDirectory/success?session_id={CHECKOUT_SESSION_ID}&registration_id=${registrationId}`;
+        const cancelUrl = `${baseUrl}/player/eventsDirectory/cancel?registration_id=${registrationId}`;
+
+        const res = await checkout({ 
+          registration_id: registrationId!,
+          success_url: successUrl,
+          cancel_url: cancelUrl
+        }).unwrap();
+        
         if (res.checkout_url) {
           window.location.href = res.checkout_url;
         } else {

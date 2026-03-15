@@ -62,7 +62,7 @@ const PlayerDiscoveryPage = () => {
                      Array.isArray(apiData?.data) ? apiData.data : 
                      Array.isArray(apiData) ? apiData : [];
 
-  const handleOpenMessageModal = (player: any) => {
+  const handleOpenMessageModal = (player: Player) => {
     setSelectedPlayerForMessage(player);
     setIsMessageModalOpen(true);
     setMessageText("");
@@ -70,13 +70,13 @@ const PlayerDiscoveryPage = () => {
 
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
-    alert(`Message sent to ${selectedPlayerForMessage?.name || selectedPlayerForMessage?.user?.first_name}: ${messageText}`);
+    alert(`Message sent to ${selectedPlayerForMessage?.name}: ${messageText}`);
     setIsMessageModalOpen(false);
     setMessageText("");
   };
 
   // Process data with Fallbacks so UI never breaks
-  const players = rawPlayers.map((p: any) => {
+  const players: Player[] = rawPlayers.map((p: any) => {
     const firstName = p?.user?.first_name || p?.first_name || "Unknown";
     const lastName = p?.user?.last_name || p?.last_name || "Player";
     
@@ -101,7 +101,7 @@ const PlayerDiscoveryPage = () => {
   });
 
   const filteredPlayers = useMemo(() => {
-    return players.filter((player: any) => {
+    return players.filter((player: Player) => {
       const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesPosition = positionFilter === "All Positions" || player.position === positionFilter;
       const matchesNationality = nationalityFilter === "All Countries" || player.nationality === nationalityFilter;
@@ -218,7 +218,7 @@ const PlayerDiscoveryPage = () => {
               <p className="text-gray-500 text-xl font-medium tracking-wide">No players found matching your criteria</p>
             </div>
           ) : (
-            filteredPlayers.map((player: any) => (
+            filteredPlayers.map((player: Player) => (
               <div
                 key={player.id}
                 className="group bg-[#12143A]/40 backdrop-blur-sm p-6 rounded-[28px] border border-[#1E2550] hover:border-[#04B5A3]/30 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(4,181,163,0.1)] hover:-translate-y-2"

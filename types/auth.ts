@@ -36,4 +36,8 @@ export interface LoginResponse {
   access: string;
   message: string;
   user: User;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> github/development
