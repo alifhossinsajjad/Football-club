@@ -94,15 +94,17 @@ const SubscriptionPage = () => {
       let pType = "BASIC";
       if (rawName.includes("PRO") || rawName.includes("PREMIUM")) pType = "PRO";
       else if (rawName.includes("ELITE")) pType = "ELITE";
-      else if (rawName.includes("BASIC")) pType = "BASIC";
-      else pType = rawName; // Fallback to sending what we have
+      else if (rawName.includes("BASIC") || rawName.includes("STARTER")) pType = "BASIC";
+      else pType = "BASIC"; // Absolute fallback to BASIC because backend rejects unknown types like STARTER
       
       const rawCycle = String(plan.billing_cycle || plan.billingInterval || "ANNUAL").toUpperCase();
       let bCycle = rawCycle.includes("MONTH") ? "MONTHLY" : "ANNUAL";
       
-      const payload = {
+      const payload: { plan_type: string; billing_cycle: string; success_url?: string; cancel_url?: string } = {
         plan_type: pType, 
-        billing_cycle: bCycle
+        billing_cycle: bCycle,
+        success_url: `${baseUrl}/player/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/player/subscription/cancel`
       };
       
       console.log("Sending checkout payload:", payload);
