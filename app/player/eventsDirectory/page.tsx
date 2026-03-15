@@ -17,8 +17,17 @@ import {
   useGetRegistrationStatusQuery,
 } from "../../../redux/features/player/eventsDirectoryApi";
 
+interface EventData {
+  id: number;
+  event_name: string;
+  venue_name: string;
+  event_date: string;
+  registration_fee: string;
+  event_type?: string;
+}
+
 // ── Single event card. Fetches its own status if a registrationId exists ──────
-const EventCard = ({ event, onViewDetails }: { event: any; onViewDetails: (id: any) => void }) => {
+const EventCard = ({ event, onViewDetails }: { event: EventData; onViewDetails: (id: number) => void }) => {
   const [registration_id] = useState<string | null>(() => {
     try {
       const map = JSON.parse(localStorage.getItem("playerRegistrations") || "{}");
@@ -111,7 +120,7 @@ const EventsDirectoryPage = () => {
   const { data: events = [], isLoading } = useGetEventsQuery();
 
   const filteredEvents = useMemo(() => {
-    return events.filter((event: any) => {
+    return events.filter((event: EventData) => {
       const matchesSearch = event.event_name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = typeFilter === "All Types" || event.event_type === typeFilter;
       const matchesLocation = locationFilter === "All Locations" || event.venue_name?.includes(locationFilter);
@@ -127,7 +136,7 @@ const EventsDirectoryPage = () => {
     return filteredEvents.slice(start, start + itemsPerPage);
   }, [filteredEvents, currentPage]);
 
-  const handleViewDetails = (id: any) => router.push(`/player/eventsDirectory/${id}`);
+  const handleViewDetails = (id: number) => router.push(`/player/eventsDirectory/${id}`);
 
   return (
     <div className="p-6">
@@ -176,7 +185,7 @@ const EventsDirectoryPage = () => {
       ) : (
         <div className="space-y-8">
           <div className="grid lg:grid-cols-2 gap-6">
-            {paginatedEvents.map((event: any) => (
+            {paginatedEvents.map((event: EventData) => (
               <EventCard key={event.id} event={event} onViewDetails={handleViewDetails} />
             ))}
           </div>

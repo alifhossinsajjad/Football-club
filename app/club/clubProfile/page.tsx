@@ -28,8 +28,56 @@ import {
   useUpdateClubProfileMutation,
 } from "../../../redux/features/club/clubProfileApi";
 
+interface Achievement {
+  title: string;
+  year: string;
+}
+
+interface UpcomingEvent {
+  title: string;
+  date: string;
+  venue: string;
+  fee?: string;
+}
+
+interface FeaturedPlayer {
+  name: string;
+  age_group: string;
+  position: string;
+}
+
+interface ClubProfile {
+  club_name: string;
+  tagline: string;
+  club_type: string;
+  location: string;
+  founded_year: string;
+  total_players: string | number;
+  email: string;
+  phone: string;
+  website: string;
+  address: string;
+  facebook: string;
+  twitter: string;
+  instagram: string;
+  youtube: string;
+  overview: string;
+  mission: string;
+  age_groups: string[];
+  facilities: string[];
+  achievements: Achievement[];
+  upcoming_events: UpcomingEvent[];
+  featured_players: FeaturedPlayer[];
+  gallery: string[];
+  cover_image: string;
+  logo: string | null;
+  age_groups_text?: string;
+  _coverFile?: File;
+  _logoFile?: File;
+}
+
 // ── Fallback data ──────────────────────────────────────────────────────────────
-const FALLBACK: Record<string, any> = {
+const FALLBACK: ClubProfile = {
   club_name: "FC Barcelona Youth",
   tagline: "Developing Champions Since 1973",
   club_type: "Professional Academy",
@@ -179,7 +227,7 @@ const ClubProfilePage = () => {
     useUpdateClubProfileMutation();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState<Record<string, any>>({});
+  const [form, setForm] = useState<Partial<ClubProfile>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
   const coverRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
@@ -203,7 +251,7 @@ const ClubProfilePage = () => {
     setSaveError(null);
   };
 
-  const set = (key: string, val: any) => setForm((p) => ({ ...p, [key]: val }));
+  const set = (key: keyof ClubProfile, val: any) => setForm((p) => ({ ...p, [key]: val }));
 
   // ── PATCH API ─────────────────────────────────────────────────────────────
   const handleSave = async () => {
@@ -518,18 +566,18 @@ const ClubProfilePage = () => {
           <Card>
             <CardTitle>Social Media</CardTitle>
             <div className="space-y-4">
-              {[
+              {( [
                 { label: "Facebook", key: "facebook" },
                 { label: "Twitter / X", key: "twitter" },
                 { label: "Instagram", key: "instagram" },
                 { label: "YouTube", key: "youtube" },
-              ].map(({ label, key }) => (
+              ] as { label: string; key: keyof ClubProfile }[]).map(({ label, key }) => (
                 <div key={key} className="space-y-1.5">
                   <label className="text-xs text-gray-500 font-bold">
                     {label}
                   </label>
                   <EInput
-                    value={current[key] || ""}
+                    value={(current[key] as string) || ""}
                     onChange={(v) => set(key, v)}
                     placeholder={`${label} URL or handle`}
                   />
@@ -571,7 +619,7 @@ const ClubProfilePage = () => {
                     set(
                       "facilities",
                       (current.facilities || []).filter(
-                        (_: any, idx: number) => idx !== i,
+                        (_: string, idx: number) => idx !== i,
                       ),
                     )
                   }
@@ -602,7 +650,7 @@ const ClubProfilePage = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {(current.achievements || []).map((a: any, i: number) => (
+            {(current.achievements || []).map((a: Achievement, i: number) => (
               <div
                 key={i}
                 className="space-y-2 pb-4 border-b border-[#1e2650] last:border-0 last:pb-0"
@@ -637,7 +685,7 @@ const ClubProfilePage = () => {
                     set(
                       "achievements",
                       (current.achievements || []).filter(
-                        (_: any, idx: number) => idx !== i,
+                        (_: Achievement, idx: number) => idx !== i,
                       ),
                     )
                   }
@@ -668,7 +716,7 @@ const ClubProfilePage = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {(current.upcoming_events || []).map((ev: any, i: number) => (
+            {(current.upcoming_events || []).map((ev: UpcomingEvent, i: number) => (
               <div
                 key={i}
                 className="space-y-2 pb-4 border-b border-[#1e2650] last:border-0 last:pb-0"
@@ -727,7 +775,7 @@ const ClubProfilePage = () => {
                     set(
                       "upcoming_events",
                       (current.upcoming_events || []).filter(
-                        (_: any, idx: number) => idx !== i,
+                        (_: UpcomingEvent, idx: number) => idx !== i,
                       ),
                     )
                   }
@@ -758,7 +806,7 @@ const ClubProfilePage = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {(current.featured_players || []).map((p: any, i: number) => (
+            {(current.featured_players || []).map((p: FeaturedPlayer, i: number) => (
               <div
                 key={i}
                 className="space-y-2 pb-4 border-b border-[#1e2650] last:border-0 last:pb-0"
@@ -804,7 +852,7 @@ const ClubProfilePage = () => {
                     set(
                       "featured_players",
                       (current.featured_players || []).filter(
-                        (_: any, idx: number) => idx !== i,
+                        (_: FeaturedPlayer, idx: number) => idx !== i,
                       ),
                     )
                   }

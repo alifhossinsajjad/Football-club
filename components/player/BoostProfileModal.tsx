@@ -33,7 +33,7 @@ export default function BoostProfileModal({
   isOpen,
   onClose,
 }: BoostProfileModalProps) {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
     null,
   );
@@ -100,14 +100,13 @@ export default function BoostProfileModal({
     if (!boostRequestId) return;
 
     try {
-      // Typically Stripe would tokenize the card first, but using mock payload as specified:
       const response = await processPayment({
         boostRequestId: boostRequestId,
         stripe_payment_method_id: "pm_card_visa",
       }).unwrap();
 
       toast.success("Payment successful! Your profile is now boosted.");
-      onClose();
+      setStep(3);
     } catch (error: any) {
       toast.error(error?.data?.message || "Payment failed.");
     }
@@ -300,7 +299,6 @@ export default function BoostProfileModal({
                   onSubmit={handleSubmit(onPaymentSubmit)}
                   className="space-y-8"
                 >
-                  {/* Card Information */}
                   <div className="bg-[#11163C] p-5 rounded-xl border border-[#1E2554] space-y-4">
                     <h4 className="text-sm font-bold text-white mb-2">
                       Card Information
@@ -311,7 +309,6 @@ export default function BoostProfileModal({
                         Card Number *
                       </label>
                       <div className="relative">
-                        {/* MOCK STRIPE INPUT DESIGN */}
                         <input
                           disabled
                           placeholder="1234 5678 9012 3456"
@@ -348,7 +345,6 @@ export default function BoostProfileModal({
                     </div>
                   </div>
 
-                  {/* Billing Address */}
                   <div className="bg-[#11163C] p-5 rounded-xl border border-[#1E2554] space-y-4">
                     <h4 className="text-sm font-bold text-white mb-2">
                       Billing Address
@@ -385,7 +381,6 @@ export default function BoostProfileModal({
                     </div>
                   </div>
 
-                  {/* Terms Validation */}
                   <div className="flex items-start gap-3 mt-4">
                     <input
                       type="checkbox"
@@ -410,6 +405,47 @@ export default function BoostProfileModal({
                     Encrypted
                   </div>
                 </form>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="flex-1 flex flex-col items-center justify-center space-y-8 py-10 animate-in fade-in zoom-in-95 duration-500">
+                <div className="w-24 h-24 bg-[#04B5A3]/10 text-[#04B5A3] rounded-full flex items-center justify-center border-2 border-[#04B5A3]/30 animate-bounce">
+                  <Check size={48} strokeWidth={3} />
+                </div>
+                <div className="text-center space-y-3">
+                  <h3 className="text-3xl font-black text-white uppercase tracking-tighter">
+                    Profile Boosted!
+                  </h3>
+                  <p className="text-gray-400 max-w-sm mx-auto">
+                    Your payment was successful and your profile boost is now
+                    active. You'll see increased visibility immediately.
+                  </p>
+                </div>
+                <div className="bg-[#11163C] border border-cyan-400/20 rounded-2xl p-6 w-full max-w-md space-y-4">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 font-bold uppercase tracking-widest">
+                      Boost Request ID
+                    </span>
+                    <span className="text-cyan-400 font-mono">
+                      #{boostRequestId?.split("-")[0]?.toUpperCase() || "NEW"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 font-bold uppercase tracking-widest">
+                      Status
+                    </span>
+                    <span className="text-[#04B5A3] font-bold uppercase px-3 py-1 bg-[#04B5A3]/10 rounded-full tracking-wider">
+                      Active
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="w-full max-w-md py-4 rounded-xl bg-gradient-to-r from-[#04B5A3] to-[#039d8f] text-white font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-[0_12px_24px_-8px_rgba(4,181,163,0.4)]"
+                >
+                  Done
+                </button>
               </div>
             )}
           </div>
