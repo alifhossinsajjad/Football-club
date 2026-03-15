@@ -95,7 +95,7 @@ const SubscriptionPage = () => {
       if (rawName.includes("PRO") || rawName.includes("PREMIUM")) pType = "PRO";
       else if (rawName.includes("ELITE")) pType = "ELITE";
       else if (rawName.includes("BASIC") || rawName.includes("STARTER")) pType = "BASIC";
-      else pType = "BASIC"; // Absolute fallback to BASIC because backend rejects unknown types like STARTER
+      else pType = "BASIC"; 
       
       const rawCycle = String(plan.billing_cycle || plan.billingInterval || "ANNUAL").toUpperCase();
       let bCycle = rawCycle.includes("MONTH") ? "MONTHLY" : "ANNUAL";
