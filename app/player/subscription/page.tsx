@@ -100,8 +100,8 @@ const SubscriptionContent = () => {
       const payload: { plan_type: string; billing_cycle: string; success_url?: string; cancel_url?: string } = {
         plan_type: pType, 
         billing_cycle: bCycle,
-        success_url: `${baseUrl}/player/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/player/subscription/cancel`
+        success_url: `${baseUrl}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/subscription/cancel`
       };
       
       console.log("Sending checkout payload:", payload);
