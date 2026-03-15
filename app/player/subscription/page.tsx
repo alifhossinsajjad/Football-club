@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { 
   Check, 
   X, 
@@ -17,8 +17,7 @@ import {
   useCancelSubscriptionMutation, 
   useUpdatePaymentMethodMutation,
   useGetPlansQuery,
-  useCreateCheckoutMutation,
-  useVerifyPaymentMutation
+  useCreateCheckoutMutation
 } from "../../../redux/features/player/subscriptionApi";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -63,19 +62,17 @@ const CheckIcon = () => (
 
 
 
-const SubscriptionPage = () => {
+const SubscriptionContent = () => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
-
   const router = useRouter();
 
-  const { data: subscription, isLoading: isSubLoading } = useGetSubscriptionQuery();
+  const { data: subscription, isLoading: isSubLoading, refetch: refetchSub } = useGetSubscriptionQuery();
   const { data: plansData, isLoading: isPlansLoading } = useGetPlansQuery();
   const { data: historyRes, isLoading: isHistoryLoading } = useGetPaymentHistoryQuery();
   const [createCheckout, { isLoading: isCreatingCheckout }] = useCreateCheckoutMutation();
-  const [verifyPayment] = useVerifyPaymentMutation();
   const [cancelSubscription, { isLoading: isCancelling }] = useCancelSubscriptionMutation();
   const [updatePaymentMethod, { isLoading: isUpdating }] = useUpdatePaymentMethodMutation();
 
@@ -98,7 +95,7 @@ const SubscriptionPage = () => {
       else pType = "BASIC"; 
       
       const rawCycle = String(plan.billing_cycle || plan.billingInterval || "ANNUAL").toUpperCase();
-      let bCycle = rawCycle.includes("MONTH") ? "MONTHLY" : "ANNUAL";
+      const bCycle = rawCycle.includes("MONTH") ? "MONTHLY" : "ANNUAL";
       
       const payload: { plan_type: string; billing_cycle: string; success_url?: string; cancel_url?: string } = {
         plan_type: pType, 
@@ -127,6 +124,7 @@ const SubscriptionPage = () => {
       toast.success(res.message || "Subscription cancelled.");
       setIsCancelModalOpen(false);
       setCancelReason("");
+      refetchSub();
     } catch (err) {
       toast.error("Failed to cancel subscription.");
     }
@@ -138,6 +136,7 @@ const SubscriptionPage = () => {
       await updatePaymentMethod({ dummy: "data" }).unwrap();
       toast.success("Payment method updated.");
       setIsUpdateModalOpen(false);
+      refetchSub();
     } catch (err) {
       toast.error("Failed to update payment method.");
     }
@@ -145,7 +144,7 @@ const SubscriptionPage = () => {
 
   if (isSubLoading || isPlansLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00D4AA]"></div>
       </div>
     );
@@ -454,8 +453,22 @@ const SubscriptionPage = () => {
           </div>
         </div>
       )}
+
+
+
+
     </div>
   );
 };
 
-export default SubscriptionPage;
+export default function SubscriptionPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00D4AA]"></div>
+      </div>
+    }>
+      <SubscriptionContent />
+    </React.Suspense>
+  );
+}
