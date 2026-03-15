@@ -16,7 +16,7 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    checkout: builder.mutation<any, { registration_id: string }>({
+    checkout: builder.mutation<any, { registration_id: string; success_url: string; cancel_url: string }>({
       query: (data) => ({
         url: "/players/event-registration/checkout/",
         method: "POST",

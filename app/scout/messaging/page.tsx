@@ -98,7 +98,7 @@ const ScoutMessagingPage = () => {
               ) : filteredConvs.length === 0 ? (
                 <div className="p-4 text-center text-gray-400">No conversations found</div>
               ) : (
-                filteredConvs.map((conv: any) => (
+                filteredConvs.map((conv: Conversation) => (
                   <div
                     key={conv.id}
                     onClick={() => setSelectedConvId(conv.id)}
