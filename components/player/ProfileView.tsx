@@ -72,7 +72,21 @@ export default function ProfileView({ profile, onEdit }: Props) {
 
   const handle = (url?: string) => {
     if (!url) return "";
-    return url.replace(/\/$/, "").split("/").pop() ?? "";
+    let clean = url.replace(/\/$/, "");
+    if (clean.includes("instagram.com/")) clean = clean.split("instagram.com/").pop() || clean;
+    else if (clean.includes("twitter.com/")) clean = clean.split("twitter.com/").pop() || clean;
+    else if (clean.includes("facebook.com/")) clean = clean.split("facebook.com/").pop() || clean;
+    else if (clean.includes("youtube.com/")) clean = clean.split("youtube.com/").pop() || clean;
+    return clean.split("/").pop() ?? "";
+  };
+
+  const getYoutubeThumbnail = (url: string) => {
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url?.match(regExp);
+    if (match && match[2].length === 11) {
+      return `https://img.youtube.com/vi/${match[2]}/mqdefault.jpg`;
+    }
+    return null;
   };
 
   return (
@@ -128,7 +142,7 @@ export default function ProfileView({ profile, onEdit }: Props) {
                   {profile.designation || "Position Not Specified"}
                 </p>
                 <p className="text-[#8B97B5] text-sm mt-2 flex items-center gap-1.5">
-                  <MapPin size={14} /> {profile.address || "Location not specified"}
+                  <MapPin size={14} /> {profile.city ? `${profile.city}${profile.country ? `, ${profile.country}` : ""}` : profile.address || "Location not specified"}
                 </p>
               </div>
               
@@ -142,17 +156,18 @@ export default function ProfileView({ profile, onEdit }: Props) {
 
           {/* Stats Cards Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <StatBox icon={Calendar} label="Age" value={profile.age ? `${profile.age} years` : "Not Specified"} />
-            <StatBox icon={Ruler} label="Height" value={profile.height ? `${profile.height} cm` : "Not Specified"} />
-            <StatBox icon={Weight} label="Weight" value={profile.weight ? `${profile.weight} kg` : "Not Specified"} />
-            <StatBox icon={Flag} label="Nationality" value={profile.nationality || "Not Specified"} />
+            <StatBox icon={Calendar} label="Age" value={profile.age ? `${profile.age} years` : "—"} />
+            <StatBox icon={Ruler} label="Height" value={profile.height ? `${profile.height} cm` : "—"} />
+            <StatBox icon={Weight} label="Weight" value={profile.weight ? `${profile.weight} kg` : "—"} />
+            <StatBox icon={Flag} label="Nationality" value={profile.nationality || "—"} />
           </div>
 
           {/* Meta Text Row */}
-          <div className="grid grid-cols-3 gap-4 px-2">
+          <div className="grid grid-cols-4 gap-4 px-2">
             <MetaText label="Preferred Foot" value={profile.preferred_foot === "LEFT" ? "Left" : profile.preferred_foot === "RIGHT" ? "Right" : "Both"} />
             <MetaText label="Date of Birth" value={fmt(profile.date_of_birth)} />
             <MetaText label="Jersey Number" value={profile.jersey_number ? `#${profile.jersey_number}` : "N/A"} />
+            <MetaText label="Gender" value={profile.gender ? (profile.gender === "MALE" ? "Male (M)" : "Female (F)") : "N/A"} />
           </div>
 
         </div>
@@ -215,17 +230,33 @@ export default function ProfileView({ profile, onEdit }: Props) {
             <h2 className="text-white font-medium text-lg mb-6">Highlight Videos</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {profile.highlight_videos?.length > 0 ? profile.highlight_videos.map((v: any, idx: number) => (
-                <div key={v.id} className="group rounded-xl overflow-hidden cursor-pointer relative">
+                <a 
+                  key={v.id} 
+                  href={v.video_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group rounded-xl overflow-hidden cursor-pointer relative block"
+                >
                   <div className="h-40 bg-gray-800 relative flex items-center justify-center">
-                    {/* Placeholder for video thumbnail, since API returns text/url only */}
-                    <div className="absolute inset-0 bg-black/40 z-10" />
-                    <img src={`https://picsum.photos/seed/${v.id}/400/200`} alt="Thumbnail" className="w-full h-full object-cover" />
+                    {/* YouTube Thumbnail or Fallback */}
+                    <img 
+                      src={v.video_url ? (getYoutubeThumbnail(v.video_url) || `https://picsum.photos/seed/${v.id}/400/200`) : `https://picsum.photos/seed/${v.id}/400/200`} 
+                      alt="Thumbnail" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center z-10">
+                      <div className="w-12 h-12 rounded-full bg-[#00E5FF]/90 flex items-center justify-center pl-1 text-[#070B24] shadow-lg scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5V19L19 12L8 5Z" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#0A0D1F] to-transparent z-20">
                     <h4 className="text-white text-sm font-medium">{v.title}</h4>
                     <p className="text-[#8B97B5] text-xs mt-1">{v.description || "Video Highlight"}</p>
                   </div>
-                </div>
+                </a>
               )) : (
                 <p className="text-[#8B97B5] text-sm">No highlight videos available.</p>
               )}
@@ -255,28 +286,48 @@ export default function ProfileView({ profile, onEdit }: Props) {
             <h2 className="text-white font-medium text-lg mb-6">Social Media</h2>
             <div className="space-y-4">
               {profile.instagram && (
-                <div className="flex items-center gap-3">
+                <a 
+                  href={profile.instagram.startsWith('http') ? profile.instagram : `https://${profile.instagram}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
                   <Instagram size={18} className="text-[#E1306C]" />
                   <span className="text-sm text-[#8B97B5]">@{handle(profile.instagram)}</span>
-                </div>
+                </a>
               )}
               {profile.twitter && (
-                <div className="flex items-center gap-3">
+                <a 
+                  href={profile.twitter.startsWith('http') ? profile.twitter : `https://${profile.twitter}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
                   <Twitter size={18} className="text-[#1DA1F2]" />
                   <span className="text-sm text-[#8B97B5]">@{handle(profile.twitter)}</span>
-                </div>
+                </a>
               )}
               {profile.facebook && (
-                <div className="flex items-center gap-3">
+                <a 
+                  href={profile.facebook.startsWith('http') ? profile.facebook : `https://${profile.facebook}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
                   <Facebook size={18} className="text-[#1877F2]" />
                   <span className="text-sm text-[#8B97B5]">{profile.first_name} {profile.last_name}</span>
-                </div>
+                </a>
               )}
               {profile.youtube && (
-                <div className="flex items-center gap-3">
+                <a 
+                  href={profile.youtube.startsWith('http') ? profile.youtube : `https://${profile.youtube}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
                   <Youtube size={18} className="text-[#FF0000]" />
                   <span className="text-sm text-[#8B97B5]">{profile.first_name} Football</span>
-                </div>
+                </a>
               )}
               {(!profile.instagram && !profile.twitter && !profile.facebook && !profile.youtube) && (
                 <p className="text-[#8B97B5] text-sm">No social media links provided.</p>
@@ -340,8 +391,8 @@ export default function ProfileView({ profile, onEdit }: Props) {
             <h2 className="text-white font-medium text-lg mb-6">Preferences</h2>
             <div className="space-y-5">
               <div>
-                <span className="text-sm text-[#8B97B5] block mb-1">Preferred Leagues</span>
-                <span className="text-sm text-white font-medium">{profile.preferred_leagues || "Not Specified"}</span>
+                <span className="text-sm text-[#8B97B5] block mb-1">Preferred Regions / Countries</span>
+                <span className="text-sm text-white font-medium">{profile.preferred_regions || profile.preferred_leagues || "Not Specified"}</span>
               </div>
               <div>
                 <span className="text-sm text-[#8B97B5] block mb-1">Contract Status</span>

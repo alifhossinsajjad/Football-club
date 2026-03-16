@@ -1,7 +1,12 @@
 "use client";
 
 import React from "react";
-import { Eye, Star, CalendarDays, MessageSquare } from "lucide-react";
+import { Eye, Star, CalendarDays, MessageSquare, User } from "lucide-react";
+import { 
+  useGetProfileQuery, 
+  useGetDashboardStatsQuery, 
+  useGetShortlistedPlayersQuery 
+} from "@/redux/features/scout/scoutProfileApi";
 
 /* ─── Fake Data ─────────────────────────────────────────────── */
 const shortlistedPlayers = [
@@ -110,6 +115,13 @@ const StatCard = ({ icon, label, value, sub, iconColor, subColor }: StatCardProp
 
 /* ─── Main Component ─────────────────────────────────────────── */
 const ScoutDashboard: React.FC = () => {
+  const { data: profile, isLoading: isProfileLoading } = useGetProfileQuery();
+  const { data: stats, isLoading: isStatsLoading } = useGetDashboardStatsQuery();
+  const { data: shortlistData, isLoading: isShortlistLoading } = useGetShortlistedPlayersQuery();
+
+  const scoutName = profile?.first_name || "Member";
+  const shortlistedPlayers = shortlistData?.results || [];
+
   return (
     <div className="min-h-screen bg-[#0B0D2C] text-white font-sans pb-12">
 
@@ -118,7 +130,7 @@ const ScoutDashboard: React.FC = () => {
         <h1 className="text-2xl font-bold">
           Welcome Back,{" "}
           <span className="bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
-            Mike!
+            {scoutName}!
           </span>
         </h1>
       </div>
@@ -128,32 +140,32 @@ const ScoutDashboard: React.FC = () => {
         <StatCard
           icon={<Eye size={24} />}
           label="Players Viewed"
-          value={342}
-          sub="+48 this week"
+          value={stats?.players_viewed ?? 0}
+          sub={`+${stats?.players_viewed_this_week ?? 0} this week`}
           iconColor="text-[#00E5FF]"
           subColor="text-[#00E5FF]"
         />
         <StatCard
           icon={<Star size={24} />}
           label="Shortlisted Players"
-          value={28}
-          sub="12 active"
+          value={stats?.shortlisted_players ?? 0}
+          sub={`${stats?.active_shortlisted ?? 0} active`}
           iconColor="text-[#9C27B0]"
           subColor="text-[#9C27B0]"
         />
         <StatCard
           icon={<CalendarDays size={24} />}
           label="Upcoming Events"
-          value={6}
-          sub="Next: Sep 15"
+          value={stats?.upcoming_events ?? 0}
+          sub={stats?.next_event_date ? `Next: ${new Date(stats.next_event_date).toLocaleDateString()}` : "No events"}
           iconColor="text-[#00E5FF]"
           subColor="text-[#00E5FF]"
         />
         <StatCard
           icon={<MessageSquare size={24} />}
           label="Active Conversations"
-          value={15}
-          sub="5 unread"
+          value={stats?.active_conversations ?? 0}
+          sub={`${stats?.unread_messages ?? 0} unread`}
           iconColor="text-[#00E5FF]"
           subColor="text-[#00E5FF]"
         />
@@ -175,47 +187,62 @@ const ScoutDashboard: React.FC = () => {
 
           {/* Player Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {shortlistedPlayers.map((player) => (
-              <div
-                key={player.name}
-                className="bg-[#0B0D2C] border border-white/[0.07] rounded-xl p-4"
-              >
-                {/* Avatar + Star */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={player.image}
-                      alt={player.name}
-                      className="w-12 h-12 rounded-full object-cover border border-white/10"
-                    />
-                    <div>
-                      <p className="font-semibold text-sm text-white">{player.name}</p>
-                      <p className="text-xs text-white/50">{player.position}</p>
+            {shortlistedPlayers.length > 0 ? (
+              shortlistedPlayers.map((player: any) => (
+                <div
+                  key={player.id}
+                  className="bg-[#0B0D2C] border border-white/[0.07] rounded-xl p-4"
+                >
+                  {/* Avatar + Star */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      {player.player?.profile_image ? (
+                        <img
+                          src={player.player.profile_image}
+                          alt={player.player.full_name || "Player"}
+                          className="w-12 h-12 rounded-full object-cover border border-white/10"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-[#1A1C3D] flex items-center justify-center border border-white/10">
+                          <Eye size={20} className="text-white/20" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-semibold text-sm text-white truncate max-w-[120px]">
+                          {player.player?.full_name || "Unknown"}
+                        </p>
+                        <p className="text-xs text-white/50">{player.player?.position || "—"}</p>
+                      </div>
+                    </div>
+                    <Star size={14} className="text-yellow-400 mt-1 flex-shrink-0" fill="currentColor" />
+                  </div>
+
+                  {/* Details */}
+                  <div className="space-y-1 mb-4">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-white/45">Nationality:</span>
+                      <span className="text-white/75 truncate ml-2">
+                        {player.player?.nationality || "—"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-white/45">Age:</span>
+                      <span className="text-white/75">{player.player?.age ?? "—"} years</span>
                     </div>
                   </div>
-                  <Star size={14} className="text-yellow-400 mt-1 flex-shrink-0" fill="currentColor" />
-                </div>
 
-                {/* Details */}
-                <div className="space-y-1 mb-4">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/45">Nationality:</span>
-                    <span className="text-white/75">
-                      {player.flag} {player.nationality}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/45">Age:</span>
-                    <span className="text-white/75">{player.age} years</span>
-                  </div>
+                  {/* Button */}
+                  <button className="w-full py-2 rounded-lg border border-[#00E5FF]/50 text-[#00E5FF] text-xs font-medium hover:bg-[#00E5FF]/10 transition-colors">
+                    View Full Profile
+                  </button>
                 </div>
-
-                {/* Button */}
-                <button className="w-full py-2 rounded-lg border border-[#00E5FF]/50 text-[#00E5FF] text-xs font-medium hover:bg-[#00E5FF]/10 transition-colors">
-                  View Full Profile
-                </button>
+              ))
+            ) : (
+              <div className="col-span-full py-12 text-center text-white/30 border border-white/[0.05] border-dashed rounded-xl">
+                <Star size={24} className="mx-auto mb-2 opacity-20" />
+                <p className="text-sm">No shortlisted players found</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>

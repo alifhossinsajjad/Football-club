@@ -22,6 +22,16 @@ export const scoutProfileApi = baseApi.injectEndpoints({
       providesTags: ["ScoutProfile"],
     }),
 
+    getDashboardStats: builder.query<any, void>({
+      query: () => "/scout-agent/profile/dashboard_stats/",
+      transformResponse: (response: any) => response?.data ?? response,
+    }),
+
+    getShortlistedPlayers: builder.query<any, void>({
+      query: () => "/scout-agent/shortlisted-players/",
+      transformResponse: (response: any) => response?.data ?? response,
+    }),
+
     // PATCH — update existing profile
     updateProfile: builder.mutation<
       ScoutProfile,
@@ -38,4 +48,9 @@ export const scoutProfileApi = baseApi.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { useGetProfileQuery, useUpdateProfileMutation } = scoutProfileApi;
+export const {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useGetDashboardStatsQuery,
+  useGetShortlistedPlayersQuery
+} = scoutProfileApi;
