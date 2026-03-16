@@ -12,6 +12,7 @@ import { FaEye } from "react-icons/fa";
 import { FiMessageSquare } from "react-icons/fi";
 import { IoEyeOutline } from "react-icons/io5";
 import { SlCalender } from "react-icons/sl";
+import { formatRegistrationDate } from "@/lib/utils/dateFormatter";
 
 // ─── Fallback / Mock Data ─────────────────────────────────────────────────────
 
@@ -205,7 +206,7 @@ export default function PlayerDashboard() {
 
           <div className="bg-[#11163C] rounded-xl p-5 border border-[#1E2554] flex items-center gap-4">
             <div className="space-y-3 py-5">
-              <SlCalender size={30} className="text-[#00E5FF]" />
+              <SlCalender size={30} className="text-white" />
               <p className="text-sm text-[#9BA3C8]">Events Registered</p>
               <p className="text-3xl font-bold">
                 {stats?.events_registered ?? 5}
@@ -250,7 +251,7 @@ export default function PlayerDashboard() {
                   </div>
                   <div className="text-right text-sm">
                     <div className="font-medium text-[#00E5FF]">
-                      {event.date || event.event_date}
+                      {(event.date || event.event_date) ? formatRegistrationDate(event.date || event.event_date) : 'TBD'}
                     </div>
                     {event.time && <div className="text-[#9BA3C8] mt-0.5">{event.time}</div>}
                   </div>

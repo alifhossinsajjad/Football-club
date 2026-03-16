@@ -287,6 +287,7 @@ toast.success(
                     register={register}
                     error={errors.date_of_birth?.message}
                     icon={<Calendar size={16} />}
+                    value={watch("date_of_birth")}
                   />
                   <DarkInput
                     label="Nationality"

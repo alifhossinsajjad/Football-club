@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { formatRegistrationDate } from "@/lib/utils/dateFormatter";
 
 interface Props {
   label?: string;
@@ -10,6 +11,8 @@ interface Props {
   error?: string;
   placeholder?: string;
   icon?: React.ReactNode;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
 }
 
 const DarkInput = ({
@@ -20,12 +23,22 @@ const DarkInput = ({
   error,
   placeholder,
   icon,
+  onChange,
+  value,
 }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [hasValue, setHasValue] = useState(false);
+  const [hasValue, setHasValue] = useState(value ? String(value).length > 0 : false);
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    if (value !== undefined) {
+      setHasValue(String(value).length > 0);
+    }
+  }, [value]);
+
   const isPasswordField = type === "password";
+  const isDateType = type === "date";
+  
   const resolvedType = isPasswordField
     ? showPassword
       ? "text"
@@ -38,13 +51,19 @@ const DarkInput = ({
     if (register && register(name) && register(name).onChange) {
       register(name).onChange(e);
     }
+    // Call the passed onChange prop if it exists
+    if (onChange) {
+      onChange(e);
+    }
   };
+
+  const displayDate = isDateType && hasValue && !isFocused && value ? formatRegistrationDate(value) : "";
 
   return (
     <div className="space-y-2 relative">
       {(label || icon) && (
         <div className="flex items-center gap-2">
-          {icon && <span className="text-gray-400">{icon}</span>}
+          {icon && <span className="text-white">{icon}</span>}
           {label && (
             <label className="text-sm text-gray-300 font-medium">
               {label} <span className="text-red-500">*</span>
@@ -67,12 +86,19 @@ const DarkInput = ({
               ? "border-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.2)] bg-[#050B14]/80" 
               : "border-white/5 hover:border-white/20"
           }
+          ${isDateType && hasValue && !isFocused ? "text-transparent [&::-webkit-datetime-edit]:opacity-0 select-none" : ""}
           `}
         />
+
+        {displayDate && (
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-sm pointer-events-none">
+            {displayDate}
+          </div>
+        )}
         
         {/* Right-side affordances (success + password toggle) */}
         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          {!error && hasValue && !isPasswordField && (
+          {!error && hasValue && !isPasswordField && !isDateType && (
             <svg
               className="w-5 h-5 text-emerald-500"
               fill="none"
