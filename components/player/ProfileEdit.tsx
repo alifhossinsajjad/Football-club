@@ -126,14 +126,15 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
       first_name: profile.first_name || "",
       last_name: profile.last_name || "",
       designation: profile.designation || "",
-      address: profile.address || "",
+      city: profile.city || "",
+      country: profile.country || "",
+      gender: profile.gender || "MALE",
       about: profile.about || "",
-      age: profile.age || "",
+      date_of_birth: profile.date_of_birth || "",
       height: profile.height || "",
       weight: profile.weight || "",
       nationality: profile.nationality || "",
       preferred_foot: profile.preferred_foot || "LEFT",
-      date_of_birth: profile.date_of_birth || "",
       jersey_number: profile.jersey_number || "",
       phone: profile.phone || "",
       email: profile.email || "",
@@ -142,7 +143,7 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
       facebook: profile.facebook || "",
       youtube: profile.youtube || "",
       availability_status: profile.availability_status || "AVAILABLE",
-      preferred_leagues: profile.preferred_leagues || "",
+      preferred_regions: profile.preferred_regions || profile.preferred_leagues || "",
       contract_status: profile.contract_status || "",
       available_from: profile.available_from || "",
       career_season: profile.career_stats?.season || "",
@@ -186,26 +187,22 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
     if (avatarFile) formData.append("profile_image", avatarFile);
 
     const fields = [
-      "first_name", "last_name", "designation", "address", "about", "age", "height", "weight", "nationality",
+      "first_name", "last_name", "designation", "city", "country", "gender", "about", "height", "weight", "nationality",
       "preferred_foot", "date_of_birth", "jersey_number", "phone", "email", "instagram", "twitter", "facebook",
-      "youtube", "availability_status", "preferred_leagues", "contract_status", "available_from"
+      "youtube", "availability_status", "preferred_regions", "contract_status", "available_from",
+      "career_season", "career_matches", "career_goals", "career_assists", "career_minutes"
     ];
     fields.forEach((k) => {
       const v = data[k];
       if (v !== undefined && v !== null && v !== "") formData.append(k, String(v));
     });
 
-    formData.append("career_season", data.career_season);
-    formData.append("career_matches", String(data.career_matches));
-    formData.append("career_goals", String(data.career_goals));
-    formData.append("career_assists", String(data.career_assists));
-    formData.append("career_minutes", String(data.career_minutes));
-    formData.append("skill_pace", String(data.skill_pace));
-    formData.append("skill_shooting", String(data.skill_shooting));
-    formData.append("skill_dribbling", String(data.skill_dribbling));
-    formData.append("skill_passing", String(data.skill_passing));
-    formData.append("skill_physical", String(data.skill_physical));
-    formData.append("skill_technical", String(data.skill_technical));
+    formData.append("skill_pace", String(data.skill_pace || 50));
+    formData.append("skill_shooting", String(data.skill_shooting || 50));
+    formData.append("skill_dribbling", String(data.skill_dribbling || 50));
+    formData.append("skill_passing", String(data.skill_passing || 50));
+    formData.append("skill_physical", String(data.skill_physical || 50));
+    formData.append("skill_technical", String(data.skill_technical || 50));
 
     try {
       let updatedProfileRes: any = null;
@@ -275,8 +272,13 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0D122B] to-[#1E2548]" />
              )}
              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                <div className="flex items-center gap-2 bg-[#121730] px-4 py-2 rounded-xl text-white font-medium border border-[#1E2548] shadow-xl">
-                  <Upload size={18} className="text-[#00E5FF]" /> Upload Cover Photo
+                <div className="flex flex-col items-center gap-2 bg-[#121730] px-4 py-3 rounded-xl text-white font-medium border border-[#1E2548] shadow-xl text-center">
+                  <div className="flex items-center gap-2">
+                    <Upload size={18} className="text-[#00E5FF]" /> Upload Cover Photo
+                  </div>
+                  <p className="text-[10px] text-[#8B97B5] mt-1 max-w-[200px]">
+                    Upload a square image (1080 × 1080 px). Preferably a football-related photo (in match, training, or team kit).
+                  </p>
                 </div>
              </div>
              <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
@@ -295,9 +297,12 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
                ) : (
                   <span className="text-4xl font-black text-[#00E5FF]">{profile?.first_name?.charAt(0) || "U"}</span>
                )}
-               <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                 <Camera className="text-[#00E5FF]" size={36} />
-               </div>
+                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity p-2 text-center">
+                  <Camera className="text-[#00E5FF] mb-2" size={32} />
+                  <p className="text-[9px] text-white leading-tight">
+                    Upload a square image (1080 × 1080 px). Preferably a football-related photo (in match, training, or team kit).
+                  </p>
+                </div>
                <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) { setAvatarFile(file); setAvatarPreview(URL.createObjectURL(file)); }
@@ -305,8 +310,8 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
             </div>
             
             <div className="pb-4 flex-1">
-               <h2 className="text-2xl font-bold text-white tracking-tight">{profile?.first_name} {profile?.last_name || "Profile"}</h2>
-               <p className="text-[#8B97B5] text-sm mt-1">Tap the avatar or cover to upload new photos.</p>
+               <h2 className="text-2xl font-bold text-white tracking-tight">{profile?.first_name || "Guest"} {profile?.last_name || "Player"}</h2>
+               <p className="text-[#8B97B5] text-sm mt-1">Upload a square image (1080 × 1080 px). Preferably a football-related photo (in match, training, or team kit).</p>
             </div>
           </div>
         </div>
@@ -322,23 +327,64 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
                 <InputField label="Last Name *" {...register("last_name")} />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
-                <InputField label="Position / Designation" {...register("designation")} placeholder="e.g. Forward" />
-                <InputField label="Location / Address" {...register("address")} placeholder="City, Country" />
+                <SelectField label="Position" {...register("designation")}>
+                  <option value="">Select Position</option>
+                  <option value="Goalkeeper">Goalkeeper</option>
+                  <option value="Defender">Defender</option>
+                  <option value="Midfielder">Midfielder</option>
+                  <option value="Forward">Forward</option>
+                </SelectField>
+                <div className="grid grid-cols-2 gap-4">
+                  <InputField label="City" {...register("city")} placeholder="e.g. Barcelona" />
+                  <SelectField label="Country" {...register("country")}>
+                    <option value="">Select Country</option>
+                    {require("@/constants/countries").countries.map((c: any) => (
+                      <option key={c.value} value={c.value}>{c.label}</option>
+                    ))}
+                  </SelectField>
+                </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <InputField label="Age" type="number" {...register("age")} />
-                <InputField label="Height (cm)" type="number" step="0.01" {...register("height")} />
-                <InputField label="Weight (kg)" type="number" step="0.01" {...register("weight")} />
-                <InputField label="Nationality" {...register("nationality")} placeholder="e.g. England" />
+                <SelectField label="Nationality" {...register("nationality")}>
+                  <option value="">Select Nationality</option>
+                  {require("@/constants/countries").countries.map((c: any) => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </SelectField>
+                <div className="space-y-1">
+                  <label className="text-xs text-[#8B97B5] font-medium ml-1 block">Date of Birth</label>
+                  <input 
+                    type="date" 
+                    {...register("date_of_birth")}
+                    className="w-full bg-[#0A0D1F] border border-[#1E2548] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00E5FF] transition-all"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-[#8B97B5] font-medium ml-1 block">Age (Calculated)</label>
+                  <div className="w-full bg-[#0A0D1F]/50 border border-[#1E2548] rounded-xl px-4 py-3 text-[#00E5FF] text-sm font-bold h-[46px] flex items-center">
+                    {watch("date_of_birth") ? (() => {
+                      const dob = new Date(watch("date_of_birth"));
+                      const today = new Date();
+                      let age = today.getFullYear() - dob.getFullYear();
+                      const m = today.getMonth() - dob.getMonth();
+                      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+                      return age > 0 ? age : 0;
+                    })() : "—"}
+                  </div>
+                </div>
+                <SelectField label="Gender" {...register("gender")}>
+                  <option value="MALE">Male (M)</option>
+                  <option value="FEMALE">Female (F)</option>
+                </SelectField>
               </div>
               <div className="grid grid-cols-3 gap-4">
-                <SelectField label="Preferred Foot" {...register("preferred_foot")}>
-                  <option value="LEFT">Left</option>
-                  <option value="RIGHT">Right</option>
-                  <option value="BOTH">Both</option>
-                </SelectField>
-                <InputField label="Date of Birth" type="date" {...register("date_of_birth")} />
-                <InputField label="Jersey Number" type="number" {...register("jersey_number")} />
+                 <InputField label="Height (cm)" type="number" step="0.01" {...register("height")} />
+                 <InputField label="Weight (kg)" type="number" step="0.01" {...register("weight")} />
+                 <SelectField label="Preferred Foot" {...register("preferred_foot")}>
+                    <option value="LEFT">Left</option>
+                    <option value="RIGHT">Right</option>
+                    <option value="BOTH">Both</option>
+                 </SelectField>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <SelectField label="Availability Status" {...register("availability_status")}>
@@ -425,8 +471,30 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
                     <div className="text-[#00E5FF] text-xs font-medium uppercase tracking-widest mb-4">Video {i + 1}</div>
                     
                     <div className="grid md:grid-cols-2 gap-4 mb-4">
-                      <InputField label="Title" {...register(`highlight_videos.${i}.title` as const)} placeholder="Season Highlights 2024" />
-                      <InputField label="Video URL" {...register(`highlight_videos.${i}.video_url` as const)} placeholder="https://youtube.com/..." />
+                      <div>
+                        <InputField label="Title" {...register(`highlight_videos.${i}.title` as const)} placeholder="Season Highlights 2024" />
+                        <div className="mt-4">
+                          <InputField label="Video URL" {...register(`highlight_videos.${i}.video_url` as const)} placeholder="https://youtube.com/..." />
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center justify-center border border-[#1E2548] rounded-xl bg-[#0A0D1F] overflow-hidden">
+                        {watch(`highlight_videos.${i}.video_url`) ? (
+                          (() => {
+                            const url = watch(`highlight_videos.${i}.video_url`);
+                            const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                            const match = url?.match(regExp);
+                            const thumbUrl = (match && match[2].length === 11) ? `https://img.youtube.com/vi/${match[2]}/mqdefault.jpg` : null;
+                            
+                            return thumbUrl ? (
+                              <img src={thumbUrl} alt="Thumbnail Preview" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="text-[10px] text-[#8B97B5] p-4 text-center">Invalid YouTube URL or no thumbnail found</div>
+                            );
+                          })()
+                        ) : (
+                          <div className="text-[10px] text-[#8B97B5] p-4 text-center">YouTube thumbnail preview will appear here</div>
+                        )}
+                      </div>
                     </div>
                     <InputField label="Description" {...register(`highlight_videos.${i}.description` as const)} placeholder="Short description of the video..." />
                   </div>
@@ -450,10 +518,22 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
 
             <Card title="Social Media">
               <div className="space-y-4">
-                <InputField label="Instagram URL" {...register("instagram")} />
-                <InputField label="Twitter / X URL" {...register("twitter")} />
-                <InputField label="Facebook URL" {...register("facebook")} />
-                <InputField label="YouTube URL" {...register("youtube")} />
+                <div className="space-y-1">
+                  <InputField label="Instagram URL" {...register("instagram")} placeholder="https://instagram.com/handle" />
+                  <p className="text-[10px] text-[#8B97B5] ml-1">Insert full URL. It will be displayed as a handle.</p>
+                </div>
+                <div className="space-y-1">
+                  <InputField label="Twitter / X URL" {...register("twitter")} placeholder="https://twitter.com/handle" />
+                  <p className="text-[10px] text-[#8B97B5] ml-1">Insert full URL. It will be displayed as a handle.</p>
+                </div>
+                <div className="space-y-1">
+                  <InputField label="Facebook URL" {...register("facebook")} placeholder="https://facebook.com/handle" />
+                  <p className="text-[10px] text-[#8B97B5] ml-1">Insert full URL. It will be displayed as a handle.</p>
+                </div>
+                <div className="space-y-1">
+                  <InputField label="YouTube Channel URL" {...register("youtube")} placeholder="https://youtube.com/@handle" />
+                  <p className="text-[10px] text-[#8B97B5] ml-1">Insert full URL. It will be displayed as a handle.</p>
+                </div>
               </div>
             </Card>
 
@@ -484,7 +564,7 @@ export default function ProfileEdit({ profile, onCancel }: Props) {
 
             <Card title="Preferences">
               <div className="space-y-4">
-                <InputField label="Preferred Leagues" {...register("preferred_leagues")} placeholder="Premier League, La Liga..." />
+                <InputField label="Preferred Regions / Countries" {...register("preferred_regions")} placeholder="Europe, Asia, Italy, Spain..." />
                 <InputField label="Contract Status" {...register("contract_status")} placeholder="Open to Offers..." />
               </div>
             </Card>

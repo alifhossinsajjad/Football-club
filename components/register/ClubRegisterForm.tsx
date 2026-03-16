@@ -5,7 +5,9 @@ import { useForm, Controller } from "react-hook-form";
 
 import { showRegistrationError } from "@/lib/registrationErrors";
 import DarkInput from "../reuseable/DarkInput";
+import DarkSelect from "../reuseable/DarkSelect";
 import StepIndicator from "../reuseable/StepIndicator";
+import { countries } from "@/constants/countries";
 import { useRegisterClubMutation } from "@/redux/features/auth/clubRegistretaionApi";
 import { ClubRegisterPayload } from "@/types/club";
 import Link from "next/link";
@@ -133,6 +135,10 @@ const ClubRegisterForm = () => {
 
   const handleNextStep = async () => {
     if (step === 0) {
+      if (formValues.password !== formValues.confirm_password) {
+        toast.error("Passwords do not match");
+        return;
+      }
       const valid = await trigger([
         "organization_name",
         "organization_type",
@@ -175,6 +181,10 @@ const ClubRegisterForm = () => {
   };
 
   const onSubmit = async (data: FormData) => {
+    if (data.password !== data.confirm_password) {
+      toast.error("Passwords do not match");
+      return;
+    }
     const payload: ClubRegisterPayload = {
       email: data.email,
       password: data.password,
@@ -281,13 +291,13 @@ const ClubRegisterForm = () => {
                      placeholder="Select Type"
                   />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <DarkInput
-                        label="Country *"
+                     <DarkSelect
+                        label="Country"
                         name="country"
                         register={register}
                         error={errors.country?.message}
                         icon={<Globe size={16} />}
-                        placeholder="Select Country"
+                        options={countries}
                      />
                      <DarkInput
                         label="City *"

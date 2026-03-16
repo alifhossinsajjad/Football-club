@@ -9,6 +9,7 @@ import {
   Flag,
   Trophy,
   Calendar,
+  User,
 } from "lucide-react";
 import { ScoutProfile } from "@/types/scout/profileType";
 
@@ -76,15 +77,17 @@ export default function ProfileView({ profile }: { profile: ScoutProfile }) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#2D3568]">
-              {/* Placeholder icon if needed */}
+            <div className="w-full h-full flex items-center justify-center text-[#2D3568] bg-[#111640]">
+              <User size={24} />
             </div>
           )}
         </div>
         <div className="flex-1 min-w-0 pb-1">
           <div className="flex items-center gap-1">
             <h2 className="text-[#00D9FF] font-bold text-sm truncate">
-              {profile.first_name} {profile.last_name}
+              {(profile.first_name || profile.last_name) 
+                ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim() 
+                : "Scout Member"}
             </h2>
             <CheckCircle size={11} className="text-[#00D9FF] flex-shrink-0" />
           </div>
@@ -94,9 +97,13 @@ export default function ProfileView({ profile }: { profile: ScoutProfile }) {
             </p>
           )}
           <div className="flex flex-wrap gap-x-2 mt-0.5">
-            {profile.location && (
+            {profile.location ? (
               <span className="flex items-center gap-0.5 text-[#5B6397] text-[9px]">
                 <MapPin size={8} /> {profile.location}
+              </span>
+            ) : (
+              <span className="flex items-center gap-0.5 text-[#2D3568] text-[9px]">
+                <MapPin size={8} /> Location not set
               </span>
             )}
             {profile.joined && (
@@ -131,16 +138,25 @@ export default function ProfileView({ profile }: { profile: ScoutProfile }) {
         <div className="w-[90px] flex-shrink-0">
           <SLabel>Contact</SLabel>
           {[
-            { icon: <Globe size={9} />, val: profile.website },
-            { icon: <Twitter size={9} />, val: profile.twitter },
-            { icon: <Facebook size={9} />, val: profile.facebook },
-            { icon: <Youtube size={9} />, val: profile.youtube },
+            { icon: <Globe size={9} />, val: profile.website, type: 'web' },
+            { icon: <Twitter size={9} />, val: profile.twitter, type: 'tw' },
+            { icon: <Facebook size={9} />, val: profile.facebook, type: 'fb' },
+            { icon: <Youtube size={9} />, val: profile.youtube, type: 'yt' },
           ].map((s, i) => (
             <div key={i} className="flex items-center gap-1 mb-1">
               <span className="text-[#00D9FF] flex-shrink-0">{s.icon}</span>
-              <span className="text-[#5B6397] text-[9px] truncate">
-                {s.val ? urlHandle(s.val) : "—"}
-              </span>
+              {s.val ? (
+                <a 
+                  href={s.val.startsWith('http') ? s.val : (s.type === 'tw' ? `https://twitter.com/${s.val}` : s.type === 'fb' ? `https://facebook.com/${s.val}` : s.type === 'yt' ? `https://youtube.com/${s.val}` : `https://${s.val}`)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#5B6397] text-[9px] truncate hover:text-[#00D9FF] transition-colors"
+                >
+                  {urlHandle(s.val)}
+                </a>
+              ) : (
+                <span className="text-[#2D3568] text-[9px] truncate">—</span>
+              )}
             </div>
           ))}
         </div>
@@ -149,16 +165,16 @@ export default function ProfileView({ profile }: { profile: ScoutProfile }) {
       {/* Social links */}
       <div className="flex gap-1.5 mb-3">
         {[
-          { icon: <Globe size={11} />, href: profile.website },
-          { icon: <Twitter size={11} />, href: profile.twitter },
-          { icon: <Facebook size={11} />, href: profile.facebook },
-          { icon: <Youtube size={11} />, href: profile.youtube },
+          { icon: <Globe size={11} />, href: profile.website, type: 'web' },
+          { icon: <Twitter size={11} />, href: profile.twitter, type: 'tw' },
+          { icon: <Facebook size={11} />, href: profile.facebook, type: 'fb' },
+          { icon: <Youtube size={11} />, href: profile.youtube, type: 'yt' },
         ]
           .filter((s) => s.href)
           .map((s, i) => (
             <a
               key={i}
-              href={s.href}
+              href={s.href?.startsWith('http') ? s.href : (s.type === 'tw' ? `https://twitter.com/${s.href}` : s.type === 'fb' ? `https://facebook.com/${s.href}` : s.type === 'yt' ? `https://youtube.com/${s.href}` : `https://${s.href}`)}
               target="_blank"
               rel="noreferrer"
               className="w-7 h-7 rounded-lg bg-[#111640] border border-[#1A2160] flex items-center justify-center text-[#5B6397] hover:text-[#00D9FF] hover:border-[#00D9FF]/30 transition-all"
@@ -198,12 +214,11 @@ export default function ProfileView({ profile }: { profile: ScoutProfile }) {
           { label: "Pref. Leagues", value: profile.preferred_leagues },
           { label: "Visibility", value: profile.profile_visibility },
         ]
-          .filter((r) => r.value)
           .map((r) => (
             <div key={r.label} className="flex justify-between gap-2 mb-1.5">
               <span className="text-[#5B6397] text-[9px]">{r.label}</span>
               <span className="text-[#00D9FF] text-[9px] font-medium text-right truncate max-w-[120px]">
-                {r.value}
+                {r.value || "—"}
               </span>
             </div>
           ))}

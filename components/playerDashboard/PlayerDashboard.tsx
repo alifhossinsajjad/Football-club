@@ -158,9 +158,9 @@ export default function PlayerDashboard() {
 
           <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
             {[
-              { label: "Basic Info", done: true },
-              { label: "Profile Photo", done: true },
-              { label: "Highlight Video", done: false },
+              { label: "Basic Info", done: !!(profile?.first_name && profile?.last_name && profile?.designation) },
+              { label: "Profile Photo", done: !!profile?.profile_image },
+              { label: "Highlight Video", done: (profile?.highlight_videos?.length ?? 0) > 0 || (profile?.videos?.length ?? 0) > 0 },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2">
                 <div
