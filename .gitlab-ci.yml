@@ -8,7 +8,6 @@ workflow:
 
 build:
   stage: build
-  tags: [vps-runner]
   image: docker:27-cli
   services:
     - name: docker:27-dind
