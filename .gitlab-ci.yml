@@ -1,122 +1,214 @@
-stages:
-  - build
-  - push
-  - deploy
-
-# Global variables
 variables:
-  DOCKER_TLS_CERTDIR: ""
-
-# DRY template
-.default_docker:
-  image: docker:27-cli
-
-  services:
-    - name: docker:27-dind
-      command: ["--tls=false"]
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-    # Fail fast (important)
-    - set -e
-
-    # Install tools
-    - apk add --no-cache make
-
-    # Docker login
-    - echo "Login to the docker hub account"
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    # Debug check
-    - docker info
+    PROJECT_NAME: carolineatta997-frontend-lab
+    DOCKER_USERNAME: $DOCKER_USERNAME
+    DOCKER_PASSWORD: $DOCKER_PASSWORD
+    VPS_HOST: $VPS_HOST
+    VPS_USER: $VPS_USER
+    VPS_SSH_KEY: $VPS_SSH_KEY
 
 
-# -------------------------
-# BUILD
-# -------------------------
-build:
-  stage: build
+stages:
+    - ci
+    - build_image
+    - deploy
 
-  extends:
-    - .default_docker
+workflow:
+    rules:
+        # Run only when commit lands on main branch (both merge to main and push to main are applicable) (for all jobs)
+        - if: '$CI_COMMIT_BRANCH == "main"'
+          when: always
+        - when: never
 
-  before_script:
-    - set -e
-    - docker info
+# pnpm Build test
+ci:
+    stage: ci
+    image: node:24-bookworm-slim
 
-  script:
-    - make test
+    before_script:
+      - curl -fsSL https://bun.sh/install | bash
+      - export PATH="$HOME/.bun/bin:$PATH"
+      - bun --version
+      - node -v
 
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    script:
+        - bun i 
+        - bun run build
 
+build_image:
+    stage: build_image
+    tags: [vps-runner]
+    image: docker:27-cli
+    services:
+        - name: docker:27-dind
+          command: ['--tls=false']
 
-# -------------------------
-# PUSH
-# -------------------------
-push:
-  stage: push
+    variables:
+        DOCKER_HOST: 'tcp://docker:2375'
+        DOCKER_TLS_CERTDIR: ''
+    before_script:
+        - echo "Logging in to docker hub"
+        - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    script:
+        - docker info
+        - echo "Build and push docker image"
+        - docker build -t $DOCKER_USERNAME/$PROJECT_NAME:latest .
+        - docker push $DOCKER_USERNAME/$PROJECT_NAME:latest
 
-  extends:
-    - .default_docker
-
-  script:
-    - make push
-
-  needs:
-    - build
-
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-
-
-# -------------------------
-# DEPLOY
-# -------------------------
 deploy:
-  stage: deploy
+    stage: deploy
+    tags: [vps-runner]
+    image: alpine:3.20
+    before_script:
+        - apk add --no-cache openssh-client
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
 
-  image: alpine:3.21
+        # Write key into a real file with correct permissions
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+        - chmod 600 ~/.ssh/id_ed25519
 
-  before_script:
+        # Add host key (no prompt)
+        - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
 
-    - set -e
+    script:
+        - |
+            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes $VPS_USER@$VPS_HOST << EOF
+            set -e
 
-    # Install ssh
-    - apk add --no-cache openssh-client rsync
+            cd ~/frontend
 
-    # Setup ssh
-    - mkdir -p ~/.ssh
+            echo "🐳 Pull latest images"
+            docker compose pull
 
-    # Fix newline formatting issue (very important)
-    - echo "$VPS_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+            echo "🛑 Stop old containers"
+            docker compose down --remove-orphans
 
-    - chmod 600 ~/.ssh/id_rsa
+            echo "🚀 Start new containers"
+            docker compose up -d
 
-    # Known hosts (better than disabling check)
-    - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+            echo "🧹 Cleanup old images"
+            docker image prune -af
+            EOF
 
-  script:
-
-    # Copy compose
-    - rsync -avz docker-compose.yaml $VPS_USER@$VPS_HOST:/home/$VPS_USER/app/
-
-    # Deploy
-    - |
-      ssh $VPS_USER@$VPS_HOST "
-        set -e
-
-        cd /home/$VPS_USER/app
-
-        docker compose pull
-
-        docker compose up -d
-
-        docker image prune -f
-      "
-
-  needs:
-    - push
-
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+# stages:
+#   - build
+#   - push
+#   - deploy
+#
+# # Global variables
+# variables:
+#   DOCKER_TLS_CERTDIR: ""
+#
+# # DRY template
+# .default_docker:
+#   image: docker:27-cli
+#
+#   services:
+#     - name: docker:27-dind
+#       command: ["--tls=false"]
+#   variables:
+#     DOCKER_HOST: "tcp://docker:2375"
+#     DOCKER_TLS_CERTDIR: ""
+#   before_script:
+#     # Fail fast (important)
+#     - set -e
+#
+#     # Install tools
+#     - apk add --no-cache make
+#
+#     # Docker login
+#     - echo "Login to the docker hub account"
+#     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#     # Debug check
+#     - docker info
+#
+#
+# # -------------------------
+# # BUILD
+# # -------------------------
+# build:
+#   stage: build
+#
+#   extends:
+#     - .default_docker
+#
+#   before_script:
+#     - set -e
+#     - docker info
+#
+#   script:
+#     - make test
+#
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#
+#
+# # -------------------------
+# # PUSH
+# # -------------------------
+# push:
+#   stage: push
+#
+#   extends:
+#     - .default_docker
+#
+#   script:
+#     - make push
+#
+#   needs:
+#     - build
+#
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#
+#
+# # -------------------------
+# # DEPLOY
+# # -------------------------
+# deploy:
+#   stage: deploy
+#
+#   image: alpine:3.21
+#
+#   before_script:
+#
+#     - set -e
+#
+#     # Install ssh
+#     - apk add --no-cache openssh-client rsync
+#
+#     # Setup ssh
+#     - mkdir -p ~/.ssh
+#
+#     # Fix newline formatting issue (very important)
+#     - echo "$VPS_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+#
+#     - chmod 600 ~/.ssh/id_rsa
+#
+#     # Known hosts (better than disabling check)
+#     - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+#
+#   script:
+#
+#     # Copy compose
+#     - rsync -avz docker-compose.yaml $VPS_USER@$VPS_HOST:/home/$VPS_USER/app/
+#
+#     # Deploy
+#     - |
+#       ssh $VPS_USER@$VPS_HOST "
+#         set -e
+#
+#         cd /home/$VPS_USER/app
+#
+#         docker compose pull
+#
+#         docker compose up -d
+#
+#         docker image prune -f
+#       "
+#
+#   needs:
+#     - push
+#
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
