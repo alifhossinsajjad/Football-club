@@ -1,17 +1,14 @@
-variables:
-  PROJECT_NAME: carolineatta997-frontend-lab
-  IMAGE_TAG: $DOCKER_USERNAME/$PROJECT_NAME:latest
-
 stages:
   - build
-
 workflow:
-    rules:
-        - if: '$CI_COMMIT_BRANCH == "main"'
-          when: always
-        - when: never
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
 
-.default_docker: &docker_setup
+build:
+  stage: build
+  tags: [vps-runner]
   image: docker:27-cli
   services:
     - name: docker:27-dind
@@ -23,13 +20,10 @@ workflow:
     - echo "Logging in to docker hub"
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-build_and_push:
-  stage: build
-  <<: *docker_setup
   script:
     - echo "Docker information...."
     - docker info
     - echo "Building image"
-    - docker build -t $IMAGE_TAG .
+    - docker build --no-cache -t softvence/carolineatta997-frontend-lab .
     - echo "Pushing image to docker hub"
-    - docker push $IMAGE_TAG
+    - docker push softvence/carolineatta997-frontend-lab
