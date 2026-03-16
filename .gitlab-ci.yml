@@ -8,7 +8,6 @@ variables:
 
 
 stages:
-    - ci
     - build_image
     - deploy
 
@@ -41,7 +40,6 @@ workflow:
 
 build_image:
     stage: build_image
-    tags: [vps-runner]
     extends:
       - .default_docker
     script:
