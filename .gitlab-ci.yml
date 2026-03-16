@@ -22,5 +22,11 @@ workflow:
   before_script:
     - echo "Logging in to docker hub"
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+build_and_push:
+  stage: build
+  <<: *docker_setup
   script:
-    - docker info
+    - echo "Build and push docker image"
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
