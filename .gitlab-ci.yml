@@ -21,13 +21,16 @@ workflow:
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - echo "Logging in to docker hub"
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 build_and_push:
   stage: build
   tags: [vps-runner]
   <<: *docker_setup
   script:
-    - echo "Build and push docker image"
+    - echo "Docker information...."
+    - docker info
+    - echo "Building image"
     - docker build -t $IMAGE_TAG .
+    - echo "Pushing image to docker hub"
     - docker push $IMAGE_TAG
