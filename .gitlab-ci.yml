@@ -14,84 +14,76 @@ stages:
 
 workflow:
     rules:
-        # Run only when commit lands on main branch (both merge to main and push to main are applicable) (for all jobs)
         - if: '$CI_COMMIT_BRANCH == "main"'
           when: always
         - when: never
 
-# pnpm Build test
-ci:
-    stage: ci
-    image: node:24-bookworm-slim
+.default_docker:
+  image: docker:27-cli
 
-    before_script:
-      - corepack enable
-      - apt-get update -qq && apt-get install -y curl
-      - apt-get install -y unzip
-      - curl -fsSL https://bun.sh/install | bash
-      - export PATH="$HOME/.bun/bin:$PATH"
-      - bun --version
-      - node -v
+  services:
+    - name: docker:27-dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - set -e
+    - apk add --no-cache make
+    - corepack enable
+    - apt-get update -qq && apt-get install -y curl
+    - apt-get install -y unzip
 
-    script:
-        - bun i 
-        - bun run build
+    - echo "Login to the docker hub account"
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    # Debug check
+    - docker info
 
 build_image:
     stage: build_image
     tags: [vps-runner]
-    image: docker:27-cli
-    services:
-        - name: docker:27-dind
-          command: ['--tls=false']
-
-    variables:
-        DOCKER_HOST: 'tcp://docker:2375'
-        DOCKER_TLS_CERTDIR: ''
-    before_script:
-        - echo "Logging in to docker hub"
-        - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    extends:
+      - .default_docker
     script:
-        - docker info
         - echo "Build and push docker image"
         - docker build -t $DOCKER_USERNAME/$PROJECT_NAME:latest .
         - docker push $DOCKER_USERNAME/$PROJECT_NAME:latest
 
-deploy:
-    stage: deploy
-    tags: [vps-runner]
-    image: alpine:3.20
-    before_script:
-        - apk add --no-cache openssh-client
-        - mkdir -p ~/.ssh
-        - chmod 700 ~/.ssh
-
-        # Write key into a real file with correct permissions
-        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
-        - chmod 600 ~/.ssh/id_ed25519
-
-        # Add host key (no prompt)
-        - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
-
-    script:
-        - |
-            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes $VPS_USER@$VPS_HOST << EOF
-            set -e
-
-            cd ~/frontend
-
-            echo "🐳 Pull latest images"
-            docker compose pull
-
-            echo "🛑 Stop old containers"
-            docker compose down --remove-orphans
-
-            echo "🚀 Start new containers"
-            docker compose up -d
-
-            echo "🧹 Cleanup old images"
-            docker image prune -af
-            EOF
+# deploy:
+#     stage: deploy
+#     tags: [vps-runner]
+#     image: alpine:3.20
+#     before_script:
+#         - apk add --no-cache openssh-client
+#         - mkdir -p ~/.ssh
+#         - chmod 700 ~/.ssh
+#
+#         # Write key into a real file with correct permissions
+#         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+#         - chmod 600 ~/.ssh/id_ed25519
+#
+#         # Add host key (no prompt)
+#         - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+#
+#     script:
+#         - |
+#             ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes $VPS_USER@$VPS_HOST << EOF
+#             set -e
+#
+#             cd ~/frontend
+#
+#             echo "🐳 Pull latest images"
+#             docker compose pull
+#
+#             echo "🛑 Stop old containers"
+#             docker compose down --remove-orphans
+#
+#             echo "🚀 Start new containers"
+#             docker compose up -d
+#
+#             echo "🧹 Cleanup old images"
+#             docker image prune -af
+#             EOF
 
 # stages:
 #   - build
