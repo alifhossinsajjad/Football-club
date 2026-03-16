@@ -25,7 +25,6 @@ workflow:
 
 build_and_push:
   stage: build
-  tags: [vps-runner]
   <<: *docker_setup
   script:
     - echo "Docker information...."
