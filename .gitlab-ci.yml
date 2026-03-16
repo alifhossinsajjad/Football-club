@@ -5,6 +5,12 @@ variables:
 stages:
   - build
 
+workflow:
+    rules:
+        - if: '$CI_COMMIT_BRANCH == "main"'
+          when: always
+        - when: never
+
 .default_docker: &docker_setup
   image: docker:27-cli
   services:
