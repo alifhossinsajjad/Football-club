@@ -25,12 +25,8 @@ variables:
     - apk add --no-cache make
 
     # Docker login
+    - echo "Login to the docker hub account"
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-    - sudo systemctl start docker
-    - sudo newgrp docker
-    - sudo usermod -aG docker $USER
-
     # Debug check
     - docker info
 
@@ -43,6 +39,10 @@ build:
 
   extends:
     - .default_docker
+
+  before_script:
+    - set -e
+    - docker info
 
   script:
     - make test
