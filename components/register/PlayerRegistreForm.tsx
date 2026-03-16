@@ -204,7 +204,7 @@ const PlayerRegisterForm = () => {
       await registerPlayer(payload).unwrap();
       toast.success("Registration successful!");
       reset();
-      router.push("/player");
+      router.push("/login");
     } catch (error: any) {
       console.error("Registration failed:", error);
       await showRegistrationError(error, {
