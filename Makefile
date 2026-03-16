@@ -24,3 +24,9 @@ deploy:
 	docker image prune -f
 	docker system prune -af
 	systemctl restart caddy
+
+
+# take message as argument
+push-%:
+	git commit -am $*
+	git push

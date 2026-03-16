@@ -27,9 +27,8 @@ workflow:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - set -e
-    - apk add --no-cache make
     - corepack enable
+    - apk add --no-cache make
     - apt-get update -qq && apt-get install -y curl
     - apt-get install -y unzip
 
