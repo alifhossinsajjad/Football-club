@@ -33,6 +33,6 @@ build:
     - echo "Docker information...."
     - docker info
     - echo "Building image"
-    - docker build --no-cache -t softvence/carolineatta997-frontend-lab .
+    - sudo docker build --no-cache -t softvence/carolineatta997-frontend-lab .
     - echo "Pushing image to docker hub"
-    - docker push softvence/carolineatta997-frontend-lab
+    - sudo docker push softvence/carolineatta997-frontend-lab
