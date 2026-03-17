@@ -10,21 +10,7 @@ workflow:
 
 test:
   stage: test
-  image: alpine:latest
-
-  before_script:
-    # Required system deps for bun on Alpine
-    - apk add --no-cache curl bash libstdc++ libgcc
-
-    # install bun
-    - curl -fsSL https://bun.sh/install | bash
-
-    # setup path properly (DRY version)
-    - export BUN_INSTALL="$HOME/.bun"
-    - export PATH="$BUN_INSTALL/bin:$PATH"
-
-    # verify installation
-    - bun --version
+  image: oven/bun:1
 
   script:
     - bun install
@@ -32,7 +18,7 @@ test:
 
 build:
   stage: build
-  tags: [vps-runner]
+  tags: [gitlab-runner]
   image: docker:27-cli
   services:
     - name: docker:27-dind
