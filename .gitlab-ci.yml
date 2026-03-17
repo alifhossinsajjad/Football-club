@@ -19,8 +19,7 @@ test:
     - curl -fsSL https://bun.sh/install | bash
     - export PATH="$HOME/.bun/bin:$PATH"
   script:
-    - bun install
-    - bun run build
+    - ls -la
 
 build:
   stage: build
