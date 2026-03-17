@@ -18,6 +18,7 @@ test:
 
 build:
   stage: build
+  tags: [gitlab-runner, vps-runner]
   image: docker:27-cli
   services:
     - name: docker:27-dind
