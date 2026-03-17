@@ -13,14 +13,19 @@ test:
   image: alpine:latest
 
   before_script:
-    - apk add --no-cache curl
-    # bash is required for bun
-    - apk add --no-cache bash
+    # Required system deps for bun on Alpine
+    - apk add --no-cache curl bash libstdc++ libgcc
+
+    # install bun
     - curl -fsSL https://bun.sh/install | bash
-    - export PATH="$HOME/.bun/bin:$PATH"
+
+    # setup path properly (DRY version)
     - export BUN_INSTALL="$HOME/.bun"
     - export PATH="$BUN_INSTALL/bin:$PATH"
+
+    # verify installation
     - bun --version
+
   script:
     - bun install
     - bun run build
