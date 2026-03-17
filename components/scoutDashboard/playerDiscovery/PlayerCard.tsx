@@ -8,6 +8,8 @@ import {
   useRemoveFromShortlistMutation,
 } from "@/redux/features/scout/playerDiscoverApi";
 import { toast } from "react-hot-toast";
+import { useCreateConversationMutation } from "@/redux/features/chat/chatApi";
+import { useRouter } from "next/navigation";
 
 interface PlayerCardProps {
   player: DiscoveryPlayer;
@@ -23,6 +25,8 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
 
   const [addToShortlist] = useAddToShortlistMutation();
   const [removeFromShortlist] = useRemoveFromShortlistMutation();
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
+  const router = useRouter();
 
   const handleStarClick = async () => {
     const wasStarred = starred;
@@ -46,6 +50,10 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
       toast.error(errorDetail);
       setStarred(wasStarred);
     }
+  };
+
+  const handleMessageClick = () => {
+    router.push(`/scout/messaging?userId=${player.id}`);
   };
 
   if (!player) return <h1>No player found!</h1>;
@@ -119,7 +127,11 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
         >
           View Profile
         </button>
-        <button className="w-9 h-9 rounded-lg bg-[#2DD4BF]/10 border border-[#2DD4BF]/30 text-[#2DD4BF] flex items-center justify-center hover:bg-[#2DD4BF] hover:text-[#0a1218] transition-all duration-200">
+        <button 
+          onClick={handleMessageClick}
+          disabled={isCreatingChat}
+          className="w-9 h-9 rounded-lg bg-[#2DD4BF]/10 border border-[#2DD4BF]/30 text-[#2DD4BF] flex items-center justify-center hover:bg-[#2DD4BF] hover:text-[#0a1218] transition-all duration-200 disabled:opacity-50"
+        >
           <MessageCircle size={15} />
         </button>
       </div>

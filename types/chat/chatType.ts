@@ -1,38 +1,55 @@
 export interface ChatUser {
-  id: number;
+  id: string | number;
   name: string;
   avatar?: string | null;
+  role?: string;
+}
+
+export interface LastMessage {
+  id: number;
+  content: string;
+  sender: number | string;
+  sender_name: string;
+  sender_role: string;
+  is_read: boolean;
+  created_at: string;
 }
 
 export interface Conversation {
   id: number;
+  last_message?: LastMessage;
+  other_participant: ChatUser;
+  unread_count: number;
+  updated_at: string;
+  // Fallbacks for transition
   name?: string;
   user?: ChatUser;
   avatar?: string | null;
-  active?: boolean;
-  last_message?: string;
-  message?: string;
-  last_message_time?: string;
+  last_message_text?: string;
   time?: string;
-  unread_count: number;
 }
 
 export interface ChatMessage {
-  id: number;
-  text?: string;
+  id: string | number;
+  messageId?: string | number;   // returned by create-conversation API
+  conversationId?: number;       // returned by create-conversation API
   content?: string;
+  text?: string;
+  message?: string;
+  senderId?: string | number;
+  receiverId?: string | number;
   is_sender?: boolean;
-  isOwn?: boolean;
   is_own?: boolean;
+  isOwn?: boolean;
+  sender?: number | string;
+  sender_name?: string;
+  timestamp?: string;
   created_at?: string;
   time?: string;
 }
 
 export interface ChatResponse {
-  count?: number;
-  next?: string | null;
-  previous?: string | null;
-  results?: Conversation[];
+  conversations: Conversation[];
 }
 
 export interface MessageResponse {
@@ -40,4 +57,6 @@ export interface MessageResponse {
   next?: string | null;
   previous?: string | null;
   results?: ChatMessage[];
+  messages?: ChatMessage[];
+  conversationId?: number;
 }

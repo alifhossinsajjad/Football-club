@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { Bell, LogOut, User as UserIcon } from "lucide-react";
+import NotificationPopover from "./NotificationPopover";
 
 import { useRouter } from "next/navigation";
 
@@ -40,9 +41,7 @@ const AdminTopBar: React.FC = () => {
     };
   }, [profileDropdownOpen]);
 
-  // const handleNotificationClick = (): void => {
-  //   console.log("Notification clicked");
-  // };
+
 
   const handleLogout = (): void => {
     dispatch(logout());
@@ -57,15 +56,7 @@ const AdminTopBar: React.FC = () => {
         {/* Right Actions */}
         <div className="flex items-center gap-4">
           {/* Notification */}
-          {/* <button
-            onClick={handleNotificationClick}
-            type="button"
-            aria-label="Notifications"
-            className="relative p-2 rounded-full text-gray-700 hover:text-gray-800 transition cursor-pointer"
-          >
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
-          </button> */}
+          <NotificationPopover />
 
           {/* Profile Dropdown */}
           <div className=" relative" ref={profileDropdownRef}>

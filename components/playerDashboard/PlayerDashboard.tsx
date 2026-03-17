@@ -64,7 +64,7 @@ const FALLBACK_MESSAGES: RecentMessage[] = [
 // ─── Reusable Components ──────────────────────────────────────────────────────
 
 const Avatar = ({ name, logo }: { name: string; logo?: string }) => {
-  const initials = name
+  const initials = (name || "Unknown")
     .split(" ")
     .map((w) => w[0])
     .join("")
@@ -237,12 +237,12 @@ export default function PlayerDashboard() {
                 </div>
               ))
             ) : upcomingEvents.length > 0 ? (
-              upcomingEvents.map((event: any) => (
+              upcomingEvents.map((event: UpcomingEvent) => (
                 <div
                   key={event.id}
                   className="px-6 py-4 flex items-center gap-4 hover:bg-[#0A0F2C] transition-colors"
                 >
-                  <Avatar name={event.event_name || event.title} />
+                  <Avatar name={(event.event_name || event.title) || "Unknown Event"} />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{event.event_name || event.title}</p>
                     <p className="text-sm text-[#9BA3C8] flex items-center gap-1.5 mt-0.5">
@@ -251,7 +251,7 @@ export default function PlayerDashboard() {
                   </div>
                   <div className="text-right text-sm">
                     <div className="font-medium text-[#00E5FF]">
-                      {(event.date || event.event_date) ? formatRegistrationDate(event.date || event.event_date) : 'TBD'}
+                      {(event.date || event.event_date) ? formatRegistrationDate((event.date || event.event_date) as string) : 'TBD'}
                     </div>
                     {event.time && <div className="text-[#9BA3C8] mt-0.5">{event.time}</div>}
                   </div>
