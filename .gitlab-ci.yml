@@ -18,8 +18,10 @@ test:
     - apk add --no-cache bash
     - curl -fsSL https://bun.sh/install | bash
     - export PATH="$HOME/.bun/bin:$PATH"
+    - bun --version
   script:
-    - ls -la
+    - bun install
+    - bun run build
 
 build:
   stage: build
