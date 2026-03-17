@@ -16,14 +16,18 @@ export interface DiscoveryPlayer {
   highlight_video_available: boolean;
   rating?: number;
   is_shortlisted?: boolean;
-  shortlist_id?: number; // ADD THIS
+  shortlist_id?: number; 
+  user?: {
+    id: number | string;
+  };
 }
 
 export interface PlayerDiscoveryListResponse {
-  results: DiscoveryPlayer[];
-  count: number;
-  next: string | null;
-  previous: string | null;
+  results?: DiscoveryPlayer[];
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+  data?: any;
 }
 
 export interface PlayerDiscoveryFilters {

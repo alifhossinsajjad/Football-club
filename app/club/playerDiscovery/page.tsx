@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -17,6 +18,7 @@ import {
   Phone,
   LayoutGrid,
 } from "lucide-react";
+import { useGetDiscoveryPlayersQuery } from "@/redux/features/club/playerDiscoveryApi";
 
 // Types
 interface PlayerStats {
@@ -42,7 +44,7 @@ interface Player {
   stats: PlayerStats;
 }
 
-import { useGetDiscoveredPlayersQuery } from "@/redux/features/club/playerDiscoveryApi";
+
 
 const PlayerDiscoveryPage = () => {
   const router = useRouter();
@@ -54,7 +56,7 @@ const PlayerDiscoveryPage = () => {
   const [selectedPlayerForMessage, setSelectedPlayerForMessage] = useState<any | null>(null);
   const [messageText, setMessageText] = useState("");
 
-  const { data: apiData, isLoading, isError } = useGetDiscoveredPlayersQuery({});
+  const { data: apiData, isLoading, isError } = useGetDiscoveryPlayersQuery({});
   
   // Safely map API response allowing for {success, data} envelope, paginated {results}, or direct array
   const rawPlayers = Array.isArray(apiData?.data?.results) ? apiData.data.results :
@@ -79,15 +81,16 @@ const PlayerDiscoveryPage = () => {
   const players: Player[] = rawPlayers.map((p: any) => {
     const firstName = p?.user?.first_name || p?.first_name || "Unknown";
     const lastName = p?.user?.last_name || p?.last_name || "Player";
+    const pos = typeof p?.primary_position === 'string' ? p.primary_position.replace(/_/g, ' ') : (p?.position || "Position N/A");
     
     return {
       id: p?.id || Math.random(),
       name: `${firstName} ${lastName}`,
-      position: p?.primary_position?.replace(/_/g, ' ') || "Position N/A",
+      position: pos,
       nationality: p?.nationality || "Unknown",
       nationalityCode: p?.nationality ? "🏳️" : "🌍", // Fallback flag
-      age: p?.age || Math.floor(Math.random() * (25 - 17) + 17), // Fallback age 17-25
-      rating: p?.rating || Math.floor(Math.random() * (90 - 70) + 70), // Fallback rating
+      age: p?.age || 20, // Default age
+      rating: p?.rating || 80, // Default rating
       image: p?.profile_image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
       stats: {
         matches: p?.matches_played || 0,

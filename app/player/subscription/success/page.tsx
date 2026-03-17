@@ -25,7 +25,8 @@ console.log('session id ', sessionId)
         })
         .catch((err) => {
           console.error("Verification failed:", err);
-          setError("Failed to verify payment. Please contact support.");
+          const errorMessage = err?.data?.message || err?.data?.detail || err?.error || "Failed to verify payment. Please contact support.";
+          setError(errorMessage);
           toast.error("Verification failed.");
         });
     } else {

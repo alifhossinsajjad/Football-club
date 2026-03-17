@@ -23,7 +23,7 @@ export default function PlayerDiscoveryDetailsPage() {
   const router = useRouter();
   const id = params.id as string;
 
-  const { data: apiData, isLoading, isError } = useGetPlayerDetailsQuery(id);
+  const { data: apiData, isLoading, isError } = useGetPlayerDetailsQuery(Number(id));
   
   if (isLoading) {
     return (
@@ -49,12 +49,12 @@ export default function PlayerDiscoveryDetailsPage() {
     );
   }
 
-  const p = apiData?.data || apiData || {};
+  const p: any = apiData;
   
   // Header Meta
   const firstName = p?.user?.first_name || p?.first_name || "John";
   const lastName = p?.user?.last_name || p?.last_name || "Doe";
-  const position = p?.primary_position?.replace(/_/g, ' ') || p?.position || "Forward / Striker";
+  const position = typeof p?.primary_position === 'string' ? p.primary_position.replace(/_/g, ' ') : (p?.position || "Forward / Striker");
   const location = p?.location || p?.user?.address || "Manchester, United Kingdom";
   
   const age = p?.age || "—";
@@ -85,14 +85,14 @@ export default function PlayerDiscoveryDetailsPage() {
     { label: "Technical", value: p?.technical || 89 },
   ];
 
-  const playingHistory = p?.playing_history || [];
-  const highlightVideos = p?.highlight_videos || [];
+  const playingHistory = Array.isArray(p?.playing_history) ? p.playing_history : [];
+  const highlightVideos = Array.isArray(p?.highlight_videos) ? p.highlight_videos : [];
 
   // Right Column
   const email = p?.user?.email || p?.email || "john.doe@email.com";
   const phone = p?.user?.phone || p?.phone || "+44 7700 900000";
 
-  const achievements = p?.achievements || [];
+  const achievements = Array.isArray(p?.achievements) ? p.achievements : [];
 
   const profileViews = p?.insights?.profile_views || 0;
   const scoutViews = p?.insights?.scout_views || 0;
