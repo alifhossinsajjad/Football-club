@@ -1,4 +1,0 @@
-types/auth.ts(35,3): error TS2300: Duplicate identifier 'refresh'.
-types/auth.ts(36,3): error TS2300: Duplicate identifier 'access'.
-types/auth.ts(39,3): error TS2300: Duplicate identifier 'access'.
-types/auth.ts(40,3): error TS2300: Duplicate identifier 'refresh'.

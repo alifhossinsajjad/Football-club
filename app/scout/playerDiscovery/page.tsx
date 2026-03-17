@@ -193,7 +193,9 @@ console.log('player discover data',data)
             <PlayerCard
               key={player.id}
               player={player}
-              onViewProfile={() => setSelectedPlayerId(player.id)}
+              onViewProfile={() => {
+                setSelectedPlayerId(player.id);
+              }}
             />
           ))}
         </div>
