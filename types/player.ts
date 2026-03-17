@@ -20,4 +20,5 @@ export interface PlayerRegisterPayload {
   parent_guardian_last_name?: string;
   parent_id_number?: string;
   parent_guardian_digital_signature?: string | null;
+  parent_guardian_email?: string;
 }

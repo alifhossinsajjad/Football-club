@@ -9,7 +9,9 @@ import { showRegistrationError } from "@/lib/registrationErrors";
 import { useRegisterScoutMutation } from "@/redux/features/auth/scoutRegistretionApi";
 import { ScoutRegisterPayload } from "@/types/scout";
 import DarkInput from "../reuseable/DarkInput";
+import DarkSelect from "../reuseable/DarkSelect";
 import StepIndicator from "../reuseable/StepIndicator";
+import { countries } from "@/constants/countries";
 
 import { 
   User, 
@@ -131,6 +133,10 @@ const ScoutRegistretionForm = () => {
 
   const handleNextStep = async () => {
     if (step === 0) {
+      if (formValues.password !== formValues.confirm_password) {
+        toast.error("Passwords do not match");
+        return;
+      }
       const valid = await trigger([
         "first_name",
         "last_name",
@@ -176,6 +182,10 @@ const ScoutRegistretionForm = () => {
   };
 
   const onSubmit = async (data: FormData) => {
+    if (data.password !== data.confirm_password) {
+      toast.error("Passwords do not match");
+      return;
+    }
     const payload: ScoutRegisterPayload = {
       email: data.email,
       password: data.password,
@@ -287,14 +297,15 @@ toast.success(
                     register={register}
                     error={errors.date_of_birth?.message}
                     icon={<Calendar size={16} />}
+                    value={watch("date_of_birth")}
                   />
-                  <DarkInput
+                  <DarkSelect
                     label="Nationality"
                     name="nationality"
                     register={register}
                     error={errors.nationality?.message}
                     icon={<Globe size={16} />}
-                    placeholder="Select Nationality"
+                    options={countries}
                   />
                   <DarkInput
                     label="Phone Number"

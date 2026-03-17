@@ -18,12 +18,6 @@ interface PlayingHistory {
   detail: string;
 }
 
-interface HighlightVideo {
-  title: string;
-  duration: string;
-  thumb: string;
-}
-
 export default function PlayerDiscoveryDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -63,24 +57,24 @@ export default function PlayerDiscoveryDetailsPage() {
   const position = p?.primary_position?.replace(/_/g, ' ') || p?.position || "Forward / Striker";
   const location = p?.location || p?.user?.address || "Manchester, United Kingdom";
   
-  const age = p?.age || "17 years";
-  const height = p?.height ? `${p.height} cm` : "5'11\" (180 cm)";
-  const weight = p?.weight ? `${p.weight} kg` : "165 lbs (75 kg)";
-  const nationality = p?.nationality || "British";
+  const age = p?.age || "—";
+  const height = p?.height ? `${p.height} cm` : "—";
+  const weight = p?.weight ? `${p.weight} kg` : "—";
+  const nationality = p?.nationality || "—";
   
-  const preferredFoot = p?.preferred_foot || "Right";
-  const dateOfBirth = p?.date_of_birth || "15/03/2008";
-  const jerseyNumber = p?.jersey_number || "#10";
+  const preferredFoot = p?.preferred_foot || "—";
+  const dateOfBirth = p?.date_of_birth || "—";
+  const jerseyNumber = p?.jersey_number || "—";
 
   const image =p?.profile_image || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop";
   const coverImage = p?.cover_image || "https://www.ipsos.com/sites/default/files/ct/news_and_polls/2022-11/ipsos-global-advisor-fifa-world-cup-2022.jpg";
   
   // Left Column
-  const bio = p?.bio || p?.about || "Highly skilled and dedicated forward with exceptional technical abilities and a strong goal-scoring record. Known for excellent ball control, pace, and tactical awareness. Currently playing for Manchester United Youth Academy and representing England U-18 National Team. Passionate about developing my skills and pursuing a professional career in football at the highest level.";
-  const matches = p?.matches_played || p?.stats?.matches || 28;
-  const goals = p?.goals_scored || p?.stats?.goals || 19;
-  const assists = p?.assists || p?.stats?.assists || 12;
-  const minutes = p?.minutes_played || "2,340";
+  const bio = p?.bio || p?.about || "No biography provided.";
+  const matches = p?.matches_played || p?.stats?.matches || 0;
+  const goals = p?.goals_scored || p?.stats?.goals || 0;
+  const assists = p?.assists || p?.stats?.assists || 0;
+  const minutes = p?.minutes_played || "0";
 
   const skills = [
     { label: "Pace", value: p?.pace || 92 },
@@ -91,32 +85,18 @@ export default function PlayerDiscoveryDetailsPage() {
     { label: "Technical", value: p?.technical || 89 },
   ];
 
-  const playingHistory = p?.playing_history || [
-    { team: "Manchester United Youth Academy", duration: "2021 - Present", role: "Forward", detail: "FA Youth Cup Runner-up 2024" },
-    { team: "England U-18 National Team", duration: "2024 - Present", role: "Forward", detail: "8 Caps, 5 Goals" },
-    { team: "City Football Academy", duration: "2018 - 2021", role: "Forward", detail: "Regional Champions 2020" },
-  ];
-
-  const highlightVideos = p?.highlight_videos || [
-    { title: "Season Highlights 2024/25 - Part 1", duration: "3:45 minutes", thumb: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&h=300&fit=crop" },
-    { title: "Season Highlights 2024/25 - Part 2", duration: "3:45 minutes", thumb: "https://images.unsplash.com/photo-1518605368461-1ee0ab24921f?w=500&h=300&fit=crop" }
-  ];
+  const playingHistory = p?.playing_history || [];
+  const highlightVideos = p?.highlight_videos || [];
 
   // Right Column
   const email = p?.user?.email || p?.email || "john.doe@email.com";
   const phone = p?.user?.phone || p?.phone || "+44 7700 900000";
 
-  const achievements = p?.achievements || [
-    "Player of the Month - March 2025",
-    "Top Scorer U-18 League 2024",
-    "England Youth Call-up 2024",
-    "FA Youth Cup Finalist 2024",
-    "Academy Player of the Year 2023"
-  ];
+  const achievements = p?.achievements || [];
 
-  const profileViews = p?.insights?.profile_views || 1245;
-  const scoutViews = p?.insights?.scout_views || 89;
-  const clubInterest = p?.insights?.club_interest || 12;
+  const profileViews = p?.insights?.profile_views || 0;
+  const scoutViews = p?.insights?.scout_views || 0;
+  const clubInterest = p?.insights?.club_interest || 0;
 
   return (
     <div className="min-h-screen bg-[#070B24] text-white font-sans pb-20">
@@ -280,21 +260,32 @@ export default function PlayerDiscoveryDetailsPage() {
                  <Video size={20} className="text-[#00E5FF]" />
                </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                 {highlightVideos.map((vid: HighlightVideo, i: number) => (
-                   <div key={i} className="group cursor-pointer">
+                 {highlightVideos.map((vid: any, i: number) => (
+                   <a 
+                     key={i} 
+                     href={vid.video_url || "#"} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="group cursor-pointer block"
+                   >
                      <div className="w-full aspect-video rounded-xl overflow-hidden border border-[#1A2160] relative mb-3">
-                       <Image src={vid.thumb} alt={vid.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                       <Image 
+                         src={vid.video_url ? `https://img.youtube.com/vi/${vid.video_url.split('v=')[1]?.split('&')[0] || vid.video_url.split('/').pop()}/mqdefault.jpg` : (vid.thumb || `https://picsum.photos/seed/${i}/400/225`)} 
+                         alt={vid.title} 
+                         fill 
+                         className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                       />
                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                          <div className="w-12 h-12 rounded-full bg-[#00E5FF]/90 flex items-center justify-center pl-1 text-[#070B24] shadow-lg scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all">
-                           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                              <path d="M8 5V19L19 12L8 5Z" />
                            </svg>
                          </div>
                        </div>
                      </div>
                      <p className="text-gray-300 text-sm font-medium mb-1 line-clamp-1">{vid.title}</p>
-                     <p className="text-gray-500 text-xs">{vid.duration}</p>
-                   </div>
+                     <p className="text-gray-500 text-xs font-normal opacity-80">{vid.description || "Video Highlight"}</p>
+                   </a>
                  ))}
                </div>
              </div>
@@ -309,12 +300,12 @@ export default function PlayerDiscoveryDetailsPage() {
                <h3 className="text-white font-bold mb-5">Contact Information</h3>
                <div className="space-y-4">
                  <div className="flex items-center gap-3 text-sm text-gray-300">
-                   <Mail size={16} className="text-[#00E5FF]" /> 
-                   <span>{email}</span>
+                    <Mail size={16} className="text-[#00E5FF]" /> 
+                    <span>{email}</span>
                  </div>
                  <div className="flex items-center gap-3 text-sm text-gray-300">
-                   <Phone size={16} className="text-[#00E5FF]" /> 
-                   <span>{phone}</span>
+                    <Phone size={16} className="text-[#00E5FF]" /> 
+                    <span>{phone}</span>
                  </div>
                </div>
              </div>
@@ -323,18 +314,49 @@ export default function PlayerDiscoveryDetailsPage() {
              <div className="bg-[#12143A] rounded-2xl border border-[#1A2160] p-6">
                <h3 className="text-white font-bold mb-5">Social Media</h3>
                <div className="space-y-4">
-                 <div className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors">
-                   <Instagram size={16} className="text-[#E1306C]" /> <span>@johndoe_10</span>
-                 </div>
-                 <div className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors">
-                   <Twitter size={16} className="text-[#1DA1F2]" /> <span>@johndoe_10</span>
-                 </div>
-                 <div className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors">
-                   <Facebook size={16} className="text-[#1877F2]" /> <span>John Doe</span>
-                 </div>
-                 <div className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors">
-                   <Youtube size={16} className="text-[#FF0000]" /> <span>John Doe Football</span>
-                 </div>
+                 {p.instagram && (
+                   <a 
+                     href={p.instagram.startsWith('http') ? p.instagram : `https://instagram.com/${p.instagram.replace('@', '')}`} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors"
+                   >
+                     <Instagram size={16} className="text-[#E1306C]" /> <span>@{p.instagram.replace('@', '')}</span>
+                   </a>
+                 )}
+                 {p.twitter && (
+                   <a 
+                     href={p.twitter.startsWith('http') ? p.twitter : `https://twitter.com/${p.twitter.replace('@', '')}`} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors"
+                   >
+                     <Twitter size={16} className="text-[#1DA1F2]" /> <span>@{p.twitter.replace('@', '')}</span>
+                   </a>
+                 )}
+                 {p.facebook && (
+                   <a 
+                     href={p.facebook.startsWith('http') ? p.facebook : `https://facebook.com/${p.facebook}`} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors"
+                   >
+                     <Facebook size={16} className="text-[#1877F2]" /> <span>{firstName} {lastName}</span>
+                   </a>
+                 )}
+                 {p.youtube && (
+                   <a 
+                     href={p.youtube.startsWith('http') ? p.youtube : `https://youtube.com/${p.youtube}`} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors"
+                   >
+                     <Youtube size={16} className="text-[#FF0000]" /> <span>{firstName} Football</span>
+                   </a>
+                 )}
+                 {(!p.instagram && !p.twitter && !p.facebook && !p.youtube) && (
+                   <p className="text-gray-500 text-xs">No social media links provided.</p>
+                 )}
                </div>
              </div>
 
@@ -391,7 +413,7 @@ export default function PlayerDiscoveryDetailsPage() {
                <h3 className="text-white font-bold mb-6">Preferences</h3>
                <div className="space-y-5">
                  <div>
-                   <p className="text-gray-500 text-xs mb-1">Preferred Leagues</p>
+                   <p className="text-gray-500 text-xs mb-1">Preferred Regions / Countries</p>
                    <p className="text-gray-300 text-sm">Premier League, La Liga, Bundesliga</p>
                  </div>
                  <div>
@@ -412,4 +434,3 @@ export default function PlayerDiscoveryDetailsPage() {
     </div>
   );
 }
-

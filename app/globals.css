@@ -186,3 +186,15 @@
     scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
   }
 }
+
+/* Make native browser calendar icons white on dark background */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}

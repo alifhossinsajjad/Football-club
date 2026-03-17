@@ -9,8 +9,13 @@ import {
   Download, 
   Calendar,
   Lock,
-  ChevronRight
+  ChevronRight,
+  Rocket,
+  CheckCircle,
+  Shield,
+  XCircle
 } from "lucide-react";
+import { formatRegistrationDate } from "@/lib/utils/dateFormatter";
 import { 
   useGetSubscriptionQuery, 
   useGetPaymentHistoryQuery, 
@@ -100,8 +105,8 @@ const SubscriptionContent = () => {
       const payload: { plan_type: string; billing_cycle: string; success_url?: string; cancel_url?: string } = {
         plan_type: pType, 
         billing_cycle: bCycle,
-        success_url: `${baseUrl}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/subscription/cancel`
+        success_url: `${baseUrl}/player/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/player/subscription/cancel`
       };
       
       console.log("Sending checkout payload:", payload);
@@ -263,7 +268,9 @@ const SubscriptionContent = () => {
         <div className="grid md:grid-cols-3 gap-4">
           <div className="p-6 bg-[#0B0D2C]/50 rounded-2xl border border-white/[0.03]">
             <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Next Billing Date</p>
-            <p className="text-sm text-white font-bold">{displaySub.next_billing_date}</p>
+            <p className="text-sm text-white font-bold">
+              {displaySub.next_billing_date ? formatRegistrationDate(displaySub.next_billing_date) : 'N/A'}
+            </p>
           </div>
           
           <div className="p-6 bg-[#0B0D2C]/50 rounded-2xl border border-white/[0.03]">
@@ -311,7 +318,9 @@ const SubscriptionContent = () => {
             <tbody>
               {paymentHistory.map((item: PaymentHistoryItem) => (
                 <tr key={item.id} className="group border-b border-white/[0.02] last:border-0 hover:bg-white/[0.01] transition-colors">
-                  <td className="py-6 text-sm text-gray-300 font-bold">{new Date(item.payment_date).toLocaleDateString()}</td>
+                  <td className="py-6 text-sm text-gray-300 font-bold">
+                    {new Date(item.payment_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  </td>
                   <td className="py-6 text-sm text-gray-400">{item.description}</td>
                   <td className="py-6 text-sm text-white font-black">{item.currency.toUpperCase()} {item.amount}</td>
                   <td className="py-6">

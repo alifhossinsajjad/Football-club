@@ -13,6 +13,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { countries } from "@/constants/countries";
+import { useGetAllClubsQuery } from "@/redux/features/scout/clubDireactoryApi";
 import { 
   User, 
   Calendar, 
@@ -52,6 +54,7 @@ interface FormData {
   parent_guardian_first_name?: string;
   parent_guardian_last_name?: string;
   parent_id_number?: string;
+  parent_guardian_email?: string;
   parent_guardian_digital_signature?: string | null;
   accept_privacy: boolean;
 }
@@ -76,9 +79,24 @@ const PlayerRegisterForm = () => {
   });
 
   const [registerPlayer, { isLoading }] = useRegisterPlayerMutation();
+  const { data: clubsData } = useGetAllClubsQuery();
+  const allClubs = clubsData?.results || [];
 
   const dob = watch("date_of_birth");
+  const password = watch("password");
+  const confirmPassword = watch("confirm_password");
+  const nationality = watch("nationality");
   const formValues = watch();
+
+  const [clubSearch, setClubSearch] = useState("");
+  const [showClubSuggestions, setShowClubSuggestions] = useState(false);
+
+  const filteredClubs = useMemo(() => {
+    if (!clubSearch) return [];
+    return allClubs.filter(club => 
+      club.club_name.toLowerCase().includes(clubSearch.toLowerCase())
+    );
+  }, [clubSearch, allClubs]);
 
   const isMinor = useMemo(() => {
     if (!dob) return false;
@@ -96,6 +114,15 @@ const PlayerRegisterForm = () => {
     let fieldsToValidate: (keyof FormData)[] = [];
     
     if (step === 0) {
+      const isDobValid = dob && new Date(dob).getFullYear() >= 1900 && new Date(dob) <= new Date();
+      if (!isDobValid) {
+        toast.error("Please enter a valid date of birth (after 1900 and not in the future)");
+        return;
+      }
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
       fieldsToValidate = [
         "first_name", "last_name", "date_of_birth", "nationality", 
         "phone_number", "email", "password", "confirm_password"
@@ -105,6 +132,11 @@ const PlayerRegisterForm = () => {
         "playing_position", "preferred_foot", "height", "weight", "city", "country"
       ];
     } else if (step === 2) {
+      const contractDate = watch("contract_valid_until");
+      if (contractDate && new Date(contractDate) < new Date(new Date().setHours(0,0,0,0))) {
+        toast.error("Contract validity date cannot be in the past");
+        return;
+      }
       fieldsToValidate = ["current_club_academy", "type_of_commitment", "contract_valid_until"];
     } else if (step === 3 && isMinor) {
       fieldsToValidate = [
@@ -155,6 +187,7 @@ const PlayerRegisterForm = () => {
       contract_valid_until: data.contract_valid_until,
       parent_guardian_first_name: data.parent_guardian_first_name,
       parent_guardian_last_name: data.parent_guardian_last_name,
+      parent_guardian_email: data.parent_guardian_email,
       parent_id_number: data.parent_id_number,
       parent_guardian_digital_signature: data.parent_guardian_digital_signature || null,
     };
@@ -162,6 +195,7 @@ const PlayerRegisterForm = () => {
     if (!isMinor) {
       delete payload.parent_guardian_first_name;
       delete payload.parent_guardian_last_name;
+      delete payload.parent_guardian_email;
       delete payload.parent_guardian_digital_signature;
       delete payload.parent_id_number;
     }
@@ -170,7 +204,7 @@ const PlayerRegisterForm = () => {
       await registerPlayer(payload).unwrap();
       toast.success("Registration successful!");
       reset();
-      router.push("/player");
+      router.push("/login");
     } catch (error: any) {
       console.error("Registration failed:", error);
       await showRegistrationError(error, {
@@ -228,22 +262,23 @@ const PlayerRegisterForm = () => {
                     placeholder="Doe"
                   />
                 </div>
-                <DarkInput
+                  <DarkInput
                   label="Date of Birth"
                   name="date_of_birth"
                   type="date"
                   register={register}
                   error={errors.date_of_birth?.message}
                   icon={<Calendar size={16} />}
+                  value={watch("date_of_birth")}
                 />
-                <DarkInput
-                  label="Nationality"
-                  name="nationality"
-                  register={register}
-                  error={errors.nationality?.message}
-                  icon={<Globe size={16} />}
-                  placeholder="Select Nationality"
-                />
+                  <DarkSelect
+                    label="Nationality"
+                    name="nationality"
+                    register={register}
+                    error={errors.nationality?.message}
+                    icon={<Globe size={16} />}
+                    options={countries}
+                  />
                 <DarkInput
                   label="Phone Number"
                   name="phone_number"
@@ -349,7 +384,13 @@ const PlayerRegisterForm = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                    <DarkInput label="City" name="city" register={register} error={errors.city?.message} placeholder="Barcelona" />
-                   <DarkInput label="Country" name="country" register={register} error={errors.country?.message} placeholder="Spain" />
+                   <DarkSelect
+                    label="Country"
+                    name="country"
+                    register={register}
+                    error={errors.country?.message}
+                    options={countries}
+                  />
                 </div>
 
                 <div className="flex gap-4 pt-4">
@@ -384,24 +425,63 @@ const PlayerRegisterForm = () => {
                    </div>
                 </div>
 
-                <DarkInput
-                  label="Current Club / Academy"
-                  name="current_club_academy"
-                  register={register}
-                  error={errors.current_club_academy?.message}
-                  placeholder="e.g. FC Barcelona Youth Academy or 'None' if free agent"
-                />
+                <div className="relative">
+                  <DarkInput
+                    label="Current Club / Academy"
+                    name="current_club_academy"
+                    register={register}
+                    error={errors.current_club_academy?.message}
+                    placeholder="e.g. FC Barcelona Youth Academy or 'None' if free agent"
+                    onChange={(e: any) => {
+                      setClubSearch(e.target.value);
+                      setShowClubSuggestions(true);
+                      register("current_club_academy").onChange(e);
+                    }}
+                  />
+                  {showClubSuggestions && filteredClubs.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-[#0b1221] border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                      {filteredClubs.map((club) => (
+                        <button
+                          key={club.id}
+                          type="button"
+                          onClick={() => {
+                            setClubSearch(club.club_name);
+                            setShowClubSuggestions(false);
+                            control._names.mount.add("current_club_academy");
+                            const input = document.getElementsByName("current_club_academy")[0] as HTMLInputElement;
+                            if (input) {
+                              input.value = club.club_name;
+                              input.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+                        >
+                          {club.club_logo ? (
+                            <img src={club.club_logo} alt={club.club_name} className="w-8 h-8 rounded-full object-cover border border-white/10" />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs text-gray-400">?</div>
+                          )}
+                          <div className="flex flex-col">
+                            <span className="text-sm text-white font-medium">{club.club_name}</span>
+                            <span className="text-[10px] text-gray-500 uppercase">{club.location}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <DarkSelect
                   label="Type of Commitment"
                   name="type_of_commitment"
                   register={register}
                   error={errors.type_of_commitment?.message}
                   options={[
-                    { label: "Full-time", value: "full_time" },
-                    { label: "Part-time", value: "part_time" },
-                    { label: "Amateur", value: "amateur" },
-                    { label: "Professional", value: "professional" },
-                    { label: "None / Freelancer", value: "none" },
+                    { label: "Academy Player", value: "academy_player" },
+                    { label: "Youth / Nursery Player", value: "youth_nursery_player" },
+                    { label: "Amateur Club Player", value: "amateur_club_player" },
+                    { label: "Semi-Professional Player", value: "semi_professional_player" },
+                    { label: "Professional Player", value: "professional_player" },
+                    { label: "Free Agent", value: "free_agent" },
                   ]}
                 />
                 <DarkInput
@@ -411,6 +491,8 @@ const PlayerRegisterForm = () => {
                   register={register}
                   error={errors.contract_valid_until?.message}
                   placeholder="dd/mm/yyyy"
+                  icon={<Calendar size={16} />}
+                  value={watch("contract_valid_until")}
                 />
                 <p className="text-[10px] text-gray-500 pl-1 -mt-4">If you're a free agent, select today's date or a future date</p>
 
@@ -474,7 +556,10 @@ const PlayerRegisterForm = () => {
                   <DarkInput label="Parent/Guardian First Name" name="parent_guardian_first_name" register={register} error={errors.parent_guardian_first_name?.message} icon={<User size={14}/>} placeholder="Enter parent's first name" />
                   <DarkInput label="Parent/Guardian Last Name" name="parent_guardian_last_name" register={register} error={errors.parent_guardian_last_name?.message} icon={<User size={14}/>} placeholder="Enter parent's last name" />
                 </div>
-                <DarkInput label="Parent/Guardian ID Number" name="parent_id_number" register={register} error={errors.parent_id_number?.message} placeholder="National ID / Passport number" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <DarkInput label="Parent/Guardian ID Number" name="parent_id_number" register={register} error={errors.parent_id_number?.message} placeholder="National ID / Passport number" />
+                  <DarkInput label="Parent/Guardian Email Address" name="parent_guardian_email" register={register} error={errors.parent_guardian_email?.message} icon={<Mail size={14}/>} placeholder="guardian@example.com" />
+                </div>
                 <p className="text-[10px] text-gray-500 pl-1 -mt-4 italic">Required for identity verification and legal compliance</p>
 
                 <Controller
