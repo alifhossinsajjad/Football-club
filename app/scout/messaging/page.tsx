@@ -26,6 +26,7 @@ const MessagingContent = () => {
   const initialSelectionDone = useRef(false);
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get("userId");
+  const playerId = searchParams.get("playerId");
   const targetConvId = searchParams.get("id");
   // Get logged-in user's numeric ID to determine message ownership
   const currentUser = useAppSelector((state) => state.auth.user);
@@ -37,8 +38,8 @@ const MessagingContent = () => {
   const { data: convsData, isLoading: loadingConvs } = useGetConversationsQuery();
   const [createConversation, { isLoading: isCreating }] = useCreateConversationMutation();
 
-  const { data: targetPlayerData, isLoading: loadingTargetPlayer } = useGetPlayerByIdQuery(Number(targetUserId), {
-    skip: !targetUserId,
+  const { data: targetPlayerData, isLoading: loadingTargetPlayer } = useGetPlayerByIdQuery(Number(playerId || targetUserId), {
+    skip: !playerId && !targetUserId,
   });
   const { data: messagesData, isLoading: loadingMessages } = useGetMessagesQuery(selectedConvId, {
     // Skip when no conversation selected OR when it's a virtual conversation (id=-1)
@@ -58,7 +59,7 @@ const MessagingContent = () => {
       const virtualConv: Conversation = {
         id: -1, // Use -1 as a flag for virtual/new conversation
         other_participant: {
-          id: targetPlayerData.id,
+          id: targetUserId as string,
           name: `${targetPlayerData.first_name} ${targetPlayerData.last_name}`,
           avatar: targetPlayerData.profile_image || null,
           role: "PLAYER",
@@ -350,32 +351,19 @@ const MessagingContent = () => {
                 </div>
 
                 {/* Messages Area - Independent Scroll */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 custom-scrollbar scroll-smooth relative min-h-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
-                  <div className="absolute inset-0 bg-gradient-to-b from-[#0B1229]/80 via-transparent to-[#0B1229]/80 pointer-events-none z-0" />
-                  
-                  {loadingMessages ? (
-                    <div className="flex flex-col items-center justify-center h-full gap-6 relative z-10">
-                      <div className="relative">
-                        <Loader2 className="h-14 w-14 animate-spin text-[#00E5FF]/40" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <MessageSquare className="h-6 w-6 text-[#00E5FF]/20" />
-                        </div>
-                      </div>
-                      <p className="text-[10px] font-black text-[#00E5FF]/40 uppercase tracking-[0.3em] animate-pulse">Retrieving Manifest...</p>
-                    </div>
-                  ) : (messages.length === 0) ? (
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-1 custom-scrollbar scroll-smooth relative min-h-0 bg-[#0B1229]">
+                  {!loadingMessages && messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-8 animate-in fade-in zoom-in duration-700 relative z-10">
-                       <div className="w-28 h-28 rounded-[40px] bg-[#1A2049]/80 border-2 border-[#2A3560]/60 flex items-center justify-center shadow-[0_0_50px_rgba(0,229,255,0.05)] relative overflow-hidden group">
-                         <div className="absolute inset-0 bg-gradient-to-br from-[#00E5FF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                         <MessageCircle className="h-12 w-12 text-[#00E5FF]/40 relative z-10 shadow-inner" />
+                       <div className="w-24 h-24 rounded-[32px] bg-[#1A2049]/80 border-2 border-[#2A3560]/60 flex items-center justify-center shadow-[0_0_50px_rgba(0,229,255,0.05)]">
+                         <MessageCircle className="h-10 w-10 text-[#00E5FF]/40 relative z-10" />
                        </div>
-                       <div className="text-center space-y-3 px-10">
-                         <h3 className="text-white font-black text-xl tracking-tight">Begin Discovery</h3>
-                         <p className="text-sm text-gray-400 font-medium leading-relaxed max-w-xs mx-auto opacity-70">Initiate a formal communication channel with this scouted asset. Terms and protocols apply.</p>
+                       <div className="text-center space-y-2 px-10">
+                         <h3 className="text-white font-bold text-lg tracking-tight">Zero Transmissions</h3>
+                         <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-xs mx-auto opacity-70">Initiate a secure channel to begin data exchange with this asset.</p>
                        </div>
                     </div>
                   ) : (
-                    <div className="relative z-10 space-y-8 pb-4">
+                    <div className="relative z-10 space-y-1 pb-4">
                       {messages.map((msg, idx) => {
                         const isOwn =
                           msg.is_sender === true ||
@@ -383,50 +371,89 @@ const MessagingContent = () => {
                           msg.isOwn === true ||
                           (msg.sender && currentUser?.id && sameId(msg.sender, currentUser.id));
                         
+                        const nextMsg = idx < messages.length - 1 ? messages[idx + 1] : null;
                         const prevMsg = idx > 0 ? messages[idx - 1] : null;
-                        const prevIsOwn = prevMsg
-                          ? (prevMsg.is_sender === true || 
-                             prevMsg.is_own === true || 
-                             prevMsg.isOwn === true || 
-                             (prevMsg.sender && currentUser?.id && sameId(prevMsg.sender, currentUser.id)))
-                          : true;
-                        const showAvatar = !isOwn && prevIsOwn;
+
+                        const nextIsOwn = nextMsg ? (
+                          nextMsg.is_sender === true ||
+                          nextMsg.is_own === true ||
+                          nextMsg.isOwn === true ||
+                          (nextMsg.sender && currentUser?.id && sameId(nextMsg.sender, currentUser.id))
+                        ) : null;
+
+                        const prevIsOwn = prevMsg ? (
+                          prevMsg.is_sender === true ||
+                          prevMsg.is_own === true ||
+                          prevMsg.isOwn === true ||
+                          (prevMsg.sender && currentUser?.id && sameId(prevMsg.sender, currentUser.id))
+                        ) : null;
+
+                        const isFirstInGroup = prevIsOwn !== isOwn;
+                        const isLastInGroup = nextIsOwn !== isOwn;
+                        const showAvatar = !isOwn && isLastInGroup;
 
                         return (
                           <div key={msg.id || idx} className={cn(
-                            "flex w-full animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both",
-                            isOwn ? "justify-end" : "justify-start"
-                          )} style={{ animationDelay: `${Math.min(idx * 40, 400)}ms` }}>
-                            <div className={cn("flex max-w-[90%] md:max-w-[80%]", isOwn ? "flex-row-reverse" : "flex-row")}>
+                            "flex w-full animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-both",
+                            isOwn ? "justify-end" : "justify-start",
+                            isFirstInGroup && idx !== 0 ? "mt-4" : "mt-0"
+                          )}>
+                            <div className={cn("flex max-w-[85%] md:max-w-[75%]", isOwn ? "flex-row-reverse" : "flex-row")}>
+                              {/* Avatar Column */}
                               {!isOwn && (
-                                <div className="w-10 shrink-0 flex items-end mb-1 mr-3">
+                                <div className="w-10 shrink-0 flex items-end">
                                   {showAvatar ? (
-                                    <Avatar className="h-10 w-10 ring-2 ring-[#2A3560] border-2 border-[#1A2049] shadow-lg">
+                                    <Avatar className="h-8 w-8 ring-2 ring-[#2A3560] border-2 border-[#1A2049] shadow-lg mb-1">
                                       <AvatarImage src={selectedConv.other_participant?.avatar || undefined} />
                                       <AvatarFallback className="text-[10px] bg-[#1A2049] font-black">AI</AvatarFallback>
                                     </Avatar>
-                                  ) : <div className="w-10" />}
+                                  ) : <div className="w-8" />}
                                 </div>
                               )}
+
                               <div className={cn("flex flex-col", isOwn ? "items-end" : "items-start")}>
                                 <div
                                   className={cn(
-                                    "px-6 py-4 rounded-[28px] shadow-2xl relative transition-all duration-300 hover:scale-[1.01] hover:shadow-cyan-500/5",
+                                    "px-4 py-2.5 shadow-sm relative transition-all duration-200",
                                     isOwn
-                                      ? "bg-gradient-to-br from-[#9C27B0] via-[#8E24AA] to-[#7B1FA2] text-white rounded-tr-none shadow-[#9C27B0]/20 border border-white/10"
-                                      : "bg-gradient-to-br from-[#242E5A] to-[#1A2049] border border-[#2A3560] text-gray-100 rounded-tl-none shadow-black/40"
+                                      ? "bg-[#0084ff] text-white border border-white/5"
+                                      : "bg-[#242E5A] text-gray-100 border border-[#2A3560]",
+                                    // Sequence-aware rounding
+                                    isOwn 
+                                      ? cn(
+                                          "rounded-[20px]",
+                                          isFirstInGroup ? "rounded-tr-[4px]" : "rounded-tr-[4px]", // Messenger style first message has small radius on tail side
+                                          !isFirstInGroup && "rounded-tr-[4px]",
+                                          !isLastInGroup && "rounded-br-[4px]"
+                                        )
+                                      : cn(
+                                          "rounded-[20px]",
+                                          isFirstInGroup ? "rounded-tl-[4px]" : "rounded-tl-[4px]",
+                                          !isFirstInGroup && "rounded-tl-[4px]",
+                                          !isLastInGroup && "rounded-bl-[4px]"
+                                        )
                                   )}
                                 >
-                                  <p className="text-[14px] md:text-[16px] leading-[1.6] break-words font-semibold tracking-wide">
+                                  <p className="text-[14px] md:text-[15px] leading-normal break-words font-medium">
                                     {msg.text || msg.content || msg.message}
                                   </p>
-                                </div>
-                                <div className={cn("flex items-center gap-3 mt-2.5 px-2", isOwn ? "flex-row-reverse" : "flex-row")}>
-                                  <p className="text-[9px] text-gray-500 font-black uppercase tracking-[0.2em] opacity-80">
-                                    {msg.created_at || msg.time}
-                                  </p>
-                                  {isOwn && (
-                                    <Badge className="bg-[#00E5FF]/20 text-[#00E5FF] border-none text-[8px] h-3 px-1 py-0 pointer-events-none rounded-sm">DELIVERED</Badge>
+                                  {/* Timestamp on hover or inline for last */}
+                                  {isLastInGroup && (
+                                    <div className={cn(
+                                      "flex items-center gap-1.5 mt-1 opacity-50",
+                                      isOwn ? "justify-end" : "justify-start"
+                                    )}>
+                                      <span className="text-[9px] font-bold uppercase tracking-wider">
+                                        {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (msg.time || '')}
+                                      </span>
+                                      {isOwn && (
+                                        <div className="flex items-center text-[#00E5FF]">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="20 6 9 17 4 12" />
+                                          </svg>
+                                        </div>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -434,6 +461,11 @@ const MessagingContent = () => {
                           </div>
                         );
                       })}
+                      {loadingMessages && (
+                        <div className="flex justify-center p-4">
+                           <Loader2 className="h-6 w-6 animate-spin text-[#00E5FF]/40" />
+                        </div>
+                      )}
                       <div ref={messagesEndRef} className="h-2" />
                     </div>
                   )}

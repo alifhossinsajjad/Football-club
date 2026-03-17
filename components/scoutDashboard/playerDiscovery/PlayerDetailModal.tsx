@@ -266,7 +266,8 @@ export const PlayerDetailModal = ({
             {/* Send Message CTA */}
             <button
               onClick={() => {
-                router.push(`/scout/messaging?userId=${playerId}`);
+                const userId = player.user?.id || playerId;
+                router.push(`/scout/messaging?playerId=${playerId}&userId=${userId}`);
               }}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-[#0a1218] font-bold text-sm transition-colors"
             >

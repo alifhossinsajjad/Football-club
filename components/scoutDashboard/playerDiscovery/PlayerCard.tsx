@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Star, MessageCircle } from "lucide-react";
 import { DiscoveryPlayer } from "@/types/scout/playerDicoverType";
@@ -53,7 +54,8 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
   };
 
   const handleMessageClick = () => {
-    router.push(`/scout/messaging?userId=${player.id}`);
+    const userId = player.user?.id || player.id;
+    router.push(`/scout/messaging?playerId=${player.id}&userId=${userId}`);
   };
 
   if (!player) return <h1>No player found!</h1>;

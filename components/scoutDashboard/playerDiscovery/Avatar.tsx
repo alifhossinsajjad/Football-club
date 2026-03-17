@@ -1,32 +1,50 @@
 import { DiscoveryPlayer } from "@/types/scout/playerDicoverType";
+import Image from "next/image";
 
-export const Avatar = ({ player, size = 48 }: { player: DiscoveryPlayer; size?: number }) => {
-  const initials = `${player.first_name[0]}${player.last_name[0]}`;
+export const Avatar = ({
+  player,
+  size = 48,
+}: {
+  player: DiscoveryPlayer;
+  size?: number;
+}) => {
+  const name = `${player?.first_name || ""}${player?.last_name || ""}`;
+
   const hue =
-    (player.first_name + player.last_name)
+    name
       .split("")
       .reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
-  if (player.profile_image) {
+
+  const imageSrc = player?.profile_image?.trim();
+
+  // ✅ If image exists → show image
+  if (imageSrc) {
     return (
-      <img
-        src={player.profile_image ?? ""}
-        alt=""
-        className="rounded-full object-cover border-2 border-[#1d3a55] flex-shrink-0"
+      <div
+        className="relative rounded-full overflow-hidden border-2 border-[#1d3a55] flex-shrink-0"
         style={{ width: size, height: size }}
-      />
+      >
+        <Image
+          src={imageSrc}
+          alt={name || "Player"}
+          fill
+          className="object-cover"
+        />
+      </div>
     );
   }
+
+  // ✅ Fallback avatar (NO IMAGE)
   return (
     <div
-      className="rounded-full flex items-center justify-center text-white font-bold border-2 border-[#1d3a55] flex-shrink-0"
+      className="flex items-center justify-center rounded-full text-white font-bold border-2 border-[#1d3a55] flex-shrink-0"
       style={{
         width: size,
         height: size,
-        fontSize: size * 0.32,
-        background: `linear-gradient(135deg, hsl(${hue},55%,28%), hsl(${hue},45%,18%))`,
+        backgroundColor: `hsl(${hue}, 60%, 50%)`,
       }}
     >
-      {initials}
+      {player?.first_name?.[0] || "P"}
     </div>
   );
 };
