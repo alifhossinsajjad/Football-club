@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/immutability */
+/* eslint-disable react-hooks/purity */
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -25,40 +27,59 @@ import { toast } from "react-hot-toast";
 import { ChatMessage, Conversation } from "../../../types/chat/chatType";
 
 const MessagingContent = () => {
-  const [selectedConvId, setSelectedConvId] = useState<number | null>(() => {
-    if (typeof window !== "undefined") {
-      const savedConvId = sessionStorage.getItem("selectedConvId");
-      const parsedId = savedConvId ? Number(savedConvId) : null;
-      // Validate that the saved conversation still exists
-      if (parsedId && conversations.some((c) => c.id === parsedId)) {
-        return parsedId;
-      }
-    }
-    return null;
-  });
+  const searchParams = useSearchParams();
+  const urlUserId = searchParams.get("userId");
+  const urlPlayerId = searchParams.get("playerId");
+  const targetConvId = searchParams.get("id");
 
+  const [selectedConvId, setSelectedConvId] = useState<number | null>(null);
+  const [targetUserId, setTargetUserId] = useState<string | null>(urlUserId);
+  const [playerId, setPlayerId] = useState<string | null>(urlPlayerId);
+
+  // Load persistence and URL state
   useEffect(() => {
-    if (selectedConvId) {
-      sessionStorage.setItem("selectedConvId", String(selectedConvId));
-    } else {
-      sessionStorage.removeItem("selectedConvId");
+    const saved = localStorage.getItem("scout_lastMessagingState");
+    const parsed = saved ? JSON.parse(saved) : null;
+
+    if (urlUserId || urlPlayerId || targetConvId) {
+      if (urlUserId) setTargetUserId(urlUserId);
+      if (urlPlayerId) setPlayerId(urlPlayerId);
+      if (targetConvId) setSelectedConvId(Number(targetConvId));
+    } else if (parsed) {
+      if (parsed.selectedConvId) setSelectedConvId(parsed.selectedConvId);
+      if (parsed.targetUserId) setTargetUserId(parsed.targetUserId);
+      if (parsed.playerId) setPlayerId(parsed.playerId);
     }
-  }, [selectedConvId]);
+  }, [urlUserId, urlPlayerId, targetConvId]);
+
+  // Save persistence
+  useEffect(() => {
+    if (selectedConvId || targetUserId || playerId) {
+      localStorage.setItem("scout_lastMessagingState", JSON.stringify({
+        selectedConvId,
+        targetUserId,
+        playerId
+      }));
+    }
+  }, [selectedConvId, targetUserId, playerId]);
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialSelectionDone = useRef(false);
-  const searchParams = useSearchParams();
-  const targetUserId = searchParams.get("userId");
-  const playerId = searchParams.get("playerId");
-  const targetConvId = searchParams.get("id");
   // Get logged-in user's numeric ID to determine message ownership
   const currentUser = useAppSelector((state) => state.auth.user);
 
   // Helper: compare IDs regardless of type (string "USR-00020" or number)
   const sameId = React.useCallback(
-    (a: string | number | undefined, b: string | number | undefined) =>
-      a !== undefined && b !== undefined && String(a) === String(b),
+    (
+      a: string | number | undefined | null,
+      b: string | number | undefined | null,
+    ) => {
+      if (!a || !b) return false;
+      const normalize = (id: string | number) =>
+        String(id).replace("USR-", "").replace(/^0+/, "");
+      return normalize(a) === normalize(b);
+    },
     [],
   );
 
@@ -71,9 +92,18 @@ const MessagingContent = () => {
     useCreateConversationMutation();
 
   const { data: targetPlayerData, isLoading: loadingTargetPlayer } =
-    useGetPlayerByIdQuery(Number(playerId || targetUserId), {
-      skip: !playerId && !targetUserId,
-    });
+    useGetPlayerByIdQuery(
+      (() => {
+        const pid = Number(playerId);
+        if (!isNaN(pid)) return pid;
+        const uid = Number(String(targetUserId).replace("USR-", ""));
+        if (!isNaN(uid)) return uid;
+        return 0; // Fallback
+      })(),
+      {
+        skip: !playerId && !targetUserId,
+      },
+    );
   const { data: messagesData, isLoading: loadingMessages } =
     useGetMessagesQuery(selectedConvId, {
       // Skip when no conversation selected OR when it's a virtual conversation (id < 0)
@@ -189,34 +219,41 @@ const MessagingContent = () => {
     }
   }, [messages, loadingMessages]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
+ const handleSend = async () => {
+  if (!inputValue.trim()) return;
 
-    try {
-      if (selectedConvId && selectedConvId < 0 && targetUserId) {
-        // Create new conversation — capture the real conversationId from the response
-        const response = await createConversation({
-          receiver_id: targetUserId,
-          message: inputValue.trim(),
-        }).unwrap();
-        const newConvId = response.conversationId;
-        if (newConvId) {
-          setSelectedConvId(newConvId);
-        }
-        refetch();
-      } else if (selectedConvId && selectedConvId !== -1) {
-        // Reply to existing
-        await sendReply({
-          conversation_id: selectedConvId,
-          message: inputValue.trim(),
-        }).unwrap();
+  try {
+    if (selectedConvId && selectedConvId < 0 && targetUserId) {
+      // Create new conversation
+      const response = await createConversation({
+        receiver_id: targetUserId,
+        message: inputValue.trim(),
+      }).unwrap();
+      const newConvId = response.conversationId;
+      if (newConvId) {
+        setSelectedConvId(newConvId);
       }
-      setInputValue("");
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      toast.error("Failed to send message. Frequency jammed.");
+      refetch();
+    } else if (selectedConvId !== null && selectedConvId >= 0) {
+      // Reply to existing - IMPORTANT: Include receiver_id
+      const receiverId = selectedConv?.other_participant?.id;
+      if (!receiverId) {
+        toast.error("Cannot identify message recipient");
+        return;
+      }
+      
+      await sendReply({
+        conversation_id: selectedConvId,
+        message: inputValue.trim(),
+        receiver_id: receiverId, // Add this!
+      }).unwrap();
     }
-  };
+    setInputValue("");
+  } catch (error) {
+    console.error("Failed to send message:", error);
+    toast.error("Failed to send message. Frequency jammed.");
+  }
+};
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -230,10 +267,10 @@ const MessagingContent = () => {
   }, [messages]);
 
   return (
-    <div className="p-2 md:p-4 lg:p-6 bg-[#0B1229] min-h-screen font-sans">
+    <div className="p-2 md:p-4 lg:p-6 bg-[#080D28] min-h-screen font-sans">
       <div className="max-w-[1600px] mx-auto flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-6rem)]">
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-4 bg-gradient-to-r from-[#00E5FF] via-[#9C27B0] to-[#E040FB] bg-clip-text text-transparent drop-shadow-sm tracking-tight shrink-0">
-          Scout Messaging
+        <h1 className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent drop-shadow-sm tracking-tight shrink-0 px-2">
+          Messaging
         </h1>
 
         <div className="flex-1 flex bg-[#1A2049] rounded-2xl md:rounded-3xl overflow-hidden border border-[#2A3560]/60 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-sm relative min-h-0">
@@ -244,30 +281,22 @@ const MessagingContent = () => {
           {/* Left Sidebar - Chat List */}
           <div
             className={cn(
-              "flex flex-col border-r border-[#2A3560]/50 bg-[#1A2049]/50 backdrop-blur-md transition-all duration-300 relative z-10 shrink-0",
+              "flex flex-col border-r border-white/5 bg-[#12143A] backdrop-blur-md transition-all duration-300 relative z-10 shrink-0",
               "w-full md:w-85 lg:w-[400px]",
               selectedConvId && "hidden md:flex",
             )}
           >
-            <div className="p-5 border-b border-[#2A3560]/30 shrink-0">
-              <div className="flex items-center justify-between mb-4">
+            <div className="p-5 border-b border-white/5 shrink-0">
+              <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white tracking-wide">
-                  Conversations
+                  Messages
                 </h2>
-                <div className="flex gap-1">
-                  <button className="p-2 rounded-xl hover:bg-[#242E5A] text-[#00E5FF]/70 transition-colors">
-                    <MessageSquare className="h-5 w-5" />
-                  </button>
-                  <button className="p-2 rounded-xl hover:bg-[#242E5A] text-[#00E5FF]/70 transition-colors">
-                    <MoreVertical className="h-5 w-5" />
-                  </button>
-                </div>
               </div>
               <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#00E5FF]/40" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
                 <Input
-                  placeholder="Search scouts & players..."
-                  className="pl-11 bg-[#242E5A]/80 border-[#2A3560] text-white placeholder:text-gray-500 focus:border-[#00E5FF]/50 rounded-2xl h-11 transition-all focus:ring-4 focus:ring-[#00E5FF]/5 border-2"
+                  placeholder="Search messages..."
+                  className="pl-11 bg-[#080D28]/50 border-white/10 text-white placeholder:text-white/20 focus:border-[#00E5FF]/50 rounded-xl h-12 transition-all"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -308,30 +337,27 @@ const MessagingContent = () => {
                       key={conv.id}
                       onClick={() => setSelectedConvId(conv.id)}
                       className={cn(
-                        "flex items-center gap-3 px-4 py-4 cursor-pointer transition-all rounded-2xl group relative overflow-hidden mb-1 border-2",
+                        "flex items-center gap-4 px-4 py-4 cursor-pointer transition-all rounded-xl group relative overflow-hidden mb-1",
                         selectedConvId === conv.id
-                          ? "bg-gradient-to-r from-[#242E5A] to-[#1A2049] border-[#00E5FF]/20 shadow-xl"
-                          : "hover:bg-[#242E5A]/40 border-transparent hover:border-[#2A3560]/30",
+                          ? "bg-gradient-to-r from-[#242E5A] to-[#1A2049]"
+                          : "hover:bg-white/5",
                       )}
                     >
-                      {selectedConvId === conv.id && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00E5FF] shadow-[0_0_15px_#00E5FF]" />
-                      )}
 
                       <div className="relative shrink-0">
                         <Avatar
                           className={cn(
-                            "h-14 w-14 transition-all duration-300 ring-2",
+                            "h-14 w-14 transition-all duration-300",
                             selectedConvId === conv.id
-                              ? "ring-[#00E5FF]/40 scale-105 shadow-lg shadow-[#00E5FF]/10"
-                              : "ring-transparent group-hover:ring-[#00E5FF]/10",
+                              ? "ring-2 ring-purple-500"
+                              : "ring-0",
                           )}
                         >
                           <AvatarImage
                             src={conv.other_participant?.avatar || undefined}
                             className="object-cover"
                           />
-                          <AvatarFallback className="bg-gradient-to-br from-[#1A2049] to-[#242E5A] text-white font-black text-xl border border-[#2A3560]">
+                          <AvatarFallback className="bg-[#1A2049] text-white font-bold text-xl">
                             {(conv.other_participant?.name || "U")
                               .split(" ")
                               .map((n: string) => n[0])
@@ -339,31 +365,28 @@ const MessagingContent = () => {
                               .toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        {conv.id === -1 && (
-                          <span
-                            className={cn(
-                              "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-[#1A2049] shadow-md z-10",
-                              "bg-purple-500 animate-bounce",
-                            )}
-                          />
+                        {conv.unread_count > 0 && (
+                          <div className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center bg-[#9C27B0] rounded-full text-[10px] font-bold text-white border-2 border-[#12143A]">
+                            {conv.unread_count}
+                          </div>
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-baseline mb-0.5">
+                        <div className="flex justify-between items-baseline">
                           <p
                             className={cn(
-                              "font-bold truncate text-[15px] transition-colors",
+                              "font-bold truncate text-[16px]",
                               selectedConvId === conv.id
                                 ? "text-white"
-                                : "text-gray-300 group-hover:text-[#00E5FF]",
+                                : "text-white/80",
                             )}
                           >
                             {conv.other_participant?.name}
                           </p>
-                          <span className="text-[9px] text-gray-500 font-black uppercase tracking-widest whitespace-nowrap">
-                            {conv.id === -1
-                              ? "Pending"
+                          <span className="text-[11px] text-white/40 whitespace-nowrap">
+                            {conv.id < 0
+                              ? "just now"
                               : conv.last_message?.created_at
                                 ? new Date(
                                     conv.last_message.created_at,
@@ -374,18 +397,19 @@ const MessagingContent = () => {
                                 : ""}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-400 truncate font-semibold opacity-70">
-                          {conv.id === -1
-                            ? "Initializing secure link..."
+                        <p className="text-sm text-white/50 truncate">
+                          {conv.id < 0
+                            ? "Start a conversation..."
                             : conv.last_message?.content || ""}
                         </p>
+                        <div className="mt-1 flex gap-1">
+                          <span className="px-2 py-0.5 rounded-full bg-cyan-900/40 text-cyan-400 text-[10px] font-bold uppercase">
+                            {conv.other_participant?.role?.toLowerCase() || "user"}
+                          </span>
+                        </div>
                       </div>
 
-                      {conv.unread_count > 0 && (
-                        <div className="h-5 min-w-5 flex items-center justify-center bg-[#9C27B0] rounded-lg text-[9px] font-black text-white shadow-lg shadow-[#9C27B0]/30 px-1.5 animate-pulse">
-                          {conv.unread_count}
-                        </div>
-                      )}
+
                     </div>
                   ))}
                 </div>
@@ -396,43 +420,43 @@ const MessagingContent = () => {
           {/* Right Chat Area */}
           <div
             className={cn(
-              "flex-1 flex flex-col bg-[#0B1229] relative z-0 h-full overflow-hidden min-h-0",
+              "flex-1 flex flex-col bg-[#0B0D28] relative z-0 h-full overflow-hidden min-h-0",
               !selectedConvId && "hidden md:flex",
             )}
           >
             {selectedConv ? (
               <>
                 {/* Chat Header */}
-                <div className="shrink-0 p-4 md:p-6 border-b border-[#2A3560]/40 flex items-center justify-between bg-[#1A2049]/90 backdrop-blur-2xl sticky top-0 z-30 shadow-lg shadow-black/20">
+                <div className="shrink-0 p-4 md:p-6 border-b border-white/5 flex items-center justify-between bg-[#0B0D28] backdrop-blur-2xl sticky top-0 z-30">
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setSelectedConvId(null)}
-                      className="md:hidden p-2.5 rounded-2xl bg-[#242E5A] border border-[#2A3560] text-[#00E5FF]/70 ripple"
+                      className="md:hidden p-2 text-white/70"
                     >
                       <MoreVertical className="h-5 w-5 rotate-90" />
                     </button>
-                    <div className="relative group cursor-pointer">
-                      <Avatar className="h-12 w-12 md:h-14 md:w-14 ring-2 ring-[#00E5FF]/40 border-2 border-[#1A2049] transition-transform group-hover:scale-105">
+                    <div className="relative">
+                      <Avatar className="h-10 w-10 md:h-12 md:w-12 border border-white/10 transition-transform">
                         <AvatarImage
                           src={
                             selectedConv.other_participant?.avatar || undefined
                           }
                           className="object-cover"
                         />
-                        <AvatarFallback className="bg-gradient-to-tr from-[#1A2049] to-[#242E5A] font-black text-lg">
+                        <AvatarFallback className="bg-[#1A2049] font-bold text-lg">
                           {(selectedConv.other_participant?.name ||
                             "U")[0].toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="absolute bottom-0 right-0 h-4 w-4 bg-[#00E5FF] border-2 border-[#1A2049] rounded-full shadow-[0_0_8px_#00E5FF]" />
+                      <span className="absolute bottom-0 right-0 h-3 w-3 bg-[#00E5FF] border-2 border-[#12143A] rounded-full shadow-[0_0_8px_#00E5FF]" />
                     </div>
                     <div>
-                      <h2 className="font-black text-white text-lg md:text-xl tracking-tight leading-none mb-1.5">
+                      <h2 className="font-bold text-white text-lg tracking-tight">
                         {selectedConv.other_participant?.name}
                       </h2>
-                      <div className="flex items-center gap-2 text-[10px] text-[#00E5FF]/80 font-black uppercase tracking-[0.15em]">
-                        <span className="h-2 w-2 rounded-full bg-[#00E5FF] animate-pulse shadow-[0_0_5px_#00E5FF]" />
-                        Active Connection
+                      <div className="flex items-center gap-1.5 text-xs text-[#00E5FF]/80 font-medium">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#00E5FF]" />
+                        Active now
                       </div>
                     </div>
                   </div>
@@ -446,8 +470,8 @@ const MessagingContent = () => {
                   </div>
                 </div>
 
-                {/* Messages Area - Independent Scroll */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-1 custom-scrollbar scroll-smooth relative min-h-0 bg-[#0B1229]">
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar scroll-smooth relative min-h-0 bg-[#080D28]">
                   {!loadingMessages && messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-8 animate-in fade-in zoom-in duration-700 relative z-10">
                       <div className="w-24 h-24 rounded-[32px] bg-[#1A2049]/80 border-2 border-[#2A3560]/60 flex items-center justify-center shadow-[0_0_50px_rgba(0,229,255,0.05)]">
@@ -504,51 +528,29 @@ const MessagingContent = () => {
                           <div
                             key={msg.id || idx}
                             className={cn(
-                              "flex items-end gap-2",
-                              isOwn ? "justify-end" : "justify-start",
+                              "flex flex-col gap-1",
+                              isOwn ? "items-end" : "items-start",
                             )}
                           >
-                            {!isOwn && (
-                              <Avatar className="h-8 w-8">
-                                <AvatarImage
-                                  src={
-                                    selectedConv.other_participant?.avatar ||
-                                    undefined
-                                  }
-                                />
-                                <AvatarFallback>
-                                  {(selectedConv.other_participant?.name ||
-                                    "U")[0].toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                            )}
                             <div
                               className={cn(
-                                "max-w-[70%]",
-                                isOwn ? "text-right" : "text-left",
+                                "max-w-[80%] px-4 py-3 text-[15px] leading-relaxed",
+                                isOwn
+                                  ? "bg-[#9C27B0] text-white rounded-[18px] rounded-tr-none"
+                                  : "bg-[#1E2554] text-white/90 rounded-[18px] rounded-tl-none",
                               )}
                             >
-                              <div
-                                className={cn(
-                                  "px-4 py-2 rounded-lg",
-                                  isOwn
-                                    ? "bg-blue-600 text-white rounded-br-none"
-                                    : "bg-gray-700 text-gray-200 rounded-bl-none",
-                                )}
-                              >
-                                <p className="text-sm">
-                                  {msg.text || msg.content || msg.message}
-                                </p>
-                              </div>
-                              <p className="text-xs text-gray-500 mt-1 px-2">
-                                {new Date(
-                                  msg.created_at || "",
-                                ).toLocaleTimeString()}
-                              </p>
+                              <p>{msg.text || msg.content || msg.message}</p>
                             </div>
+                            <p className="text-[10px] text-white/20 mt-1 font-medium">
+                              {new Date(
+                                msg.created_at || "",
+                              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
                           </div>
                         );
                       })}
+
                       {loadingMessages && (
                         <div className="flex justify-center p-4">
                           <Loader2 className="h-6 w-6 animate-spin text-[#00E5FF]/40" />
@@ -559,48 +561,35 @@ const MessagingContent = () => {
                   )}
                 </div>
 
-                {/* Input Area - Fixed At Bottom */}
-                <div className="shrink-0 p-5 md:p-8 border-t border-[#2A3560]/40 bg-[#1A2049]/95 backdrop-blur-2xl sticky bottom-0 z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
-                  <div className="max-w-5xl mx-auto flex items-center gap-3 md:gap-5 px-4 relative">
+                {/* Input Area */}
+                <div className="shrink-0 p-4 md:p-6 border-t border-white/5 bg-[#080D28]">
+                  <div className="max-w-5xl mx-auto flex items-center gap-4">
                     <div className="relative flex-1 group">
                       <Input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Encrypted data transmission..."
-                        className="w-full bg-[#0B1229]/80 border-[#2A3560] text-white placeholder:text-gray-600 focus:border-[#00E5FF]/60 rounded-[24px] h-14 md:h-16 px-8 py-4 transition-all duration-300 focus:ring-[12px] focus:ring-[#00E5FF]/5 text-sm md:text-lg font-bold border-2 shadow-inner"
+                        placeholder="Type a message..."
+                        className="w-full bg-[#12143A]/50 border-white/5 text-white placeholder:text-white/20 rounded-xl h-12 px-6 focus:border-purple-500 transition-all"
                         disabled={isSending || isCreating}
                       />
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 hidden lg:flex items-center">
-                        <div className="flex items-center gap-1.5 opacity-30 group-focus-within:opacity-80 transition-opacity">
-                          <span className="text-[10px] font-black text-gray-500 tracking-widest">
-                            SEND
-                          </span>
-                          <kbd className="px-2 py-1 text-[9px] font-black bg-[#1A2049] border border-[#2A3560] rounded-lg text-white shadow-sm">
-                            CMD + ↵
-                          </kbd>
-                        </div>
-                      </div>
                     </div>
 
                     <button
                       onClick={handleSend}
                       disabled={!inputValue.trim() || isSending || isCreating}
                       className={cn(
-                        "h-14 w-14 md:h-16 md:w-16 flex items-center justify-center rounded-[24px] transition-all duration-500 relative overflow-hidden group/btn shadow-2xl",
+                        "h-12 w-12 flex items-center justify-center rounded-xl transition-all relative overflow-hidden group/btn",
                         !inputValue.trim() || isSending || isCreating
-                          ? "bg-[#242E5A] opacity-40 cursor-not-allowed border border-[#2A3560]"
-                          : "bg-gradient-to-br from-[#00E5FF] to-[#01BCD4] hover:shadow-[0_0_30px_#00E5FF44] active:scale-90 border-2 border-white/10",
+                          ? "bg-white/5 text-white/20"
+                          : "bg-[#00E5FF] text-[#080D28] hover:scale-105 active:scale-95",
                       )}
                     >
                       {isSending || isCreating ? (
-                        <Loader2 className="h-7 w-7 animate-spin text-[#1A2049]" />
+                        <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
-                        <div className="relative z-10">
-                          <Send className="h-7 w-7 text-[#1A2049] fill-current -rotate-12 translate-x-0.5 transition-transform group-hover/btn:scale-110" />
-                        </div>
+                        <Send className="h-5 w-5 fill-current" />
                       )}
-                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500" />
                     </button>
                   </div>
                 </div>
