@@ -7,6 +7,7 @@ import {
   useGetDashboardStatsQuery, 
   useGetShortlistedPlayersQuery 
 } from "@/redux/features/scout/scoutProfileApi";
+import Link from "next/link";
 
 /* ─── Fake Data ─────────────────────────────────────────────── */
 const shortlistedPlayers = [
@@ -180,9 +181,11 @@ const ScoutDashboard: React.FC = () => {
               <Star size={18} className="text-yellow-400" fill="currentColor" />
               <h2 className="text-base font-bold text-white">Shortlisted Players</h2>
             </div>
-            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-3 py-1 rounded-md hover:bg-[#00E5FF]/10 transition-colors">
-              View All
-            </button>
+            <Link href="/scout/playerDiscovery">
+              <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-3 py-1 rounded-md hover:bg-[#00E5FF]/10 transition-colors">
+                View All
+              </button>
+            </Link>
           </div>
 
           {/* Player Cards */}
@@ -232,9 +235,11 @@ const ScoutDashboard: React.FC = () => {
                   </div>
 
                   {/* Button */}
-                  <button className="w-full py-2 rounded-lg border border-[#00E5FF]/50 text-[#00E5FF] text-xs font-medium hover:bg-[#00E5FF]/10 transition-colors">
-                    View Full Profile
-                  </button>
+                  <Link href={`/scout/playerDiscovery?playerId=${player.player?.id}&userId=${player.player?.user?.id}`}>
+                    <button className="w-full py-2 rounded-lg border border-[#00E5FF]/50 text-[#00E5FF] text-xs font-medium hover:bg-[#00E5FF]/10 transition-colors">
+                      View Full Profile
+                    </button>
+                  </Link>
                 </div>
               ))
             ) : (
@@ -285,9 +290,11 @@ const ScoutDashboard: React.FC = () => {
 
           {/* View All Events */}
           <div className="mt-4 text-center">
-            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
-              View All Events
-            </button>
+            <Link href="/scout/events">
+              <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
+                View All Events
+              </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -350,9 +357,11 @@ const ScoutDashboard: React.FC = () => {
           </div>
 
           <div className="mt-4 text-center">
-            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
-              View All Messages
-            </button>
+            <Link href="/scout/messaging">
+              <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
+                View All Messages
+              </button>
+            </Link>
           </div>
         </div>
       </section>

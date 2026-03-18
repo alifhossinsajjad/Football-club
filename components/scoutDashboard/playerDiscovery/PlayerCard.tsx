@@ -55,6 +55,7 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
   };
 
   const handleMessageClick = () => {
+    // Prioritize user.id for chat, fallback to player.id (which might trigger shadow user creation)
     const userId = player.user?.id || player.id;
     if (!userId) {
       toast.error("Cannot message this player: missing user ID");
