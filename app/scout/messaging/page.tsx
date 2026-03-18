@@ -55,11 +55,14 @@ const MessagingContent = () => {
   // Save persistence
   useEffect(() => {
     if (selectedConvId || targetUserId || playerId) {
-      localStorage.setItem("scout_lastMessagingState", JSON.stringify({
-        selectedConvId,
-        targetUserId,
-        playerId
-      }));
+      localStorage.setItem(
+        "scout_lastMessagingState",
+        JSON.stringify({
+          selectedConvId,
+          targetUserId,
+          playerId,
+        }),
+      );
     }
   }, [selectedConvId, targetUserId, playerId]);
   const [search, setSearch] = useState("");
@@ -104,6 +107,9 @@ const MessagingContent = () => {
         skip: !playerId && !targetUserId,
       },
     );
+
+  console.log("scout page ", targetPlayerData);
+
   const { data: messagesData, isLoading: loadingMessages } =
     useGetMessagesQuery(selectedConvId, {
       // Skip when no conversation selected OR when it's a virtual conversation (id < 0)
@@ -219,41 +225,41 @@ const MessagingContent = () => {
     }
   }, [messages, loadingMessages]);
 
- const handleSend = async () => {
-  if (!inputValue.trim()) return;
+  const handleSend = async () => {
+    if (!inputValue.trim()) return;
 
-  try {
-    if (selectedConvId && selectedConvId < 0 && targetUserId) {
-      // Create new conversation
-      const response = await createConversation({
-        receiver_id: targetUserId,
-        message: inputValue.trim(),
-      }).unwrap();
-      const newConvId = response.conversationId;
-      if (newConvId) {
-        setSelectedConvId(newConvId);
+    try {
+      if (selectedConvId && selectedConvId < 0 && targetUserId) {
+        // Create new conversation
+        const response = await createConversation({
+          receiver_id: targetUserId,
+          message: inputValue.trim(),
+        }).unwrap();
+        const newConvId = response.conversationId;
+        if (newConvId) {
+          setSelectedConvId(newConvId);
+        }
+        refetch();
+      } else if (selectedConvId !== null && selectedConvId >= 0) {
+        // Reply to existing - IMPORTANT: Include receiver_id
+        const receiverId = selectedConv?.other_participant?.id;
+        if (!receiverId) {
+          toast.error("Cannot identify message recipient");
+          return;
+        }
+
+        await sendReply({
+          conversation_id: selectedConvId,
+          message: inputValue.trim(),
+          receiver_id: receiverId, // Add this!
+        }).unwrap();
       }
-      refetch();
-    } else if (selectedConvId !== null && selectedConvId >= 0) {
-      // Reply to existing - IMPORTANT: Include receiver_id
-      const receiverId = selectedConv?.other_participant?.id;
-      if (!receiverId) {
-        toast.error("Cannot identify message recipient");
-        return;
-      }
-      
-      await sendReply({
-        conversation_id: selectedConvId,
-        message: inputValue.trim(),
-        receiver_id: receiverId, // Add this!
-      }).unwrap();
+      setInputValue("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      toast.error("Failed to send message. Frequency jammed.");
     }
-    setInputValue("");
-  } catch (error) {
-    console.error("Failed to send message:", error);
-    toast.error("Failed to send message. Frequency jammed.");
-  }
-};
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -343,7 +349,6 @@ const MessagingContent = () => {
                           : "hover:bg-white/5",
                       )}
                     >
-
                       <div className="relative shrink-0">
                         <Avatar
                           className={cn(
@@ -404,12 +409,11 @@ const MessagingContent = () => {
                         </p>
                         <div className="mt-1 flex gap-1">
                           <span className="px-2 py-0.5 rounded-full bg-cyan-900/40 text-cyan-400 text-[10px] font-bold uppercase">
-                            {conv.other_participant?.role?.toLowerCase() || "user"}
+                            {conv.other_participant?.role?.toLowerCase() ||
+                              "user"}
                           </span>
                         </div>
                       </div>
-
-
                     </div>
                   ))}
                 </div>
@@ -545,7 +549,10 @@ const MessagingContent = () => {
                             <p className="text-[10px] text-white/20 mt-1 font-medium">
                               {new Date(
                                 msg.created_at || "",
-                              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
                             </p>
                           </div>
                         );

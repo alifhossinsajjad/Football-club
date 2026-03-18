@@ -51,7 +51,7 @@ const PlayerTopBar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-[#12143A]  border-2 border-[#00E5FF1A]">
+    <header className="sticky top-0 z-40 bg-[#12143A]  border-2 border-[#00E5FF1A]">
       <div className="flex items-center justify-end px-4 lg:px-8 py-3">
      
         {/* Right Actions */}
