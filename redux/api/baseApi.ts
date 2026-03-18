@@ -39,7 +39,9 @@ export const baseApi = createApi({
     "ClubPrivacy",
     "ClubNotifications",
     "PlayerDiscovery",
-    "Chat"
+    "Chat",
+    "Notification"
   ],
   endpoints: () => ({}),
-});
+});
+

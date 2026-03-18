@@ -1,5 +1,8 @@
-import { X, User, Ruler, Home, Video } from "lucide-react";
+import { X, User, Ruler, Home, Video, MessageCircle } from "lucide-react";
 import { useGetPlayerByIdQuery } from "@/redux/features/scout/playerDiscoverApi";
+import { useCreateConversationMutation } from "@/redux/features/chat/chatApi";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { DiscoveryPlayer } from "@/types/scout/playerDicoverType";
 
 // Reusable components (assume they exist, or define them inline)
@@ -84,6 +87,8 @@ export const PlayerDetailModal = ({
   onClose: () => void;
 }) => {
   const { data: player, isLoading } = useGetPlayerByIdQuery(playerId);
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
+  const router = useRouter();
 
   const isAvailable = player?.availability_status === "AVAILABLE";
   const fullName = player ? `${player.first_name} ${player.last_name}` : "";
@@ -245,33 +250,30 @@ export const PlayerDetailModal = ({
             {player.highlight_video_available ? (
               <div className="w-full h-28 rounded-xl bg-[#0a1622] border border-[#162d45] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#2DD4BF]/40 transition-colors group">
                 <div className="w-10 h-10 rounded-full bg-[#2DD4BF]/10 border border-[#2DD4BF]/30 flex items-center justify-center group-hover:bg-[#2DD4BF]/20 transition-colors">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="#2DD4BF"
-                  >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#2DD4BF">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
                 </div>
-                <p className="text-[11px] text-[#4A6480]">
-                  Play Highlight Video
-                </p>
+                <p className="text-[11px] text-[#4A6480]">Play Highlight Video</p>
               </div>
             ) : (
               <div className="w-full h-20 rounded-xl bg-[#0a1622] border border-dashed border-[#162d45] flex items-center justify-center gap-2">
                 <Video size={13} />
-                <p className="text-[11px] text-[#4A6480]">
-                  No highlight video available
-                </p>
+                <p className="text-[11px] text-[#4A6480]">No highlight video available</p>
               </div>
             )}
 
-            {/* Send Message CTA (commented as in original) */}
-            {/* <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-[#0a1218] font-bold text-sm transition-colors">
-              <MessageIcon />
+            {/* Send Message CTA */}
+            <button
+              onClick={() => {
+                const userId = player.user?.id || playerId;
+                router.push(`/scout/messaging?playerId=${playerId}&userId=${userId}`);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-[#0a1218] font-bold text-sm transition-colors"
+            >
+              <MessageCircle size={14} />
               Send Message
-            </button> */}
+            </button>
           </div>
         )}
       </div>

@@ -43,11 +43,9 @@ export default function UpcomingEvent() {
       <div className="max-w-7xl mx-auto px-4  sm:px-6 lg:px-8">
         <div className="text-center mb-9">
           <SectionTitel
-        
-          title="LATEST NEWS"
-          subtitle="Stay updated with training tips, nutrition advice, and gear reviews."
-          
-        />
+            title="LATEST Events"
+            subtitle="Stay updated with training tips, nutrition advice, and gear reviews."
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -145,7 +143,7 @@ export default function UpcomingEvent() {
         </div>
 
         {/*  go pro*/}
-        <div className="min-h-screen flex items-center justify-center p-6 ">
+        {/* <div className="min-h-screen flex items-center justify-center p-6 ">
           <div
             className="
           w-full max-w-md 
@@ -156,7 +154,7 @@ export default function UpcomingEvent() {
         "
           >
             <div className="bg-[#171D36]/90 p-8">
-              {/* Header */}
+
               <div className="  gap-4 mb-6">
                 <div className="flex justify-center mb-3">
                   <div
@@ -176,7 +174,7 @@ export default function UpcomingEvent() {
                 </h2>
               </div>
 
-              {/* Subtitle */}
+
               <div className="text-center">
                 <p className="text-[#7FB6B6] text-base leading-relaxed mb-8 font-bold">
                   Unlock premium features and accelerate your football career
@@ -184,7 +182,7 @@ export default function UpcomingEvent() {
                 </p>
               </div>
 
-              {/* Features */}
+        
               <ul className="space-y-4 mb-10 text-[#7FB6B6] text-sm">
                 <li className="flex items-start gap-3">
                   <span className="text-indigo-400 text-lg font-bold mt-0.5">
@@ -232,7 +230,7 @@ export default function UpcomingEvent() {
                 </li>
               </ul>
 
-              {/* Pricing */}
+       
               <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-baseline text-[#9CFFF0]">
                   <span className="text-4xl font-black ">$</span>
@@ -251,20 +249,20 @@ export default function UpcomingEvent() {
                 (introductory offer — usually $19.99/year)
               </p>
 
-              {/* CTA Button */}
+        
               <div className="flex justify-center">
                 <Link href={"/login"} className="text-center bg-[#00F6FF] text-black px-3 py-2 font-bold rounded-full">
                   Sign Up
                 </Link>
               </div>
 
-              {/* Promo link */}
+      
               <p className="text-center mt-6 text-[#7FB6B6] hover:text-blue-300 text-sm cursor-pointer transition-colors">
                 Have a promo code?
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

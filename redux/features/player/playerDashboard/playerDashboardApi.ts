@@ -4,10 +4,13 @@ import { baseApi } from "@/redux/api/baseApi";
 
 export interface UpcomingEvent {
   id: number;
-  title: string;
-  location: string;
-  date: string;      // e.g. "15/06/2025"
-  time: string;      // e.g. "10:00 AM"
+  title?: string;
+  event_name?: string;
+  location?: string;
+  city?: string;
+  date?: string;
+  event_date?: string;
+  time?: string;
   club_logo?: string;
 }
 

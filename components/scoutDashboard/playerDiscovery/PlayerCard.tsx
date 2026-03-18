@@ -1,13 +1,16 @@
-import { useState } from "react";
-import { Star, MessageCircle } from "lucide-react";
-import { DiscoveryPlayer } from "@/types/scout/playerDicoverType";
-import { Avatar } from "./Avatar";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getFlag } from "@/app/scout/playerDiscovery/page";
+import { useCreateConversationMutation } from "@/redux/features/chat/chatApi";
 import {
   useAddToShortlistMutation,
   useRemoveFromShortlistMutation,
 } from "@/redux/features/scout/playerDiscoverApi";
+import { DiscoveryPlayer } from "@/types/scout/playerDicoverType";
+import { MessageCircle, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { Avatar } from "./Avatar";
 
 interface PlayerCardProps {
   player: DiscoveryPlayer;
@@ -23,11 +26,14 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
 
   const [addToShortlist] = useAddToShortlistMutation();
   const [removeFromShortlist] = useRemoveFromShortlistMutation();
+  const [createConversation, { isLoading: isCreatingChat }] =
+    useCreateConversationMutation();
+  const router = useRouter();
 
   const handleStarClick = async () => {
     const wasStarred = starred;
     setStarred(!wasStarred);
-    console.log({wasStarred})
+    console.log({ wasStarred });
 
     try {
       if (wasStarred && shortlistId) {
@@ -48,10 +54,20 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
     }
   };
 
+  const handleMessageClick = () => {
+    // Prioritize user.id for chat, fallback to player.id (which might trigger shadow user creation)
+    const userId = player.user?.id || player.id;
+    if (!userId) {
+      toast.error("Cannot message this player: missing user ID");
+      return;
+    }
+    router.push(`/scout/messaging?playerId=${player.id}&userId=${userId}`);
+  };
+
   if (!player) return <h1>No player found!</h1>;
 
-  console.log()
-  console.log()
+  console.log();
+  console.log();
 
   return (
     <div className="bg-[#12143A] border border-[#2DD4BF]/30 rounded-xl p-4 transition-all duration-200 hover:shadow-[0_0_20px_rgba(45,212,191,0.06)] flex flex-col">
@@ -60,10 +76,11 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
           <Avatar player={player} size={48} />
           <div className="min-w-0">
             <p className="text-sm font-bold text-white truncate">
-              {player.first_name ? player.first_name : "Empty"} {player.last_name ? player.last_name : "Empty"}
+              {player.first_name ? player.first_name : "Empty"}{" "}
+              {player.last_name ? player.last_name : "Empty"}
             </p>
             <p className="text-[11px] text-[#4A6480] mt-0.5">
-          {player.designation ? player.designation : "No designation"}
+              {player.designation ? player.designation : "No designation"}
             </p>
           </div>
         </div>
@@ -119,7 +136,11 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
         >
           View Profile
         </button>
-        <button className="w-9 h-9 rounded-lg bg-[#2DD4BF]/10 border border-[#2DD4BF]/30 text-[#2DD4BF] flex items-center justify-center hover:bg-[#2DD4BF] hover:text-[#0a1218] transition-all duration-200">
+        <button
+          onClick={handleMessageClick}
+          disabled={isCreatingChat}
+          className="w-9 h-9 rounded-lg bg-[#2DD4BF]/10 border border-[#2DD4BF]/30 text-[#2DD4BF] flex items-center justify-center hover:bg-[#2DD4BF] hover:text-[#0a1218] transition-all duration-200 disabled:opacity-50"
+        >
           <MessageCircle size={15} />
         </button>
       </div>

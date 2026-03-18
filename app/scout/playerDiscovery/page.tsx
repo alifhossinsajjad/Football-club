@@ -77,9 +77,7 @@ export default function PlayerDiscoveryPage() {
   const { data, isLoading, isFetching } =
     useGetDiscoveryPlayersQuery(activeFilters);
 
-console.log('player discover data',data)
-
-
+  console.log("player discover data", data);
 
   const players = data?.results ?? [];
   const hasMore = !!data?.next;
@@ -193,7 +191,9 @@ console.log('player discover data',data)
             <PlayerCard
               key={player.id}
               player={player}
-              onViewProfile={() => setSelectedPlayerId(player.id)}
+              onViewProfile={() => {
+                setSelectedPlayerId(player.id);
+              }}
             />
           ))}
         </div>
