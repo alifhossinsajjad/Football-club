@@ -1,6 +1,3 @@
-// components/scoutDashboard/event/EventRegisrtation/EventRegistretionForm.tsx
-"use client";
-
 import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useAppSelector } from "@/redux/hooks";
@@ -13,15 +10,17 @@ import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepReview from "./StepReview";
 import Stepper from "./Stepper";
+import { useRegisterForEventMutation } from "@/redux/features/scout/eventsApi";
 
 type FormValues = {
   first_name: string;
   last_name: string;
   email: string;
   phone_number: string;
-  agency_name: string;
+  region_country: string;
+  specialization: string;
+  years_of_experience: number;
   event: number;
-  city: string;
 };
 
 type EventRegistrationFormProps = {
@@ -44,10 +43,18 @@ export default function EventRegistrationForm({
 }: EventRegistrationFormProps) {
   const [step, setStep] = useState(0);
   const theme = useAppSelector((state: RootState) => state.theme);
+  const [registerForEvent, { isLoading: isRegistering }] = useRegisterForEventMutation();
 
   const methods = useForm<FormValues>({
     defaultValues: {
       event: event.id,
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+      region_country: "",
+      specialization: "",
+      years_of_experience: 0,
     },
     mode: "onChange",
   });
@@ -56,7 +63,7 @@ export default function EventRegistrationForm({
     let fields: (keyof FormValues)[] = [];
     if (step === 0)
       fields = ["first_name", "last_name", "email", "phone_number"];
-    if (step === 1) fields = ["agency_name"];
+    if (step === 1) fields = ["region_country", "specialization", "years_of_experience"];
 
     const valid = await methods.trigger(fields);
     if (valid) setStep((prev) => prev + 1);
@@ -65,10 +72,26 @@ export default function EventRegistrationForm({
   const prev = () => setStep((prev) => prev - 1);
 
   const onSubmit = async (data: FormValues) => {
-    console.log("Submitting:", data);
-    toast.success("Registration Successful");
-    methods.reset();
-    if (onSuccess) onSuccess();
+    try {
+      const response = await registerForEvent({
+        ...data,
+        years_of_experience: Number(data.years_of_experience),
+      }).unwrap();
+
+      if (response.success) {
+        if (response.checkout_url) {
+          toast.success("Redirecting to payment...");
+          window.location.href = response.checkout_url;
+        } else {
+          toast.success(response.message || "Registration Successful");
+          if (onSuccess) onSuccess();
+        }
+      } else {
+        toast.error(response.message || "Registration failed");
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Something went wrong during registration");
+    }
   };
 
   return (

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import EventFilters from "@/components/scoutDashboard/event/EventFilterSelect";
@@ -74,7 +75,7 @@ const Page = () => {
   if (error) return <div>Error loading events</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <div className=" px-4">
       <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
         Events
       </h1>

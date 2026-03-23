@@ -2,11 +2,9 @@ import { useFormContext } from "react-hook-form";
 import { Info } from "lucide-react";
 
 type FormValues = {
-  agency_name: string;
-  region: string;
-  state: string;
-  professional_phone: string;
-  experience: string;
+  region_country: string;
+  specialization: string;
+  years_of_experience: number;
 };
 
 export default function StepTwo() {
@@ -17,96 +15,47 @@ export default function StepTwo() {
       <h3 className="text-xl font-bold text-white mb-6">Professional Information</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Agency Name */}
+        {/* Specialization */}
         <div className="space-y-2 col-span-1 md:col-span-2">
           <label className="text-sm font-medium text-white/70 flex items-center gap-1">
-            Organization/Agency Name <span className="text-red-500">*</span>
+            Specialization <span className="text-red-500">*</span>
           </label>
           <input
-            {...register("agency_name", { required: "Agency name is required" })}
-            placeholder="Enter organization or agency name"
-            className={`w-full bg-[#0A0F1D] border ${errors.agency_name ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/50 transition-all`}
+            {...register("specialization", { required: "Specialization is required" })}
+            placeholder="e.g. Youth Development, Talent Identification"
+            className={`w-full bg-[#0A0F1D] border ${errors.specialization ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/50 transition-all`}
           />
-          {errors.agency_name && <p className="text-xs text-red-400 mt-1">{errors.agency_name.message}</p>}
+          {errors.specialization && <p className="text-xs text-red-400 mt-1">{errors.specialization.message}</p>}
         </div>
 
         {/* Region/Country */}
-        <div className="space-y-2">
+        <div className="space-y-2 col-span-1 md:col-span-2">
           <label className="text-sm font-medium text-white/70 flex items-center gap-1">
             Region/Country <span className="text-red-500">*</span>
           </label>
-          <div className="relative">
-            <select
-              {...register("region", { required: "Region is required" })}
-              className={`w-full bg-[#0A0F1D] border ${errors.region ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00E5FF]/50 transition-all appearance-none cursor-pointer`}
-            >
-              <option value="" className="bg-[#0A0F1D]">Select Region</option>
-              <option value="uk" className="bg-[#0A0F1D]">United Kingdom</option>
-              <option value="us" className="bg-[#0A0F1D]">United States</option>
-              <option value="de" className="bg-[#0A0F1D]">Germany</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[5px] border-t-white/40" />
-            </div>
-          </div>
-          {errors.region && <p className="text-xs text-red-400 mt-1">{errors.region.message}</p>}
-        </div>
-
-        {/* State/Location */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-white/70 flex items-center gap-1">
-            State/Location <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              {...register("state", { required: "State is required" })}
-              className={`w-full bg-[#0A0F1D] border ${errors.state ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00E5FF]/50 transition-all appearance-none cursor-pointer`}
-            >
-              <option value="" className="bg-[#0A0F1D]">Select State/Location</option>
-              <option value="london" className="bg-[#0A0F1D]">London</option>
-              <option value="berlin" className="bg-[#0A0F1D]">Berlin</option>
-              <option value="ny" className="bg-[#0A0F1D]">New York</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[5px] border-t-white/40" />
-            </div>
-          </div>
-          {errors.state && <p className="text-xs text-red-400 mt-1">{errors.state.message}</p>}
-        </div>
-
-        {/* Professional Contact */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-white/70 flex items-center gap-1">
-            Contact Number <span className="text-red-500">*</span>
-          </label>
           <input
-            {...register("professional_phone", { required: "Contact number is required" })}
-            placeholder="Enter contact number"
-            className={`w-full bg-[#0A0F1D] border ${errors.professional_phone ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/50 transition-all`}
+            {...register("region_country", { required: "Region/Country is required" })}
+            placeholder="e.g. London, UK"
+            className={`w-full bg-[#0A0F1D] border ${errors.region_country ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/50 transition-all`}
           />
-          {errors.professional_phone && <p className="text-xs text-red-400 mt-1">{errors.professional_phone.message}</p>}
+          {errors.region_country && <p className="text-xs text-red-400 mt-1">{errors.region_country.message}</p>}
         </div>
 
         {/* Experience */}
-        <div className="space-y-2">
+        <div className="space-y-2 col-span-1 md:col-span-2">
           <label className="text-sm font-medium text-white/70 flex items-center gap-1">
             Years of Experience <span className="text-red-500">*</span>
           </label>
-          <div className="relative">
-            <select
-              {...register("experience", { required: "Experience is required" })}
-              className={`w-full bg-[#0A0F1D] border ${errors.experience ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00E5FF]/50 transition-all appearance-none cursor-pointer`}
-            >
-              <option value="" className="bg-[#0A0F1D]">Select experience</option>
-              <option value="1-3" className="bg-[#0A0F1D]">1-3 Years</option>
-              <option value="4-7" className="bg-[#0A0F1D]">4-7 Years</option>
-              <option value="8+" className="bg-[#0A0F1D]">8+ Years</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[5px] border-t-white/40" />
-            </div>
-          </div>
-          {errors.experience && <p className="text-xs text-red-400 mt-1">{errors.experience.message}</p>}
+          <input
+            type="number"
+            {...register("years_of_experience", { 
+              required: "Experience is required",
+              min: { value: 0, message: "Must be a positive number" }
+            })}
+            placeholder="Enter years of experience"
+            className={`w-full bg-[#0A0F1D] border ${errors.years_of_experience ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/50 transition-all`}
+          />
+          {errors.years_of_experience && <p className="text-xs text-red-400 mt-1">{errors.years_of_experience.message}</p>}
         </div>
       </div>
 
