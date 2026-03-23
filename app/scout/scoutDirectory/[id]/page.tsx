@@ -245,7 +245,7 @@ export default function ScoutProfilePage({
       <div className="h-[200px]" />
 
       {/* ── Stats Card Bar ── */}
-      <section className="px-6 max-w-7xl mx-auto mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="px-6  mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: "Players Viewed", val: scout.dashboard_stats?.players_viewed || 0, sub: "Total count", icon: Eye },
           { label: "Shortlisted Players", val: scout.dashboard_stats?.shortlisted_players || 0, sub: "Ready for review", icon: Star },
@@ -264,7 +264,7 @@ export default function ScoutProfilePage({
       </section>
 
       {/* ── Layout Grid ── */}
-      <div className="px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="px-6  mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Column (Main Content) */}
         <div className="lg:col-span-2 space-y-6">
