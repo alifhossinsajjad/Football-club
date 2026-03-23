@@ -117,7 +117,8 @@ const Cross = () => (
 export default function PlayerDashboard() {
   const { data: stats } = useGetDashboardStatsQuery();
   const { data: profile } = useGetMyProfileQuery();
-  const { data: upcomingEventsData, isLoading: isEventsLoading } = useGetUpcomingEventsQuery();
+  const { data: upcomingEventsData, isLoading: isEventsLoading } =
+    useGetUpcomingEventsQuery();
 
   const completeness = profile?.profile_completeness ?? 0;
   const upcomingEvents = upcomingEventsData ?? [];
@@ -126,7 +127,8 @@ export default function PlayerDashboard() {
     ? stats.recent_messages
     : FALLBACK_MESSAGES;
 
-  const profileViews = profile?.insights?.profile_views ?? stats?.profile_views ?? 0;
+  const profileViews =
+    profile?.insights?.profile_views ?? stats?.profile_views ?? 0;
   const profileViewsWeekly = profile?.insights?.profile_views_this_week ?? 0;
 
   return (
@@ -158,9 +160,21 @@ export default function PlayerDashboard() {
 
           <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
             {[
-              { label: "Basic Info", done: !!(profile?.first_name && profile?.last_name && profile?.designation) },
+              {
+                label: "Basic Info",
+                done: !!(
+                  profile?.first_name &&
+                  profile?.last_name &&
+                  profile?.designation
+                ),
+              },
               { label: "Profile Photo", done: !!profile?.profile_image },
-              { label: "Highlight Video", done: (profile?.highlight_videos?.length ?? 0) > 0 || (profile?.videos?.length ?? 0) > 0 },
+              {
+                label: "Highlight Video",
+                done:
+                  (profile?.highlight_videos?.length ?? 0) > 0 ||
+                  (profile?.videos?.length ?? 0) > 0,
+              },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2">
                 <div
@@ -178,18 +192,16 @@ export default function PlayerDashboard() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-[#11163C] rounded-xl p-5 border border-[#1E2554] flex items-center gap-4">
+          {/* <div className="bg-[#11163C] rounded-xl p-5 border border-[#1E2554] flex items-center gap-4">
             <div className="space-y-3 py-5">
               <IoEyeOutline size={30} className="text-[#00E5FF]" />
               <p className="text-sm text-[#9BA3C8]">Profile Views</p>
-              <p className="text-3xl font-bold">
-                {profileViews}
-              </p>
+              <p className="text-3xl font-bold">{profileViews}</p>
               <p className="text-xs text-[#00E564]">
                 +{profileViewsWeekly} this week
               </p>
             </div>
-          </div>
+          </div> */}
 
           <div className="bg-[#11163C] rounded-xl p-5 border border-[#1E2554] flex items-center gap-4">
             <div className="space-y-3 py-5">
@@ -242,18 +254,29 @@ export default function PlayerDashboard() {
                   key={event.id}
                   className="px-6 py-4 flex items-center gap-4 hover:bg-[#0A0F2C] transition-colors"
                 >
-                  <Avatar name={(event.event_name || event.title) || "Unknown Event"} />
+                  <Avatar
+                    name={event.event_name || event.title || "Unknown Event"}
+                  />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{event.event_name || event.title}</p>
+                    <p className="font-medium truncate">
+                      {event.event_name || event.title}
+                    </p>
                     <p className="text-sm text-[#9BA3C8] flex items-center gap-1.5 mt-0.5">
-                      <span>📍</span> {event.location || event.city || "Online / TBD"}
+                      <span>📍</span>{" "}
+                      {event.location || event.city || "Online / TBD"}
                     </p>
                   </div>
                   <div className="text-right text-sm">
                     <div className="font-medium text-[#00E5FF]">
-                      {(event.date || event.event_date) ? formatRegistrationDate((event.date || event.event_date) as string) : 'TBD'}
+                      {event.date || event.event_date
+                        ? formatRegistrationDate(
+                            (event.date || event.event_date) as string,
+                          )
+                        : "TBD"}
                     </div>
-                    {event.time && <div className="text-[#9BA3C8] mt-0.5">{event.time}</div>}
+                    {event.time && (
+                      <div className="text-[#9BA3C8] mt-0.5">{event.time}</div>
+                    )}
                   </div>
                 </div>
               ))
@@ -261,7 +284,9 @@ export default function PlayerDashboard() {
               <div className="px-6 py-10 flex flex-col items-center justify-center text-[#9BA3C8]">
                 <SlCalender size={40} className="opacity-20 mb-4" />
                 <p className="font-medium">No upcoming events found.</p>
-                <p className="text-sm mt-1">When you register for events, they will appear here.</p>
+                <p className="text-sm mt-1">
+                  When you register for events, they will appear here.
+                </p>
               </div>
             )}
           </div>
