@@ -78,30 +78,31 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-[#070B24] text-white">
-      {/* Header */}
-      <div className="border-b border-[#1A2160] px-6 py-4 flex items-center justify-between bg-[#08092F]">
-        <h1 className="text-xl font-bold text-[#00D9FF]">My Scout Profile</h1>
-        {!isEditMode && (
-          <button
-            onClick={() => setIsEditMode(true)}
-            className="px-5 py-2 bg-[#111640] border border-[#00D9FF]/30 text-[#00D9FF] rounded-lg text-sm font-medium hover:bg-[#00D9FF]/10 transition-colors flex items-center gap-2"
-          >
-            <Edit size={16} /> Edit Profile
-          </button>
-        )}
-      </div>
-
-      <div className="p-6 max-w-4xl mx-auto">
-        {isEditMode ? (
+      {isEditMode ? (
+        <div className="w-full">
+          {/* Form will handle its own header and layout */}
           <ProfileEditForm
             profile={profile}
             onCancel={() => setIsEditMode(false)}
             onSuccess={() => setIsEditMode(false)}
           />
-        ) : (
-          <ProfileView profile={profile} />
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="relative">
+          {/* Floating Edit Button for the new design */}
+          <div className="absolute top-6 right-6 z-30">
+            <button
+              onClick={() => setIsEditMode(true)}
+              className="px-5 py-2 bg-[#111640]/80 backdrop-blur-md border border-[#00D9FF]/30 text-[#00D9FF] rounded-lg text-sm font-medium hover:bg-[#00D9FF]/10 transition-colors flex items-center gap-2 shadow-lg"
+            >
+              <Edit size={16} /> Edit Profile
+            </button>
+          </div>
+          <div className="max-w-7xl mx-auto p-4 md:p-8">
+            <ProfileView profile={profile} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
