@@ -97,8 +97,8 @@ const PlayerDiscoveryPage = () => {
       setIsMessageModalOpen(false);
       setMessageText("");
 
-      // Navigate to messaging page with the correct user ID
-      router.push(`/club/messaging?userId=${receiverId}`);
+      // Navigate to messaging page with both user ID and player ID
+      router.push(`/club/messaging?userId=${receiverId}&playerId=${selectedPlayerForMessage.id}`);
     } catch (error) {
       console.error("Message error:", error);
       toast.error("Failed to send message. Please try again.");

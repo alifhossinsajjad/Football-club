@@ -166,11 +166,11 @@ const Navbar = () => {
                 </Link>
               </>
             )}
-            <button className="flex items-center gap-1 px-3 py-2 rounded-md bg-[#00E5FF]/90 hover:bg-[#00cce6] transition-colors">
+            {/* <button className="flex items-center gap-1 px-3 py-2 rounded-md bg-[#00E5FF]/90 hover:bg-[#00cce6] transition-colors">
               <Globe className="w-4 h-4 text-black" />
               <span className="text-black font-medium text-sm">EN</span>
               <ChevronDown className="w-4 h-4 text-black" />
-            </button>
+            </button> */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -237,11 +237,11 @@ const Navbar = () => {
                     </Link>
                   </>
                 )}
-                <button className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-md bg-[#00E5FF]/90 hover:bg-[#00cce6] transition-colors">
+                {/* <button className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-md bg-[#00E5FF]/90 hover:bg-[#00cce6] transition-colors">
                   <Globe className="w-4 h-4 text-black" />
                   <span className="text-black font-medium">English</span>
                   <ChevronDown className="w-4 h-4 text-black" />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

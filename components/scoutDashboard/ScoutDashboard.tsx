@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -7,6 +8,7 @@ import {
   useGetDashboardStatsQuery, 
   useGetShortlistedPlayersQuery 
 } from "@/redux/features/scout/scoutProfileApi";
+import Link from "next/link";
 
 /* ─── Fake Data ─────────────────────────────────────────────── */
 const shortlistedPlayers = [
@@ -137,14 +139,14 @@ const ScoutDashboard: React.FC = () => {
 
       {/* ── Stats ── */}
       <section className="px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
+        {/* <StatCard
           icon={<Eye size={24} />}
           label="Players Viewed"
           value={stats?.players_viewed ?? 0}
           sub={`+${stats?.players_viewed_this_week ?? 0} this week`}
           iconColor="text-[#00E5FF]"
           subColor="text-[#00E5FF]"
-        />
+        /> */}
         <StatCard
           icon={<Star size={24} />}
           label="Shortlisted Players"
@@ -180,9 +182,11 @@ const ScoutDashboard: React.FC = () => {
               <Star size={18} className="text-yellow-400" fill="currentColor" />
               <h2 className="text-base font-bold text-white">Shortlisted Players</h2>
             </div>
-            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-3 py-1 rounded-md hover:bg-[#00E5FF]/10 transition-colors">
-              View All
-            </button>
+            <Link href="/scout/playerDiscovery">
+              <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-3 py-1 rounded-md hover:bg-[#00E5FF]/10 transition-colors">
+                View All
+              </button>
+            </Link>
           </div>
 
           {/* Player Cards */}
@@ -232,9 +236,11 @@ const ScoutDashboard: React.FC = () => {
                   </div>
 
                   {/* Button */}
-                  <button className="w-full py-2 rounded-lg border border-[#00E5FF]/50 text-[#00E5FF] text-xs font-medium hover:bg-[#00E5FF]/10 transition-colors">
-                    View Full Profile
-                  </button>
+                  <Link href={`/scout/playerDiscovery?playerId=${player.player?.id}&userId=${player.player?.user?.id}`}>
+                    <button className="w-full py-2 rounded-lg border border-[#00E5FF]/50 text-[#00E5FF] text-xs font-medium hover:bg-[#00E5FF]/10 transition-colors">
+                      View Full Profile
+                    </button>
+                  </Link>
                 </div>
               ))
             ) : (
@@ -285,9 +291,11 @@ const ScoutDashboard: React.FC = () => {
 
           {/* View All Events */}
           <div className="mt-4 text-center">
-            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
-              View All Events
-            </button>
+            <Link href="/scout/events">
+              <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
+                View All Events
+              </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -296,7 +304,7 @@ const ScoutDashboard: React.FC = () => {
       <section className="px-6 grid md:grid-cols-2 gap-5">
 
         {/* Recent Player Views */}
-        <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
+        {/* <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
           <h2 className="text-base font-bold text-white mb-4">Recent Player Views</h2>
 
           <div className="space-y-3">
@@ -320,7 +328,7 @@ const ScoutDashboard: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Recent Messages */}
         <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
@@ -350,9 +358,11 @@ const ScoutDashboard: React.FC = () => {
           </div>
 
           <div className="mt-4 text-center">
-            <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
-              View All Messages
-            </button>
+            <Link href="/scout/messaging">
+              <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
+                View All Messages
+              </button>
+            </Link>
           </div>
         </div>
       </section>

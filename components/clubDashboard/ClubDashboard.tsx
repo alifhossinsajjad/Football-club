@@ -8,6 +8,7 @@ import {
   Star,
   MoreVertical,
 } from "lucide-react";
+import Link from "next/link";
 
 const ClubDashboard: React.FC = () => {
   return (
@@ -29,13 +30,13 @@ const ClubDashboard: React.FC = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 ">
-          <StatCard
+          {/* <StatCard
             icon={<Eye size={26} />}
             label="Profile Views"
             value="1,842"
             change="+158 this week"
             changeColor="text-emerald-400"
-          />
+          /> */}
           <StatCard
             icon={<CalendarDays size={26} />}
             label="Events"
@@ -63,9 +64,11 @@ const ClubDashboard: React.FC = () => {
         <section className="space-y-5 bg-[#12143A] p-8 rounded-lg border border-[#04B5A3]/30">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">Your Active Events</h2>
-            <button className="bg-[#04B5A3] hover:bg-[#04B5A3]/80 px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
-              + Create Event
-            </button>
+            <Link href="/club/eventManagement">
+              <button className="bg-[#04B5A3] hover:bg-[#04B5A3]/80 px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
+                + Create Event
+              </button>
+            </Link>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-5 ">
@@ -120,9 +123,11 @@ const ClubDashboard: React.FC = () => {
             />
           </div>
 
-          <button className="w-full py-3.5  border border-[#00E5FF]/30 text-[#00E5FF]  rounded-xl  font-medium transition-colors ">
-            View All Messages
-          </button>
+          <Link href="/club/messaging">
+            <button className="w-full py-3.5  border border-[#00E5FF]/30 text-[#00E5FF]  rounded-xl  font-medium transition-colors ">
+              View All Messages
+            </button>
+          </Link>
         </section>
       </div>
     </div>
@@ -211,9 +216,11 @@ function EventCard({
         </div>
       </div>
 
-      <button className="mt-6 w-full py-2.5  border border-[#00E5FF]/30 text-[#00E5FF] rounded-lg text-sm font-medium transition-colors">
-        View Details
-      </button>
+      <Link href="/club/eventManagement">
+        <button className="mt-6 w-full py-2.5  border border-[#00E5FF]/30 text-[#00E5FF] rounded-lg text-sm font-medium transition-colors">
+          View Details
+        </button>
+      </Link>
     </div>
   );
 }

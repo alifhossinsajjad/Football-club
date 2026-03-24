@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
@@ -17,19 +18,47 @@ import { toast } from "react-hot-toast";
 import { useAppSelector } from "@/redux/hooks";
 
 const PlayerMessagingPage = () => {
+  const searchParams = useSearchParams();
+  const urlUserId = searchParams.get("userId");
+  const targetConvId = searchParams.get("id");
+
   const [selectedConvId, setSelectedConvId] = useState<number | string | null>(null);
+  const [targetUserId, setTargetUserId] = useState<string | null>(urlUserId);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("player_lastMessagingState");
+    const parsed = saved ? JSON.parse(saved) : null;
+
+    if (urlUserId || targetConvId) {
+      if (urlUserId) setTargetUserId(urlUserId);
+      if (targetConvId) setSelectedConvId(Number(targetConvId));
+    } else if (parsed) {
+      if (parsed.selectedConvId) setSelectedConvId(parsed.selectedConvId);
+      if (parsed.targetUserId) setTargetUserId(parsed.targetUserId);
+    }
+  }, [urlUserId, targetConvId]);
+
+  useEffect(() => {
+    if (selectedConvId || targetUserId) {
+      localStorage.setItem("player_lastMessagingState", JSON.stringify({
+        selectedConvId,
+        targetUserId
+      }));
+    }
+  }, [selectedConvId, targetUserId]);
+
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialSelectionDone = useRef(false);
-  const searchParams = useSearchParams();
-  const targetUserId = searchParams.get("userId");
-  const targetConvId = searchParams.get("id");
   const currentUser = useAppSelector((state) => state.auth.user);
 
-  const { data: convsData, isLoading: loadingConvs } = useGetConversationsQuery();
+  const { data: convsData, isLoading: loadingConvs } = useGetConversationsQuery(undefined, {
+    pollingInterval: 5000,
+  });
   const { data: messagesData, isLoading: loadingMessages } = useGetMessagesQuery(selectedConvId as number, {
     skip: !selectedConvId,
+    pollingInterval: 3000,
   });
   const [sendReply, { isLoading: isSending }] = useSendReplyMutation();
 
@@ -46,8 +75,18 @@ const PlayerMessagingPage = () => {
   }, [messagesData]);
 
   // Helper: compare IDs regardless of type (string "USR-00020" or number)
-  const sameId = useCallback((a: string | number | undefined, b: string | number | undefined) =>
-    a !== undefined && b !== undefined && String(a) === String(b), []);
+  const sameId = useCallback(
+    (
+      a: string | number | undefined | null,
+      b: string | number | undefined | null,
+    ) => {
+      if (!a || !b) return false;
+      const normalize = (id: string | number) =>
+        String(id).replace("USR-", "").replace(/^0+/, "");
+      return normalize(a) === normalize(b);
+    },
+    [],
+  );
 
   const selectedConv = useMemo(() => 
     conversations.find((c) => selectedConvId !== null && sameId(c.id, selectedConvId))
@@ -98,23 +137,29 @@ const PlayerMessagingPage = () => {
     }
   }, [conversations, selectedConvId, targetConvId, targetUserId, sameId]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || !selectedConvId) return;
-
+ const handleSend = async () => {
+    if (!inputValue.trim() || !selectedConv) return;
     try {
+      const receiverId = selectedConv?.other_participant?.id;
+      if (!receiverId) {
+        toast.error("Cannot identify recipient");
+        return;
+      }
+
       await sendReply({
-        conversation_id: selectedConvId as number | string,
+        conversation_id: selectedConv.id as number,
         message: inputValue.trim(),
+        receiver_id: receiverId,
       }).unwrap();
       setInputValue("");
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      toast.error("Failed to send message. Frequency jammed.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to send message");
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -132,27 +177,27 @@ const PlayerMessagingPage = () => {
   }, [messages, loadingMessages]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] w-full overflow-hidden relative group/page">
-      {/* Decorative Background Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00E5FF]/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#9C27B0]/5 rounded-full blur-[120px] pointer-events-none" />
-
-      <h1 className="text-3xl font-black mb-6 px-2 tracking-tight flex items-center gap-3">
-        <span className="bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
-          Secure Comms
-        </span>
-        <div className="h-1 flex-1 bg-gradient-to-r from-[#2A3560] to-transparent rounded-full opacity-20" />
+    <div className="flex flex-col h-[calc(100vh-100px)] w-full overflow-hidden relative bg-[#080D28] p-4 md:p-6">
+      <h1 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent px-2">
+        Messaging
       </h1>
 
-      <div className="flex flex-1 overflow-hidden bg-[#1A2049]/40 backdrop-blur-xl rounded-[32px] border border-[#2A3560]/50 shadow-2xl relative">
+      <div className="flex flex-1 overflow-hidden bg-[#12143A] rounded-[24px] border border-white/5 shadow-2xl relative">
         {/* Left Sidebar - Chat List */}
-        <div className="hidden md:flex md:w-80 lg:w-100 flex-col border-r border-[#2A3560]/40 bg-[#1A2049]/60">
-          <div className="p-6">
+        <div
+          className={cn(
+            "flex flex-col border-r border-white/5 shrink-0 transition-all",
+            "w-full md:w-80 lg:w-96",
+            selectedConvId && "hidden md:flex",
+          )}
+        >
+          <div className="p-5 border-b border-white/5">
+            <h2 className="text-xl font-bold text-white mb-4">Messages</h2>
             <div className="relative group/search">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#00E5FF]/40 group-focus-within/search:text-[#00E5FF] transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within/search:text-white" />
               <Input
-                placeholder="Search database..."
-                className="pl-11 bg-[#0B1229]/60 border-[#2A3560] text-white placeholder:text-gray-500 focus:border-[#00E5FF]/50 rounded-2xl h-12 transition-all border-2"
+                placeholder="Search messages..."
+                className="pl-11 bg-[#080D28]/50 border-white/10 text-white placeholder:text-white/20 rounded-xl h-11 focus:border-purple-500 transition-all"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -178,44 +223,48 @@ const PlayerMessagingPage = () => {
                     key={conv.id}
                     onClick={() => setSelectedConvId(conv.id)}
                     className={cn(
-                      "flex items-center gap-4 px-4 py-4 cursor-pointer transition-all duration-300 rounded-2xl group relative overflow-hidden",
+                      "flex items-center gap-4 px-4 py-4 cursor-pointer transition-all duration-300 rounded-xl relative overflow-hidden",
                       selectedConvId === conv.id 
-                        ? "bg-gradient-to-r from-[#242E5A] to-[#1A2049] shadow-lg border border-[#00E5FF]/20" 
-                        : "hover:bg-[#242E5A]/40 border border-transparent"
+                        ? "bg-gradient-to-r from-[#242E5A] to-[#1A2049] shadow-lg" 
+                        : "hover:bg-white/5"
                     )}
                   >
                     <div className="relative shrink-0">
                       <Avatar className={cn(
-                        "h-14 w-14 transition-all duration-300 ring-2",
-                        selectedConvId === conv.id ? "ring-[#00E5FF]/40 scale-105 shadow-lg shadow-[#00E5FF]/10" : "ring-transparent group-hover:ring-[#00E5FF]/10"
+                        "h-14 w-14 transition-all duration-300",
+                        selectedConvId === conv.id ? "ring-2 ring-purple-500" : "ring-0"
                       )}>
                         <AvatarImage src={conv.other_participant?.avatar || undefined} className="object-cover" />
-                        <AvatarFallback className="bg-gradient-to-br from-[#1A2049] to-[#242E5A] text-white font-black text-xl border border-[#2A3560]">
+                        <AvatarFallback className="bg-[#1A2049] text-white font-bold text-xl">
                           {(conv.other_participant?.name || "U").split(" ").map((n: string) => n[0]).join("").toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
+                      {conv.unread_count > 0 && (
+                        <div className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center bg-[#9C27B0] rounded-full text-[10px] font-bold text-white border-2 border-[#12143A]">
+                          {conv.unread_count}
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-0.5">
                         <p className={cn(
-                          "font-bold truncate text-[15px] transition-colors",
-                          selectedConvId === conv.id ? "text-white" : "text-gray-300 group-hover:text-[#00E5FF]"
+                          "font-bold truncate text-[16px]",
+                          selectedConvId === conv.id ? "text-white" : "text-white/80"
                         )}>{conv.other_participant?.name}</p>
-                        <span className="text-[9px] text-gray-500 font-black uppercase tracking-widest whitespace-nowrap">
+                        <span className="text-[11px] text-white/40 whitespace-nowrap font-medium">
                           {conv.last_message?.created_at ? new Date(conv.last_message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-400 truncate font-semibold opacity-70">
-                        {conv.last_message?.content || "Channel open"}
+                      <p className="text-sm text-white/50 truncate">
+                        {conv.last_message?.content || "Message open"}
                       </p>
+                      <div className="mt-1 flex gap-1">
+                        <span className="px-2 py-0.5 rounded-full bg-cyan-900/40 text-cyan-400 text-[10px] font-bold uppercase">
+                          {conv.other_participant?.role?.toLowerCase() || "user"}
+                        </span>
+                      </div>
                     </div>
-
-                    {conv.unread_count > 0 && (
-                      <Badge className="bg-[#00E5FF] text-[#1A2049] font-black text-[10px] h-5 min-w-[20px] rounded-full flex items-center justify-center p-0 shadow-[0_0_10px_#00E5FF44]">
-                        {conv.unread_count}
-                      </Badge>
-                    )}
                   </div>
                 ))}
               </div>
@@ -224,50 +273,50 @@ const PlayerMessagingPage = () => {
         </div>
 
         {/* Right Chat Area */}
-        <div className="flex-1 flex flex-col bg-gradient-to-b from-[#1A2049]/40 to-[#0B1229]/40 relative">
+        <div className="flex-1 flex flex-col bg-[#0B0D28] relative overflow-hidden">
           {selectedConv ? (
             <>
               {/* Chat Header */}
-              <div className="shrink-0 p-5 md:p-6 border-b border-[#2A3560]/40 flex items-center justify-between bg-[#1A2049]/80 backdrop-blur-2xl sticky top-0 z-30 shadow-sm">
+              <div className="shrink-0 p-4 md:p-6 border-b border-white/5 flex items-center justify-between bg-[#0B0D28] sticky top-0 z-30">
                 <div className="flex items-center gap-4">
                   <div className="relative group cursor-pointer">
-                    <Avatar className="h-12 w-12 md:h-14 md:w-14 ring-2 ring-[#00E5FF]/40 border-2 border-[#1A2049] transition-transform group-hover:scale-105">
+                    <Avatar className="h-10 w-10 md:h-12 md:w-12 border border-white/10 transition-transform">
                       <AvatarImage src={selectedConv.other_participant?.avatar || undefined} className="object-cover" />
-                      <AvatarFallback className="bg-gradient-to-tr from-[#1A2049] to-[#242E5A] font-black text-lg">
+                      <AvatarFallback className="bg-[#1A2049] font-bold text-lg">
                         {(selectedConv.other_participant?.name || "U")[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="absolute bottom-0 right-0 h-4 w-4 bg-[#00E5FF] border-2 border-[#1A2049] rounded-full shadow-[0_0_8px_#00E5FF]" />
+                    <span className="absolute bottom-0 right-0 h-3 w-3 bg-[#00E5FF] border-2 border-[#12143A] rounded-full shadow-[0_0_8px_#00E5FF]" />
                   </div>
                   <div>
-                    <h2 className="font-black text-white text-lg md:text-xl tracking-tight leading-none mb-1.5">
+                    <h2 className="font-bold text-white text-lg tracking-tight">
                       {selectedConv.other_participant?.name}
                     </h2>
-                    <div className="flex items-center gap-2 text-[10px] text-[#00E5FF]/80 font-black uppercase tracking-[0.15em]">
-                      <span className="h-2 w-2 rounded-full bg-[#00E5FF] animate-pulse shadow-[0_0_5px_#00E5FF]" />
-                      Active Connection
+                    <div className="flex items-center gap-1.5 text-xs text-cyan-400/80 font-medium">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                      Active now
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 md:gap-3">
-                  <button title="Options" className="p-3 rounded-2xl bg-[#242E5A]/80 border border-[#2A3560]/50 text-[#00E5FF]/60 hover:text-[#00E5FF] hover:bg-[#00E5FF]/10 transition-all">
-                    <MoreVertical className="h-5 w-5" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => setSelectedConvId(null)}
+                  className="md:hidden text-white/50 p-2"
+                >
+                  <MoreVertical size={20} />
+                </button>
               </div>
 
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-1 custom-scrollbar scroll-smooth bg-[#0B1229]">
+              <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar bg-[#080D28]">
                 {!loadingMessages && messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-12">
-                    <div className="h-20 w-20 bg-[#242E5A] rounded-full flex items-center justify-center mb-6 shadow-2xl border border-[#2A3560]">
-                      <MessageSquare className="h-10 w-10 text-[#00E5FF]/20" />
+                  <div className="flex flex-col items-center justify-center h-full text-center p-12 opacity-20">
+                    <div className="h-20 w-20 bg-[#1A2049] rounded-full flex items-center justify-center mb-6 border border-white/5">
+                      <MessageSquare className="h-10 w-10 text-white/40" />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Secure Link Established</h3>
-                    <p className="text-sm text-gray-500 max-w-xs font-semibold">Initiate formal communication via the encrypted terminal below.</p>
+                    <h3 className="text-xl font-bold text-white mb-2">Message Channel Open</h3>
                   </div>
                 ) : (
-                  <div className="max-w-4xl mx-auto space-y-1 pb-4">
+                  <div className="mx-auto space-y-6 pb-4">
                     {messages.map((msg, idx) => {
                       const isOwn =
                         msg.is_sender === true ||
@@ -275,90 +324,22 @@ const PlayerMessagingPage = () => {
                         msg.isOwn === true ||
                         (msg.sender && currentUser?.id && sameId(msg.sender, currentUser.id));
                       
-                      const nextMsg = idx < messages.length - 1 ? messages[idx + 1] : null;
-                      const prevMsg = idx > 0 ? messages[idx - 1] : null;
-
-                      const nextIsOwn = nextMsg ? (
-                        nextMsg.is_sender === true ||
-                        nextMsg.is_own === true ||
-                        nextMsg.isOwn === true ||
-                        (nextMsg.sender && currentUser?.id && sameId(nextMsg.sender, currentUser.id))
-                      ) : null;
-
-                      const prevIsOwn = prevMsg ? (
-                        prevMsg.is_sender === true ||
-                        prevMsg.is_own === true ||
-                        prevMsg.isOwn === true ||
-                        (prevMsg.sender && currentUser?.id && sameId(prevMsg.sender, currentUser.id))
-                      ) : null;
-
-                      const isFirstInGroup = prevIsOwn !== isOwn;
-                      const isLastInGroup = nextIsOwn !== isOwn;
-                      const showAvatar = !isOwn && isLastInGroup;
-
                       return (
                         <div key={msg.id || idx} className={cn(
-                          "flex group/msg animate-in fade-in slide-in-from-bottom-2 duration-300", 
-                          isOwn ? "justify-end" : "justify-start",
-                          isFirstInGroup && idx !== 0 ? "mt-4" : "mt-0"
+                          "flex flex-col gap-1", 
+                          isOwn ? "items-end" : "items-start"
                         )}>
-                          {!isOwn && (
-                            <div className="w-10 shrink-0 flex items-end">
-                              {showAvatar ? (
-                                <Avatar className="h-8 w-8 ring-2 ring-[#2A3560] border-2 border-[#1A2049] shadow-lg mb-1">
-                                  <AvatarImage src={selectedConv.other_participant?.avatar || undefined} />
-                                  <AvatarFallback className="text-[10px] bg-[#1A2049] font-black">AI</AvatarFallback>
-                                </Avatar>
-                              ) : <div className="w-8" />}
-                            </div>
-                          )}
                           <div className={cn(
-                            "max-w-[85%] md:max-w-[70%] relative flex flex-col",
-                            isOwn ? "items-end" : "items-start"
+                            "max-w-[80%] px-4 py-3 leading-relaxed text-[15px]",
+                            isOwn
+                              ? "bg-[#9C27B0] text-white rounded-[18px] rounded-tr-none shadow-lg"
+                              : "bg-[#1E2554] text-white/90 rounded-[18px] rounded-tl-none border border-white/5 shadow-md",
                           )}>
-                            <div className={cn(
-                              "px-4 py-2.5 shadow-sm relative transition-all duration-200",
-                              isOwn
-                                ? "bg-[#0084ff] text-white border border-white/5"
-                                : "bg-[#242E5A] text-gray-100 border border-[#2A3560]",
-                              // Sequence-aware rounding
-                              isOwn 
-                                ? cn(
-                                    "rounded-[20px]",
-                                    isFirstInGroup ? "rounded-tr-[4px]" : "rounded-tr-[4px]",
-                                    !isFirstInGroup && "rounded-tr-[4px]",
-                                    !isLastInGroup && "rounded-br-[4px]"
-                                  )
-                                : cn(
-                                    "rounded-[20px]",
-                                    isFirstInGroup ? "rounded-tl-[4px]" : "rounded-tl-[4px]",
-                                    !isFirstInGroup && "rounded-tl-[4px]",
-                                    !isLastInGroup && "rounded-bl-[4px]"
-                                  )
-                            )}>
-                              <p className="text-[14px] md:text-[15px] leading-normal font-medium tracking-wide">
-                                {msg.content || msg.text || msg.message}
-                              </p>
-                              
-                              {isLastInGroup && (
-                                <div className={cn(
-                                  "flex items-center gap-1.5 mt-1 opacity-50",
-                                  isOwn ? "justify-end" : "justify-start"
-                                )}>
-                                  <span className="text-[9px] font-bold uppercase tracking-wider">
-                                    {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (msg.time || '')}
-                                  </span>
-                                  {isOwn && (
-                                    <div className="flex items-center text-[#00E5FF]">
-                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="20 6 9 17 4 12" />
-                                      </svg>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
+                            <p>{msg.content || msg.text || msg.message}</p>
                           </div>
+                          <p className="text-[10px] text-white/20 mt-1 font-medium px-1">
+                            {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                          </p>
                         </div>
                       );
                     })}
@@ -372,44 +353,35 @@ const PlayerMessagingPage = () => {
                 )}
               </div>
 
-              {/* Input Area - Fixed At Bottom */}
-              <div className="shrink-0 p-5 md:p-8 border-t border-[#2A3560]/40 bg-[#1A2049]/95 backdrop-blur-2xl sticky bottom-0 z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
-                <div className="max-w-5xl mx-auto flex items-center gap-3 md:gap-5 px-4 relative">
+              {/* Input Area */}
+              <div className="shrink-0 p-4 md:p-6 border-t border-white/5 bg-[#080D28]">
+                <div className="max-w-5xl mx-auto flex items-center gap-4">
                   <div className="relative flex-1 group">
                     <Input
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Encrypted data transmission..."
-                      className="w-full bg-[#0B1229]/80 border-[#2A3560] text-white placeholder:text-gray-600 focus:border-[#00E5FF]/60 rounded-[24px] h-14 md:h-16 px-8 py-4 transition-all duration-300 focus:ring-[12px] focus:ring-[#00E5FF]/5 text-sm md:text-lg font-bold border-2 shadow-inner"
+                      placeholder="Type a message..."
+                      className="w-full bg-[#12143A]/50 border-white/5 text-white placeholder:text-white/20 rounded-xl h-12 px-6 focus:border-purple-500 transition-all"
                       disabled={isSending}
                     />
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 hidden lg:flex items-center">
-                       <div className="flex items-center gap-1.5 opacity-30 group-focus-within:opacity-80 transition-opacity">
-                          <span className="text-[10px] font-black text-gray-500 tracking-widest">SEND</span>
-                          <kbd className="px-2 py-1 text-[9px] font-black bg-[#1A2049] border border-[#2A3560] rounded-lg text-white shadow-sm">CMD + ↵</kbd>
-                       </div>
-                    </div>
                   </div>
 
                   <button
                     onClick={handleSend}
                     disabled={!inputValue.trim() || isSending}
                     className={cn(
-                      "h-14 w-14 md:h-16 md:w-16 flex items-center justify-center rounded-[24px] transition-all duration-500 relative overflow-hidden group/btn shadow-2xl",
+                      "h-12 w-12 flex items-center justify-center rounded-xl transition-all relative overflow-hidden group/btn shadow-md",
                       !inputValue.trim() || isSending 
-                        ? "bg-[#242E5A] opacity-40 cursor-not-allowed border border-[#2A3560]" 
-                        : "bg-gradient-to-br from-[#00E5FF] to-[#01BCD4] hover:shadow-[0_0_30px_#00E5FF44] active:scale-90 border-2 border-white/10"
+                        ? "bg-white/5 text-white/20" 
+                        : "bg-[#00E5FF] text-[#080D28] hover:scale-105 active:scale-95"
                     )}
                   >
                     {isSending ? (
-                      <Loader2 className="h-7 w-7 animate-spin text-[#1A2049]" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <div className="relative z-10">
-                        <Send className="h-7 w-7 text-[#1A2049] fill-current -rotate-12 translate-x-0.5 transition-transform group-hover/btn:scale-110" />
-                      </div>
+                      <Send className="h-5 w-5 fill-current" />
                     )}
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500" />
                   </button>
                 </div>
               </div>

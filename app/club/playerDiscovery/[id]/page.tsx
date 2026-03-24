@@ -66,7 +66,8 @@ export default function PlayerDiscoveryDetailsPage() {
       toast.success(`Message sent to ${firstName}`);
       setIsMessageModalOpen(false);
       setMessageText("");
-      router.push(`/club/messaging?userId=${receiverId}`);
+      // Include both userId and playerId for robust fetching in the messaging hub
+      router.push(`/club/messaging?userId=${receiverId}&playerId=${id}`);
     } catch (error) {
       console.error("Message error:", error);
       toast.error("Failed to send message.");
