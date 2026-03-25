@@ -18,6 +18,8 @@ import {
   ChartNoAxesCombined,
   Newspaper,
   TrendingUp,
+  Home,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -104,6 +106,21 @@ const ScoutSideBar: React.FC = () => {
       label: "Profile Boosting",
       href: "/admin/profileBoosting",
     }, */
+    {
+      icon: Home,
+      label: "Home page settings",
+      href: "/admin/homePageSettings",
+    },
+    {
+      icon: Building2,
+      label: "Featured Clubs",
+      href: "/admin/clubManagement",
+    },
+    {
+      icon: FileText,
+      label: "Content management",
+      href: "/admin/contentManagement",
+    },
 
     { icon: Settings, label: " Settings", href: "/admin/adminSettings" },
   ];

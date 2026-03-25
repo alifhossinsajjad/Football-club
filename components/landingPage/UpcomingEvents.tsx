@@ -143,7 +143,7 @@ export default function UpcomingEvent() {
         </div>
 
         {/*  go pro*/}
-        {/* <div className="min-h-screen flex items-center justify-center p-6 ">
+        <div className="min-h-screen flex items-center justify-center p-6 ">
           <div
             className="
           w-full max-w-md 
@@ -262,7 +262,7 @@ export default function UpcomingEvent() {
               </p>
             </div>
           </div>
-        </div> */}
+        </div>
       </div>
     </div>
   );
