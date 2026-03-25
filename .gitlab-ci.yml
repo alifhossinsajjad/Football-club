@@ -1,0 +1,38 @@
+stages:
+  - test
+  - build
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
+
+test:
+  stage: test
+  image: oven/bun:1
+
+  script:
+    - bun install
+    - bun run build
+
+build:
+  stage: build
+  image: docker:27-cli
+  services:
+    - name: docker:27-dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - echo "Logging in to docker hub"
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+  script:
+    - echo "Docker information...."
+    - docker info
+    - echo "Building image"
+    - sudo docker build --no-cache -t softvence/carolineatta997-frontend-lab .
+    - echo "Pushing image to docker hub"
+    - sudo docker push softvence/carolineatta997-frontend-lab
