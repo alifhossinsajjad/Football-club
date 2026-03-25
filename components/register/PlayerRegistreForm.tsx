@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import StepIndicator from "../reuseable/StepIndicator";
 import DarkInput from "../reuseable/DarkInput";
+import DarkPhoneInput from "../reuseable/DarkPhoneInput";
 import DarkSelect from "../reuseable/DarkSelect";
 import SignatureField from "./SignatureField";
 import { useRegisterPlayerMutation } from "@/redux/features/auth/playerRegistraionApi";
@@ -279,13 +280,13 @@ const PlayerRegisterForm = () => {
                     icon={<Globe size={16} />}
                     options={countries}
                   />
-                <DarkInput
+                <DarkPhoneInput
                   label="Phone Number"
                   name="phone_number"
-                  register={register}
+                  control={control}
                   error={errors.phone_number?.message}
                   icon={<Phone size={16} />}
-                  placeholder="+34 XXX XXX XXX"
+                  placeholder="XXX XXX XXX"
                 />
                 <DarkInput
                   label="Email Address"

@@ -203,7 +203,8 @@ const ClubSettingsPage = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-[#1A2160] mb-6">
+        <div className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
+          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {(
             [
               { id: "security", label: "Security & Privacy", icon: Shield },
@@ -455,7 +456,7 @@ const ClubSettingsPage = () => {
               </h2>
               <p className="text-[11px] text-[#5B6397] mb-6">Set times when you don't want to receive non-urgent notifications</p>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Start Time</label>
                   <input

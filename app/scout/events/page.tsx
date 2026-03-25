@@ -22,7 +22,7 @@ const Page = () => {
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   const filters = useMemo(() => {
-    const params: any = { page };
+    const params: any = { page, page_size: 6, ordering: "created_at" };
     if (eventType) params.event_type = eventType;
     if (date) params.event_date = date;
     if (debouncedSearch) params.search = debouncedSearch;
@@ -33,7 +33,22 @@ const Page = () => {
   const { data, isLoading, error } = useGetAllEventsQuery(filters);
   const { data: registrations } = useGetScoutRegistrationsQuery();
 
-  console.log("event data", registrations);
+  const sortedEvents = useMemo(() => {
+    if (!data?.results) return [];
+    return [...data.results].sort((a, b) => {
+      const aReg = registrations?.results ? registrations.results.some((r: any) => r.event === a.id) : registrations?.some((r: any) => r.event === a.id);
+      const bReg = registrations?.results ? registrations.results.some((r: any) => r.event === b.id) : registrations?.some((r: any) => r.event === b.id);
+      if (aReg !== bReg) {
+        return aReg ? 1 : -1; // Unregistered (false) comes first
+      }
+      // If registration status is same, sort by created date (newest first)
+      const timeA = new Date(a.created_at || a.event_date || 0).getTime();
+      const timeB = new Date(b.created_at || b.event_date || 0).getTime();
+      // If both dates are invalid/missing, fallback to ID sorting
+      if (timeA === timeB) return b.id - a.id;
+      return timeB - timeA;
+    });
+  }, [data?.results, registrations]);
 
   const eventTypes = useMemo(() => {
     if (!data?.results) return [];
@@ -103,21 +118,23 @@ const Page = () => {
       </div>
 
       {/* Card Grid */}
-      <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-        {data?.results.map((event) => (
+      <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6 w-full">
+        {sortedEvents.map((event) => (
           <div
             key={event.id}
             className="bg-[#12143A] rounded-xl border border-[#00E5FF]/20 overflow-hidden hover:border-[#00E5FF]/40 transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,229,255,0.1)]"
           >
             {/* Top bar with tags */}
             {/* Event Image Banner */}
-            <div className="relative h-44 w-full">
-              <Image
-                src="/images/event-card.jpg"
-                alt="event card image"
-                fill
-                className="object-cover"
-              />
+            <div className="relative h-44 w-full p-2">
+              <div className="relative w-full h-full rounded-xl overflow-hidden">
+                <Image
+                  src="/images/event-card.jpg"
+                  alt="event card image"
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
               {/* Gradient overlay for readability */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#12143A] via-transparent to-transparent" />
@@ -188,22 +205,22 @@ const Page = () => {
               </div>
 
               {/* Scouts registered + Location venue */}
-              <div className="flex justify-between items-center mb-5">
-                <div>
+              <div className="mb-6">
+                <div className="">
                   <span className="text-[#2DD4BF] font-bold text-lg">
                     {event.registered_count}
                   </span>
                   <span className="text-gray-400 text-sm ml-1">
-                    / 100 Scouts Registered
+                    / {event.maximum_capacity} Scouts Registered
                   </span>
-                </div>
-                <div className="text-right">
-                  <p className="text-gray-400 text-xs uppercase tracking-wider">
+                 <div className="mt-3">
+                   <p className="text-gray-400 text-xs uppercase tracking-wider">
                     Location
                   </p>
                   <p className="text-white text-sm font-medium">
                     {event.location || "Venue TBD"}
                   </p>
+                 </div>
                 </div>
               </div>
 
@@ -240,17 +257,24 @@ const Page = () => {
         ))}
       </div>
 
-      {/* Load More (if next page exists) */}
-      {data?.next && (
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={() => setPage((p) => p + 1)}
-            className="px-8 py-2.5 rounded-lg border border-[#2DD4BF]/40 text-[#2DD4BF] text-sm font-semibold hover:bg-[#2DD4BF]/10 transition-colors"
-          >
-            Load More
-          </button>
-        </div>
-      )}
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center gap-6 mt-12 mb-8">
+        <button
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="px-6 py-2 rounded-lg border border-[#2DD4BF]/40 text-[#2DD4BF] text-sm font-semibold hover:bg-[#2DD4BF]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors w-24"
+        >
+          Previous
+        </button>
+        <span className="text-[#2DD4BF] font-semibold">Page {page}</span>
+        <button
+          onClick={() => setPage((p) => p + 1)}
+          disabled={!data?.next}
+          className="px-6 py-2 rounded-lg border border-[#2DD4BF]/40 text-[#2DD4BF] text-sm font-semibold hover:bg-[#2DD4BF]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors w-24"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

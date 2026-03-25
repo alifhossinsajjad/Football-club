@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/purity */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
   Eye,
@@ -63,7 +65,7 @@ type Event = {
 
 export default function EventManagementPage() {
   const { data: apiEvents, isLoading } = useGetClubEventsQuery(undefined);
-  console.log('create event data ', apiEvents)
+  console.log("create event data ", apiEvents);
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
   const [deleteEventApi] = useDeleteEventMutation();
@@ -82,7 +84,10 @@ export default function EventManagementPage() {
     // API might return a direct array or a paginated object with 'results'
     const sourceData = Array.isArray(apiEvents)
       ? apiEvents
-      : (apiEvents as any).results || (apiEvents as any).data || (apiEvents as any).events || [];
+      : (apiEvents as any).results ||
+        (apiEvents as any).data ||
+        (apiEvents as any).events ||
+        [];
 
     if (sourceData.length === 0) {
       return [];
@@ -977,28 +982,28 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
                     role: "Midfielder",
                     age: 19,
                     registered: "2 days ago",
-                    status: "Confirmed",
+                   
                   },
                   {
                     name: "Sarah Player",
                     role: "Forward",
                     age: 18,
                     registered: "3 days ago",
-                    status: "Confirmed",
+                  
                   },
                   {
                     name: "Mike Johnson",
                     role: "Defender",
                     age: 20,
                     registered: "5 days ago",
-                    status: "Pending",
+                    
                   },
                   {
                     name: "Emma Garcia",
                     role: "Goalkeeper",
                     age: 17,
                     registered: "1 week ago",
-                    status: "Confirmed",
+                
                   },
                 ].map((participant, idx) => (
                   <div
@@ -1029,15 +1034,7 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
                           {participant.registered}
                         </p>
                       </div>
-                      <span
-                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                          participant.status === "Confirmed"
-                            ? "bg-green-500/10 text-green-400 border-green-500/20"
-                            : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                        }`}
-                      >
-                        {participant.status}
-                      </span>
+                      
                       <button className="text-gray-500 hover:text-cyan-400 transition-colors">
                         <Eye size={18} />
                       </button>
@@ -1123,7 +1120,7 @@ function CreateEventModal({
     type: "Trial",
     minAge: "16",
     maxAge: "21",
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
     startTime: "",
     endTime: "",
     location: {
@@ -1241,10 +1238,10 @@ function CreateEventModal({
             />
           )}
           {step === 4 && (
-            <Step4 
-              onPrev={prev} 
-              onClose={onClose} 
-              data={formData} 
+            <Step4
+              onPrev={prev}
+              onClose={onClose}
+              data={formData}
               setStep={setStep}
             />
           )}
@@ -1462,11 +1459,11 @@ function Step1({
             </div>
             <div className="space-y-2 mt-4 pt-4 border-t border-[#1E2550]">
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Calendar size={14} className="text-[#04B5A3]"/>
+                <Calendar size={14} className="text-[#04B5A3]" />
                 {data.date || "dd/mm/yyyy"}
               </div>
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Clock size={14} className="text-[#04B5A3]"/>
+                <Clock size={14} className="text-[#04B5A3]" />
                 {data.startTime || "00:00"} - {data.endTime || "00:00"}
               </div>
             </div>
@@ -1495,7 +1492,7 @@ function Step2({
         <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] p-7">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-cyan-400/10 rounded-xl flex items-center justify-center text-cyan-400">
-              <MapPin size={20} className="text-[#04B5A3]"/>
+              <MapPin size={20} className="text-[#04B5A3]" />
             </div>
             <h3 className="text-xl font-bold text-white">Venue Location</h3>
           </div>
@@ -1975,7 +1972,7 @@ function Step4({
                 Basic information
               </h4>
             </div>
-            <button 
+            <button
               onClick={() => setStep(1)}
               className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all"
             >
@@ -2044,7 +2041,7 @@ function Step4({
                 Venue & Location
               </h4>
             </div>
-            <button 
+            <button
               onClick={() => setStep(2)}
               className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all"
             >
@@ -2106,7 +2103,7 @@ function Step4({
               Event Details
             </h4>
           </div>
-          <button 
+          <button
             onClick={() => setStep(3)}
             className="text-gray-500 hover:text-cyan-400 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/5 px-3 py-1.5 rounded-lg group-hover:border-cyan-400/20 transition-all"
           >

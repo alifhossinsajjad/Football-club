@@ -67,7 +67,8 @@ const ScoutSettingsPage = () => {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-slate-800 mb-10">
+        <div className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
+          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="flex gap-8 text-sm font-medium">
             <button
               onClick={() => setActiveTab("security")}
