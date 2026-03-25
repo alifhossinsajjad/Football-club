@@ -41,7 +41,7 @@ const ClubDirectoryPage = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-[#00E5FF] text-2xl font-bold mb-6">
+      <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
         Player Discovery
       </h1>
 
@@ -100,7 +100,7 @@ const ClubDirectoryPage = () => {
             <div className="flex items-center gap-4">
               {club.club_logo ? (
                 <Image
-                  src={'/images/logo.png'}
+                  src={"/images/logo.png"}
                   alt={club.club_name}
                   width={60}
                   height={60}

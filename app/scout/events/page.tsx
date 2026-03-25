@@ -34,10 +34,16 @@ const Page = () => {
   const { data: registrations } = useGetScoutRegistrationsQuery();
 
   const sortedEvents = useMemo(() => {
-    if (!data?.results) return [];
-    return [...data.results].sort((a, b) => {
-      const aReg = registrations?.results ? registrations.results.some((r: any) => r.event === a.id) : registrations?.some((r: any) => r.event === a.id);
-      const bReg = registrations?.results ? registrations.results.some((r: any) => r.event === b.id) : registrations?.some((r: any) => r.event === b.id);
+    const events = data?.results;
+    if (!events) return [];
+
+    return [...events].sort((a: any, b: any) => {
+      const aReg = registrations?.results
+        ? registrations.results.some((r: any) => r.event === a.id)
+        : registrations?.some((r: any) => r.event === a.id);
+      const bReg = registrations?.results
+        ? registrations.results.some((r: any) => r.event === b.id)
+        : registrations?.some((r: any) => r.event === b.id);
       if (aReg !== bReg) {
         return aReg ? 1 : -1; // Unregistered (false) comes first
       }
@@ -48,11 +54,12 @@ const Page = () => {
       if (timeA === timeB) return b.id - a.id;
       return timeB - timeA;
     });
-  }, [data?.results, registrations]);
+  }, [data, registrations]);
 
   const eventTypes = useMemo(() => {
-    if (!data?.results) return [];
-    const types = new Set(data.results.map((e) => e.event_type));
+    const events = data?.results;
+    if (!events) return [];
+    const types = new Set(events.map((e: any) => e.event_type));
     return Array.from(types);
   }, [data]);
 
@@ -213,14 +220,14 @@ const Page = () => {
                   <span className="text-gray-400 text-sm ml-1">
                     / {event.maximum_capacity} Scouts Registered
                   </span>
-                 <div className="mt-3">
-                   <p className="text-gray-400 text-xs uppercase tracking-wider">
-                    Location
-                  </p>
-                  <p className="text-white text-sm font-medium">
-                    {event.location || "Venue TBD"}
-                  </p>
-                 </div>
+                  <div className="mt-3">
+                    <p className="text-gray-400 text-xs uppercase tracking-wider">
+                      Location
+                    </p>
+                    <p className="text-white text-sm font-medium">
+                      {event.location || "Venue TBD"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
