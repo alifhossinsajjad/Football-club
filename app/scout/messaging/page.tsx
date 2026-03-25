@@ -275,7 +275,7 @@ const MessagingContent = () => {
   return (
     <div className="p-2 md:p-4 lg:p-6 bg-[#080D28] min-h-screen font-sans">
       <div className="max-w-[1600px] mx-auto flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-6rem)]">
-        <h1 className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent drop-shadow-sm tracking-tight shrink-0 px-2">
+        <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
           Messaging
         </h1>
 

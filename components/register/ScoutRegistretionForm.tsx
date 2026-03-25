@@ -9,6 +9,7 @@ import { showRegistrationError } from "@/lib/registrationErrors";
 import { useRegisterScoutMutation } from "@/redux/features/auth/scoutRegistretionApi";
 import { ScoutRegisterPayload } from "@/types/scout";
 import DarkInput from "../reuseable/DarkInput";
+import DarkPhoneInput from "../reuseable/DarkPhoneInput";
 import DarkSelect from "../reuseable/DarkSelect";
 import StepIndicator from "../reuseable/StepIndicator";
 import { countries } from "@/constants/countries";
@@ -307,13 +308,13 @@ toast.success(
                     icon={<Globe size={16} />}
                     options={countries}
                   />
-                  <DarkInput
+                  <DarkPhoneInput
                     label="Phone Number"
                     name="phone_number"
-                    register={register}
+                    control={control}
                     error={errors.phone_number?.message}
                     icon={<Phone size={16} />}
-                    placeholder="+34 XXX XXX XXX"
+                    placeholder="XXX XXX XXX"
                   />
                   <DarkInput
                     label="Email Address"

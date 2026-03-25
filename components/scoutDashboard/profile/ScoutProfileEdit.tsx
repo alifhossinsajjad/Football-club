@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useUpdateProfileMutation } from "@/redux/features/scout/scoutProfileApi";
 import { ScoutProfile, Achievement, NotableDiscovery, ScoutingRegion, ProfessionalHistory, ScoutingStatistic } from "@/types/scout/profileType";
+import DarkPhoneInput from "../../reuseable/DarkPhoneInput";
 
 // Form types
 export interface FormValues {
@@ -502,7 +503,12 @@ export default function ProfileEditForm({
                     </div>
                     <div>
                        <FieldLabel>Phone</FieldLabel>
-                       <input {...register("phone")} className={inputCls} placeholder="+44 7700 900000" />
+                       <DarkPhoneInput
+                         name="phone"
+                         control={control}
+                         placeholder="XXX XXX XXX"
+                         className="flex items-center w-full bg-[#111640] border border-[#1A2160] text-white text-xs rounded-lg overflow-hidden focus-within:border-[#00D9FF] focus-within:ring-1 focus-within:ring-[#00D9FF]/20 transition-all shadow-inner"
+                       />
                     </div>
                  </div>
               </Card>

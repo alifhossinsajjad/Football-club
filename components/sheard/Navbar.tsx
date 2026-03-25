@@ -116,13 +116,29 @@ const Navbar = () => {
                   onClick={() => setUserMenuOpen((v) => !v)}
                   aria-haspopup="menu"
                   aria-expanded={userMenuOpen}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium"
+                  className="flex items-center gap-3 pr-4 p-1 rounded-full bg-[#050B14]/40 hover:bg-[#050B14]/60 backdrop-blur-md border border-white/10 transition-all group"
                 >
-                  <span>
-                    {auth.user.first_name} {auth.user.last_name}
-                  </span>
+                  {auth.user.profile_image ? (
+                    <img 
+                      src={auth.user.profile_image} 
+                      alt="Profile" 
+                      className="w-9 h-9 rounded-full object-cover border border-[#00E5FF]/30"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
+                      {auth.user.first_name?.[0]}{auth.user.last_name?.[0]}
+                    </div>
+                  )}
+                  <div className="flex flex-col items-start mr-1 text-left">
+                    <span className="text-sm font-bold text-white leading-tight">
+                      {auth.user.first_name} {auth.user.last_name}
+                    </span>
+                    <span className="text-[9px] text-[#00E5FF] font-black uppercase tracking-widest leading-tight">
+                      {auth.user.role?.replace("_", " ")}
+                    </span>
+                  </div>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 text-gray-400 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
                   />
                 </button>
                 <div
@@ -198,11 +214,27 @@ const Navbar = () => {
               <div className="flex flex-col gap-3 pt-4">
                 {auth.user ? (
                   <>
-                    <button
-                      className="w-full px-4 py-3 rounded-md bg-white/10 text-white text-sm font-medium"
-                    >
-                      {auth.user.first_name} {auth.user.last_name}
-                    </button>
+                    <div className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 mb-2">
+                      {auth.user.profile_image ? (
+                        <img 
+                          src={auth.user.profile_image} 
+                          alt="Profile" 
+                          className="w-12 h-12 rounded-full object-cover border border-[#00E5FF]/30"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-lg font-bold shadow-inner text-white">
+                          {auth.user.first_name?.[0]}{auth.user.last_name?.[0]}
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-white text-base font-bold">
+                          {auth.user.first_name} {auth.user.last_name}
+                        </div>
+                        <div className="text-[10px] text-[#00E5FF] font-black uppercase tracking-widest mt-1">
+                          {auth.user.role?.replace("_", " ")}
+                        </div>
+                      </div>
+                    </div>
                     <Link
                       href={getDashboardHref(auth.user?.role)}
                       className="w-full px-4 py-3 rounded-md bg-white/5 text-center text-sm text-gray-200"

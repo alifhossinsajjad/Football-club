@@ -9,8 +9,11 @@ interface GetEventResponse {
 
 export const eventsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllEvents: builder.query<EventListResponse, void>({
-      query: () => "/scout-agent/event-discovery/",
+    getAllEvents: builder.query<EventListResponse, any>({
+      query: (params) => ({
+        url: "/scout-agent/event-discovery/",
+        params,
+      }),
       providesTags: ["Events"],
     }),
 

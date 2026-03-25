@@ -115,17 +115,36 @@ const EventsDirectoryPage = () => {
   const [typeFilter, setTypeFilter] = useState("All Types");
   const [locationFilter, setLocationFilter] = useState("All Locations");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 6;
 
   const { data: events = [], isLoading } = useGetEventsQuery();
 
   const filteredEvents = useMemo(() => {
-    return events.filter((event: EventData) => {
+    let result = events.filter((event: EventData) => {
       const matchesSearch = event.event_name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = typeFilter === "All Types" || event.event_type === typeFilter;
       const matchesLocation = locationFilter === "All Locations" || event.venue_name?.includes(locationFilter);
       return matchesSearch && matchesType && matchesLocation;
     });
+
+    try {
+      const map = JSON.parse(localStorage.getItem("playerRegistrations") || "{}");
+      result.sort((a: any, b: any) => {
+        const aReg = !!map[String(a.id)];
+        const bReg = !!map[String(b.id)];
+        if (aReg !== bReg) return aReg ? 1 : -1; // Unregistered first
+
+        // Sort by created date (newest first)
+        const timeA = new Date(a.created_at || a.event_date || 0).getTime();
+        const timeB = new Date(b.created_at || b.event_date || 0).getTime();
+        if (timeA === timeB) return b.id - a.id;
+        return timeB - timeA;
+      });
+    } catch {
+      // safe fallback
+    }
+
+    return result;
   }, [events, searchTerm, typeFilter, locationFilter]);
 
   useEffect(() => { setCurrentPage(1); }, [searchTerm, typeFilter, locationFilter]);
