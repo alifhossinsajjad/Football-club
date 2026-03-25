@@ -350,7 +350,8 @@ export default function SettingsPage() {
         <SectionTitel title="Settings" />
       </h1>
 
-      <div className="bg-[#12143A] rounded-2xl border border-[#04B5A3]/20 overflow-hidden shadow-2xl">
+      <div className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
+          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/* Tabs Header */}
         <div className="flex bg-[#12143A] border-b border-[#04B5A3]/20 ">
           {[

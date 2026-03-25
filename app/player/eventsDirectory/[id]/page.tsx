@@ -23,6 +23,8 @@ import {
   useGetRegistrationStatusQuery
 } from "../../../../redux/features/player/eventsDirectoryApi";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import DarkPhoneInput from "@/components/reuseable/DarkPhoneInput";
 
 interface EventData {
   id: number;
@@ -314,7 +316,7 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
   const [checkout] = useCheckoutMutation();
   const [verifyPayment] = useVerifyPaymentMutation();
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  const { register, control, handleSubmit, formState: { errors }, watch } = useForm();
 
   const handleNext = async (data: any) => {
     if (step === 1) {
@@ -354,6 +356,7 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
           setRegistrationError("You are already registered for this event. Please check your registrations.");
         } else {
           setRegistrationError(errMsg);
+          toast.error(errMsg);
         }
       }
     } else if (step === 3) {
@@ -371,12 +374,13 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
         }).unwrap();
         
         if (res.checkout_url) {
+          toast.success("Redirecting to checkout...");
           window.location.href = res.checkout_url;
         } else {
-          alert("Could not get checkout URL.");
+          toast.error("Could not get checkout URL.");
         }
-      } catch (err) {
-        alert("Checkout failed.");
+      } catch (err: any) {
+        toast.error(err?.data?.message || err?.data?.error || "Checkout failed.");
       }
     }
   };
@@ -456,7 +460,14 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
                     </div>
                     <div className="space-y-2">
                        <label className="text-xs text-gray-500 font-bold ml-1">Phone Number *</label>
-                       <input {...register("phone", { required: true })} className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400 transition-all" placeholder="+34 XXX XXX XXX" />
+                       <DarkPhoneInput
+                         name="phone"
+                         control={control}
+                         placeholder="XXX XXX XXX"
+                         className="flex items-center w-full bg-[#0B0E1E] border border-[#1E2550] text-white text-xs rounded-xl overflow-hidden focus-within:border-cyan-400 transition-all shadow-inner"
+                         dropdownClassName="bg-[#0B0E1E] text-white"
+                       />
+                       {errors.phone && <span className="text-red-500 text-xs ml-1">Phone is required</span>}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -502,7 +513,14 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs text-gray-500 font-bold ml-1">Emergency Phone *</label>
-                        <input {...register("emergencyPhone", { required: true })} className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400 transition-all" placeholder="+34 XXX XXX XXX" />
+                        <DarkPhoneInput
+                          name="emergencyPhone"
+                          control={control}
+                          placeholder="XXX XXX XXX"
+                          className="flex items-center w-full bg-[#0B0E1E] border border-[#1E2550] text-white text-xs rounded-xl overflow-hidden focus-within:border-cyan-400 transition-all shadow-inner"
+                          dropdownClassName="bg-[#0B0E1E] text-white"
+                        />
+                        {errors.emergencyPhone && <span className="text-red-500 text-xs ml-1">Emergency phone is required</span>}
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs text-gray-500 font-bold ml-1">Relationship *</label>

@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 
 import { showRegistrationError } from "@/lib/registrationErrors";
 import DarkInput from "../reuseable/DarkInput";
+import DarkPhoneInput from "../reuseable/DarkPhoneInput";
 import DarkSelect from "../reuseable/DarkSelect";
 import StepIndicator from "../reuseable/StepIndicator";
 import { countries } from "@/constants/countries";
@@ -308,14 +309,14 @@ const ClubRegisterForm = () => {
                         placeholder="Barcelona"
                      />
                   </div>
-                  <DarkInput
-                     label="Phone Number *"
-                     name="phone_number"
-                     register={register}
-                     error={errors.phone_number?.message}
-                     icon={<Phone size={16} />}
-                     placeholder="+34 XXX XXX XXX"
-                  />
+                     <DarkPhoneInput
+                        label="Phone Number *"
+                        name="phone_number"
+                        control={control}
+                        error={errors.phone_number?.message}
+                        icon={<Phone size={14} />}
+                        placeholder="XXX XXX XXX"
+                     />
                   <DarkInput
                      label="Website (Optional)"
                      name="website"
@@ -472,15 +473,14 @@ const ClubRegisterForm = () => {
                   />
                   <p className="text-[10px] text-gray-500 -mt-4 ml-1">This can be the same as your organization email</p>
 
-                  <DarkInput
-                     label="Phone Number *"
-                     name="contact_phone_number"
-                     register={register}
-                     error={errors.contact_phone_number?.message}
-                     icon={<Phone size={16} />}
-                     placeholder="+34 XXX XXX XXX"
-                  />
-                </div>
+                           <DarkPhoneInput
+                              label="Contact Phone"
+                              name="contact_phone_number"
+                              control={control}
+                              error={errors.contact_phone_number?.message}
+                              icon={<Phone size={14} />}
+                              placeholder="XXX XXX XXX"
+                           />           </div>
               )}
 
               {/* STEP 3 - FACILITIES & PROGRAMS */}

@@ -1,5 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { Info } from "lucide-react";
+import DarkPhoneInput from "../../../reuseable/DarkPhoneInput";
 
 type FormValues = {
   first_name: string;
@@ -9,7 +10,7 @@ type FormValues = {
 };
 
 export default function StepOne() {
-  const { register, formState: { errors } } = useFormContext<FormValues>();
+  const { register, control, formState: { errors } } = useFormContext<FormValues>();
 
   return (
     <div className="space-y-6">
@@ -66,10 +67,11 @@ export default function StepOne() {
           <label className="text-sm font-medium text-white/70 flex items-center gap-1">
             Phone Number <span className="text-red-500">*</span>
           </label>
-          <input
-            {...register("phone_number", { required: "Phone number is required" })}
-            placeholder="+0 - 00 - 00 - 00"
-            className={`w-full bg-[#0A0F1D] border ${errors.phone_number ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/50 transition-all`}
+          <DarkPhoneInput
+            name="phone_number"
+            control={control}
+            placeholder="XXX XXX XXX"
+            className={`flex items-center w-full bg-[#0A0F1D] border rounded-xl overflow-hidden transition-all duration-300 ${errors.phone_number ? 'border-red-500/50' : 'border-white/10 focus-within:border-[#00E5FF]/50'}`}
           />
           {errors.phone_number && <p className="text-xs text-red-400 mt-1">{errors.phone_number.message}</p>}
         </div>
