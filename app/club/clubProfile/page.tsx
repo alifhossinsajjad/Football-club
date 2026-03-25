@@ -954,9 +954,9 @@ const ClubProfilePage = () => {
               </span>
             </div>
           </div>
-          <button className="px-5 py-2.5 bg-[#04B5A3] text-white rounded-xl font-bold text-sm hover:bg-[#039d8f] transition-all flex items-center gap-2">
+          {/* <button className="px-5 py-2.5 bg-[#04B5A3] text-white rounded-xl font-bold text-sm hover:bg-[#039d8f] transition-all flex items-center gap-2">
             <MessageSquare size={14} /> Contact Club
-          </button>
+          </button> */}
         </div>
       </div>
 

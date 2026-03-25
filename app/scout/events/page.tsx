@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import EventFilters from "@/components/scoutDashboard/event/EventFilterSelect";
-import { useGetAllEventsQuery } from "@/redux/features/scout/eventsApi";
+import {
+  useGetAllEventsQuery,
+  useGetScoutRegistrationsQuery,
+} from "@/redux/features/scout/eventsApi";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useMemo, useEffect } from "react";
@@ -27,7 +31,9 @@ const Page = () => {
   }, [eventType, date, debouncedSearch, page]);
 
   const { data, isLoading, error } = useGetAllEventsQuery(filters);
-  console.log("eventy data", data);
+  const { data: registrations } = useGetScoutRegistrationsQuery();
+
+  console.log("event data", registrations);
 
   const eventTypes = useMemo(() => {
     if (!data?.results) return [];
@@ -74,7 +80,7 @@ const Page = () => {
   if (error) return <div>Error loading events</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <div className=" px-4">
       <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
         Events
       </h1>
@@ -196,22 +202,35 @@ const Page = () => {
                     Location
                   </p>
                   <p className="text-white text-sm font-medium">
-                    {event.venue_address || "Venue TBD"}
+                    {event.location || "Venue TBD"}
                   </p>
                 </div>
               </div>
 
               {/* Buttons */}
               <div className="flex gap-3">
-                <Link
-                  href={`/scout/eventRegister?eventId=${event.id}`}
-                  className="flex-1 bg-[#04B5A3] hover:bg-[#2DD4BF] text-white text-sm font-semibold py-2.5 rounded-lg text-center transition-colors"
-                >
-                  Register Now
-                </Link>
+                {(() => {
+                  const isRegistered = registrations?.results
+                    ? registrations.results.some(
+                        (reg: any) => reg.event === event.id,
+                      )
+                    : registrations?.some((reg: any) => reg.event === event.id);
+                  return (
+                    <Link
+                      href={
+                        isRegistered
+                          ? "#"
+                          : `/scout/eventRegister?eventId=${event.id}`
+                      }
+                      className={`flex-1 ${isRegistered ? "bg-gray-600 cursor-not-allowed" : "bg-[#04B5A3] hover:bg-[#2DD4BF]"} text-white flex items-center justify-center text-sm font-semibold py-2.5 rounded-lg text-center transition-colors`}
+                    >
+                      {isRegistered ? "Registered" : "Register Now"}
+                    </Link>
+                  );
+                })()}
                 <Link
                   href={`/scout/events/${event.id}`}
-                  className="flex-1 border border-[#04B5A3] text-[#04B5A3] hover:bg-[#04B5A3]/10 text-sm font-semibold py-2.5 rounded-lg text-center transition-colors"
+                  className="flex-1 border border-[#04B5A3] text-[#04B5A3] hover:bg-[#04B5A3]/10 flex items-center justify-center text-sm font-semibold py-2.5 rounded-lg text-center transition-colors"
                 >
                   View Details
                 </Link>

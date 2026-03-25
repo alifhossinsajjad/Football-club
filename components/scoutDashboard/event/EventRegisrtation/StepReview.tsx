@@ -46,18 +46,16 @@ export default function StepReview() {
           </h4>
           <div className="space-y-4">
             <div>
-              <p className="text-white/30 text-[11px] uppercase mb-1">Organization</p>
-              <p className="text-white font-medium">{values.agency_name || "Not provided"}</p>
+              <p className="text-white/30 text-[11px] uppercase mb-1">Specialization</p>
+              <p className="text-white font-medium">{values.specialization || "Not provided"}</p>
             </div>
             <div>
-              <p className="text-white/30 text-[11px] uppercase mb-1">Region & Experience</p>
-              <p className="text-white font-medium">
-                {values.region ? `${values.region} • ${values.experience}` : "Not provided"}
-              </p>
+              <p className="text-white/30 text-[11px] uppercase mb-1">Region & Country</p>
+              <p className="text-white font-medium">{values.region_country || "Not provided"}</p>
             </div>
             <div>
-              <p className="text-white/30 text-[11px] uppercase mb-1">Contact Number</p>
-              <p className="text-white font-medium">{values.professional_phone || "Not provided"}</p>
+              <p className="text-white/30 text-[11px] uppercase mb-1">Years of Experience</p>
+              <p className="text-white font-medium">{values.years_of_experience ?? "Not provided"}</p>
             </div>
           </div>
         </div>

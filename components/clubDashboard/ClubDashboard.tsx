@@ -30,13 +30,13 @@ const ClubDashboard: React.FC = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 ">
-          <StatCard
+          {/* <StatCard
             icon={<Eye size={26} />}
             label="Profile Views"
             value="1,842"
             change="+158 this week"
             changeColor="text-emerald-400"
-          />
+          /> */}
           <StatCard
             icon={<CalendarDays size={26} />}
             label="Events"

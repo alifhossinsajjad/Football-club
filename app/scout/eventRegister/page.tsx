@@ -29,7 +29,7 @@ const EventRegister = () => {
   }
 
   const handleClose = () => router.back();
-  const handleSuccess = () => router.push("/scout/events?registered=true");
+  const handleSuccess = () => router.push("/scout/events/success");
 
   return (
     <EventRegistrationForm

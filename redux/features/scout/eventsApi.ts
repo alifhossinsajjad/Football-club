@@ -25,15 +25,35 @@ export const eventsApi = baseApi.injectEndpoints({
       transformResponse: (response: GetEventResponse) => response.data,
     }),
 
-    registerForEvent: builder.mutation<any, FormData>({
-      query: (formData) => ({
+    registerForEvent: builder.mutation<any, any>({
+      query: (payload) => ({
         url: "/scout-agent/event-registrations/",
         method: "POST",
-        body: formData,
+        body: payload,
       }),
       invalidatesTags: ["Events"],
+    }),
+
+    checkPaymentStatus: builder.mutation<any, { session_id: string }>({
+      query: (payload) => ({
+        url: "/scout-agent/event-registrations/",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Events"],
+    }),
+
+    getScoutRegistrations: builder.query<any, void>({
+      query: () => "/scout-agent/event-registrations/",
+      providesTags: ["Events"],
     }),
   }),
 });
 
-export const { useGetAllEventsQuery, useGetEventQuery, useRegisterForEventMutation } = eventsApi;
+export const { 
+  useGetAllEventsQuery, 
+  useGetEventQuery, 
+  useRegisterForEventMutation, 
+  useCheckPaymentStatusMutation,
+  useGetScoutRegistrationsQuery
+} = eventsApi;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -138,14 +139,14 @@ const ScoutDashboard: React.FC = () => {
 
       {/* ── Stats ── */}
       <section className="px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
+        {/* <StatCard
           icon={<Eye size={24} />}
           label="Players Viewed"
           value={stats?.players_viewed ?? 0}
           sub={`+${stats?.players_viewed_this_week ?? 0} this week`}
           iconColor="text-[#00E5FF]"
           subColor="text-[#00E5FF]"
-        />
+        /> */}
         <StatCard
           icon={<Star size={24} />}
           label="Shortlisted Players"
@@ -303,7 +304,7 @@ const ScoutDashboard: React.FC = () => {
       <section className="px-6 grid md:grid-cols-2 gap-5">
 
         {/* Recent Player Views */}
-        <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
+        {/* <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
           <h2 className="text-base font-bold text-white mb-4">Recent Player Views</h2>
 
           <div className="space-y-3">
@@ -327,7 +328,7 @@ const ScoutDashboard: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Recent Messages */}
         <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
