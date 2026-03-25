@@ -159,7 +159,7 @@ export default function ScoutDirectoryPage() {
     <div className="min-h-screen bg-[#0B0D2C] text-white font-sans ">
       {/* Title */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent inline-block">
+        <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
           Scout Directory
         </h1>
       </div>

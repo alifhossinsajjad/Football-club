@@ -173,7 +173,7 @@ export default function ProfileView({ profile }: { profile: ScoutProfile }) {
       </section>
 
       {/* ── Layout Grid ── */}
-      <div className="px-0 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="px-0 max-w-7xl mx-auto grid gridz-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Column (Main Content) */}
         <div className="lg:col-span-2 space-y-6">
@@ -189,8 +189,8 @@ export default function ProfileView({ profile }: { profile: ScoutProfile }) {
                 <p className="text-xs text-white/30 uppercase mb-3">Specializations</p>
                 <div className="flex flex-wrap gap-2">
                   {profile.specialization.map((spec) => (
-                    <span key={spec} className="px-3 py-1.5 bg-[#00E5FF]/5 border border-[#00E5FF]/20 text-[#00E5FF] text-[11px] font-medium rounded-full">
-                      {spec.replace(/_/g, " ")}
+                    <span key={String(spec)} className="px-3 py-1.5 bg-[#00E5FF]/5 border border-[#00E5FF]/20 text-[#00E5FF] text-[11px] font-medium rounded-full">
+                      {String(spec).replace(/_/g, " ")}
                     </span>
                   ))}
                 </div>

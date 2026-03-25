@@ -103,7 +103,7 @@ const EventDetailsPage = () => {
   ];
 
   return (
-    <div className="max-w-[1240px] mx-auto pb-20 px-4">
+    <div className=" pb-20 px-4">
       {/* Back Button */}
       <div className="mb-6">
         <Link
@@ -115,7 +115,7 @@ const EventDetailsPage = () => {
       </div>
 
       {/* Hero Banner Section */}
-      <div className="relative rounded-3xl overflow-hidden mb-10 h-[500px]">
+      <div className="relative rounded-2xl md:rounded-3xl overflow-hidden mb-10 h-[350px] md:h-[500px]">
         <Image
           src="/images/event-banner.jpg"
           alt="Event Banner"
@@ -125,27 +125,27 @@ const EventDetailsPage = () => {
         {/* Overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1D] via-[#0A0F1D]/40 to-transparent" />
 
-        <div className="absolute top-6 left-6 flex gap-3">
-          <span className="bg-[#1DA1F2]/20 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-lg border border-[#1DA1F2]/30 uppercase tracking-wider">
+        <div className="absolute top-4 left-4 md:top-6 md:left-6 flex gap-3">
+          <span className="bg-[#1DA1F2]/20 backdrop-blur-md text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg border border-[#1DA1F2]/30 uppercase tracking-wider">
             {event.event_type}
           </span>
         </div>
 
         {event.is_featured && (
-          <div className="absolute top-6 right-6">
-            <span className="bg-[#00E5FF] text-black text-xs font-bold px-4 py-2 rounded-lg uppercase tracking-wider shadow-[0_0_20px_rgba(0,229,255,0.4)]">
+          <div className="absolute top-4 right-4 md:top-6 md:right-6">
+            <span className="bg-[#00E5FF] text-black text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg uppercase tracking-wider shadow-[0_0_20px_rgba(0,229,255,0.4)]">
               Featured Event
             </span>
           </div>
         )}
 
         {/* Content Overlay */}
-        <div className="absolute bottom-10 left-10 right-10">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight">
+        <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 md:right-10">
+          <h1 className="text-3xl md:text-5xl font-black text-white mb-4 md:mb-6 uppercase tracking-tight line-clamp-2 md:line-clamp-none">
             {event.event_name}
           </h1>
-          <div className="flex items-center gap-6">
-            <div className="w-16 h-16 relative">
+          <div className="flex items-center gap-4 md:gap-6">
+            <div className="w-12 h-12 md:w-16 md:h-16 relative flex-shrink-0">
               <Image
                 src="/images/club-logo.png"
                 alt="Club Logo"
@@ -153,13 +153,13 @@ const EventDetailsPage = () => {
                 className="object-contain"
               />
             </div>
-            <div>
-              <p className="text-xl font-bold text-[#00E5FF]">
+            <div className="min-w-0">
+              <p className="text-lg md:text-xl font-bold text-[#00E5FF] truncate">
                 {event.venue_name || "FC Barcelona Youth"}
               </p>
               <div className="flex items-center gap-2 text-white/70">
-                <CiLocationOn className="text-[#00E5FF]" />
-                <span className="text-sm">
+                <CiLocationOn className="text-[#00E5FF] flex-shrink-0" />
+                <span className="text-xs md:text-sm truncate">
                   {event.city}, {event.country || "Spain"}
                 </span>
               </div>
@@ -168,38 +168,38 @@ const EventDetailsPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-white">
         {/* Main Content (Left Column) */}
-        <div className="lg:col-span-2 space-y-10">
+        <div className="lg:col-span-2 space-y-8 md:space-y-10">
           {/* Event Details Grid */}
-          <div className="bg-[#0D1424] border border-white/5 rounded-3xl p-8">
-            <h2 className="text-xl font-bold text-white mb-8 border-l-4 border-[#00E5FF] pl-4">
+          <div className="bg-[#0D1424] border border-white/5 rounded-2xl md:rounded-3xl p-5 md:p-8 bg-[#12143A]">
+            <h2 className="text-lg md:text-xl font-bold text-white mb-6 md:mb-8 border-l-4 border-[#00E5FF] pl-4">
               Event Details
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 md:gap-y-8 gap-x-6 md:gap-x-12">
               <div className="flex items-start gap-4">
-                <div className="bg-[#00E5FF]/10 p-3 rounded-xl">
-                  <IoCalendarOutline className="text-[#00E5FF] text-xl" />
+                <div className="bg-[#00E5FF]/10 p-2.5 md:p-3 rounded-xl flex-shrink-0">
+                  <IoCalendarOutline className="text-[#00E5FF] text-lg md:text-xl" />
                 </div>
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">
+                  <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
                     Date
                   </p>
-                  <p className="text-white font-semibold">
+                  <p className="text-white text-sm md:text-base font-semibold">
                     {formatDate(event.event_date)}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="bg-[#00E5FF]/10 p-3 rounded-xl">
-                  <IoTimeOutline className="text-[#00E5FF] text-xl" />
+                <div className="bg-[#00E5FF]/10 p-2.5 md:p-3 rounded-xl flex-shrink-0">
+                  <IoTimeOutline className="text-[#00E5FF] text-lg md:text-xl" />
                 </div>
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">
+                  <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
                     Time
                   </p>
-                  <p className="text-white font-semibold">
+                  <p className="text-white text-sm md:text-base font-semibold">
                     {event.start_time.substring(0, 5)} -{" "}
                     {event.end_time.substring(0, 5)}
                   </p>
@@ -207,29 +207,29 @@ const EventDetailsPage = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="bg-[#00E5FF]/10 p-3 rounded-xl">
-                  <CiLocationOn className="text-[#00E5FF] text-xl" />
+                <div className="bg-[#00E5FF]/10 p-2.5 md:p-3 rounded-xl flex-shrink-0">
+                  <CiLocationOn className="text-[#00E5FF] text-lg md:text-xl" />
                 </div>
-                <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">
+                <div className="min-w-0">
+                  <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
                     Location
                   </p>
-                  <p className="text-white font-semibold">{event.venue_name}</p>
-                  <p className="text-white/60 text-sm mt-0.5">
+                  <p className="text-white text-sm md:text-base font-semibold truncate">{event.venue_name}</p>
+                  <p className="text-white/60 text-xs md:text-sm mt-0.5 line-clamp-1">
                     {event.street_address}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="bg-[#00E5FF]/10 p-3 rounded-xl">
-                  <span className="text-[#00E5FF] font-bold text-sm">$</span>
+                <div className="bg-[#00E5FF]/10 p-2.5 md:p-3 rounded-xl flex-shrink-0">
+                  <span className="text-[#00E5FF] font-bold text-sm md:text-base">$</span>
                 </div>
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">
+                  <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
                     Entry Fee
                   </p>
-                  <p className="text-white font-black text-xl">
+                  <p className="text-white font-black text-lg md:text-xl">
                     {Number(event.registration_fee) === 0
                       ? "Free"
                       : `$${event.registration_fee}`}
@@ -238,32 +238,32 @@ const EventDetailsPage = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="bg-[#00E5FF]/10 p-3 rounded-xl">
-                  <FaUserFriends className="text-[#00E5FF] text-xl" />
+                <div className="bg-[#00E5FF]/10 p-2.5 md:p-3 rounded-xl flex-shrink-0">
+                  <FaUserFriends className="text-[#00E5FF] text-lg md:text-xl" />
                 </div>
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">
+                  <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
                     Age Group
                   </p>
-                  <p className="text-white font-semibold italic">
+                  <p className="text-white text-sm md:text-base font-semibold italic">
                     U{event.minimum_age} - U{event.maximum_age}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="bg-[#00E5FF]/10 p-3 rounded-xl">
-                  <BsCheckCircleFill className="text-[#00E5FF] text-xl" />
+                <div className="bg-[#00E5FF]/10 p-2.5 md:p-3 rounded-xl flex-shrink-0">
+                  <BsCheckCircleFill className="text-[#00E5FF] text-lg md:text-xl" />
                 </div>
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">
+                  <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
                     Scouts Registered
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-black text-xl">
+                    <span className="text-white font-black text-lg md:text-xl">
                       {event.registered_count}
                     </span>
-                    <span className="text-white/40 text-sm">
+                    <span className="text-white/40 text-xs md:text-sm">
                       / {event.maximum_capacity} Registered
                     </span>
                   </div>
@@ -272,11 +272,11 @@ const EventDetailsPage = () => {
             </div>
 
             {/* About This Event */}
-            <div className="mt-12 pt-10 border-t border-white/5">
-              <h2 className="text-xl font-bold text-white mb-6">
+            <div className="mt-8 md:mt-12 pt-6 md:pt-10 border-t border-white/5">
+              <h2 className="text-lg md:text-xl font-bold text-white mb-4 md:mb-6">
                 About This Event
               </h2>
-              <p className="text-white/70 leading-relaxed text-sm">
+              <p className="text-white/70 leading-relaxed text-xs md:text-sm">
                 {event.description ||
                   "No description available for this event."}
               </p>
@@ -285,11 +285,11 @@ const EventDetailsPage = () => {
 
           {/* Registered Players Section */}
           <div>
-            <div className="flex items-end gap-3 mb-6">
-              <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+            <div className="flex flex-col md:flex-row md:items-end gap-1 md:gap-3 mb-6 ">
+              <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">
                 Registered Players
               </h2>
-              <p className="text-white/40 text-sm mb-1">
+              <p className="text-white/40 text-xs md:text-sm mb-0.5 md:mb-1">
                 {registeredPlayers.length} players participating
               </p>
             </div>
@@ -298,10 +298,10 @@ const EventDetailsPage = () => {
               {registeredPlayers.map((player) => (
                 <div
                   key={player.id}
-                  className="bg-[#0D1424] border border-white/5 rounded-2xl p-5 flex items-center justify-between group hover:border-[#00E5FF]/30 transition-all duration-300"
+                  className="bg-[#12143A] border border-white/5 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:border-[#00E5FF]/30 transition-all duration-300"
                 >
-                  <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-full overflow-hidden relative border-2 border-white/10 group-hover:border-[#00E5FF]/50 transition-colors">
+                  <div className="flex items-center gap-4 md:gap-5">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden relative border-2 border-white/10 group-hover:border-[#00E5FF]/50 transition-colors flex-shrink-0">
                       <Image
                         src={player.image}
                         alt={player.name}
@@ -309,26 +309,26 @@ const EventDetailsPage = () => {
                         className="object-cover"
                       />
                     </div>
-                    <div>
-                      <h4 className="text-white font-bold text-lg">
+                    <div className="min-w-0">
+                      <h4 className="text-white font-bold text-base md:text-lg truncate">
                         {player.name}
                       </h4>
-                      <p className="text-sm flex items-center gap-2 text-white/50">
-                        <span className="text-[#00E5FF] font-medium">
+                      <p className="text-xs md:text-sm flex flex-wrap items-center gap-x-2 gap-y-1 text-white/50">
+                        <span className="text-[#00E5FF] font-medium whitespace-nowrap">
                           {player.role}
                         </span>
-                        <span>•</span>
-                        <span>{player.age} years</span>
-                        <span>•</span>
-                        <span>{player.country}</span>
+                        <span className="hidden xs:inline">•</span>
+                        <span className="whitespace-nowrap">{player.age} years</span>
+                        <span className="hidden xs:inline">•</span>
+                        <span className="whitespace-nowrap">{player.country}</span>
                       </p>
-                      <p className="text-xs text-white/30 mt-1">
+                      <p className="text-[10px] md:text-xs text-white/30 mt-1 truncate">
                         {player.club}
                       </p>
                     </div>
                   </div>
-                  <button className="bg-[#1DA1F2]/10 text-[#1DA1F2] border border-[#1DA1F2]/20 hover:bg-[#1DA1F2] hover:text-white px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all">
-                    <MdOutlineMail size={18} />
+                  <button className="w-full sm:w-auto bg-[#1DA1F2]/10 text-[#1DA1F2] border border-[#1DA1F2]/20 hover:bg-[#1DA1F2] hover:text-white px-4 md:px-6 py-2 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-2 transition-all">
+                    <MdOutlineMail size={16} />
                     Contact
                   </button>
                 </div>
@@ -338,9 +338,9 @@ const EventDetailsPage = () => {
         </div>
 
         {/* Sidebar (Right Column) */}
-        <div className="space-y-6">
+        <div className="space-y-6 ">
           {/* Registration Card */}
-          <div className="bg-[#0D1424] border border-white/5 rounded-3xl p-8 sticky top-6">
+          <div className="bg-[#12143A] border border-white/5 rounded-3xl p-8 sticky top-6">
             <h3 className="text-xl font-bold text-white mb-2 italic">
               Register as Scout
             </h3>
