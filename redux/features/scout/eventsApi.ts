@@ -40,6 +40,7 @@ export const eventsApi = baseApi.injectEndpoints({
         method: "POST",
         body: payload,
       }),
+      invalidatesTags: ["Events"],
     }),
 
     getScoutRegistrations: builder.query<any, void>({
