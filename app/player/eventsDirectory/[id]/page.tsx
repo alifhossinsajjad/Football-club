@@ -20,7 +20,8 @@ import {
   useCreateRegistrationMutation,
   useCheckoutMutation, 
   useVerifyPaymentMutation,
-  useGetRegistrationStatusQuery
+  useGetRegistrationStatusQuery,
+  useApplyPromoCodeMutation
 } from "../../../../redux/features/player/eventsDirectoryApi";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -315,8 +316,31 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
   const [createRegistration] = useCreateRegistrationMutation();
   const [checkout] = useCheckoutMutation();
   const [verifyPayment] = useVerifyPaymentMutation();
+  const [applyPromoCode, { isLoading: isApplyingPromo }] = useApplyPromoCodeMutation();
+
+  const [promoCode, setPromoCode] = useState("");
+  const [promoAmount, setPromoAmount] = useState<number>(0);
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
 
   const { register, control, handleSubmit, formState: { errors }, watch } = useForm();
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoError("");
+    try {
+      const res = await applyPromoCode({ code: promoCode, event_id: event.id }).unwrap();
+      if (res.discount_amount) {
+        setPromoAmount(Number(res.discount_amount));
+        setIsPromoApplied(true);
+        toast.success("Promo code applied successfully!");
+      }
+    } catch (err: any) {
+      setPromoError(err?.data?.message || err?.data?.error || "Invalid promo code");
+      setPromoAmount(0);
+      setIsPromoApplied(false);
+    }
+  };
 
   const handleNext = async (data: any) => {
     if (step === 1) {
@@ -370,7 +394,8 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
         const res = await checkout({ 
           registration_id: registrationId!,
           success_url: successUrl,
-          cancel_url: cancelUrl
+          cancel_url: cancelUrl,
+          ...(isPromoApplied && promoCode ? { promo_code: promoCode } : {})
         }).unwrap();
         
         if (res.checkout_url) {
@@ -546,18 +571,48 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
               {step === 3 && (
                 <div className="space-y-8">
                   <h3 className="text-2xl font-bold text-white mb-8 border-b border-[#1E2550] pb-4">Payment Summary</h3>
-                  <div className="bg-[#0B0E1E] border border-[#1E2550] rounded-[24px] p-8 space-y-4">
-                     <div className="flex justify-between text-gray-400 text-sm font-medium">
-                        <span>Registration Fee</span>
-                        <span className="text-white">€{parseFloat(event.registration_fee || "0").toFixed(0)}</span>
+                  <div className="bg-[#0B0E1E] border border-[#1E2550] rounded-[24px] p-8 space-y-6">
+                     <div className="space-y-3">
+                        <label className="text-xs text-gray-500 font-bold ml-1 uppercase tracking-widest">Promo Code</label>
+                        <div className="flex gap-3">
+                          <input 
+                            value={promoCode} 
+                            onChange={(e) => setPromoCode(e.target.value)} 
+                            disabled={isPromoApplied}
+                            className={`flex-1 bg-[#121433] border ${promoError ? 'border-red-500' : 'border-[#1E2550]'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400 transition-all`} 
+                            placeholder="Enter code" 
+                          />
+                          <button 
+                            type="button" 
+                            onClick={handleApplyPromo} 
+                            disabled={isPromoApplied || isApplyingPromo || !promoCode}
+                            className="px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all disabled:opacity-50"
+                          >
+                            {isApplyingPromo ? "Applying..." : isPromoApplied ? "Applied" : "Apply"}
+                          </button>
+                        </div>
+                        {promoError && <p className="text-red-500 text-xs ml-1">{promoError}</p>}
                      </div>
-                     <div className="flex justify-between text-gray-400 text-sm font-medium">
-                        <span>Processing Fee</span>
-                        <span className="text-white">€2.50</span>
-                     </div>
-                     <div className="pt-4 border-t border-[#1E2550] flex justify-between items-center">
-                        <span className="text-lg font-bold text-white">Total</span>
-                        <span className="text-2xl font-black text-white">€{(parseFloat(event.registration_fee || "0") + 2.50).toFixed(2)}</span>
+
+                     <div className="border-t border-[#1E2550] pt-6 space-y-4">
+                       <div className="flex justify-between text-gray-400 text-sm font-medium">
+                          <span>Registration Fee</span>
+                          <span className={`text-white ${isPromoApplied ? 'line-through text-gray-500' : ''}`}>€{parseFloat(event.registration_fee || "0").toFixed(2)}</span>
+                       </div>
+                       {isPromoApplied && (
+                         <div className="flex justify-between text-[#00E5FF] text-sm font-bold">
+                            <span>Discount applied ({promoCode})</span>
+                            <span>-€{promoAmount.toFixed(2)}</span>
+                         </div>
+                       )}
+                       <div className="flex justify-between text-gray-400 text-sm font-medium">
+                          <span>Processing Fee</span>
+                          <span className="text-white">€2.50</span>
+                       </div>
+                       <div className="pt-4 border-t border-[#1E2550] flex justify-between items-center">
+                          <span className="text-lg font-bold text-white">Total</span>
+                          <span className="text-2xl font-black text-white">€{Math.max(0, parseFloat(event.registration_fee || "0") - promoAmount + 2.50).toFixed(2)}</span>
+                       </div>
                      </div>
                      <p className="text-xs text-gray-500 pt-4 text-center">
                        You will be redirected to a secure Stripe checkout page in the next step.

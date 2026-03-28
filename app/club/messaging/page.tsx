@@ -122,10 +122,12 @@ const MessagingContent = () => {
 
   const [sendReply, { isLoading: isSending }] = useSendReplyMutation();
 
-  const rawConversations: Conversation[] = useMemo(
-    () => convsData?.conversations || [],
-    [convsData],
-  );
+  const rawConversations: Conversation[] = useMemo(() => {
+    if (Array.isArray(convsData)) return convsData;
+    if (convsData?.conversations) return convsData.conversations;
+    if ((convsData as any)?.results) return (convsData as any).results;
+    return [];
+  }, [convsData]);
 
   // Logic for Virtual Conversation (when we clicked "Message" on a new player)
   const conversations = useMemo(() => {
@@ -152,7 +154,11 @@ const MessagingContent = () => {
   }, [rawConversations, targetUserId, targetPlayerData, sameId]);
 
   const messages: ChatMessage[] = useMemo(() => {
-    const msgs = messagesData?.messages || messagesData?.results || [];
+    let msgs: ChatMessage[] = [];
+    if (Array.isArray(messagesData)) msgs = messagesData;
+    else if (messagesData?.messages) msgs = messagesData.messages;
+    else if ((messagesData as any)?.results) msgs = (messagesData as any).results;
+    
     return [...msgs].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
       const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
@@ -428,10 +434,10 @@ const handleSend = async () => {
                   <div className="mx-auto space-y-6 pb-4">
                     {messages.map((msg, idx) => {
                       const isOwn =
-                        msg.is_sender ||
-                        msg.is_own ||
-                        msg.sender === currentUser?.id ||
-                        sameId(msg.sender, currentUser?.id);
+                        msg.is_sender === true ||
+                        msg.is_own === true ||
+                        (msg as any).isOwn === true ||
+                        (msg.sender && currentUser?.id && sameId(msg.sender, currentUser.id));
                       return (
                         <div
                           key={msg.id || idx}

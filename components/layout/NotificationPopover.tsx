@@ -22,13 +22,18 @@ const NotificationPopover = () => {
   const { data: notificationData } = useGetNotificationsQuery(undefined, { skip: !open });
   const [markAsRead] = useMarkAsReadMutation();
 
-  const unreadCount = summaryData?.summary?.total_unread || 0;
-  const notifications = notificationData?.notifications || [];
+  const unreadCount = summaryData?.summary?.total_unread || (summaryData as any)?.total_unread || 0;
+  const notifications: any[] = React.useMemo(() => {
+    if (Array.isArray(notificationData)) return notificationData;
+    if (notificationData?.notifications) return notificationData.notifications;
+    if ((notificationData as any)?.results) return (notificationData as any).results;
+    return [];
+  }, [notificationData]);
 
   const handleMarkAllAsRead = async () => {
     const unreadIds = notifications
-      .filter(n => !n.is_read)
-      .map(n => n.id);
+      .filter((n: any) => !n.is_read)
+      .map((n: any) => n.id);
     
     if (unreadIds.length > 0) {
       await markAsRead({ notification_ids: unreadIds });
@@ -110,7 +115,7 @@ const NotificationPopover = () => {
                       {typeof n.message === 'string' ? n.message : "Notification"}
                     </p>
                     <p className="text-[10px] text-gray-500 mt-1.5 flex items-center gap-1.5 uppercase font-bold tracking-widest">
-                      {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                      {n.created_at ? formatDistanceToNow(new Date(n.created_at), { addSuffix: true }) : ''}
                     </p>
                   </div>
                 </div>

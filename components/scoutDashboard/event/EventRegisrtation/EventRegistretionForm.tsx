@@ -10,7 +10,7 @@ import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepReview from "./StepReview";
 import Stepper from "./Stepper";
-import { useRegisterForEventMutation } from "@/redux/features/scout/eventsApi";
+import { useRegisterForEventMutation, useApplyPromoCodeMutation } from "@/redux/features/scout/eventsApi";
 
 type FormValues = {
   first_name: string;
@@ -21,6 +21,7 @@ type FormValues = {
   specialization: string;
   years_of_experience: number;
   event: number;
+  promo_code?: string;
 };
 
 type EventRegistrationFormProps = {
@@ -55,9 +56,35 @@ export default function EventRegistrationForm({
       region_country: "",
       specialization: "",
       years_of_experience: 0,
+      promo_code: "",
     },
     mode: "onChange",
   });
+
+  const [promoCode, setPromoCode] = useState("");
+  const [promoAmount, setPromoAmount] = useState<number>(0);
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
+  const [applyPromoCode, { isLoading: isApplyingPromo }] = useApplyPromoCodeMutation();
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoError("");
+    try {
+      const res = await applyPromoCode({ code: promoCode, event_id: event.id }).unwrap();
+      if (res.discount_amount) {
+        setPromoAmount(Number(res.discount_amount));
+        setIsPromoApplied(true);
+        methods.setValue("promo_code", promoCode);
+        toast.success("Promo code applied successfully!");
+      }
+    } catch (err: any) {
+      setPromoError(err?.data?.message || err?.data?.error || "Invalid promo code");
+      setPromoAmount(0);
+      setIsPromoApplied(false);
+      methods.setValue("promo_code", "");
+    }
+  };
 
   const next = async () => {
     let fields: (keyof FormValues)[] = [];
@@ -76,6 +103,7 @@ export default function EventRegistrationForm({
       const response = await registerForEvent({
         ...data,
         years_of_experience: Number(data.years_of_experience),
+        ...(isPromoApplied && methods.getValues("promo_code") ? { promo_code: methods.getValues("promo_code") } : {}),
       }).unwrap();
 
       if (response.success) {
@@ -130,11 +158,18 @@ export default function EventRegistrationForm({
           </div>
         </div>
 
-        <div className="text-right relative z-10">
+        <div className="text-right relative z-10 flex flex-col items-end">
           <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Registration Fee</p>
-          <p className="text-4xl font-black text-[#00E5FF]">
-            {event.registration_fee.toUpperCase() === "FREE" ? "FREE" : event.registration_fee}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className={`text-4xl font-black ${isPromoApplied ? 'text-white/50 line-through text-2xl' : 'text-[#00E5FF]'}`}>
+              {event.registration_fee.toUpperCase() === "FREE" ? "FREE" : event.registration_fee}
+            </p>
+            {isPromoApplied && (
+              <p className="text-4xl font-black text-[#00E5FF]">
+                €{Math.max(0, parseFloat(event.registration_fee || "0") - promoAmount).toFixed(2)}
+              </p>
+            )}
+          </div>
         </div>
         
         {/* Subtle decorative glow */}
@@ -147,7 +182,34 @@ export default function EventRegistrationForm({
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             {step === 0 && <StepOne />}
             {step === 1 && <StepTwo />}
-            {step === 2 && <StepReview />}
+            {step === 2 && (
+              <>
+                <StepReview />
+                <div className="mt-8 bg-[#0A0F1D] border border-white/5 rounded-2xl p-6">
+                  <div className="space-y-3">
+                    <label className="text-xs text-white/60 font-bold uppercase tracking-widest">Promo Code</label>
+                    <div className="flex gap-3">
+                      <input 
+                        value={promoCode} 
+                        onChange={(e) => setPromoCode(e.target.value)} 
+                        disabled={isPromoApplied}
+                        className={`flex-1 bg-white/5 border ${promoError ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00E5FF] transition-all`} 
+                        placeholder="Enter discount code" 
+                      />
+                      <button 
+                        type="button" 
+                        onClick={(e) => { e.preventDefault(); handleApplyPromo(); }} 
+                        disabled={isPromoApplied || isApplyingPromo || !promoCode}
+                        className="px-6 py-3 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/30 hover:bg-[#00E5FF] hover:text-black font-bold rounded-xl transition-all disabled:opacity-50 disabled:hover:bg-[#00E5FF]/20 disabled:hover:text-[#00E5FF]"
+                      >
+                        {isApplyingPromo ? "Applying..." : isPromoApplied ? "Applied" : "Apply"}
+                      </button>
+                    </div>
+                    {promoError && <p className="text-red-500 text-xs mt-1">{promoError}</p>}
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="flex justify-between mt-10 pt-6 border-t border-white/5">
               {step > 0 && (

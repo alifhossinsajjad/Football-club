@@ -117,7 +117,12 @@ const MessagingContent = () => {
     });
   const [sendReply, { isLoading: isSending }] = useSendReplyMutation();
 
-  const rawConversations: Conversation[] = convsData?.conversations || [];
+  const rawConversations: Conversation[] = React.useMemo(() => {
+    if (Array.isArray(convsData)) return convsData;
+    if (convsData?.conversations) return convsData.conversations;
+    if ((convsData as any)?.results) return (convsData as any).results;
+    return [];
+  }, [convsData]);
 
   // Logic for Virtual Conversation
   const conversations = React.useMemo(() => {
@@ -146,7 +151,11 @@ const MessagingContent = () => {
 
   // API returns { conversationId, messages: [...] } — NOT results
   const messages: ChatMessage[] = React.useMemo(() => {
-    const msgs = messagesData?.messages || messagesData?.results || [];
+    let msgs: ChatMessage[] = [];
+    if (Array.isArray(messagesData)) msgs = messagesData;
+    else if (messagesData?.messages) msgs = messagesData.messages;
+    else if ((messagesData as any)?.results) msgs = (messagesData as any).results;
+    
     // Ensure chronological order (oldest to newest)
     return [...msgs].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
@@ -497,7 +506,7 @@ const MessagingContent = () => {
                         const isOwn =
                           msg.is_sender === true ||
                           msg.is_own === true ||
-                          msg.isOwn === true ||
+                          (msg as any).isOwn === true ||
                           (msg.sender &&
                             currentUser?.id &&
                             sameId(msg.sender, currentUser.id));
@@ -509,7 +518,7 @@ const MessagingContent = () => {
                         const nextIsOwn = nextMsg
                           ? nextMsg.is_sender === true ||
                             nextMsg.is_own === true ||
-                            nextMsg.isOwn === true ||
+                            (nextMsg as any).isOwn === true ||
                             (nextMsg.sender &&
                               currentUser?.id &&
                               sameId(nextMsg.sender, currentUser.id))
@@ -518,7 +527,7 @@ const MessagingContent = () => {
                         const prevIsOwn = prevMsg
                           ? prevMsg.is_sender === true ||
                             prevMsg.is_own === true ||
-                            prevMsg.isOwn === true ||
+                            (prevMsg as any).isOwn === true ||
                             (prevMsg.sender &&
                               currentUser?.id &&
                               sameId(prevMsg.sender, currentUser.id))

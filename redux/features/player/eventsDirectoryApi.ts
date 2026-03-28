@@ -16,7 +16,7 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    checkout: builder.mutation<any, { registration_id: string; success_url: string; cancel_url: string }>({
+    checkout: builder.mutation<any, { registration_id: string; success_url: string; cancel_url: string; promo_code?: string }>({
       query: (data) => ({
         url: "/players/event-registration/checkout/",
         method: "POST",
@@ -37,6 +37,13 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
       query: () => `/players/event-registrations/`,
       providesTags: ["Events"],
     }),
+    applyPromoCode: builder.mutation<any, { code: string; event_id: number | string }>({
+      query: (data) => ({
+        url: "/api/payments/apply-promo/",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -48,4 +55,5 @@ export const {
   useVerifyPaymentMutation,
   useGetRegistrationStatusQuery,
   useGetMyRegistrationsQuery,
+  useApplyPromoCodeMutation,
 } = eventsDirectoryApi;
