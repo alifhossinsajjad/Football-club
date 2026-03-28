@@ -46,7 +46,7 @@ export const adminHomePageApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getHeroSettings: builder.query<HeroSettings[], void>({
       query: () => "/admin-dashboard/home/hero/",
-      transformResponse: (response: any) => response?.data || response,
+      transformResponse: (response: { data: HeroSettings[] }) => response?.data || response,
       providesTags: ["Dashboard"],
     }),
     createHeroSettings: builder.mutation<HeroSettingsResponse, Partial<HeroSettings>>({
@@ -65,7 +65,7 @@ export const adminHomePageApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard"],
     }),
-    deleteHeroSettings: builder.mutation<any, number>({
+    deleteHeroSettings: builder.mutation<{ success: boolean; message?: string }, number>({
       query: (id) => ({
         url: `/admin-dashboard/home/hero/${id}/`,
         method: "DELETE",
@@ -74,7 +74,7 @@ export const adminHomePageApi = baseApi.injectEndpoints({
     }),
     getFeaturedClubs: builder.query<FeaturedClub[], void>({
       query: () => "/admin-dashboard/home/featured-clubs/",
-      transformResponse: (response: any) => response?.data || response,
+      transformResponse: (response: { data: FeaturedClub[] }) => response?.data || response,
       providesTags: ["Dashboard"],
     }),
     createFeaturedClub: builder.mutation<FeaturedClubResponse, Partial<FeaturedClub>>({
@@ -93,7 +93,7 @@ export const adminHomePageApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard"],
     }),
-    deleteFeaturedClub: builder.mutation<any, number>({
+    deleteFeaturedClub: builder.mutation<{ success: boolean; message?: string }, number>({
       query: (id) => ({
         url: `/admin-dashboard/home/featured-clubs/${id}/`,
         method: "DELETE",

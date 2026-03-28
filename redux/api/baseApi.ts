@@ -41,7 +41,8 @@ export const baseApi = createApi({
     "PlayerDiscovery",
     "Chat",
     "Notification",
-    "Promo"
+    "Promo",
+    "Config"
   ],
   endpoints: () => ({}),
 });

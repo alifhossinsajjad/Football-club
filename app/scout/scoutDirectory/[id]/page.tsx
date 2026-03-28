@@ -35,6 +35,10 @@ import { toast } from "react-hot-toast";
 import { useGetScoutProfileByIdQuery } from "@/redux/features/scout/scoutDirectoryApi";
 import { useCreateConversationMutation } from "@/redux/features/chat/chatApi";
 
+/* ─── Helpers ────────────────────────────────────────────────── */
+const renderSafe = (val: any, fallback: string | number = "") => 
+  (typeof val === 'string' || typeof val === 'number') ? val : fallback;
+
 /* ─── Shared Components ────────────────────────────────────────── */
 const SidebarSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="bg-[#12143A] border border-white/[0.08] rounded-xl p-5 mb-5">
@@ -170,19 +174,18 @@ export default function ScoutProfilePage({
               />
             </div>
 
-            {/* Content */}
             <div className="flex-1 text-center md:text-left min-w-0">
               <h1 className="text-2xl md:text-3xl font-bold mb-1 truncate">
-                {scout.scout_name ? (
+                {typeof scout.scout_name === 'string' ? (
                   <>
                     <span className="text-[#00E5FF]">{scout.scout_name.split(" ")[0]} </span>
                     <span className="text-[#9C27B0]">{scout.scout_name.split(" ").slice(1).join(" ")}</span>
                   </>
                 ) : (
-                  <span className="text-[#00E5FF]">Unnamed Scout</span>
+                  <span className="text-[#00E5FF]">{renderSafe(scout.scout_name, "Unnamed Scout")}</span>
                 )}
               </h1>
-              <p className="text-sm text-white/50 mb-6 truncate">{scout.bio || "No bio provided"}</p>
+              <p className="text-sm text-white/50 mb-6 truncate">{typeof scout.bio === 'string' ? scout.bio : "No bio provided"}</p>
 
               {/* Info Grid */}
               <div className="grid grid-cols-2 gap-y-4 gap-x-8 mb-8">
@@ -192,7 +195,7 @@ export default function ScoutProfilePage({
                   </div>
                   <div className="text-left">
                     <p className="text-[10px] text-white/40 uppercase">Location</p>
-                    <p className="text-xs font-semibold">{scout.location || "N/A"}</p>
+                    <p className="text-xs font-semibold">{typeof scout.location === 'string' ? scout.location : "N/A"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -210,7 +213,7 @@ export default function ScoutProfilePage({
                   </div>
                   <div className="text-left">
                     <p className="text-[10px] text-white/40 uppercase">Connections</p>
-                    <p className="text-xs font-semibold">{scout.connections || 0}</p>
+                    <p className="text-xs font-semibold">{typeof scout.connections === 'number' || typeof scout.connections === 'string' ? scout.connections : 0}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -219,7 +222,7 @@ export default function ScoutProfilePage({
                   </div>
                   <div className="text-left">
                     <p className="text-[10px] text-white/40 uppercase">Experience</p>
-                    <p className="text-xs font-semibold">{scout.experience_years || 0} years</p>
+                    <p className="text-xs font-semibold">{typeof scout.experience_years === 'number' || typeof scout.experience_years === 'string' ? scout.experience_years : 0} years</p>
                   </div>
                 </div>
               </div>
@@ -257,7 +260,7 @@ export default function ScoutProfilePage({
               <s.icon size={18} />
             </div>
             <p className="text-xs text-white/50 mb-1">{s.label}</p>
-            <p className="text-2xl font-bold mb-1">{s.val}</p>
+            <p className="text-2xl font-bold mb-1">{typeof s.val === 'string' || typeof s.val === 'number' ? s.val : 0}</p>
             <p className="text-[10px] text-[#00D4AA]">{s.sub}</p>
           </div>
         ))}
@@ -273,15 +276,15 @@ export default function ScoutProfilePage({
           <div className="bg-[#12143A] border border-white/[0.08] rounded-xl p-7">
             <SectionTitle title="About" />
             <p className="text-sm text-white/70 leading-relaxed mb-6 whitespace-pre-line">
-              {scout.about || "No detailed about information provided."}
+              {renderSafe(scout.about, "No detailed about information provided.")}
             </p>
             {scout.specialization && scout.specialization.length > 0 && (
               <div>
                 <p className="text-xs text-white/30 uppercase mb-3">Specializations</p>
                 <div className="flex flex-wrap gap-2">
-                  {scout.specialization.map((spec) => (
-                    <span key={spec} className="px-3 py-1.5 bg-[#00E5FF]/5 border border-[#00E5FF]/20 text-[#00E5FF] text-[11px] font-medium rounded-full">
-                      {spec}
+                  {scout.specialization.map((spec: any, idx: number) => (
+                    <span key={idx} className="px-3 py-1.5 bg-[#00E5FF]/5 border border-[#00E5FF]/20 text-[#00E5FF] text-[11px] font-medium rounded-full">
+                      {typeof spec === 'string' ? spec : (spec?.name || 'Specialization')}
                     </span>
                   ))}
                 </div>
@@ -301,8 +304,8 @@ export default function ScoutProfilePage({
                 ].map((st) => (
                   <div key={st.label} className="bg-[#0B0D2C] border border-white/[0.05] rounded-xl p-4">
                     <div className="text-[#00E5FF] mb-2"><st.icon size={16} /></div>
-                    <p className="text-[10px] text-white/40 mb-1">{st.label}</p>
-                    <p className="text-lg font-bold">{st.val}</p>
+                    <p className="text-[10px] text-white/40 mb-1">{renderSafe(st.label, "Stat")}</p>
+                    <p className="text-lg font-bold">{renderSafe(st.val, 0)}</p>
                   </div>
                 ))}
               </div>
@@ -313,8 +316,8 @@ export default function ScoutProfilePage({
                 ].map((st) => (
                   <div key={st.label} className="bg-[#0B0D2C] border border-white/[0.05] rounded-xl p-4">
                     <div className="text-[#00E5FF] mb-2"><st.icon size={16} /></div>
-                    <p className="text-[10px] text-white/40 mb-1">{st.label}</p>
-                    <p className="text-lg font-bold">{st.val}</p>
+                    <p className="text-[10px] text-white/40 mb-1">{renderSafe(st.label, "Stat")}</p>
+                    <p className="text-lg font-bold">{renderSafe(st.val, 0)}</p>
                   </div>
                 ))}
               </div>
@@ -330,14 +333,14 @@ export default function ScoutProfilePage({
                   <div key={idx} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold">{p.player_name}</p>
+                        <p className="text-sm font-semibold">{renderSafe(p.player_name, "Player")}</p>
                         <div className="w-2.5 h-2.5 rounded-full bg-[#00E5FF]/40 border border-[#00E5FF] shadow-[0_0_5px_rgba(0,229,255,0.5)]" />
                       </div>
-                      <p className="text-xs text-white/30">{p.position}</p>
+                      <p className="text-xs text-white/30">{renderSafe(p.position, "Position")}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-[#00E5FF]">{p.current_team}</p>
-                      <p className="text-[10px] text-white/30">Discovered in {p.discovered_year}</p>
+                      <p className="text-sm font-medium text-[#00E5FF]">{renderSafe(p.current_team, "Team")}</p>
+                      <p className="text-[10px] text-white/30">Discovered in {renderSafe(p.discovered_year, "-")}</p>
                     </div>
                   </div>
                 ))}
@@ -355,11 +358,11 @@ export default function ScoutProfilePage({
                     <div className="flex items-center gap-3">
                       <span className="text-xl">🏳️</span>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate">{r.country}</p>
-                        <p className="text-[10px] text-white/30 lowercase">{r.coverage_type} coverage</p>
+                        <p className="text-sm font-semibold truncate">{renderSafe(r.country, "Country")}</p>
+                        <p className="text-[10px] text-white/30 lowercase">{renderSafe(r.coverage_type, "N/A")} coverage</p>
                       </div>
                     </div>
-                    <p className="text-xs font-bold text-[#00E5FF] flex-shrink-0">{r.active_since} years</p>
+                    <p className="text-xs font-bold text-[#00E5FF] flex-shrink-0">{renderSafe(r.active_since, 0)} years</p>
                   </div>
                 ))}
               </div>
@@ -378,14 +381,14 @@ export default function ScoutProfilePage({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-bold truncate">{j.organization}</p>
+                        <p className="text-sm font-bold truncate">{renderSafe(j.organization, "Organization")}</p>
                         {j.is_current && (
                           <span className="px-2 py-0.5 bg-[#00D4AA] text-black text-[10px] font-bold rounded-lg uppercase flex-shrink-0 ml-2">Current</span>
                         )}
                       </div>
-                      <p className="text-xs text-white/50">{j.role}</p>
-                      <p className="text-[10px] text-[#00E5FF] mt-1">{j.duration}</p>
-                      {j.description && <p className="text-[11px] text-white/40 mt-2 italic">{j.description}</p>}
+                      <p className="text-xs text-white/50">{renderSafe(j.role, "Role")}</p>
+                      <p className="text-[10px] text-[#00E5FF] mt-1">{renderSafe(j.duration, "Duration")}</p>
+                      {j.description && <p className="text-[11px] text-white/40 mt-2 italic">{renderSafe(j.description, "")}</p>}
                     </div>
                   </div>
                 ))}
@@ -409,11 +412,11 @@ export default function ScoutProfilePage({
                     <c.icon size={16} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[9px] text-white/30 uppercase">{c.label}</p>
+                    <p className="text-[9px] text-white/30 uppercase">{renderSafe(c.label, "Contact")}</p>
                     <p className={`text-[11px] font-medium truncate ${c.color || "text-white"}`}>
-                       {c.val && c.val.startsWith('http') ? (
+                       {typeof c.val === 'string' && c.val.startsWith('http') ? (
                           <a href={c.val} target="_blank" rel="noopener noreferrer" className="hover:underline">{c.val.replace(/^https?:\/\//, '')}</a>
-                       ) : c.val || "N/A"}
+                       ) : renderSafe(c.val, "N/A")}
                     </p>
                   </div>
                 </div>
@@ -432,13 +435,13 @@ export default function ScoutProfilePage({
                 ].filter(s => s.val).map((s) => (
                   <a 
                     key={s.platform} 
-                    href={s.val || '#'} 
+                    href={typeof s.val === 'string' ? s.val : '#'} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 bg-[#0B0D2C] border border-white/5 p-3 rounded-lg hover:bg-white/5 transition-colors"
                   >
                     <s.icon size={14} className="text-[#00E5FF]" />
-                    <p className="text-[11px] text-white/70 truncate">{s.val?.split('/').pop() || s.platform}</p>
+                    <p className="text-[11px] text-white/70 truncate">{typeof s.val === 'string' ? s.val.split('/').pop() : s.platform}</p>
                   </a>
                 ))}
               </div>
@@ -449,9 +452,9 @@ export default function ScoutProfilePage({
           {scout.languages && scout.languages.length > 0 && (
             <SidebarSection title="Languages">
               <div className="flex flex-wrap gap-2">
-                {scout.languages.map((l) => (
-                  <span key={l} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-white/70">
-                    {l}
+                {scout.languages.map((l: any) => (
+                  <span key={renderSafe(l, Math.random())} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-white/70">
+                    {renderSafe(l, "Language")}
                   </span>
                 ))}
               </div>
@@ -464,8 +467,8 @@ export default function ScoutProfilePage({
               <div className="space-y-2">
                 {scout.club_affiliations.map((c, idx) => (
                   <div key={idx} className="p-3 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-white/60">
-                    <p className="font-bold text-white/80">{c.club_name}</p>
-                    <p className="text-[10px]">{c.affiliation_type} • {c.year}</p>
+                    <p className="font-bold text-white/80">{renderSafe(c.club_name, "Club")}</p>
+                    <p className="text-[10px]">{renderSafe(c.affiliation_type, "Affiliation")} • {renderSafe(c.year, "Year")}</p>
                   </div>
                 ))}
               </div>
@@ -480,8 +483,8 @@ export default function ScoutProfilePage({
                   <div key={idx} className="flex items-start gap-3">
                     <div className="mt-1 text-[#00E5FF]"><Award size={14} /></div>
                     <div>
-                      <p className="text-xs text-white/70 leading-relaxed font-normal">{a.achievement}</p>
-                      <p className="text-[10px] text-white/30">{a.club_name} • {a.year}</p>
+                      <p className="text-xs text-white/70 leading-relaxed font-normal">{renderSafe(a.achievement, "Achievement")}</p>
+                      <p className="text-[10px] text-white/30">{renderSafe(a.club_name, "Club")} • {renderSafe(a.year, "Year")}</p>
                     </div>
                   </div>
                 ))}
@@ -518,7 +521,7 @@ export default function ScoutProfilePage({
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">
-                    Message {scout.scout_name}
+                    Message {renderSafe(scout.scout_name, "Scout")}
                   </h3>
                   <p className="text-xs text-gray-400">
                     Scout Profile
@@ -542,7 +545,7 @@ export default function ScoutProfilePage({
                 <textarea
                   autoFocus
                   className="w-full h-40 p-4 rounded-2xl bg-[#0B0E1E] border border-[#1E2550] text-white focus:outline-none focus:border-[#04B5A3]/50 transition-all resize-none placeholder:text-gray-600"
-                  placeholder={`Hi ${scout.scout_name?.split(" ")[0]}, let's connect...`}
+                  placeholder={`Hi ${typeof scout.scout_name === 'string' ? scout.scout_name?.split(" ")[0] : 'Scout'}, let's connect...`}
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
                 />

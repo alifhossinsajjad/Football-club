@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import { Loader2, Shield, ImageIcon, Type, Edit, Trash2, X, Check, Plus, Hash } from "lucide-react";
 import { toast } from "react-hot-toast";
 import swal from "sweetalert";
@@ -51,11 +52,7 @@ export default function ClubManagementPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<Partial<FeaturedClub>>({});
 
-  useEffect(() => {
-    if (editingClub) {
-      setFormData(editingClub);
-    }
-  }, [editingClub]);
+
 
   const handleAddNew = () => {
     setFormData({
@@ -94,8 +91,9 @@ export default function ClubManagementPage() {
       try {
         await deleteClub(id).unwrap();
         toast.success("Featured club deleted successfully");
-      } catch (error: any) {
-        toast.error(error?.data?.message || "Failed to delete featured club");
+      } catch (error) {
+        const err = error as { data?: { message?: string } };
+        toast.error(err?.data?.message || "Failed to delete featured club");
       }
     }
   };
@@ -117,8 +115,9 @@ export default function ClubManagementPage() {
         toast.success("Featured club updated successfully");
         setEditingClub(null);
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || `Failed to ${isCreating ? 'create' : 'update'} featured club`);
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || `Failed to ${isCreating ? 'create' : 'update'} featured club`);
     }
   };
 
@@ -174,7 +173,14 @@ export default function ClubManagementPage() {
                         <td className="px-6 py-5">
                           <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-700 bg-white/5 flex items-center justify-center p-2">
                             {club.club_logo ? (
-                              <img src={club.club_logo} alt="Club Logo" className="w-full h-full object-contain" />
+                              <Image 
+                                src={club.club_logo} 
+                                alt="Club Logo" 
+                                width={64} 
+                                height={64} 
+                                className="w-full h-full object-contain" 
+                                unoptimized
+                              />
                             ) : (
                               <ImageIcon size={20} className="text-gray-500" />
                             )}
@@ -204,7 +210,11 @@ export default function ClubManagementPage() {
                         <td className="px-6 py-5 text-right">
                           <div className="flex items-center justify-end gap-3 opacity-80 group-hover:opacity-100 transition-opacity">
                             <button
-                              onClick={() => { setEditingClub(club); setIsCreating(false); }}
+                              onClick={() => { 
+                                setEditingClub(club); 
+                                setFormData(club);
+                                setIsCreating(false); 
+                              }}
                               className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/20"
                               title="Edit Featured Club"
                             >
@@ -294,7 +304,14 @@ export default function ClubManagementPage() {
                 {formData.club_logo && (
                   <div className="mt-6 flex justify-center bg-white/5 border border-gray-800 rounded-xl p-6">
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-700 bg-white">
-                      <img src={formData.club_logo} alt="Club Preview" className="w-full h-full object-contain p-2" />
+                      <Image 
+                        src={formData.club_logo} 
+                        alt="Club Preview" 
+                        width={128} 
+                        height={128} 
+                        className="w-full h-full object-contain p-2" 
+                        unoptimized
+                      />
                     </div>
                   </div>
                 )}

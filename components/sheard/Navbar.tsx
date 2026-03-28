@@ -13,9 +13,9 @@ import { UserRole } from "@/types/auth";
 const navLinks = [
   { name: "Home", href: "#" },
   { name: "Membership", href: "#" },
-  { name: "Academies", href: "#" },
-  { name: "Clubs", href: "#" },
-  { name: "Players", href: "/player" },
+  { name: "Academies", href: "/#academies" },
+  { name: "Players", href: "/#players" },
+  { name: "Latest News", href: "#" },
 ];
 
 const Navbar = () => {
@@ -59,7 +59,11 @@ const Navbar = () => {
 
     const onMouseDown = (e: MouseEvent) => {
       const target = e.target as Node | null;
-      if (target && userMenuRef.current && !userMenuRef.current.contains(target)) {
+      if (
+        target &&
+        userMenuRef.current &&
+        !userMenuRef.current.contains(target)
+      ) {
         setUserMenuOpen(false);
       }
     };
@@ -96,13 +100,13 @@ const Navbar = () => {
           <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
             <div className="flex items-center gap-8">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   className="text-[#B0B0B0] hover:text-white transition-colors font-medium text-[15px] whitespace-nowrap"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -119,14 +123,15 @@ const Navbar = () => {
                   className="flex items-center gap-3 pr-4 p-1 rounded-full bg-[#050B14]/40 hover:bg-[#050B14]/60 backdrop-blur-md border border-white/10 transition-all group"
                 >
                   {auth.user.profile_image ? (
-                    <img 
-                      src={auth.user.profile_image} 
-                      alt="Profile" 
+                    <img
+                      src={auth.user.profile_image}
+                      alt="Profile"
                       className="w-9 h-9 rounded-full object-cover border border-[#00E5FF]/30"
                     />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
-                      {auth.user.first_name?.[0]}{auth.user.last_name?.[0]}
+                      {auth.user.first_name?.[0]}
+                      {auth.user.last_name?.[0]}
                     </div>
                   )}
                   <div className="flex flex-col items-start mr-1 text-left">
@@ -171,7 +176,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="login" className="px-6"  >
+                  <Button variant="login" className="px-6">
                     Log in
                   </Button>
                 </Link>
@@ -203,27 +208,28 @@ const Navbar = () => {
           <div className="lg:hidden p-7 rounded-xl border-t border-white/10 bg-blur backdrop-blur-md">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   className="text-white/80 hover:text-[#00E5FF] text-base font-medium py-2 transition-colors"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
               <div className="flex flex-col gap-3 pt-4">
                 {auth.user ? (
                   <>
                     <div className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 mb-2">
                       {auth.user.profile_image ? (
-                        <img 
-                          src={auth.user.profile_image} 
-                          alt="Profile" 
+                        <img
+                          src={auth.user.profile_image}
+                          alt="Profile"
                           className="w-12 h-12 rounded-full object-cover border border-[#00E5FF]/30"
                         />
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-lg font-bold shadow-inner text-white">
-                          {auth.user.first_name?.[0]}{auth.user.last_name?.[0]}
+                          {auth.user.first_name?.[0]}
+                          {auth.user.last_name?.[0]}
                         </div>
                       )}
                       <div>

@@ -12,12 +12,10 @@ import {
   Settings,
   User,
   Building2,
-  SubscriptIcon,
   CreditCard,
   CircleDollarSign,
   ChartNoAxesCombined,
   Newspaper,
-  TrendingUp,
   Home,
   FileText,
   Ticket,
@@ -27,7 +25,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 
-import Image from "next/image";
+
 import { logout } from "@/redux/features/auth/authSlice";
 import Logo from "../reuseable/Logo";
 
@@ -69,7 +67,7 @@ const ScoutSideBar: React.FC = () => {
   const pathname = usePathname();
   const theme = useAppSelector((state: RootState) => state.theme);
 
-  const menuItems: MenuItem[] = [
+  const menuItems: MenuItem[] = useMemo(() => [
     { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
     {
       icon: User,
@@ -129,7 +127,7 @@ const ScoutSideBar: React.FC = () => {
     },
 
     { icon: Settings, label: " Settings", href: "/admin/adminSettings" },
-  ];
+  ], []);
 
   // ✅ stable key for groups even without href
   const groupKey = (item: MenuItem, index: number) =>
@@ -165,7 +163,7 @@ const ScoutSideBar: React.FC = () => {
       });
       return next;
     });
-  }, [pathname]);
+  }, [pathname, menuItems]);
 
   const handleToggle = (): void => setIsOpen((p) => !p);
   const handleClose = (): void => setIsOpen(false);

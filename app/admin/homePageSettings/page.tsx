@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import { Loader2, Settings, Image as ImageIcon, Type, Sparkles, Edit, Trash2, X, Check, Plus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import swal from "sweetalert";
@@ -51,11 +52,7 @@ export default function HomePageSettings() {
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<Partial<HeroSettings>>({});
 
-  useEffect(() => {
-    if (editingHero) {
-      setFormData(editingHero);
-    }
-  }, [editingHero]);
+
 
   const handleAddNew = () => {
     setFormData({
@@ -98,8 +95,9 @@ export default function HomePageSettings() {
       try {
         await deleteHero(id).unwrap();
         toast.success("Hero section deleted successfully");
-      } catch (error: any) {
-        toast.error(error?.data?.message || "Failed to delete hero section");
+      } catch (error) {
+        const err = error as { data?: { message?: string } };
+        toast.error(err?.data?.message || "Failed to delete hero section");
       }
     }
   };
@@ -116,8 +114,9 @@ export default function HomePageSettings() {
         toast.success("Hero settings updated successfully");
         setEditingHero(null);
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || `Failed to ${isCreating ? 'create' : 'update'} hero settings`);
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || `Failed to ${isCreating ? 'create' : 'update'} hero settings`);
     }
   };
 
@@ -171,7 +170,14 @@ export default function HomePageSettings() {
                         <td className="px-6 py-5">
                           <div className="w-24 h-16 rounded-lg overflow-hidden border border-gray-700">
                             {hero.hero_image ? (
-                              <img src={hero.hero_image} alt="Hero" className="w-full h-full object-cover" />
+                              <Image 
+                                src={hero.hero_image} 
+                                alt="Hero" 
+                                width={96} 
+                                height={64} 
+                                className="w-full h-full object-cover"
+                                unoptimized
+                              />
                             ) : (
                               <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-500">
                                 <ImageIcon size={20} />
@@ -194,7 +200,11 @@ export default function HomePageSettings() {
                         <td className="px-6 py-5 text-right">
                           <div className="flex items-center justify-end gap-3 opacity-80 group-hover:opacity-100 transition-opacity">
                             <button
-                              onClick={() => { setEditingHero(hero); setIsCreating(false); }}
+                              onClick={() => { 
+                                setEditingHero(hero); 
+                                setFormData(hero);
+                                setIsCreating(false); 
+                              }}
                               className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/20"
                               title="Edit Hero"
                             >
@@ -334,7 +344,14 @@ export default function HomePageSettings() {
                 <input name="hero_image" value={formData.hero_image || ""} onChange={handleChange} className={inputClass} placeholder="https://cloudinary.com/..." />
                 {formData.hero_image && (
                   <div className="mt-4 rounded-xl overflow-hidden border border-gray-800 w-full max-w-md">
-                    <img src={formData.hero_image} alt="Hero Preview" className="w-full h-auto object-cover" />
+                    <Image 
+                      src={formData.hero_image} 
+                      alt="Hero Preview" 
+                      width={400} 
+                      height={225} 
+                      className="w-full h-auto object-cover"
+                      unoptimized
+                    />
                   </div>
                 )}
               </div>
