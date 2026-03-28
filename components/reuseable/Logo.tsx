@@ -10,6 +10,7 @@ const Logo = () => {
         width={140}
         height={40}
         priority
+        style={{ width: "auto", height: "auto" }}
       />
     </div>
   );

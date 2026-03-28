@@ -57,7 +57,9 @@ const Banner = () => {
       <div className="w-full min-h-screen flex items-center justify-center bg-[#050B14]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white/60 font-medium animate-pulse">Initializing Experience...</p>
+          <p className="text-white/60 font-medium animate-pulse">
+            Initializing Experience...
+          </p>
         </div>
       </div>
     );
@@ -68,24 +70,25 @@ const Banner = () => {
   }
 
   return (
-    <section 
+    <section
       className="relative w-full min-h-screen flex items-center justify-center overflow-hidden"
       style={{ backgroundColor: activeHero.background_color }}
     >
       {/* Background Image / Hero Image */}
       <div className="absolute inset-0">
         <Image
-          src={activeHero.hero_image}
+          src={activeHero.hero_image || "/images/banner.png"}
           alt={activeHero.title}
           fill
           className="object-cover opacity-60"
           priority
-          unoptimized={activeHero.hero_image.startsWith('http')}
+          unoptimized={
+            typeof activeHero.hero_image === "string" &&
+            activeHero.hero_image.startsWith("http")
+          }
         />
         {/* Dynamic Overlay Gradient */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/80" 
-        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/80" />
       </div>
 
       {/* Content */}
@@ -102,9 +105,12 @@ const Banner = () => {
         </div>
 
         {/* Dynamic Subtitle */}
-        <span 
+        <span
           className="inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-[0.3em] mb-6 border border-white/20 backdrop-blur-sm shadow-xl"
-          style={{ color: activeHero.subtitle_color, backgroundColor: `${activeHero.subtitle_color}10` }}
+          style={{
+            color: activeHero.subtitle_color,
+            backgroundColor: `${activeHero.subtitle_color}10`,
+          }}
         >
           {activeHero.subtitle}
         </span>
@@ -131,15 +137,17 @@ const Banner = () => {
           ref={btnRef}
           className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full max-w-lg mx-auto"
         >
-          <Link 
+          <Link
             href={activeHero.primary_button_url}
             className="group relative w-full sm:w-auto overflow-hidden px-10 py-4 bg-white text-black font-black rounded-xl text-base uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.15)]"
           >
-            <span className="relative z-10">{activeHero.primary_button_text}</span>
+            <span className="relative z-10">
+              {activeHero.primary_button_text}
+            </span>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
           </Link>
 
-          <Link 
+          <Link
             href={activeHero.secondary_button_url}
             className="w-full sm:w-auto px-10 py-4 bg-transparent text-white font-bold rounded-xl text-base border-2 border-white/30 backdrop-blur-md uppercase tracking-wider transition-all hover:bg-white hover:text-black hover:border-white shadow-xl hover:scale-105 active:scale-95"
           >
@@ -150,7 +158,7 @@ const Banner = () => {
 
       {/* Modern gradient at bottom to blend with next section */}
       <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#050B14] to-transparent pointer-events-none" />
-      
+
       {/* Decorative Light Leak */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-white/5 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-white/5 blur-[150px] rounded-full pointer-events-none" />
@@ -159,4 +167,3 @@ const Banner = () => {
 };
 
 export default Banner;
-

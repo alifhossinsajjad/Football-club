@@ -119,15 +119,15 @@ export default function ScoutDirectoryPage() {
   const scouts = rawScouts.map((s: any) => {
     return {
       id: s.id,
-      name: s.scout_name || "Unknown Scout",
-      title: s.position || "Scout",
-      location: s.location || "Location not provided",
+      name: typeof s.scout_name === 'string' ? s.scout_name : (s.scout_name?.name || "Unknown Scout"),
+      title: typeof s.position === 'string' ? s.position : (s.position?.name || "Scout"),
+      location: typeof s.location === 'string' ? s.location : (s.location?.name || "Location not provided"),
       specializations: Array.isArray(s.specialization) && s.specialization.length > 0 
-        ? s.specialization 
+        ? s.specialization.map((spec: any) => typeof spec === 'string' ? spec : (spec?.name || 'Specialization')) 
         : ["General Scouting"],
-      experience: s.experience || 0,
-      connections: s.connections || 0,
-      image: s.scout_logo || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+      experience: typeof s.experience === 'number' || typeof s.experience === 'string' ? s.experience : 0,
+      connections: typeof s.connections === 'number' || typeof s.connections === 'string' ? s.connections : 0,
+      image: typeof s.scout_logo === 'string' ? s.scout_logo : "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
       originalData: s,
     };
   });
@@ -260,11 +260,16 @@ export default function ScoutDirectoryPage() {
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-base font-medium text-white truncate">
-                          {scout.name}
+                          {typeof scout.name === 'string' ? scout.name : 'Unknown Scout'}
                         </h3>
-                        <p className="text-xs text-white/60 mb-2 truncate">{scout.title}</p>
+                        <p className="text-xs text-white/60 mb-2 truncate">
+                          {typeof scout.title === 'string' ? scout.title : 'Scout'}
+                        </p>
                         <p className="text-xs text-[#00E5FF] flex items-center gap-1.5 font-medium truncate">
-                          <MapPin size={12} className="flex-shrink-0" /> <span className="truncate">{scout.location}</span>
+                          <MapPin size={12} className="flex-shrink-0" /> 
+                          <span className="truncate">
+                            {typeof scout.location === 'string' ? scout.location : 'Location not provided'}
+                          </span>
                         </p>
                       </div>
                     </div>
@@ -273,17 +278,17 @@ export default function ScoutDirectoryPage() {
                     <div className="mb-6">
                       <p className="text-xs text-white/50 mb-3">Specializations</p>
                       <div className="flex flex-wrap gap-2">
-                        {scout.specializations.slice(0, 3).map((spec: string, idx: number) => (
+                        {scout.specializations.slice(0, 3).map((spec: any, idx: number) => (
                           <span
                             key={idx}
                             className="text-[11px] font-medium text-[#00E5FF] bg-white/[0.04] px-3 py-1.5 rounded-full"
                           >
-                            {spec}
+                            {typeof spec === 'string' ? spec : (spec?.name || 'Specialization')}
                           </span>
                         ))}
                         {scout.specializations.length > 3 && (
                            <span className="text-[11px] font-medium text-[#00E5FF] bg-white/[0.04] px-3 py-1.5 rounded-full">
-                           +{scout.specializations.length - 3} more
+                           {`+${scout.specializations.length - 3} more`}
                          </span>
                         )}
                       </div>
@@ -291,18 +296,18 @@ export default function ScoutDirectoryPage() {
 
                     {/* Experience and Connections Grid */}
                     <div className="flex items-center justify-between mt-auto mb-6">
-                      <div>
-                        <p className="text-xs text-white/50 mb-1">Experience</p>
-                        <p className="text-sm text-white font-medium">
-                          {scout.experience} years
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-white/50 mb-1">Connections</p>
-                        <p className="text-sm text-white font-medium">
-                          {scout.connections}
-                        </p>
-                      </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-white/45 text-[10px] uppercase tracking-wider">Experience:</span>
+                          <span className="text-[#00E5FF] text-[11px] font-bold">
+                            {typeof scout.experience === 'number' || typeof scout.experience === 'string' ? scout.experience : '0'} years
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-white/45 text-[10px] uppercase tracking-wider">Connections:</span>
+                          <span className="text-[#9C27B0] text-[11px] font-bold">
+                            {typeof scout.connections === 'number' || typeof scout.connections === 'string' ? scout.connections : '0'}
+                          </span>
+                        </div>
                     </div>
 
                     {/* Action Buttons */}
@@ -375,10 +380,10 @@ export default function ScoutDirectoryPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white">
-                      Message {selectedScoutForMessage.name}
+                      Message {typeof selectedScoutForMessage.name === 'string' ? selectedScoutForMessage.name : 'Scout'}
                     </h3>
                     <p className="text-xs text-gray-400">
-                      {selectedScoutForMessage.title}
+                      {typeof selectedScoutForMessage.title === 'string' ? selectedScoutForMessage.title : ''}
                     </p>
                   </div>
                 </div>
@@ -399,7 +404,7 @@ export default function ScoutDirectoryPage() {
                   <textarea
                     autoFocus
                     className="w-full h-40 p-4 rounded-2xl bg-[#0B0E1E] border border-[#1E2550] text-white focus:outline-none focus:border-[#04B5A3]/50 transition-all resize-none placeholder:text-gray-600"
-                    placeholder={`Hi ${selectedScoutForMessage.name.split(" ")[0]}, let's connect...`}
+                    placeholder={`Hi ${typeof selectedScoutForMessage.name === 'string' ? selectedScoutForMessage.name.split(" ")[0] : 'Scout'}, let's connect...`}
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                   />

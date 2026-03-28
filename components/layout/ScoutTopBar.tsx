@@ -73,16 +73,16 @@ const ScoutTopBar: React.FC = () => {
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#9C27B0] to-[#00E5FF] flex items-center justify-center text-white font-semibold text-lg">
-                    {user?.first_name?.charAt(0).toUpperCase() || "U"}
+                    {typeof user?.first_name === 'string' ? user.first_name.charAt(0).toUpperCase() : "U"}
                   </div>
                 )}
 
                 {/* Name + Role */}
                 <div className="hidden lg:block text-left">
                   <p className="text-sm font-medium text-white truncate">
-                    {user?.first_name} {user?.last_name}
+                    {typeof user?.first_name === 'string' ? user.first_name : "User"} {typeof user?.last_name === 'string' ? user.last_name : ""}
                   </p>
-                  <p className="text-xs text-white  capitalize">{user?.role}</p>
+                  <p className="text-xs text-white  capitalize">{typeof user?.role === 'string' ? user.role : "Scout"}</p>
                 </div>
               </button>
             </div>

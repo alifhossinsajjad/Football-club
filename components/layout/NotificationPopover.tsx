@@ -107,7 +107,7 @@ const NotificationPopover = () => {
                       "text-sm leading-relaxed",
                       n.is_read ? "text-gray-400" : "text-gray-100 font-medium"
                     )}>
-                      {n.message}
+                      {typeof n.message === 'string' ? n.message : "Notification"}
                     </p>
                     <p className="text-[10px] text-gray-500 mt-1.5 flex items-center gap-1.5 uppercase font-bold tracking-widest">
                       {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
