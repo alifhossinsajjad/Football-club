@@ -50,6 +50,13 @@ export const eventsApi = baseApi.injectEndpoints({
       query: () => "/scout-agent/event-registrations/",
       providesTags: ["Events"],
     }),
+    applyPromoCode: builder.mutation<any, { code: string; event_id: number | string }>({
+      query: (data) => ({
+        url: "/api/payments/apply-promo/",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -58,5 +65,6 @@ export const {
   useGetEventQuery, 
   useRegisterForEventMutation, 
   useCheckPaymentStatusMutation,
-  useGetScoutRegistrationsQuery
+  useGetScoutRegistrationsQuery,
+  useApplyPromoCodeMutation
 } = eventsApi;

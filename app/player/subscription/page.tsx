@@ -186,14 +186,16 @@ const SubscriptionContent = () => {
               </div>
 
               <div className="space-y-4 flex-1 mb-10">
-                {plan.features.map((feature: string, i: number) => (
+                {(plan.features || []).map((feature: any, i: number) => {
+                  const featureText = typeof feature === 'string' ? feature : feature?.name || feature?.title || feature?.description || feature?.more || Object.values(feature)[0] || JSON.stringify(feature);
+                  return (
                   <div key={i} className="flex gap-3 text-sm">
                     <div className="mt-1 flex-shrink-0">
                       <CheckIcon />
                     </div>
-                    <span className="text-gray-400 font-medium leading-tight">{feature}</span>
+                    <span className="text-gray-400 font-medium leading-tight">{featureText}</span>
                   </div>
-                ))}
+                )})}
               </div>
 
               <button 
@@ -231,12 +233,14 @@ const SubscriptionContent = () => {
             </div>
             
             <div className="grid grid-cols-2 gap-x-12 gap-y-4">
-              {displaySub.features.map((feature: string, index: number) => (
+              {(displaySub.features || []).map((feature: any, index: number) => {
+                const featureText = typeof feature === 'string' ? feature : feature?.name || feature?.title || feature?.description || feature?.more || Object.values(feature)[0] || JSON.stringify(feature);
+                return (
                 <div key={index} className="flex items-center gap-3">
                   <CheckIcon />
-                  <span className="text-sm text-gray-400 font-medium">{feature}</span>
+                  <span className="text-sm text-gray-400 font-medium">{featureText}</span>
                 </div>
-              ))}
+              )})}
             </div>
 
             <div className="flex gap-4">
@@ -371,11 +375,13 @@ const SubscriptionContent = () => {
              </div>
 
              <div className="space-y-4 mb-10 text-left bg-[#0B0D2C] p-6 rounded-2xl border border-white/5">
-                {displaySub.features.map((perk: string, i: number) => (
+                {(displaySub.features || []).map((perk: any, i: number) => {
+                  const perkText = typeof perk === 'string' ? perk : perk?.name || perk?.title || perk?.description || perk?.more || Object.values(perk)[0] || JSON.stringify(perk);
+                  return (
                   <div key={i} className="flex items-center gap-3 text-xs text-gray-500">
-                    <X size={14} className="text-red-500/50" /> {perk}
+                    <X size={14} className="text-red-500/50" /> {perkText}
                   </div>
-                ))}
+                )})}
              </div>
 
              <div className="grid grid-cols-2 gap-4">
@@ -477,7 +483,7 @@ export default function SubscriptionPage() {
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00D4AA]"></div>
       </div>
     }>
-      <SubscriptionContent />
+      <SubscriptionContent/>
     </React.Suspense>
   );
 }

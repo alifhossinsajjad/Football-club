@@ -62,10 +62,20 @@ const PlayerMessagingPage = () => {
   });
   const [sendReply, { isLoading: isSending }] = useSendReplyMutation();
 
-  const conversations: Conversation[] = useMemo(() => convsData?.conversations || [], [convsData]);
+  const conversations: Conversation[] = useMemo(() => {
+    if (Array.isArray(convsData)) return convsData;
+    if (convsData?.conversations) return convsData.conversations;
+    if ((convsData as any)?.results) return (convsData as any).results;
+    return [];
+  }, [convsData]);
+
   // Real API returns { conversationId, messages: [...] } not { results: [...] }
   const messages: ChatMessage[] = useMemo(() => {
-    const msgs = messagesData?.messages || messagesData?.results || [];
+    let msgs: ChatMessage[] = [];
+    if (Array.isArray(messagesData)) msgs = messagesData;
+    else if (messagesData?.messages) msgs = messagesData.messages;
+    else if ((messagesData as any)?.results) msgs = (messagesData as any).results;
+    
     // Ensure chronological order (oldest to newest)
     return [...msgs].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
