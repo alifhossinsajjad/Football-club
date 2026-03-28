@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Loader2, Settings, Image as ImageIcon, Type, Sparkles, Edit, Trash2, X, Check, Plus } from "lucide-react";
 import { toast } from "react-hot-toast";
