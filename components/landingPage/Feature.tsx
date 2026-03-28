@@ -45,7 +45,7 @@ const players = [
 const Feature = () => {
   const theme = useAppSelector((state) => state.theme);
   return (
-    <section className="py-20 px-4 bg-[#07142b] text-white">
+    <section id="players" className="py-20 px-4 bg-[#07142b] text-white">
       <div className="container mx-auto">
         {/* Header */}
         <div className="text-center mb-12">

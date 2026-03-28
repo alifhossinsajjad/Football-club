@@ -89,7 +89,7 @@ export default function Club() {
   const visibleClubs = clubs.slice(currentIndex, currentIndex + visibleCount);
 
   return (
-    <section className="py-16 bg-[#07142b] text-white">
+    <section id="academies" className="py-16 bg-[#07142b] text-white">
       <div className="container mx-auto px-4">
         {/* Tabs */}
         <div className="flex justify-center mb-6 text-white">
