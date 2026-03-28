@@ -13,9 +13,9 @@ import { UserRole } from "@/types/auth";
 const navLinks = [
   { name: "Home", href: "#" },
   { name: "Membership", href: "#" },
-  { name: "Academies", href: "#" },
-  { name: "Clubs", href: "#" },
-  { name: "Players", href: "/player" },
+  { name: "Academies", href: "/#academies" },
+  { name: "Players", href: "/#players" },
+  { name: "Latest News", href: "#" },
 ];
 
 const Navbar = () => {
@@ -96,13 +96,13 @@ const Navbar = () => {
           <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
             <div className="flex items-center gap-8">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   className="text-[#B0B0B0] hover:text-white transition-colors font-medium text-[15px] whitespace-nowrap"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -203,13 +203,13 @@ const Navbar = () => {
           <div className="lg:hidden p-7 rounded-xl border-t border-white/10 bg-blur backdrop-blur-md">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   className="text-white/80 hover:text-[#00E5FF] text-base font-medium py-2 transition-colors"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
               <div className="flex flex-col gap-3 pt-4">
                 {auth.user ? (
