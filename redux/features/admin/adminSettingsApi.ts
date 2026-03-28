@@ -93,6 +93,35 @@ export const adminSettingsApi = baseApi.injectEndpoints({
     getGeneralSettings: builder.query<GeneralSettings, void>({
       query: () => "/admin-dashboard/settings/general/",
       providesTags: ["Dashboard"],
+      async onCacheEntryAdded(
+        arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+      ) {
+        try {
+          await cacheDataLoaded;
+          // Example: Setting up Server-Sent Events for real-time config updates
+          const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+          if (!apiUrl) return;
+
+          const eventSource = new EventSource(`${apiUrl}/admin-dashboard/settings/general/stream`);
+
+          eventSource.onmessage = (event) => {
+            try {
+              const newConfig = JSON.parse(event.data);
+              updateCachedData((draft) => {
+                Object.assign(draft, newConfig);
+              });
+            } catch (err) {
+              console.error("Failed to parse config update", err);
+            }
+          };
+
+          await cacheEntryRemoved;
+          eventSource.close();
+        } catch {
+          // no-op
+        }
+      },
     }),
     updateGeneralSettings: builder.mutation<UpdateSettingsResponse, GeneralSettings>({
       query: (payload) => ({
