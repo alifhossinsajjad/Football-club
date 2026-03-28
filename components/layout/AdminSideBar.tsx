@@ -20,6 +20,8 @@ import {
   TrendingUp,
   Home,
   FileText,
+  Ticket,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -89,7 +91,11 @@ const ScoutSideBar: React.FC = () => {
     {
       icon: CircleDollarSign,
       label: "Monetization",
-      href: "/admin/monetization",
+      children: [
+        { icon: CircleDollarSign, label: "View Monetization", href: "/admin/monetization" },
+        { icon: Ticket, label: "Promo Codes", href: "/admin/promoManagement" },
+        { icon: Plus, label: "Create Promo Code", href: "/admin/promoManagement/create" },
+      ],
     },
     {
       icon: ChartNoAxesCombined,
