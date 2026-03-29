@@ -1,48 +1,70 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-
   Globe,
   Bell,
   Shield,
   Lock,
   Clock,
   Cog,
+  Check
 } from "lucide-react";
-import { MdSecurity } from "react-icons/md";
+import { toast } from "react-hot-toast";
+import { 
+  useGetNotificationSettingsQuery, 
+  useUpdateNotificationSettingsMutation 
+} from "@/redux/features/notification/notificationApi";
 
 type Tab = "security" | "notifications" | "preferences";
 
 const ScoutSettingsPage = () => {
   const [activeTab, setActiveTab] = useState<Tab>("security");
 
-  // Toggle states – you can later connect to real data / API
+  const { data: notifData, isLoading: loadingNotifData } = useGetNotificationSettingsQuery();
+  const [updateNotif, { isLoading: isUpdatingNotif }] = useUpdateNotificationSettingsMutation();
+
+  const [notif, setNotif] = useState({
+    email_notifications: true,
+    push_notifications: true,
+    realtime_notifications: true,
+    notification_types: {
+      NEW_MESSAGE: { email: true, push: true, realtime: true },
+      EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+    },
+  });
+
   const [toggles, setToggles] = useState({
     profileVisibility: true,
     contactRequests: true,
     showOnlineStatus: false,
     activityHistory: true,
-
-    // Notifications
-    emailNewMatches: true,
-    emailEventUpdates: true,
-    emailPlayerViews: false,
-    emailMessages: true,
-    emailWeeklySummary: true,
-    emailPlatformUpdates: false,
-
-    pushInstantMessages: true,
-    pushEventReminders: true,
-    pushShortlistUpdates: false,
-
-    smsSecurityAlerts: true,
-    smsLoginVerification: true,
-
+    
     // Preferences
     saveSearchHistory: true,
     searchSuggestions: true,
   });
+
+  React.useEffect(() => {
+    if (notifData) {
+      setNotif({
+        email_notifications: notifData.email_notifications ?? true,
+        push_notifications: notifData.push_notifications ?? true,
+        realtime_notifications: notifData.realtime_notifications ?? true,
+        notification_types: notifData.notification_types || {
+          NEW_MESSAGE: { email: true, push: true, realtime: true },
+          EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+        },
+      });
+    }
+  }, [notifData]);
+
+  const handleSaveNotifications = async () => {
+    try {
+      await updateNotif(notif).unwrap();
+      toast.success("Notification settings updated successfully");
+    } catch (error) {
+      toast.error("Failed to update notification settings");
+    }
+  };
 
   const toggle = (key: keyof typeof toggles) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -271,64 +293,30 @@ const ScoutSettingsPage = () => {
         {/* NOTIFICATIONS TAB */}
         {activeTab === "notifications" && (
           <div className="space-y-10">
-            {/* Email Notifications */}
+            {/* Global Settings */}
             <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
+               <div className="p-6 md:p-8 border-b border-slate-800/70">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                   <Bell size={20} className="text-teal-400" />
-                  Email Notifications
+                  Global Channels
                 </h2>
               </div>
               <div className="divide-y divide-slate-800/70">
                 {[
-                  {
-                    label: "New Player Matches",
-                    desc: "Get notified when new players match your search criteria",
-                    key: "emailNewMatches",
-                  },
-                  {
-                    label: "Event Updates",
-                    desc: "Receive updates about upcoming scouting events",
-                    key: "emailEventUpdates",
-                  },
-                  {
-                    label: "Player Profile Views",
-                    desc: "Know when players view your profile",
-                    key: "emailPlayerViews",
-                  },
-                  {
-                    label: "Message Notifications",
-                    desc: "Get notified about new messages",
-                    key: "emailMessages",
-                  },
-                  {
-                    label: "Weekly Summary",
-                    desc: "Receive a weekly summary of your activity",
-                    key: "emailWeeklySummary",
-                  },
-                  {
-                    label: "Platform Updates",
-                    desc: "Stay informed about new features and updates",
-                    key: "emailPlatformUpdates",
-                  },
+                  { label: "Email Notifications", key: "email_notifications", desc: "Global master switch for all emails" },
+                  { label: "Push Notifications", key: "push_notifications", desc: "Receive alerts on your mobile device" },
+                  { label: "Real-time Notifications", key: "realtime_notifications", desc: "Instant in-app notification popups" },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between px-6 md:px-8 py-5"
-                  >
+                  <div key={item.key} className="flex items-center justify-between px-6 md:px-8 py-5">
                     <div>
                       <p className="font-medium">{item.label}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">
-                        {item.desc}
-                      </p>
+                      <p className="text-slate-400 text-sm mt-0.5">{item.desc}</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={toggles[item.key as keyof typeof toggles]}
-                        onChange={() =>
-                          toggle(item.key as keyof typeof toggles)
-                        }
+                        checked={(notif as any)[item.key]}
+                        onChange={() => setNotif(prev => ({ ...prev, [item.key]: !(prev as any)[item.key] }))}
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
@@ -338,97 +326,73 @@ const ScoutSettingsPage = () => {
               </div>
             </div>
 
-            {/* Push Notifications */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold">Push Notifications</h2>
-              </div>
-              <div className="divide-y divide-slate-800/70">
-                {[
-                  {
-                    label: "Instant Messages",
-                    desc: "Real-time notifications for new messages",
-                    key: "pushInstantMessages",
-                  },
-                  {
-                    label: "Event Reminders",
-                    desc: "Reminders before scouting events",
-                    key: "pushEventReminders",
-                  },
-                  {
-                    label: "Shortlist Updates",
-                    desc: "When shortlisted players update their profiles",
-                    key: "pushShortlistUpdates",
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between px-6 md:px-8 py-5"
-                  >
-                    <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">
-                        {item.desc}
-                      </p>
+            {/* Granular Type Control */}
+            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden p-6 md:p-8">
+               <h2 className="text-xl font-semibold mb-6">Notification Types</h2>
+               
+               <div className="space-y-6">
+                  {/* New Messages */}
+                  <div className="bg-[#0B0D2C] border border-slate-800 rounded-lg p-5">
+                    <p className="font-medium mb-4">New Messages</p>
+                    <div className="flex flex-wrap gap-8">
+                       {['email', 'push', 'realtime'].map(type => (
+                         <div key={type} className="flex items-center gap-2">
+                            <input 
+                              type="checkbox" 
+                              checked={(notif.notification_types.NEW_MESSAGE as any)[type]}
+                              onChange={() => setNotif(n => ({
+                                ...n, 
+                                notification_types: {
+                                  ...n.notification_types, 
+                                  NEW_MESSAGE: {
+                                    ...n.notification_types.NEW_MESSAGE, 
+                                    [type]: !(n.notification_types.NEW_MESSAGE as any)[type]
+                                  }
+                                }
+                              }))}
+                              className="w-4 h-4 accent-teal-500"
+                            />
+                            <span className="text-sm text-slate-3100 capitalize">{type}</span>
+                         </div>
+                       ))}
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={toggles[item.key as keyof typeof toggles]}
-                        onChange={() =>
-                          toggle(item.key as keyof typeof toggles)
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                    </label>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {/* SMS Notifications */}
-            <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-800/70">
-                <h2 className="text-xl font-semibold">SMS Notifications</h2>
-              </div>
-              <div className="divide-y divide-slate-800/70">
-                {[
-                  {
-                    label: "Security Alerts",
-                    desc: "Important security notifications",
-                    key: "smsSecurityAlerts",
-                  },
-                  {
-                    label: "Login Verification",
-                    desc: "Two-factor authentication codes",
-                    key: "smsLoginVerification",
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between px-6 md:px-8 py-5"
-                  >
-                    <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">
-                        {item.desc}
-                      </p>
+                  {/* Event Registration */}
+                  <div className="bg-[#0B0D2C] border border-slate-800 rounded-lg p-5">
+                    <p className="font-medium mb-4">Event Management</p>
+                    <div className="flex flex-wrap gap-8">
+                       {['email', 'push', 'realtime'].map(type => (
+                         <div key={type} className="flex items-center gap-2">
+                            <input 
+                              type="checkbox" 
+                              checked={(notif.notification_types.EVENT_REGISTRATION as any)[type]}
+                              onChange={() => setNotif(n => ({
+                                ...n, 
+                                notification_types: {
+                                  ...n.notification_types, 
+                                  EVENT_REGISTRATION: {
+                                    ...n.notification_types.EVENT_REGISTRATION, 
+                                    [type]: !(n.notification_types.EVENT_REGISTRATION as any)[type]
+                                  }
+                                }
+                              }))}
+                              className="w-4 h-4 accent-teal-500"
+                            />
+                            <span className="text-sm text-slate-300 capitalize">{type}</span>
+                         </div>
+                       ))}
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={toggles[item.key as keyof typeof toggles]}
-                        onChange={() =>
-                          toggle(item.key as keyof typeof toggles)
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                    </label>
                   </div>
-                ))}
-              </div>
+               </div>
+
+               <button 
+                onClick={handleSaveNotifications}
+                disabled={isUpdatingNotif}
+                className="w-full mt-8 bg-teal-600 hover:bg-teal-500 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+               >
+                 {isUpdatingNotif ? "Saving..." : "Save Notification Settings"}
+               </button>
             </div>
           </div>
         )}

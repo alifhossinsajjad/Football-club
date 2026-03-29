@@ -16,19 +16,51 @@ import { PiBuildingOfficeLight } from "react-icons/pi";
 import { MdEmail, MdPhone, MdLanguage } from "react-icons/md";
 import { BsGrid3X3 } from "react-icons/bs";
 import { useGetClubQuery } from "@/redux/features/scout/clubDireactoryApi";
-import { useParams } from "next/navigation";
+import { useCreateConversationMutation } from "@/redux/features/chat/chatApi";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { BiLeftArrow } from "react-icons/bi";
 import { LuBadge, LuMessageCircle } from "react-icons/lu";
 import { FiMapPin } from "react-icons/fi";
+import { X, Info, Mail, Loader2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const ClubDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [messageText, setMessageText] = useState("");
+
   if (!id)
     return <p className="text-white text-center py-10">Params id not found!</p>;
 
   const { data: club, isLoading, error } = useGetClubQuery(Number(id));
-  console.log(club);
+  const [createConversation, { isLoading: isSendingMessage }] = useCreateConversationMutation();
+
+  const handleSendMessage = async () => {
+    if (!messageText.trim() || !club) return;
+
+    try {
+      const receiverId = (club as any).user?.id || club.id;
+      if (!receiverId) throw new Error("Invalid club recipient");
+
+      await createConversation({
+        receiver_id: receiverId,
+        message: messageText.trim(),
+      }).unwrap();
+
+      toast.success(`Message sent to ${club.club_name}`);
+      setIsMessageModalOpen(false);
+      setMessageText("");
+
+      // Redirect with role to help virtual conversation logic
+      router.push(`/scout/messaging?userId=${club.id}&role=CLUB_ACADEMY`);
+    } catch (error) {
+      console.error("Message error:", error);
+      toast.error("Failed to send message. Please try again.");
+    }
+  };
 
   const aboutAcademy = {
     overview:
@@ -238,7 +270,10 @@ const achievements = [
 
             {/* Contact Button */}
             <div className="mt-4">
-              <button className="flex items-center gap-2 px-6 py-3 rounded-xl text-white bg-[#04B5A3] hover:bg-[#00E5FF] transition">
+              <button 
+                onClick={() => setIsMessageModalOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl text-white bg-[#04B5A3] hover:bg-[#00E5FF] transition"
+              >
                 <LuMessageCircle size={20} />
                 Contact Club
               </button>
@@ -589,6 +624,7 @@ const achievements = [
                 </p>
 
                 <button
+                  onClick={() => setIsMessageModalOpen(true)}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl 
           text-white bg-gradient-to-r from-[#04B5A3] to-[#00E5FF] 
           hover:opacity-90 transition"
@@ -601,6 +637,87 @@ const achievements = [
           </div>
         </section>
       </div>
+
+      {/* Messaging Modal */}
+      {isMessageModalOpen && club && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="relative w-full max-w-lg bg-[#12143A] border border-[#1E2550] rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-[#1E2550]">
+              <div className="flex items-center gap-4">
+                <div className="relative w-12 h-12 rounded-full border-2 border-[#04B5A3]/30 overflow-hidden bg-white">
+                  <Image
+                    src={"/images/logo.png"}
+                    alt={club.club_name || "Club"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    Message {club.club_name}
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    Club Academy
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsMessageModalOpen(false)}
+                className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+                  Your Message
+                </label>
+                <textarea
+                  autoFocus
+                  className="w-full h-40 p-4 rounded-2xl bg-[#0B0E1E] border border-[#1E2550] text-white focus:outline-none focus:border-[#04B5A3]/50 transition-all resize-none placeholder:text-gray-600"
+                  placeholder={`Hi ${club.club_name}, we are interested in your academy...`}
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-amber-500/80 bg-amber-500/5 rounded-xl p-3 border border-amber-500/10">
+                <Info size={16} className="shrink-0" />
+                <p className="text-[10px] leading-tight">
+                  Your message will be sent directly to the club's inbox.
+                  They will be notified immediately.
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 pt-2 flex gap-3">
+              <button
+                onClick={() => setIsMessageModalOpen(false)}
+                className="flex-1 h-14 rounded-xl border border-[#1E2550] text-gray-400 font-bold hover:bg-white/5 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendMessage}
+                disabled={!messageText.trim() || isSendingMessage}
+                className="flex-[2] h-14 rounded-xl bg-gradient-to-r from-[#04B5A3] to-[#039d8f] text-white font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_8px_20px_-5px_rgba(4,181,163,0.3)] flex items-center justify-center gap-2"
+              >
+                {isSendingMessage ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Mail size={18} />
+                )}
+                {isSendingMessage ? "Sending..." : "Send Message"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

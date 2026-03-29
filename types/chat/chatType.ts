@@ -1,8 +1,10 @@
 export interface ChatUser {
   id: string | number;
   name: string;
-  avatar?: string | null;
+  profile_image?: string | null;
+  avatar?: string | null; // Legacy/Fallback field
   role?: string;
+  email?: string;
 }
 
 export interface LastMessage {

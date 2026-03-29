@@ -1,9 +1,14 @@
 export interface Notification {
   id: number;
-  type: string;
+  notification_type: string;
+  type?: string; // fallback
+  priority?: string;
+  title?: string;
   message: string;
   is_read: boolean;
   created_at: string;
+  sender_name?: string;
+  time_ago?: string;
   data?: any;
 }
 

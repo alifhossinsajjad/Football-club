@@ -7,11 +7,16 @@ import {
   useUpdateGeneralSettingsMutation,
   useGetPrivacySettingsQuery,
   useUpdatePrivacySettingsMutation,
-  useGetNotificationSettingsQuery,
-  useUpdateNotificationSettingsMutation,
+  useGetNotificationSettingsQuery as useGetClubNotificationSettingsQuery,
+  useUpdateNotificationSettingsMutation as useUpdateClubNotificationSettingsMutation,
   useChangePasswordMutation,
   useSignOutAllSessionsMutation,
 } from "@/redux/features/club/clubSettingsApi";
+import { 
+  useGetNotificationSettingsQuery, 
+  useUpdateNotificationSettingsMutation 
+} from "@/redux/features/notification/notificationApi";
+import { NotificationSettings as NotifSettings } from "@/types/notification/notificationType";
 import { toast } from "react-hot-toast";
 
 type Tab = "security" | "notifications" | "preferences";
@@ -27,7 +32,7 @@ const ClubSettingsPage = () => {
   const [updatePrivacy] = useUpdatePrivacySettingsMutation();
 
   const { data: notifData, isLoading: notifLoading } = useGetNotificationSettingsQuery();
-  const [updateNotif] = useUpdateNotificationSettingsMutation();
+  const [updateNotif, { isLoading: isUpdatingNotif }] = useUpdateNotificationSettingsMutation();
 
   const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
   const [signOutAll] = useSignOutAllSessionsMutation();
@@ -41,28 +46,14 @@ const ClubSettingsPage = () => {
     show_statistics: false,
   });
 
-  const [notif, setNotif] = useState<Record<string, any>>({
-    email_new_applications: true,
-    email_event_updates: true,
-    email_scout_inquiries: true,
-    email_messages: true,
-    email_payment_confirmations: true,
-    email_event_reminders: true,
-    email_monthly_reports: false,
-    email_platform_updates: false,
-    email_marketing: false,
-
-    push_instant_messages: true,
-    push_application_alerts: true,
-    push_event_updates: true,
-    push_system_alerts: true,
-
-    sms_security_alerts: true,
-    sms_login_verification: true,
-    sms_event_reminders: false,
-
-    quiet_hours_start: "",
-    quiet_hours_end: "",
+  const [notif, setNotif] = useState<NotifSettings>({
+    email_notifications: true,
+    push_notifications: true,
+    realtime_notifications: true,
+    notification_types: {
+      NEW_MESSAGE: { email: true, push: true, realtime: true },
+      EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+    },
   });
 
   const [general, setGeneral] = useState<Record<string, any>>({
@@ -90,8 +81,16 @@ const ClubSettingsPage = () => {
   }, [privacyData]);
 
   useEffect(() => {
-    if (notifData?.data || notifData) {
-      setNotif((prev) => ({ ...prev, ...(notifData.data || notifData) }));
+    if (notifData) {
+      setNotif({
+        email_notifications: notifData.email_notifications ?? true,
+        push_notifications: notifData.push_notifications ?? true,
+        realtime_notifications: notifData.realtime_notifications ?? true,
+        notification_types: notifData.notification_types || {
+          NEW_MESSAGE: { email: true, push: true, realtime: true },
+          EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+        },
+      });
     }
   }, [notifData]);
 
@@ -114,14 +113,11 @@ const ClubSettingsPage = () => {
     }
   };
 
-  const handleNotifToggle = async (key: string) => {
-    const newVal = !notif[key];
-    setNotif((prev) => ({ ...prev, [key]: newVal }));
+  const handleSaveNotifications = async () => {
     try {
-      await updateNotif({ ...notif, [key]: newVal }).unwrap();
+      await updateNotif(notif).unwrap();
       toast.success("Notification settings updated");
     } catch (err) {
-      setNotif((prev) => ({ ...prev, [key]: !newVal })); // revert
       toast.error("Failed to update notifications");
     }
   };
@@ -370,120 +366,109 @@ const ClubSettingsPage = () => {
         {/* ── Notifications Tab ── */}
         {activeTab === "notifications" && (
           <div className="space-y-6">
-            {/* Email Notifications */}
+            {/* Global Settings */}
             <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
               <div className="p-6 border-b border-[#1A2160]">
                 <h2 className="text-white font-bold flex items-center gap-2">
-                  <Bell size={16} className="text-cyan-400" /> Email Notifications
+                  <Bell size={16} className="text-cyan-400" /> Global Channels
                 </h2>
               </div>
               <div className="divide-y divide-[#1A2160]">
                 {[
-                  { key: "email_new_applications", title: "New Player Applications", desc: "Get notified when players apply to your events" },
-                  { key: "email_event_updates", title: "Event Registration Updates", desc: "Receive updates about event registrations" },
-                  { key: "email_scout_inquiries", title: "Scout Inquiries", desc: "Know when scouts contact you or view your events" },
-                  { key: "email_messages", title: "Message Notifications", desc: "Get notified about new messages" },
-                  { key: "email_payment_confirmations", title: "Payment Confirmations", desc: "Receive payment and transaction confirmations" },
-                  { key: "email_event_reminders", title: "Event Reminders", desc: "Reminders about upcoming events" },
-                  { key: "email_monthly_reports", title: "Monthly Reports", desc: "Receive monthly performance and analytics reports" },
-                  { key: "email_platform_updates", title: "Platform Updates", desc: "Stay informed about new features and updates" },
-                  { key: "email_marketing", title: "Marketing Communications", desc: "Promotional offers and tips" },
+                  { key: "email_notifications", title: "Email Notifications", desc: "Global master switch for all emails" },
+                  { key: "push_notifications", title: "Push Notifications", desc: "Receive alerts on your mobile device" },
+                  { key: "realtime_notifications", title: "Real-time Notifications", desc: "In-app alerts and instant updates" },
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between p-6">
                     <div>
                       <h3 className="text-sm font-semibold text-gray-200">{item.title}</h3>
                       <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
                     </div>
-                    <ToggleSwitch checked={!!notif[item.key]} onChange={() => handleNotifToggle(item.key)} />
+                    <ToggleSwitch 
+                      checked={!!(notif as any)[item.key]} 
+                      onChange={() => setNotif((prev: NotifSettings) => ({ ...prev, [item.key]: !(prev as any)[item.key] }))} 
+                    />
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Push Notifications */}
-            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
-              <div className="p-6 border-b border-[#1A2160]">
-                <h2 className="text-white font-bold flex items-center gap-2">
-                  <Bell size={16} className="text-cyan-400" /> Push Notifications
-                </h2>
-              </div>
-              <div className="divide-y divide-[#1A2160]">
-                {[
-                  { key: "push_instant_messages", title: "Instant Messages", desc: "Real-time notifications for new messages" },
-                  { key: "push_application_alerts", title: "Application Alerts", desc: "Immediate alerts for new applications" },
-                  { key: "push_event_updates", title: "Event Updates", desc: "Updates about your events" },
-                  { key: "push_system_alerts", title: "System Alerts", desc: "Important system and security notifications" },
-                ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-6">
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-200">{item.title}</h3>
-                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
-                    </div>
-                    <ToggleSwitch checked={!!notif[item.key]} onChange={() => handleNotifToggle(item.key)} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* SMS Notifications */}
-            <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl overflow-hidden">
-              <div className="p-6 border-b border-[#1A2160]">
-                <h2 className="text-white font-bold flex items-center gap-2">
-                  <Bell size={16} className="text-cyan-400" /> SMS Notifications
-                </h2>
-              </div>
-              <div className="divide-y divide-[#1A2160]">
-                {[
-                  { key: "sms_security_alerts", title: "Security Alerts", desc: "Critical security notifications" },
-                  { key: "sms_login_verification", title: "Login Verification", desc: "Two-factor authentication codes" },
-                  { key: "sms_event_reminders", title: "Event Reminders", desc: "SMS reminders for your events" },
-                ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-6">
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-200">{item.title}</h3>
-                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
-                    </div>
-                    <ToggleSwitch checked={!!notif[item.key]} onChange={() => handleNotifToggle(item.key)} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quiet Hours */}
+            {/* Notification Types */}
             <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl p-6">
-              <h2 className="text-white font-bold flex items-center gap-2 mb-2">
-                <Clock size={16} className="text-cyan-400" /> Quiet Hours
-              </h2>
-              <p className="text-[11px] text-[#5B6397] mb-6">Set times when you don't want to receive non-urgent notifications</p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Start Time</label>
-                  <input
-                    type="time"
-                    value={notif.quiet_hours_start}
-                    onChange={(e) => {
-                      setNotif({ ...notif, quiet_hours_start: e.target.value });
-                    }}
-                    onBlur={() => handleNotifToggle("quiet_hours_start")} // fake trigger to save
-                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">End Time</label>
-                  <input
-                    type="time"
-                    value={notif.quiet_hours_end}
-                    onChange={(e) => {
-                      setNotif({ ...notif, quiet_hours_end: e.target.value });
-                    }}
-                    onBlur={() => handleNotifToggle("quiet_hours_end")} // fake trigger to save
-                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-              </div>
-            </div>
+               <h2 className="text-white font-bold mb-6">Notification Types</h2>
+               
+               <div className="space-y-4">
+                  {/* New Messages */}
+                  <div className="bg-[#12143A] border border-[#1A2160] rounded-xl p-5">
+                    <p className="text-sm font-bold mb-4">New Messages</p>
+                    <div className="grid grid-cols-3 gap-4">
+                       {['email', 'push', 'realtime'].map(type => (
+                         <div key={type} className="flex flex-col items-center gap-2">
+                            <span className="text-[9px] text-[#5B6397] font-bold uppercase">{type}</span>
+                            <div 
+                              className={`w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer border transition-all ${
+                                (notif.notification_types.NEW_MESSAGE as any)[type] 
+                                ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400" 
+                                : "bg-[#070B24] border-[#1A2160] text-[#5B6397]"
+                              }`}
+                              onClick={() => setNotif((n: NotifSettings) => ({
+                                ...n, 
+                                notification_types: {
+                                  ...n.notification_types, 
+                                  NEW_MESSAGE: {
+                                    ...n.notification_types.NEW_MESSAGE, 
+                                    [type]: !(n.notification_types.NEW_MESSAGE as any)[type]
+                                  }
+                                }
+                              }))}
+                            >
+                              <Check size={16} className={ (notif.notification_types.NEW_MESSAGE as any)[type] ? "opacity-100" : "opacity-0" } />
+                            </div>
+                         </div>
+                       ))}
+                    </div>
+                  </div>
 
+                  {/* Event Registration */}
+                  <div className="bg-[#12143A] border border-[#1A2160] rounded-xl p-5">
+                    <p className="text-sm font-bold mb-4">Event Management</p>
+                    <div className="grid grid-cols-3 gap-4">
+                       {['email', 'push', 'realtime'].map(type => (
+                         <div key={type} className="flex flex-col items-center gap-2">
+                            <span className="text-[9px] text-[#5B6397] font-bold uppercase">{type}</span>
+                            <div 
+                              className={`w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer border transition-all ${
+                                (notif.notification_types.EVENT_REGISTRATION as any)[type] 
+                                ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400" 
+                                : "bg-[#070B24] border-[#1A2160] text-[#5B6397]"
+                              }`}
+                              onClick={() => setNotif((n: NotifSettings) => ({
+                                ...n, 
+                                notification_types: {
+                                  ...n.notification_types, 
+                                  EVENT_REGISTRATION: {
+                                    ...n.notification_types.EVENT_REGISTRATION, 
+                                    [type]: !(n.notification_types.EVENT_REGISTRATION as any)[type]
+                                  }
+                                }
+                              }))}
+                            >
+                              <Check size={16} className={ (notif.notification_types.EVENT_REGISTRATION as any)[type] ? "opacity-100" : "opacity-0" } />
+                            </div>
+                         </div>
+                       ))}
+                    </div>
+                  </div>
+               </div>
+
+               <button
+                  onClick={handleSaveNotifications}
+                  disabled={isUpdatingNotif}
+                  className="w-full mt-8 py-3 bg-[#00D9FF] text-[#070B24] rounded-xl font-extrabold text-sm hover:bg-cyan-300 transition-colors"
+                >
+                  {isUpdatingNotif ? "Saving..." : "Save Notification Settings"}
+                </button>
+            </div>
           </div>
         )}
 

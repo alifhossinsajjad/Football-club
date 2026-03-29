@@ -115,7 +115,7 @@ export default function ScoutProfilePage({
       setIsMessageModalOpen(false);
       setMessageText("");
 
-      router.push(`/scout/messaging?userId=${receiverId}`);
+      router.push(`/scout/messaging?userId=${receiverId}&role=SCOUT_AGENT`);
     } catch (error) {
       console.error("Message error:", error);
       toast.error("Failed to send message. Please try again.");
