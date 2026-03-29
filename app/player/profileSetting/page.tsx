@@ -197,13 +197,14 @@ export default function SettingsPage() {
 
   // ── Your original form states ───────────────────────────────────────────────
 
-  const [notif, setNotif] = useState<Omit<NotificationSettings, "id">>({
-    email_new_messages: true,
-    email_event_reminders: true,
-    email_profile_views: true,
-    email_news_updates: true,
-    push_enabled: true,
-    push_sound: true,
+  const [notif, setNotif] = useState({
+    email_notifications: true,
+    push_notifications: true,
+    realtime_notifications: true,
+    notification_types: {
+      NEW_MESSAGE: { email: true, push: true, realtime: true },
+      EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+    },
   });
 
   const [privacy, setPrivacy] = useState<Omit<PrivacySettings, "id">>({
@@ -240,14 +241,17 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!data) return;
     const n = data.notification_settings;
-    setNotif({
-      email_new_messages: n.email_new_messages,
-      email_event_reminders: n.email_event_reminders,
-      email_profile_views: n.email_profile_views,
-      email_news_updates: n.email_news_updates,
-      push_enabled: n.push_enabled,
-      push_sound: n.push_sound,
-    });
+    if (n) {
+      setNotif({
+        email_notifications: n.email_notifications ?? true,
+        push_notifications: n.push_notifications ?? true,
+        realtime_notifications: n.realtime_notifications ?? true,
+        notification_types: n.notification_types || {
+          NEW_MESSAGE: { email: true, push: true, realtime: true },
+          EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+        },
+      });
+    }
     const p = data.privacy_settings;
     setPrivacy({
       visible_to_clubs: p.visible_to_clubs,
@@ -562,62 +566,47 @@ export default function SettingsPage() {
           {activeTab === "Notifications" && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div>
-                <SectionHeader>Email Notifications</SectionHeader>
+                <SectionHeader>Global Channels</SectionHeader>
                 <Row
-                  title="New message notifications"
-                  description="Get notified when you receive new messages"
+                  title="Email Notifications"
+                  description="Enable or disable all email alerts"
                   control={
                     <Toggle
-                      checked={notif.email_new_messages}
+                      checked={notif.email_notifications}
                       onChange={() =>
                         setNotif((n) => ({
                           ...n,
-                          email_new_messages: !n.email_new_messages,
+                          email_notifications: !n.email_notifications,
                         }))
                       }
                     />
                   }
                 />
                 <Row
-                  title="Event reminders"
-                  description="Receive reminders for upcoming events"
+                  title="Push Notifications"
+                  description="Receive notifications on your device"
                   control={
                     <Toggle
-                      checked={notif.email_event_reminders}
+                      checked={notif.push_notifications}
                       onChange={() =>
                         setNotif((n) => ({
                           ...n,
-                          email_event_reminders: !n.email_event_reminders,
+                          push_notifications: !n.push_notifications,
                         }))
                       }
                     />
                   }
                 />
                 <Row
-                  title="Profile views"
-                  description="Know when clubs or scouts view your profile"
+                  title="Real-time Notifications"
+                  description="In-app alerts and instant updates"
                   control={
                     <Toggle
-                      checked={notif.email_profile_views}
+                      checked={notif.realtime_notifications}
                       onChange={() =>
                         setNotif((n) => ({
                           ...n,
-                          email_profile_views: !n.email_profile_views,
-                        }))
-                      }
-                    />
-                  }
-                />
-                <Row
-                  title="News & updates"
-                  description="Receive platform news and training content"
-                  control={
-                    <Toggle
-                      checked={notif.email_news_updates}
-                      onChange={() =>
-                        setNotif((n) => ({
-                          ...n,
-                          email_news_updates: !n.email_news_updates,
+                          realtime_notifications: !n.realtime_notifications,
                         }))
                       }
                     />
@@ -626,34 +615,63 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <SectionHeader>Push Notifications</SectionHeader>
-                <Row
-                  title="Enable push notifications"
-                  description="Receive real-time notifications"
-                  control={
-                    <Toggle
-                      checked={notif.push_enabled}
-                      onChange={() =>
-                        setNotif((n) => ({
-                          ...n,
-                          push_enabled: !n.push_enabled,
-                        }))
-                      }
-                    />
-                  }
-                />
-                <Row
-                  title="Sound for notifications"
-                  description="Play sound when notifications arrive"
-                  control={
-                    <Toggle
-                      checked={notif.push_sound}
-                      onChange={() =>
-                        setNotif((n) => ({ ...n, push_sound: !n.push_sound }))
-                      }
-                    />
-                  }
-                />
+                <SectionHeader>Notification Types</SectionHeader>
+                
+                {/* New Messages */}
+                <div className="bg-[#0F122B] rounded-xl border border-white/5 p-5 mb-4">
+                  <p className="text-white text-sm font-semibold mb-3">New Messages</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col items-center gap-2">
+                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Email</span>
+                       <SquareCheckbox 
+                         checked={notif.notification_types.NEW_MESSAGE.email} 
+                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, NEW_MESSAGE: {...n.notification_types.NEW_MESSAGE, email: !n.notification_types.NEW_MESSAGE.email}}}))}
+                       />
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Push</span>
+                       <SquareCheckbox 
+                         checked={notif.notification_types.NEW_MESSAGE.push} 
+                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, NEW_MESSAGE: {...n.notification_types.NEW_MESSAGE, push: !n.notification_types.NEW_MESSAGE.push}}}))}
+                       />
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Realtime</span>
+                       <SquareCheckbox 
+                         checked={notif.notification_types.NEW_MESSAGE.realtime} 
+                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, NEW_MESSAGE: {...n.notification_types.NEW_MESSAGE, realtime: !n.notification_types.NEW_MESSAGE.realtime}}}))}
+                       />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Event Registration */}
+                <div className="bg-[#0F122B] rounded-xl border border-white/5 p-5">
+                  <p className="text-white text-sm font-semibold mb-3">Event Management</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col items-center gap-2">
+                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Email</span>
+                       <SquareCheckbox 
+                         checked={notif.notification_types.EVENT_REGISTRATION.email} 
+                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, EVENT_REGISTRATION: {...n.notification_types.EVENT_REGISTRATION, email: !n.notification_types.EVENT_REGISTRATION.email}}}))}
+                       />
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Push</span>
+                       <SquareCheckbox 
+                         checked={notif.notification_types.EVENT_REGISTRATION.push} 
+                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, EVENT_REGISTRATION: {...n.notification_types.EVENT_REGISTRATION, push: !n.notification_types.EVENT_REGISTRATION.push}}}))}
+                       />
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Realtime</span>
+                       <SquareCheckbox 
+                         checked={notif.notification_types.EVENT_REGISTRATION.realtime} 
+                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, EVENT_REGISTRATION: {...n.notification_types.EVENT_REGISTRATION, realtime: !n.notification_types.EVENT_REGISTRATION.realtime}}}))}
+                       />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <SaveBtn

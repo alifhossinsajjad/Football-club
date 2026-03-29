@@ -30,6 +30,8 @@ import Logo from "../reuseable/Logo";
 import { BsCalendar4Event } from "react-icons/bs";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
+import { Conversation } from "@/types/chat/chatType";
 
 export type MenuItem = {
   label: string;
@@ -77,6 +79,15 @@ const PlayerSideBar: React.FC = () => {
     { icon: CreditCard, label: "Subscriptions", href: "/player/subscription" },
     { icon: Settings, label: "Profile Settings", href: "/player/profileSetting" },
   ];
+
+  const { data: convsData } = useGetConversationsQuery(undefined, {
+    pollingInterval: 10000, // Poll every 10 seconds for sidebar badge
+  });
+
+  const totalUnreadMessages = useMemo(() => {
+    const convs: Conversation[] = (convsData as any)?.conversations || (convsData as any)?.results || (Array.isArray(convsData) ? convsData : []);
+    return convs.reduce((acc, conv) => acc + (conv.unread_count || 0), 0);
+  }, [convsData]);
 
   // ✅ stable key for groups even without href
   const groupKey = (item: MenuItem, index: number) =>
@@ -197,7 +208,12 @@ const PlayerSideBar: React.FC = () => {
                     }`}
                   >
                     <Icon size={20} />
-                    <span>{item.label}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.label === "Messaging" && totalUnreadMessages > 0 && (
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-lg animate-pulse">
+                        {totalUnreadMessages > 99 ? "99+" : totalUnreadMessages}
+                      </span>
+                    )}
                   </Link>
                 );
               }

@@ -10,10 +10,12 @@ import { GoTrophy } from "react-icons/go";
 import { PiBuildingOfficeLight } from "react-icons/pi";
 import { useGetAllClubsQuery } from "@/redux/features/scout/clubDireactoryApi";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const countries = ["USA", "UK", "Germany", "France", "Spain"]; // Example countries, replace as needed
 
 const ClubDirectoryPage = () => {
+  const router = useRouter();
   const { data, isLoading, error } = useGetAllClubsQuery();
 
   // Filters & search state
@@ -154,9 +156,18 @@ const ClubDirectoryPage = () => {
               >
                 View Details
               </Link>
-              <div className="border border-[#04B5A3]/70 flex justify-center items-center p-2 rounded-lg">
+               <button 
+                onClick={() => {
+                  const query = new URLSearchParams();
+                  query.set("userId", String(club.id)); // For clubs, the messaging page uses this to fetch detail and resolve user.id
+                  query.set("role", "CLUB_ACADEMY");
+                  router.push(`/scout/messaging?${query.toString()}`);
+                }}
+                className="border border-[#04B5A3]/70 flex justify-center items-center p-2 rounded-lg hover:bg-[#04B5A3]/10 transition-colors"
+                title={`Message ${club.club_name}`}
+              >
                 <FaMessage className="text-[#04B5A3]" />
-              </div>
+              </button>
             </div>
           </div>
         ))}

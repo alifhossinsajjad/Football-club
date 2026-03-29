@@ -2,16 +2,19 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, Bell } from "lucide-react";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import gsap from "gsap";
 import Link from "next/link";
 import { logout } from "@/redux/features/auth/authSlice";
 import { UserRole } from "@/types/auth";
+import { useNotifications } from "@/components/providers/NotificationProvider";
+import NotificationDropdown from "./NotificationDropdown";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { name: "Home", href: "#" },
+  { name: "Home", href: "/" },
   { name: "Membership", href: "#" },
   { name: "Academies", href: "/#academies" },
   { name: "Players", href: "/#players" },
@@ -21,23 +24,23 @@ const navLinks = [
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notifMenuOpen, setNotifMenuOpen] = useState(false);
+  
   const auth = useAppSelector((state) => state.auth);
+  const { unreadCount } = useNotifications();
   const dispatch = useAppDispatch();
+  
   const navRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const notifMenuRef = useRef<HTMLDivElement>(null);
 
   const getDashboardHref = (role?: UserRole) => {
     switch (role) {
-      case "ADMIN":
-        return "/admin";
-      case "PLAYER":
-        return "/player";
-      case "SCOUT_AGENT":
-        return "/scout";
-      case "CLUB_ACADEMY":
-        return "/club";
-      default:
-        return "/";
+      case "ADMIN": return "/admin";
+      case "PLAYER": return "/player";
+      case "SCOUT_AGENT": return "/scout";
+      case "CLUB_ACADEMY": return "/club";
+      default: return "/";
     }
   };
 
@@ -50,26 +53,27 @@ const Navbar = () => {
         ease: "power3.out",
       });
     });
-
-    return () => ctx.revert(); // Cleanup for React 18 strict mode
+    return () => ctx.revert();
   }, []);
 
   useEffect(() => {
-    if (!userMenuOpen || !auth.user) return;
-
     const onMouseDown = (e: MouseEvent) => {
       const target = e.target as Node | null;
-      if (
-        target &&
-        userMenuRef.current &&
-        !userMenuRef.current.contains(target)
-      ) {
+      if (!target) return;
+      
+      if (userMenuOpen && userMenuRef.current && !userMenuRef.current.contains(target)) {
         setUserMenuOpen(false);
+      }
+      if (notifMenuOpen && notifMenuRef.current && !notifMenuRef.current.contains(target)) {
+        setNotifMenuOpen(false);
       }
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setUserMenuOpen(false);
+      if (e.key === "Escape") {
+        setUserMenuOpen(false);
+        setNotifMenuOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", onMouseDown);
@@ -78,14 +82,14 @@ const Navbar = () => {
       document.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [userMenuOpen, auth.user]);
+  }, [userMenuOpen, notifMenuOpen]);
 
   return (
     <nav ref={navRef} className="fixed top-8 left-0 right-0 w-full z-50 ">
-      <div className="container mx-auto px-4 lg:px-6 relative  bg-white/10 backdrop-blur-md rounded-xl">
+      <div className="container mx-auto px-4 lg:px-6 relative bg-white/10 backdrop-blur-md rounded-xl border border-white/5 shadow-lg">
         <div className="flex items-center justify-between h-20 lg:h-24">
           {/* Logo - Left */}
-          <div className="flex items-center">
+          <Link href="/" className="flex items-center">
             <Image
               src="/images/logo.png"
               alt="NextGen Pros Logo"
@@ -94,7 +98,7 @@ const Navbar = () => {
               className="w-[120px] lg:w-[150px] h-auto opacity-90 hover:opacity-100 transition-opacity"
               priority
             />
-          </div>
+          </Link>
 
           {/* Desktop Nav Links - Center */}
           <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
@@ -112,67 +116,100 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Right Section */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
             {auth.user ? (
-              <div ref={userMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => setUserMenuOpen((v) => !v)}
-                  aria-haspopup="menu"
-                  aria-expanded={userMenuOpen}
-                  className="flex items-center gap-3 pr-4 p-1 rounded-full bg-[#050B14]/40 hover:bg-[#050B14]/60 backdrop-blur-md border border-white/10 transition-all group"
-                >
-                  {auth.user.profile_image ? (
-                    <img
-                      src={auth.user.profile_image}
-                      alt="Profile"
-                      className="w-9 h-9 rounded-full object-cover border border-[#00E5FF]/30"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
-                      {auth.user.first_name?.[0]}
-                      {auth.user.last_name?.[0]}
-                    </div>
-                  )}
-                  <div className="flex flex-col items-start mr-1 text-left">
-                    <span className="text-sm font-bold text-white leading-tight">
-                      {auth.user.first_name} {auth.user.last_name}
-                    </span>
-                    <span className="text-[9px] text-[#00E5FF] font-black uppercase tracking-widest leading-tight">
-                      {auth.user.role?.replace("_", " ")}
-                    </span>
-                  </div>
-                  <ChevronDown
-                    className={`w-4 h-4 text-gray-400 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-                <div
-                  role="menu"
-                  className={`absolute right-0 mt-2 w-40 rounded-xl bg-[#050B14] border border-white/10 shadow-lg transition origin-top-right ${
-                    userMenuOpen
-                      ? "opacity-100 scale-100 pointer-events-auto"
-                      : "opacity-0 scale-95 pointer-events-none"
-                  }`}
-                >
-                  <Link
-                    href={getDashboardHref(auth.user?.role)}
-                    onClick={() => setUserMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-gray-200 hover:bg-white/5"
+              <>
+                {/* Notification Bell */}
+                <div ref={notifMenuRef} className="relative">
+                  <button
+                    onClick={() => {
+                      setNotifMenuOpen(!notifMenuOpen);
+                      setUserMenuOpen(false);
+                    }}
+                    className={cn(
+                      "p-2.5 rounded-xl border transition-all relative group",
+                      notifMenuOpen 
+                        ? "bg-teal-400 text-teal-950 border-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.3)]" 
+                        : "bg-[#050B14]/40 border-white/10 text-white hover:bg-[#050B14]/60"
+                    )}
                   >
-                    Dashboard
-                  </Link>
+                    <Bell size={20} className={cn(unreadCount > 0 && "animate-none")} />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-5 w-5 bg-fuchsia-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#050B14] shadow-sm">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  
+                  {notifMenuOpen && (
+                    <NotificationDropdown onClose={() => setNotifMenuOpen(false)} />
+                  )}
+                </div>
+
+                {/* User Menu */}
+                <div ref={userMenuRef} className="relative">
                   <button
                     type="button"
                     onClick={() => {
-                      setUserMenuOpen(false);
-                      dispatch(logout());
+                      setUserMenuOpen((v) => !v);
+                      setNotifMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5"
+                    aria-haspopup="menu"
+                    aria-expanded={userMenuOpen}
+                    className="flex items-center gap-3 pr-4 p-1 rounded-full bg-[#050B14]/40 hover:bg-[#050B14]/60 backdrop-blur-md border border-white/10 transition-all group"
                   >
-                    Logout
+                    {auth.user.profile_image ? (
+                      <img
+                        src={auth.user.profile_image}
+                        alt="Profile"
+                        className="w-9 h-9 rounded-full object-cover border border-[#00E5FF]/30"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
+                        {auth.user.first_name?.[0]}
+                        {auth.user.last_name?.[0]}
+                      </div>
+                    )}
+                    <div className="flex flex-col items-start mr-1 text-left">
+                      <span className="text-sm font-bold text-white leading-tight">
+                        {auth.user.first_name} {auth.user.last_name}
+                      </span>
+                      <span className="text-[9px] text-[#00E5FF] font-black uppercase tracking-widest leading-tight">
+                        {auth.user.role?.replace("_", " ")}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-gray-400 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
+                  <div
+                    role="menu"
+                    className={`absolute right-0 mt-3 w-44 rounded-xl bg-[#161C39]/95 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition origin-top-right z-[60] overflow-hidden ${
+                      userMenuOpen
+                        ? "opacity-100 scale-100 pointer-events-auto"
+                        : "opacity-0 scale-95 pointer-events-none"
+                    }`}
+                  >
+                    <Link
+                      href={getDashboardHref(auth.user?.role)}
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-3 text-sm text-gray-200 hover:bg-white/5 transition-colors border-b border-white/5"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        dispatch(logout());
+                      }}
+                      className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </>
             ) : (
               <>
                 <Link href="/login">
@@ -187,11 +224,6 @@ const Navbar = () => {
                 </Link>
               </>
             )}
-            {/* <button className="flex items-center gap-1 px-3 py-2 rounded-md bg-[#00E5FF]/90 hover:bg-[#00cce6] transition-colors">
-              <Globe className="w-4 h-4 text-black" />
-              <span className="text-black font-medium text-sm">EN</span>
-              <ChevronDown className="w-4 h-4 text-black" />
-            </button> */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -275,11 +307,6 @@ const Navbar = () => {
                     </Link>
                   </>
                 )}
-                {/* <button className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-md bg-[#00E5FF]/90 hover:bg-[#00cce6] transition-colors">
-                  <Globe className="w-4 h-4 text-black" />
-                  <span className="text-black font-medium">English</span>
-                  <ChevronDown className="w-4 h-4 text-black" />
-                </button> */}
               </div>
             </div>
           </div>

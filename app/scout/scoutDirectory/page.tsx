@@ -84,7 +84,10 @@ export default function ScoutDirectoryPage() {
     if (!messageText.trim() || !selectedScoutForMessage) return;
 
     // Use user.id or id as receiver ID. It's usually the user_id for chat
-    const receiverId = selectedScoutForMessage?.originalData?.user?.id || selectedScoutForMessage.id;
+    const receiverId =
+      selectedScoutForMessage?.originalData?.user?.id ||
+      (selectedScoutForMessage as any)?.user?.id ||
+      selectedScoutForMessage.id;
     if (!receiverId) {
       toast.error("Cannot message this scout: missing ID");
       return;
@@ -101,7 +104,7 @@ export default function ScoutDirectoryPage() {
       setMessageText("");
 
       // Link to scout messaging with userId
-      router.push(`/scout/messaging?userId=${receiverId}`);
+      router.push(`/scout/messaging?userId=${receiverId}&role=SCOUT_AGENT`);
     } catch (error) {
       console.error("Message error:", error);
       toast.error("Failed to send message. Please try again.");

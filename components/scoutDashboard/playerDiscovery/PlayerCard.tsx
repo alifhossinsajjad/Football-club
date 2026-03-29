@@ -55,13 +55,21 @@ export const PlayerCard = ({ player, onViewProfile }: PlayerCardProps) => {
   };
 
   const handleMessageClick = () => {
-    // Prioritize user.id for chat, fallback to player.id (which might trigger shadow user creation)
-    const userId = player.user?.id || player.id;
-    if (!userId) {
-      toast.error("Cannot message this player: missing user ID");
+    // If we have user.id, use it. If not, pass player.id and the messaging page will resolve the correct user.id from the detail fetch.
+    const userId = player.user?.id;
+    const playerId = player.id;
+
+    if (!userId && !playerId) {
+      toast.error("Cannot identify this player for messaging.");
       return;
     }
-    router.push(`/scout/messaging?playerId=${player.id}&userId=${userId}`);
+
+    const query = new URLSearchParams();
+    if (playerId) query.set("playerId", String(playerId));
+    if (userId) query.set("userId", String(userId));
+    query.set("role", "PLAYER");
+
+    router.push(`/scout/messaging?${query.toString()}`);
   };
 
   if (!player) return <h1>No player found!</h1>;
