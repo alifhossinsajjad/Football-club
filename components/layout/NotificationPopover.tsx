@@ -6,7 +6,7 @@ import {
   useMarkAsReadMutation,
   useGetNotificationsQuery
 } from "@/redux/features/notification/notificationApi";
-import { Bell, BellDot, Loader2, MessageSquare, Calendar, ShieldAlert, Trash2 } from "lucide-react";
+import { Bell, BellDot, Loader2, MessageSquare, Calendar, ShieldAlert, Trash2, LogIn, CreditCard, Rocket } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -42,9 +42,12 @@ const NotificationPopover = () => {
   };
 
   const getIcon = (type: string) => {
-    switch (type) {
+    switch (type?.toUpperCase()) {
       case "NEW_MESSAGE": return <MessageSquare className="h-4 w-4 text-blue-400" />;
       case "EVENT_REGISTRATION": return <Calendar className="h-4 w-4 text-green-400" />;
+      case "USER_LOGIN": return <LogIn className="h-4 w-4 text-indigo-400" />;
+      case "SUBSCRIPTION_PURCHASE": return <CreditCard className="h-4 w-4 text-yellow-400" />;
+      case "PROFILE_BOOST": return <Rocket className="h-4 w-4 text-purple-400" />;
       default: return <ShieldAlert className="h-4 w-4 text-orange-400" />;
     }
   };

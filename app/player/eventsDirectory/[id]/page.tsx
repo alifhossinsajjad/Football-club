@@ -21,7 +21,7 @@ import {
   useCheckoutMutation, 
   useVerifyPaymentMutation,
   useGetRegistrationStatusQuery,
-  useApplyPromoCodeMutation
+  useValidatePromoMutation
 } from "../../../../redux/features/player/eventsDirectoryApi";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -316,7 +316,7 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
   const [createRegistration] = useCreateRegistrationMutation();
   const [checkout] = useCheckoutMutation();
   const [verifyPayment] = useVerifyPaymentMutation();
-  const [applyPromoCode, { isLoading: isApplyingPromo }] = useApplyPromoCodeMutation();
+  const [validatePromo, { isLoading: isApplyingPromo }] = useValidatePromoMutation();
 
   const [promoCode, setPromoCode] = useState("");
   const [promoAmount, setPromoAmount] = useState<number>(0);
@@ -329,9 +329,9 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
     if (!promoCode.trim()) return;
     setPromoError("");
     try {
-      const res = await applyPromoCode({ code: promoCode, event_id: event.id }).unwrap();
-      if (res.discount_amount) {
-        setPromoAmount(Number(res.discount_amount));
+      const res = await validatePromo({ code: promoCode, amount: parseFloat(event.registration_fee || "0"), usage_type: "EVENT" }).unwrap();
+      if (res.data?.discount_amount) {
+        setPromoAmount(Number(res.data.discount_amount));
         setIsPromoApplied(true);
         toast.success("Promo code applied successfully!");
       }
@@ -346,6 +346,8 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
     if (step === 1) {
       setStep(2);
     } else if (step === 2) {
+      setStep(3);
+    } else if (step === 3) {
       setRegistrationError(null);
       try {
         const payload = {
@@ -360,6 +362,7 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
           relationship: data.relationship,
           medical_conditions: data.medical || "None",
           allergies: data.allergies || "None",
+          ...(isPromoApplied && promoCode ? { promo_code: promoCode } : {})
         };
         const res = await createRegistration(payload).unwrap();
         const regId = res?.data?.registration_id || res?.registration_id;
@@ -372,7 +375,7 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
             localStorage.setItem("playerRegistrations", JSON.stringify(existing));
           } catch {}
         }
-        setStep(3);
+        setStep(4);
       } catch (err: any) {
         const errMsg = err?.data?.message || err?.data?.error || "Registration failed. Please try again.";
         // Handle "Already registered" specifically
@@ -383,8 +386,6 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
           toast.error(errMsg);
         }
       }
-    } else if (step === 3) {
-      setStep(4);
     } else if (step === 4) {
       try {
         const baseUrl = window.location.origin;

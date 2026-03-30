@@ -124,7 +124,7 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-white/5 text-center bg-[#0E1129]/30">
+      {/* <div className="p-3 border-t border-white/5 text-center bg-[#0E1129]/30">
         <Link 
           href="/notifications" 
           onClick={onClose}
@@ -132,7 +132,7 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
         >
           View All Logs
         </Link>
-      </div>
+      </div> */}
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {

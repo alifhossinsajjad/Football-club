@@ -22,6 +22,7 @@ import {
   useGetBoostPackagesQuery,
   useRequestBoostMutation,
   useProcessPaymentMutation,
+  useValidatePromoMutation,
 } from "@/redux/features/player/profileBoostingApi";
 import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 
@@ -61,6 +62,14 @@ export default function BoostProfileModal({
     handleSubmit,
     formState: { errors },
   } = useForm();
+  
+  // Promo State
+  const [promoCode, setPromoCode] = useState("");
+  const [promoAmount, setPromoAmount] = useState<number>(0);
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
+
+  const [validatePromo, { isLoading: isApplyingPromo }] = useValidatePromoMutation();
 
   // Reset modal when opened
   useEffect(() => {
@@ -70,12 +79,33 @@ export default function BoostProfileModal({
       setStartDate("");
       setEndDate("");
       setBoostRequestId(null);
+      setPromoCode("");
+      setPromoAmount(0);
+      setIsPromoApplied(false);
+      setPromoError("");
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   // Handlers
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim() || !selectedPackage) return;
+    setPromoError("");
+    try {
+      const res = await validatePromo({ code: promoCode, amount: parseFloat(String(selectedPackage.finalPrice || "0")), usage_type: "BOOSTING" }).unwrap();
+      if (res.data?.discount_amount) {
+        setPromoAmount(Number(res.data.discount_amount));
+        setIsPromoApplied(true);
+        toast.success("Promo code applied successfully!");
+      }
+    } catch (error: any) {
+      setPromoError(error?.data?.message || "Invalid promo code");
+      setPromoAmount(0);
+      setIsPromoApplied(false);
+    }
+  };
+
   const handleProceedToPayment = async () => {
     if (!selectedPackageId || !startDate || !endDate) {
       toast.error("Please select a package and valid date range.");
@@ -104,6 +134,7 @@ export default function BoostProfileModal({
       const response = await processPayment({
         boostRequestId: boostRequestId,
         stripe_payment_method_id: "pm_card_visa",
+        ...(isPromoApplied && promoCode ? { promo_code: promoCode } : {})
       }).unwrap();
 
       toast.success("Payment successful! Your profile is now boosted.");
@@ -477,9 +508,32 @@ export default function BoostProfileModal({
                     <div className="flex justify-between items-center pt-2">
                       <span className="text-[#8B97B5]">Total Price</span>
                       <span className="font-black text-2xl text-[#00E5FF]">
-                        €{selectedPackage?.finalPrice || "0"}
+                        €{Math.max(0, parseFloat(String(selectedPackage?.finalPrice || "0")) - promoAmount).toFixed(2)}
                       </span>
                     </div>
+                  </div>
+
+                  <div className="mb-6 space-y-2 text-left">
+                    <label className="text-xs text-[#8B97B5] font-bold uppercase tracking-widest pl-1">Promo Code</label>
+                    <div className="flex gap-2">
+                      <input 
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                        disabled={isPromoApplied || !selectedPackageId}
+                        placeholder={!selectedPackageId ? "Select a package first" : "Enter code"}
+                        className={`flex-1 bg-[#080B1A] border ${promoError ? 'border-red-500' : 'border-[#1E2550]'} rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#00E5FF] transition-all text-sm`}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyPromo}
+                        disabled={!selectedPackageId || isPromoApplied || isApplyingPromo || !promoCode}
+                        className="px-4 py-2 bg-[#00E5FF]/20 text-[#00E5FF] hover:bg-[#00E5FF]/30 font-bold text-xs uppercase rounded-xl disabled:opacity-50 transition-all"
+                      >
+                        {isApplyingPromo ? "..." : isPromoApplied ? "Applied" : "Apply"}
+                      </button>
+                    </div>
+                    {promoError && <p className="text-red-500 text-xs pl-1">{promoError}</p>}
+                    {isPromoApplied && <p className="text-[#00E564] text-xs pl-1">Discount applied: -€{promoAmount.toFixed(2)}</p>}
                   </div>
 
                   <div className="bg-[#080B1A] rounded-xl p-4 text-left border border-[#1E2550]">
@@ -557,7 +611,7 @@ export default function BoostProfileModal({
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-[#8B97B5]">
-                      <span>Discount</span>
+                      <span>Discount (Package)</span>
                       <span className="text-[#00E564]">
                         -€
                         {(
@@ -565,12 +619,18 @@ export default function BoostProfileModal({
                         )?.toFixed(2) || 0}
                       </span>
                     </div>
+                    {isPromoApplied && (
+                      <div className="flex justify-between items-center text-[#00E5FF] font-bold mt-1">
+                        <span>Promo ({promoCode})</span>
+                        <span>-€{promoAmount.toFixed(2)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-between items-center bg-[#080B1A] p-4 rounded-xl border border-[#1E2550]">
                     <span className="font-bold text-white">Total Amount</span>
                     <span className="font-black text-2xl text-[#00E5FF]">
-                      €{selectedPackage?.finalPrice}
+                      €{Math.max(0, parseFloat(String(selectedPackage?.finalPrice || "0")) - promoAmount).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -587,7 +647,7 @@ export default function BoostProfileModal({
                     ) : (
                       <>
                         <Lock size={18} /> Complete Payment - €
-                        {selectedPackage?.finalPrice}
+                        {Math.max(0, parseFloat(String(selectedPackage?.finalPrice || "0")) - promoAmount).toFixed(2)}
                       </>
                     )}
                   </button>

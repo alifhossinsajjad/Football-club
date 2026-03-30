@@ -18,7 +18,7 @@ const navLinks = [
   { name: "Membership", href: "#" },
   { name: "Academies", href: "/#academies" },
   { name: "Players", href: "/#players" },
-  { name: "Latest News", href: "#" },
+  { name: "Latest News", href: "/latest-news" },
 ];
 
 const Navbar = () => {

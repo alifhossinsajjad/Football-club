@@ -22,7 +22,8 @@ import {
   useCancelSubscriptionMutation, 
   useUpdatePaymentMethodMutation,
   useGetPlansQuery,
-  useCreateCheckoutMutation
+  useCreateCheckoutMutation,
+  useValidatePromoMutation
 } from "../../../redux/features/player/subscriptionApi";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -72,6 +73,14 @@ const SubscriptionContent = () => {
   const [cancelReason, setCancelReason] = useState("");
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
+  // Subscribe Modal State
+  const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoAmount, setPromoAmount] = useState<number>(0);
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
+
   const router = useRouter();
 
   const { data: subscription, isLoading: isSubLoading, refetch: refetchSub } = useGetSubscriptionQuery();
@@ -80,6 +89,7 @@ const SubscriptionContent = () => {
   const [createCheckout, { isLoading: isCreatingCheckout }] = useCreateCheckoutMutation();
   const [cancelSubscription, { isLoading: isCancelling }] = useCancelSubscriptionMutation();
   const [updatePaymentMethod, { isLoading: isUpdating }] = useUpdatePaymentMethodMutation();
+  const [validatePromo, { isLoading: isApplyingPromo }] = useValidatePromoMutation();
 
   const activeSub: ActiveSubscription | null = subscription?.data || null;
   const plans: Plan[] = plansData?.data || [];
@@ -87,29 +97,54 @@ const SubscriptionContent = () => {
 
   const displaySub = activeSub;
 
-  const handleSubscribe = async (plan: Plan) => {
+  const handleSubscribeClick = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setPromoCode("");
+    setPromoAmount(0);
+    setIsPromoApplied(false);
+    setPromoError("");
+    setIsSubscribeModalOpen(true);
+  };
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoError("");
+    try {
+      const res = await validatePromo({ code: promoCode, amount: parseFloat(String(selectedPlan?.price || "0")), usage_type: "SUBSCRIPTION" }).unwrap();
+      if (res.data?.discount_amount) {
+        setPromoAmount(Number(res.data.discount_amount));
+        setIsPromoApplied(true);
+        toast.success("Promo code applied successfully!");
+      }
+    } catch (err: any) {
+      setPromoError(err?.data?.message || err?.data?.error || "Invalid promo code");
+      setPromoAmount(0);
+      setIsPromoApplied(false);
+    }
+  };
+
+  const handleConfirmSubscribe = async () => {
+    if (!selectedPlan) return;
     try {
       const baseUrl = window.location.origin;
       
-      // Aggressively match known plan types from whatever string the backend provided
-      const rawName = String(plan.plan_type || plan.plan_name || plan.planName || "BASIC").toUpperCase();
+      const rawName = String(selectedPlan.plan_type || selectedPlan.plan_name || selectedPlan.planName || "BASIC").toUpperCase();
       let pType = "BASIC";
       if (rawName.includes("PRO") || rawName.includes("PREMIUM")) pType = "PRO";
       else if (rawName.includes("ELITE")) pType = "ELITE";
       else if (rawName.includes("BASIC") || rawName.includes("STARTER")) pType = "BASIC";
       else pType = "BASIC"; 
       
-      const rawCycle = String(plan.billing_cycle || plan.billingInterval || "ANNUAL").toUpperCase();
+      const rawCycle = String(selectedPlan.billing_cycle || selectedPlan.billingInterval || "ANNUAL").toUpperCase();
       const bCycle = rawCycle.includes("MONTH") ? "MONTHLY" : "ANNUAL";
       
-      const payload: { plan_type: string; billing_cycle: string; success_url?: string; cancel_url?: string } = {
+      const payload: { plan_type: string; billing_cycle: string; success_url?: string; cancel_url?: string; promo_code?: string } = {
         plan_type: pType, 
         billing_cycle: bCycle,
         success_url: `${baseUrl}/player/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/player/subscription/cancel`
+        cancel_url: `${baseUrl}/player/subscription/cancel`,
+        ...(isPromoApplied && promoCode ? { promo_code: promoCode } : {})
       };
-      
-      console.log("Sending checkout payload:", payload);
       
       const res = await createCheckout(payload).unwrap();
       
@@ -117,9 +152,7 @@ const SubscriptionContent = () => {
         window.location.href = res.checkout_url;
       }
     } catch (err: any) {
-      console.error("Checkout error:", err);
-      const errMsg = err?.data?.plan_type?.[0] || err?.data?.message || "Failed to initiate checkout";
-      toast.error(errMsg);
+      toast.error(err?.data?.plan_type?.[0] || err?.data?.message || "Failed to initiate checkout");
     }
   };
 
@@ -199,11 +232,11 @@ const SubscriptionContent = () => {
               </div>
 
               <button 
-                onClick={() => handleSubscribe(plan)}
+                onClick={() => handleSubscribeClick(plan)}
                 disabled={isCreatingCheckout}
                 className="w-full py-4 rounded-2xl bg-[#0B0D2C] border border-white/10 text-white font-black uppercase tracking-widest text-xs group-hover/card:bg-gradient-to-r group-hover/card:from-cyan-400 group-hover/card:to-purple-500 group-hover/card:border-transparent transition-all active:scale-95"
               >
-                {isCreatingCheckout ? "Initializing..." : "Get Started"}
+                Get Started
               </button>
             </div>
           ))}
@@ -350,6 +383,82 @@ const SubscriptionContent = () => {
       </div>
 
       {/* --- Modals --- */}
+      
+      {/* Subscribe Modal */}
+      {isSubscribeModalOpen && selectedPlan && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="relative w-full max-w-md bg-[#12143A] border border-white/10 rounded-[40px] p-8 shadow-2xl animate-in zoom-in duration-300 overflow-hidden">
+             
+             <div className="flex justify-between items-center mb-6">
+               <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Review & Subscribe</h3>
+               <button onClick={() => setIsSubscribeModalOpen(false)} className="text-gray-500 hover:text-white transition-colors">
+                 <X size={24} />
+               </button>
+             </div>
+
+             <div className="bg-[#0B0D2C]/50 p-6 rounded-3xl border border-white/5 space-y-4 mb-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-400/10 blur-[50px] rounded-full pointer-events-none" />
+                
+                <h4 className="text-xl font-bold text-white uppercase">{selectedPlan.plan_name || selectedPlan.planName || selectedPlan.plan_type}</h4>
+                
+                <div className="space-y-3 pt-2">
+                   <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500 font-bold uppercase tracking-widest">Plan Cost</span>
+                      <span className={`text-white font-bold ${isPromoApplied ? 'line-through text-gray-500' : ''}`}>€{selectedPlan.price} /{(selectedPlan.billing_cycle || selectedPlan.billingInterval || "").toLowerCase()}</span>
+                   </div>
+                   {isPromoApplied && (
+                     <div className="flex justify-between items-center text-sm">
+                        <span className="text-[#00D4AA] font-bold uppercase tracking-widest">Discount ({promoCode})</span>
+                        <span className="text-[#00D4AA] font-bold">-€{promoAmount.toFixed(2)}</span>
+                     </div>
+                   )}
+                   <div className="flex justify-between items-center text-sm border-t border-white/5 pt-3">
+                      <span className="text-white font-black uppercase tracking-widest">Total</span>
+                      <span className="text-2xl text-cyan-400 font-black">€{Math.max(0, parseFloat(String(selectedPlan.price || "0")) - promoAmount).toFixed(2)}</span>
+                   </div>
+                </div>
+             </div>
+
+             <div className="space-y-3 mb-8">
+                <label className="text-xs text-gray-500 font-bold ml-1 uppercase tracking-widest">Promo Code</label>
+                <div className="flex gap-3">
+                  <input 
+                    value={promoCode} 
+                    onChange={(e) => setPromoCode(e.target.value)} 
+                    disabled={isPromoApplied}
+                    className={`flex-1 bg-[#0B0D2C] border ${promoError ? 'border-red-500' : 'border-white/5'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400 transition-all text-sm`} 
+                    placeholder="Enter code" 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleApplyPromo} 
+                    disabled={isPromoApplied || isApplyingPromo || !promoCode}
+                    className="px-6 py-3 bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-400 font-black text-xs uppercase tracking-widest rounded-xl transition-all disabled:opacity-50"
+                  >
+                    {isApplyingPromo ? "..." : isPromoApplied ? "Applied" : "Apply"}
+                  </button>
+                </div>
+                {promoError && <p className="text-red-500 text-xs ml-1 font-medium">{promoError}</p>}
+             </div>
+
+             <div className="grid grid-cols-2 gap-4">
+                <button 
+                  onClick={() => setIsSubscribeModalOpen(false)}
+                  className="py-4 rounded-xl bg-white/5 text-gray-400 font-black hover:bg-white/10 hover:text-white transition-all border border-white/5 active:scale-95 text-xs uppercase tracking-widest"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmSubscribe}
+                  disabled={isCreatingCheckout}
+                  className="py-4 rounded-xl bg-gradient-to-r from-cyan-400 to-purple-500 text-white font-black hover:opacity-90 transition-all shadow-lg text-xs uppercase tracking-widest active:scale-95 flex justify-center items-center gap-2"
+                >
+                  {isCreatingCheckout ? "Redirecting..." : "Checkout"}
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
 
 
       {/* Cancel Modal */}

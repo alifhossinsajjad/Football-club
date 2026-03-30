@@ -15,7 +15,7 @@ export const profileBoostingApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Profile"],
     }),
-    processPayment: builder.mutation<any, { boostRequestId: string; stripe_payment_method_id: string }>({
+    processPayment: builder.mutation<any, { boostRequestId: string; stripe_payment_method_id: string; promo_code?: string }>({
       query: (data) => ({
         url: "/players/profile-boost/payment/",
         method: "POST",
@@ -27,6 +27,13 @@ export const profileBoostingApi = baseApi.injectEndpoints({
       query: (boostRequestId) => `/players/profile-boost/${boostRequestId}/`,
       providesTags: ["Profile"],
     }),
+    validatePromo: builder.mutation<any, { code: string; amount: number; usage_type: string }>({
+      query: (data) => ({
+        url: "/players/promo/validate/",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -35,4 +42,5 @@ export const {
   useRequestBoostMutation,
   useProcessPaymentMutation,
   useGetBoostStatusQuery,
+  useValidatePromoMutation,
 } = profileBoostingApi;

@@ -8,6 +8,8 @@ import {
   useGetDashboardStatsQuery, 
   useGetShortlistedPlayersQuery 
 } from "@/redux/features/scout/scoutProfileApi";
+import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
+import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 
 /* ─── Fake Data ─────────────────────────────────────────────── */
@@ -65,37 +67,6 @@ const upcomingEvents = [
   },
 ];
 
-const recentViews = [
-  { name: "Player 1", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/11.jpg" },
-  { name: "Player 2", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/22.jpg" },
-  { name: "Player 3", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/33.jpg" },
-  { name: "Player 4", position: "Midfielder", nationality: "Spain", time: "2h ago", avatar: "https://randomuser.me/api/portraits/men/44.jpg" },
-];
-
-const recentMessages = [
-  {
-    name: "John Doe",
-    preview: "Thank you for reaching out...",
-    time: "2h ago",
-    unread: true,
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    name: "FC Barcelona Youth",
-    preview: "We have updated the event...",
-    time: "5h ago",
-    unread: true,
-    avatar: "https://ui-avatars.com/api/?name=FCB&background=a50044&color=fff&size=48&bold=true",
-  },
-  {
-    name: "Sarah Player",
-    preview: "I appreciate your interest...",
-    time: "1d ago",
-    unread: false,
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-];
-
 /* ─── Stat Card ─────────────────────────────────────────────── */
 interface StatCardProps {
   icon: React.ReactNode;
@@ -120,9 +91,19 @@ const ScoutDashboard: React.FC = () => {
   const { data: profile, isLoading: isProfileLoading } = useGetProfileQuery();
   const { data: stats, isLoading: isStatsLoading } = useGetDashboardStatsQuery();
   const { data: shortlistData, isLoading: isShortlistLoading } = useGetShortlistedPlayersQuery();
+  const { data: chatData } = useGetConversationsQuery();
 
   const scoutName = profile?.first_name || "Member";
   const shortlistedPlayers = shortlistData?.results || [];
+  
+  const conversations = chatData?.conversations || [];
+  const dynamicRecentMessages = conversations.slice(0, 3).map((conv) => ({
+    name: conv.other_participant?.name || conv.name || "Unknown",
+    preview: conv.last_message?.content || conv.last_message_text || "Started a conversation",
+    time: conv.updated_at ? formatDistanceToNow(new Date(conv.updated_at), { addSuffix: true }) : "recently",
+    unread: conv.unread_count > 0,
+    avatar: conv.other_participant?.profile_image || conv.other_participant?.avatar || conv.avatar || `https://ui-avatars.com/api/?name=${conv.other_participant?.name || "U"}`,
+  }));
 
   return (
     <div className="min-h-screen bg-[#0B0D2C] text-white font-sans pb-12">
@@ -335,26 +316,32 @@ const ScoutDashboard: React.FC = () => {
           <h2 className="text-base font-bold text-white mb-4">Recent Messages</h2>
 
           <div className="space-y-3">
-            {recentMessages.map((msg, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-3"
-              >
-                <img
-                  src={msg.avatar}
-                  alt={msg.name}
-                  className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">{msg.name}</p>
-                  <p className="text-xs text-white/45 truncate">{msg.preview}</p>
-                  <p className="text-xs text-white/30 mt-0.5">{msg.time}</p>
+            {dynamicRecentMessages.length > 0 ? (
+              dynamicRecentMessages.map((msg, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-3"
+                >
+                  <img
+                    src={msg.avatar}
+                    alt={msg.name}
+                    className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white">{msg.name}</p>
+                    <p className="text-xs text-white/45 truncate">{msg.preview}</p>
+                    <p className="text-xs text-white/30 mt-0.5">{msg.time}</p>
+                  </div>
+                  {msg.unread && (
+                    <span className="w-2 h-2 bg-[#9C27B0] rounded-full mt-1.5 flex-shrink-0" />
+                  )}
                 </div>
-                {msg.unread && (
-                  <span className="w-2 h-2 bg-[#9C27B0] rounded-full mt-1.5 flex-shrink-0" />
-                )}
+              ))
+            ) : (
+              <div className="p-4 text-center border border-white/[0.05] border-dashed rounded-xl">
+                <p className="text-xs text-white/40">No recent messages</p>
               </div>
-            ))}
+            )}
           </div>
 
           <div className="mt-4 text-center">

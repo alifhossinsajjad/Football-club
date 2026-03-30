@@ -1,3 +1,5 @@
+"use client";
+
 // src/components/ClubDashboard.tsx
 import React from "react";
 import {
@@ -7,10 +9,29 @@ import {
   Mail,
   Star,
   MoreVertical,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
+import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
+import { useGetClubEventsQuery } from "@/redux/features/club/clubEventManagementApi";
+import { formatDistanceToNow, format } from "date-fns";
 
 const ClubDashboard: React.FC = () => {
+  const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
+  const { data: eventsResponse, isLoading: isEventsLoading } = useGetClubEventsQuery(undefined);
+
+  const eventsData = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse?.results || eventsResponse?.data || []);
+  const activeEvents = eventsData.slice(0, 4);
+
+  const conversations = chatData?.conversations || [];
+  const dynamicRecentMessages = conversations.slice(0, 3).map((conv) => ({
+    id: conv.id,
+    sender: conv.other_participant?.name || conv.name || "Unknown",
+    message: conv.last_message?.content || conv.last_message_text || "Started a conversation",
+    time: conv.updated_at ? formatDistanceToNow(new Date(conv.updated_at), { addSuffix: true }) : "recently",
+    unread: conv.unread_count > 0,
+  }));
+
   return (
     <div className="min-h-screen  text-white p-6 md:p-2">
       <div className="mx-auto space-y-8">
@@ -30,18 +51,11 @@ const ClubDashboard: React.FC = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 ">
-          {/* <StatCard
-            icon={<Eye size={26} />}
-            label="Profile Views"
-            value="1,842"
-            change="+158 this week"
-            changeColor="text-emerald-400"
-          /> */}
           <StatCard
             icon={<CalendarDays size={26} />}
             label="Events"
-            value="8"
-            change="3 upcoming"
+            value={eventsData.length.toString()}
+            change="Active"
             changeColor="text-cyan-400"
           />
           <StatCard
@@ -72,31 +86,36 @@ const ClubDashboard: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-5 ">
-            <EventCard
-              title="Youth Trial - Summer 2025"
-              date="15/08/2025"
-              location="Barcelona, Spain"
-              registrations={45}
-              max={100}
-              isFeatured={true}
-            />
-
-            <EventCard
-              title="Academy Showcase"
-              date="20/02/2026"
-              location="Barcelona, Spain"
-              registrations={87}
-              max={80}
-              isHighlighted={true}
-            />
-
-            <EventCard
-              title="Talent Scouting Day"
-              date="25/09/2025"
-              location="Madrid, Spain"
-              registrations={23}
-              max={50}
-            />
+            {isEventsLoading ? (
+               <div className="col-span-full flex justify-center py-8">
+                 <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+               </div>
+            ) : activeEvents.length > 0 ? (
+              activeEvents.map((event: any, idx: number) => {
+                const dateStr = event.date || event.event_date;
+                let parsedDate = "TBD";
+                if (dateStr) {
+                  const d = new Date(dateStr);
+                  parsedDate = !isNaN(d.getTime()) ? format(d, "dd/MM/yyyy") : dateStr;
+                }
+                return (
+                  <EventCard
+                    key={event.id || idx}
+                    title={event.title || event.event_name || "Club Event"}
+                    date={parsedDate}
+                    location={event.location || event.city || "TBD"}
+                    registrations={event.registrations_count || event.registered_count || event.current_registrations || 0}
+                    max={event.max_participants || event.capacity || 100}
+                    isFeatured={event.is_featured}
+                    isHighlighted={event.is_highlighted}
+                  />
+                );
+              })
+            ) : (
+               <div className="col-span-full py-12 text-center text-slate-400 border border-slate-700/50 rounded-xl border-dashed">
+                 <p>No active events found. Create one to get started!</p>
+               </div>
+            )}
           </div>
         </section>
 
@@ -105,22 +124,25 @@ const ClubDashboard: React.FC = () => {
           <h2 className="text-2xl font-semibold">Recent Messages</h2>
 
           <div className="space-y-3">
-            <MessageItem
-              sender="FC Barcelona Youth"
-              message="We are interested in your profile..."
-              time="2h ago"
-              unread
-            />
-            <MessageItem
-              sender="Mike Scout"
-              message="Great highlight reel! Would love to..."
-              time="3h ago"
-            />
-            <MessageItem
-              sender="Real Madrid Academy"
-              message="Thank you for your interest..."
-              time="1d ago"
-            />
+            {isChatLoading ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
+              </div>
+            ) : dynamicRecentMessages.length > 0 ? (
+              dynamicRecentMessages.map((msg) => (
+                <MessageItem
+                  key={msg.id}
+                  sender={msg.sender}
+                  message={msg.message}
+                  time={msg.time}
+                  unread={msg.unread}
+                />
+              ))
+            ) : (
+              <div className="text-center text-slate-400 py-4 border border-slate-700/50 rounded-xl border-dashed">
+                <p className="text-sm">No recent messages</p>
+              </div>
+            )}
           </div>
 
           <Link href="/club/messaging">
