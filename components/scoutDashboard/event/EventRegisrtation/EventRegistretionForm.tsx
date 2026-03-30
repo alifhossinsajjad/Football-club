@@ -10,7 +10,7 @@ import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepReview from "./StepReview";
 import Stepper from "./Stepper";
-import { useRegisterForEventMutation, useApplyPromoCodeMutation } from "@/redux/features/scout/eventsApi";
+import { useRegisterForEventMutation, useValidatePromoMutation } from "@/redux/features/scout/eventsApi";
 
 type FormValues = {
   first_name: string;
@@ -65,15 +65,15 @@ export default function EventRegistrationForm({
   const [promoAmount, setPromoAmount] = useState<number>(0);
   const [isPromoApplied, setIsPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
-  const [applyPromoCode, { isLoading: isApplyingPromo }] = useApplyPromoCodeMutation();
+  const [validatePromo, { isLoading: isApplyingPromo }] = useValidatePromoMutation();
 
   const handleApplyPromo = async () => {
     if (!promoCode.trim()) return;
     setPromoError("");
     try {
-      const res = await applyPromoCode({ code: promoCode, event_id: event.id }).unwrap();
-      if (res.discount_amount) {
-        setPromoAmount(Number(res.discount_amount));
+      const res = await validatePromo({ code: promoCode, amount: parseFloat(event.registration_fee === "Free" ? "0" : (event.registration_fee || "0").replace(/[^0-9.]/g, '')), usage_type: "EVENT" }).unwrap();
+      if (res.data?.discount_amount) {
+        setPromoAmount(Number(res.data.discount_amount));
         setIsPromoApplied(true);
         methods.setValue("promo_code", promoCode);
         toast.success("Promo code applied successfully!");

@@ -1,18 +1,20 @@
 "use client";
 
 import {
-  RecentMessage,
   UpcomingEvent,
   useGetDashboardStatsQuery,
   useGetUpcomingEventsQuery,
 } from "@/redux/features/player/playerDashboard/playerDashboardApi";
 import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
+import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
+import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa";
 import { FiMessageSquare } from "react-icons/fi";
 import { IoEyeOutline } from "react-icons/io5";
 import { SlCalender } from "react-icons/sl";
 import { formatRegistrationDate } from "@/lib/utils/dateFormatter";
+import { Loader2 } from "lucide-react";
 
 // ─── Fallback / Mock Data ─────────────────────────────────────────────────────
 
@@ -32,32 +34,6 @@ const FALLBACK_EVENTS: UpcomingEvent[] = [
     date: "20/09/2025",
     time: "2:00 PM",
     club_logo: "/logos/barcelona.png",
-  },
-];
-
-const FALLBACK_MESSAGES: RecentMessage[] = [
-  {
-    id: 1,
-    sender_name: "FC Barcelona Youth",
-    preview: "We are interested in your profile...",
-    time_ago: "2h ago",
-    is_unread: true,
-    sender_logo: "/logos/barcelona.png",
-  },
-  {
-    id: 2,
-    sender_name: "Mike Scout",
-    preview: "Great highlight reel! Would love to...",
-    time_ago: "5h ago",
-    is_unread: true,
-  },
-  {
-    id: 3,
-    sender_name: "Real Madrid Academy",
-    preview: "Thank you for your interest...",
-    time_ago: "1d ago",
-    is_unread: false,
-    sender_logo: "/logos/real-madrid.png",
   },
 ];
 
@@ -119,13 +95,20 @@ export default function PlayerDashboard() {
   const { data: profile } = useGetMyProfileQuery();
   const { data: upcomingEventsData, isLoading: isEventsLoading } =
     useGetUpcomingEventsQuery();
+  const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
 
   const completeness = profile?.profile_completeness ?? 0;
   const upcomingEvents = upcomingEventsData ?? [];
 
-  const recentMessages = stats?.recent_messages?.length
-    ? stats.recent_messages
-    : FALLBACK_MESSAGES;
+  const conversations = chatData?.conversations || [];
+  const recentMessages = conversations.slice(0, 3).map((conv) => ({
+    id: conv.id,
+    sender_name: conv.other_participant?.name || conv.name || "Unknown",
+    preview: conv.last_message?.content || conv.last_message_text || "Started a conversation",
+    time_ago: conv.updated_at ? formatDistanceToNow(new Date(conv.updated_at), { addSuffix: true }) : "recently",
+    is_unread: conv.unread_count > 0,
+    sender_logo: conv.other_participant?.profile_image || conv.other_participant?.avatar || conv.avatar,
+  }));
 
   const profileViews =
     profile?.insights?.profile_views ?? stats?.profile_views ?? 0;
@@ -313,7 +296,7 @@ export default function PlayerDashboard() {
                 className="px-6 py-4 flex items-center gap-4 hover:bg-[#0A0F2C] transition-colors cursor-pointer"
               >
                 <div className="relative">
-                  <Avatar name={msg.sender_name} logo={msg.sender_logo} />
+                  <Avatar name={msg.sender_name} logo={msg.sender_logo || undefined} />
                   {msg.is_unread && (
                     <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#00E5FF] rounded-full border-2 border-[#11163C]" />
                   )}

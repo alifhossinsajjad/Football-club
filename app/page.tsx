@@ -21,7 +21,6 @@ export default function Home() {
         <UpcomingEvent />
         <AddSection />
       </main>
-
       <Footer />
     </>
   );

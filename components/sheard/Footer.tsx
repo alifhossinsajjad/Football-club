@@ -10,8 +10,13 @@ import {
   InstagramIcon,
 } from "lucide-react";
 import Logo from "../reuseable/Logo";
+import { useAppSelector } from "@/redux/hooks";
 
 const Footer = () => {
+  const auth = useAppSelector((state) => state.auth);
+  const isAuthenticated = auth?.isAuthenticated;
+  const role = auth?.user?.role;
+
   return (
     <footer className="bg-[#07142b] text-gray-300 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6">
@@ -56,25 +61,65 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Resources / Dashboard Links */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Resources Links</h3>
+            <h3 className="text-white font-semibold mb-4">
+              {isAuthenticated ? "Dashboard Links" : "Resources Links"}
+            </h3>
             <ul className="space-y-3 text-sm">
-              <li>
-                <Link href="#" className="hover:text-cyan-400 transition">
-                  Player Directory
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-cyan-400 transition">
-                  Agents & Scouts Directory
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-cyan-400 transition">
-                  Events
-                </Link>
-              </li>
+              {!isAuthenticated && (
+                <>
+                  <li>
+                    <Link href="#" className="hover:text-cyan-400 transition">
+                      Player Directory
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#" className="hover:text-cyan-400 transition">
+                      Agents & Scouts Directory
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#" className="hover:text-cyan-400 transition">
+                      Events
+                    </Link>
+                  </li>
+                </>
+              )}
+
+              {role === "PLAYER" && (
+                <>
+                  <li><Link href="/player" className="hover:text-cyan-400 transition">Player Dashboard</Link></li>
+                  <li><Link href="/player/profileAndEdit" className="hover:text-cyan-400 transition">My Profile</Link></li>
+                  <li><Link href="/player/eventsDirectory" className="hover:text-cyan-400 transition">Discover Events</Link></li>
+                  <li><Link href="/player/messaging" className="hover:text-cyan-400 transition">Messages</Link></li>
+                </>
+              )}
+
+              {role === "SCOUT_AGENT" && (
+                <>
+                  <li><Link href="/scout" className="hover:text-cyan-400 transition">Scout Dashboard</Link></li>
+                  <li><Link href="/scout/playerDiscovery" className="hover:text-cyan-400 transition">Player Discovery</Link></li>
+                  <li><Link href="/scout/events" className="hover:text-cyan-400 transition">Upcoming Events</Link></li>
+                  <li><Link href="/scout/messaging" className="hover:text-cyan-400 transition">Messages</Link></li>
+                </>
+              )}
+
+              {role === "CLUB_ACADEMY" && (
+                <>
+                  <li><Link href="/club" className="hover:text-cyan-400 transition">Club Dashboard</Link></li>
+                  <li><Link href="/club/eventManagement" className="hover:text-cyan-400 transition">Manage Events</Link></li>
+                  <li><Link href="/club/messaging" className="hover:text-cyan-400 transition">Messages</Link></li>
+                </>
+              )}
+
+              {role === "ADMIN" && (
+                <>
+                  <li><Link href="/admin" className="hover:text-cyan-400 transition">Admin Dashboard</Link></li>
+                  <li><Link href="/admin/users" className="hover:text-cyan-400 transition">Manage Users</Link></li>
+                  <li><Link href="/admin/events" className="hover:text-cyan-400 transition">Manage Events</Link></li>
+                </>
+              )}
             </ul>
           </div>
 

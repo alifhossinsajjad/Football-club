@@ -44,6 +44,13 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    validatePromo: builder.mutation<any, { code: string; amount: number; usage_type: string }>({
+      query: (data) => ({
+        url: "/players/promo/validate/",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -56,4 +63,5 @@ export const {
   useGetRegistrationStatusQuery,
   useGetMyRegistrationsQuery,
   useApplyPromoCodeMutation,
+  useValidatePromoMutation,
 } = eventsDirectoryApi;
