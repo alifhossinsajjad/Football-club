@@ -11,9 +11,9 @@ import {
   Check
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { 
-  useGetNotificationSettingsQuery, 
-  useUpdateNotificationSettingsMutation 
+import {
+  useGetNotificationSettingsQuery,
+  useUpdateNotificationSettingsMutation,
 } from "@/redux/features/notification/notificationApi";
 import { NotificationSettings } from "@/types/notification/notificationType";
 
@@ -22,8 +22,10 @@ type Tab = "security" | "notifications" | "preferences";
 const ScoutSettingsPage = () => {
   const [activeTab, setActiveTab] = useState<Tab>("security");
 
-  const { data: notifData, isLoading: loadingNotifData } = useGetNotificationSettingsQuery();
-  const [updateNotif, { isLoading: isUpdatingNotif }] = useUpdateNotificationSettingsMutation();
+  const { data: notifData, isLoading: loadingNotifData } =
+    useGetNotificationSettingsQuery();
+  const [updateNotif, { isLoading: isUpdatingNotif }] =
+    useUpdateNotificationSettingsMutation();
 
 const [notif, setNotif] = React.useState<NotificationSettings>({
   email_notifications: true,
@@ -40,7 +42,7 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
     contactRequests: true,
     showOnlineStatus: false,
     activityHistory: true,
-    
+
     // Preferences
     saveSearchHistory: true,
     searchSuggestions: true,
@@ -92,8 +94,10 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
-          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div
+          className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
+          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           <div className="flex gap-8 text-sm font-medium">
             <button
               onClick={() => setActiveTab("security")}
@@ -284,8 +288,10 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
                   </div>
                 ))}
 
-                <button className="w-full mt-4 py-3 
-                 text-red-600 rounded-lg transition-colors border border-red-600">
+                <button
+                  className="w-full mt-4 py-3 
+                 text-red-600 rounded-lg transition-colors border border-red-600"
+                >
                   Sign Out All Other Sessions
                 </button>
               </div>
@@ -298,7 +304,7 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
           <div className="space-y-10">
             {/* Global Settings */}
             <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden">
-               <div className="p-6 md:p-8 border-b border-slate-800/70">
+              <div className="p-6 md:p-8 border-b border-slate-800/70">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                   <Bell size={20} className="text-teal-400" />
                   Global Channels
@@ -306,20 +312,42 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
               </div>
               <div className="divide-y divide-slate-800/70">
                 {[
-                  { label: "Email Notifications", key: "email_notifications", desc: "Global master switch for all emails" },
-                  { label: "Push Notifications", key: "push_notifications", desc: "Receive alerts on your mobile device" },
-                  { label: "Real-time Notifications", key: "realtime_notifications", desc: "Instant in-app notification popups" },
+                  {
+                    label: "Email Notifications",
+                    key: "email_notifications",
+                    desc: "Global master switch for all emails",
+                  },
+                  {
+                    label: "Push Notifications",
+                    key: "push_notifications",
+                    desc: "Receive alerts on your mobile device",
+                  },
+                  {
+                    label: "Real-time Notifications",
+                    key: "realtime_notifications",
+                    desc: "Instant in-app notification popups",
+                  },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between px-6 md:px-8 py-5">
+                  <div
+                    key={item.key}
+                    className="flex items-center justify-between px-6 md:px-8 py-5"
+                  >
                     <div>
                       <p className="font-medium">{item.label}</p>
-                      <p className="text-slate-400 text-sm mt-0.5">{item.desc}</p>
+                      <p className="text-slate-400 text-sm mt-0.5">
+                        {item.desc}
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         checked={(notif as any)[item.key]}
-                        onChange={() => setNotif(prev => ({ ...prev, [item.key]: !(prev as any)[item.key] }))}
+                        onChange={() =>
+                          setNotif((prev) => ({
+                            ...prev,
+                            [item.key]: !(prev as any)[item.key],
+                          }))
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
@@ -331,71 +359,90 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
 
             {/* Granular Type Control */}
             <div className="bg-[#12143A] border border-slate-800/70 rounded-xl overflow-hidden p-6 md:p-8">
-               <h2 className="text-xl font-semibold mb-6">Notification Types</h2>
-               
-               <div className="space-y-6">
-                  {/* New Messages */}
-                  <div className="bg-[#0B0D2C] border border-slate-800 rounded-lg p-5">
-                    <p className="font-medium mb-4">New Messages</p>
-                    <div className="flex flex-wrap gap-8">
-                       {['email', 'push', 'realtime'].map(type => (
-                         <div key={type} className="flex items-center gap-2">
-                            <input 
-                              type="checkbox" 
-                              checked={(notif.notification_types.NEW_MESSAGE as any)[type]}
-                              onChange={() => setNotif(n => ({
-                                ...n, 
-                                notification_types: {
-                                  ...n.notification_types, 
-                                  NEW_MESSAGE: {
-                                    ...n.notification_types.NEW_MESSAGE, 
-                                    [type]: !(n.notification_types.NEW_MESSAGE as any)[type]
-                                  }
-                                }
-                              }))}
-                              className="w-4 h-4 accent-teal-500"
-                            />
-                            <span className="text-sm text-slate-3100 capitalize">{type}</span>
-                         </div>
-                       ))}
-                    </div>
-                  </div>
+              <h2 className="text-xl font-semibold mb-6">Notification Types</h2>
 
-                  {/* Event Registration */}
-                  <div className="bg-[#0B0D2C] border border-slate-800 rounded-lg p-5">
-                    <p className="font-medium mb-4">Event Management</p>
-                    <div className="flex flex-wrap gap-8">
-                       {['email', 'push', 'realtime'].map(type => (
-                         <div key={type} className="flex items-center gap-2">
-                            <input 
-                              type="checkbox" 
-                              checked={(notif.notification_types.EVENT_REGISTRATION as any)[type]}
-                              onChange={() => setNotif(n => ({
-                                ...n, 
-                                notification_types: {
-                                  ...n.notification_types, 
-                                  EVENT_REGISTRATION: {
-                                    ...n.notification_types.EVENT_REGISTRATION, 
-                                    [type]: !(n.notification_types.EVENT_REGISTRATION as any)[type]
-                                  }
-                                }
-                              }))}
-                              className="w-4 h-4 accent-teal-500"
-                            />
-                            <span className="text-sm text-slate-300 capitalize">{type}</span>
-                         </div>
-                       ))}
-                    </div>
+              <div className="space-y-6">
+                {/* New Messages */}
+                <div className="bg-[#0B0D2C] border border-slate-800 rounded-lg p-5">
+                  <p className="font-medium mb-4">New Messages</p>
+                  <div className="flex flex-wrap gap-8">
+                    {["email", "push", "realtime"].map((type) => (
+                      <div key={type} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={
+                            (notif.notification_types.NEW_MESSAGE as any)[type]
+                          }
+                          onChange={() =>
+                            setNotif((n) => ({
+                              ...n,
+                              notification_types: {
+                                ...n.notification_types,
+                                NEW_MESSAGE: {
+                                  ...n.notification_types.NEW_MESSAGE,
+                                  [type]: !(
+                                    n.notification_types.NEW_MESSAGE as any
+                                  )[type],
+                                },
+                              },
+                            }))
+                          }
+                          className="w-4 h-4 accent-teal-500"
+                        />
+                        <span className="text-sm text-slate-3100 capitalize">
+                          {type}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-               </div>
+                </div>
 
-               <button 
+                {/* Event Registration */}
+                <div className="bg-[#0B0D2C] border border-slate-800 rounded-lg p-5">
+                  <p className="font-medium mb-4">Event Management</p>
+                  <div className="flex flex-wrap gap-8">
+                    {["email", "push", "realtime"].map((type) => (
+                      <div key={type} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={
+                            (
+                              notif.notification_types.EVENT_REGISTRATION as any
+                            )[type]
+                          }
+                          onChange={() =>
+                            setNotif((n) => ({
+                              ...n,
+                              notification_types: {
+                                ...n.notification_types,
+                                EVENT_REGISTRATION: {
+                                  ...n.notification_types.EVENT_REGISTRATION,
+                                  [type]: !(
+                                    n.notification_types
+                                      .EVENT_REGISTRATION as any
+                                  )[type],
+                                },
+                              },
+                            }))
+                          }
+                          className="w-4 h-4 accent-teal-500"
+                        />
+                        <span className="text-sm text-slate-300 capitalize">
+                          {type}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <button
                 onClick={handleSaveNotifications}
                 disabled={isUpdatingNotif}
                 className="w-full mt-8 bg-teal-600 hover:bg-teal-500 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-               >
-                 {isUpdatingNotif ? "Saving..." : "Save Notification Settings"}
-               </button>
+              >
+                {isUpdatingNotif ? "Saving..." : "Save Notification Settings"}
+              </button>
             </div>
           </div>
         )}
