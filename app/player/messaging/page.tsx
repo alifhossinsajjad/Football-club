@@ -365,8 +365,8 @@ const MessagingContent = () => {
         refetch();
       } else {
         // Find receiver ID from other_participant OR by looking at messages
-        let receiverId = selectedConv?.other_participant?.id;
-
+          let receiverId: string | number | undefined = selectedConv?.other_participant?.id;
+        
         if (!receiverId && messages.length > 0) {
           // Find the first message not sent by the current user
           const otherMsg = messages.find((m) => {

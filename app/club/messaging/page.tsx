@@ -372,7 +372,7 @@ const MessagingContent = () => {
         (targetData || targetUserId)
       ) {
         const response = await createConversation({
-          receiver_id: (targetData?.id || targetUserId) as string | number,
+          receiver_id: (targetData?.id || targetUserId),
           message: inputValue.trim(),
         }).unwrap();
         const newConvId = response.conversationId;
@@ -382,14 +382,14 @@ const MessagingContent = () => {
         refetch();
       } else {
         // Find receiver ID from other_participant OR by looking at messages
-        let receiverId = selectedConv?.other_participant?.id;
+        let receiverId: string | number | undefined = selectedConv?.other_participant?.id;
 
         if (!receiverId && messages.length > 0) {
           const otherMsg = messages.find((m) => {
             const s = m.sender || m.senderId;
             return s && normalizeUserId(s) !== normalizeUserId(currentUser?.id);
           });
-          receiverId = otherMsg?.sender || (otherMsg?.senderId as number);
+          receiverId  = otherMsg?.sender || otherMsg?.senderId;
         }
 
         if (!receiverId) {

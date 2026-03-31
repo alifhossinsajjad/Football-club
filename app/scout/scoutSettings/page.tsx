@@ -1,11 +1,21 @@
-"use client";
-import React, { useState } from "react";
-import { Globe, Bell, Shield, Lock, Clock, Cog } from "lucide-react";
+'use client'
+
+import React, { useState, useEffect } from "react";
+import {
+  Globe,
+  Bell,
+  Shield,
+  Lock,
+  Clock,
+  Cog,
+  Check
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 import {
   useGetNotificationSettingsQuery,
   useUpdateNotificationSettingsMutation,
 } from "@/redux/features/notification/notificationApi";
+import { NotificationSettings } from "@/types/notification/notificationType";
 
 type Tab = "security" | "notifications" | "preferences";
 
@@ -17,15 +27,15 @@ const ScoutSettingsPage = () => {
   const [updateNotif, { isLoading: isUpdatingNotif }] =
     useUpdateNotificationSettingsMutation();
 
-  const [notif, setNotif] = useState({
-    email_notifications: true,
-    push_notifications: true,
-    realtime_notifications: true,
-    notification_types: {
-      NEW_MESSAGE: { email: true, push: true, realtime: true },
-      EVENT_REGISTRATION: { email: true, push: true, realtime: true },
-    },
-  });
+const [notif, setNotif] = React.useState<NotificationSettings>({
+  email_notifications: true,
+  push_notifications: true,
+  realtime_notifications: true,
+  notification_types: {
+    NEW_MESSAGE: { email: true, push: true, realtime: true },
+    EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+  },
+});
 
   const [toggles, setToggles] = useState({
     profileVisibility: true,
