@@ -1,3 +1,4 @@
+
 export interface Notification {
   id: number;
   notification_type: string;
@@ -37,14 +38,15 @@ export interface NotificationTypeSetting {
   email: boolean;
   push: boolean;
   realtime: boolean;
-  
 }
 
 export interface NotificationSettings {
-  email_notifications: boolean;
-  push_notifications: boolean;
-  realtime_notifications: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  realtime_notifications?: boolean;
   notification_types: {
     [key: string]: NotificationTypeSetting;
   };
 }
+
+

@@ -1,5 +1,7 @@
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+import { NotificationTypeSetting } from "./notification/notificationType";
+
 export interface NotificationSettings {
   id: number;
   email_new_messages: boolean;
@@ -8,7 +10,16 @@ export interface NotificationSettings {
   email_news_updates: boolean;
   push_enabled: boolean;
   push_sound: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  realtime_notifications?: boolean;
+    notification_types: {
+    NEW_MESSAGE: NotificationTypeSetting;
+    EVENT_REGISTRATION: NotificationTypeSetting;
+  };
 }
+
+
 
 export interface PrivacySettings {
   id: number;

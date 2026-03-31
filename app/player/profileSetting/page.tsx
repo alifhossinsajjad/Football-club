@@ -50,7 +50,7 @@ const Tab = ({
 }) => (
   <button
     onClick={onClick}
-  className={`
+    className={`
 flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all duration-300
 ${
   active
@@ -354,8 +354,10 @@ export default function SettingsPage() {
         <SectionTitel title="Settings" />
       </h1>
 
-      <div className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
-          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div
+        className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
+          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+      >
         {/* Tabs Header */}
         <div className="flex bg-[#12143A] border-b border-[#04B5A3]/20 ">
           {[
@@ -616,59 +618,153 @@ export default function SettingsPage() {
 
               <div>
                 <SectionHeader>Notification Types</SectionHeader>
-                
+
                 {/* New Messages */}
                 <div className="bg-[#0F122B] rounded-xl border border-white/5 p-5 mb-4">
-                  <p className="text-white text-sm font-semibold mb-3">New Messages</p>
+                  <p className="text-white text-sm font-semibold mb-3">
+                    New Messages
+                  </p>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="flex flex-col items-center gap-2">
-                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Email</span>
-                       <SquareCheckbox 
-                         checked={notif.notification_types.NEW_MESSAGE.email} 
-                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, NEW_MESSAGE: {...n.notification_types.NEW_MESSAGE, email: !n.notification_types.NEW_MESSAGE.email}}}))}
-                       />
+                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                        Email
+                      </span>
+                      <SquareCheckbox
+                        checked={notif.notification_types.NEW_MESSAGE.email}
+                        onChange={() =>
+                          setNotif((n) => ({
+                            ...n,
+                            notification_types: {
+                              ...n.notification_types,
+                              NEW_MESSAGE: {
+                                ...n.notification_types.NEW_MESSAGE,
+                                email: !n.notification_types.NEW_MESSAGE.email,
+                              },
+                            },
+                          }))
+                        }
+                      />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Push</span>
-                       <SquareCheckbox 
-                         checked={notif.notification_types.NEW_MESSAGE.push} 
-                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, NEW_MESSAGE: {...n.notification_types.NEW_MESSAGE, push: !n.notification_types.NEW_MESSAGE.push}}}))}
-                       />
+                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                        Push
+                      </span>
+                      <SquareCheckbox
+                        checked={notif.notification_types.NEW_MESSAGE.push}
+                        onChange={() =>
+                          setNotif((n) => ({
+                            ...n,
+                            notification_types: {
+                              ...n.notification_types,
+                              NEW_MESSAGE: {
+                                ...n.notification_types.NEW_MESSAGE,
+                                push: !n.notification_types.NEW_MESSAGE.push,
+                              },
+                            },
+                          }))
+                        }
+                      />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Realtime</span>
-                       <SquareCheckbox 
-                         checked={notif.notification_types.NEW_MESSAGE.realtime} 
-                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, NEW_MESSAGE: {...n.notification_types.NEW_MESSAGE, realtime: !n.notification_types.NEW_MESSAGE.realtime}}}))}
-                       />
+                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                        Realtime
+                      </span>
+                      <SquareCheckbox
+                        checked={notif.notification_types.NEW_MESSAGE.realtime}
+                        onChange={() =>
+                          setNotif((n) => ({
+                            ...n,
+                            notification_types: {
+                              ...n.notification_types,
+                              NEW_MESSAGE: {
+                                ...n.notification_types.NEW_MESSAGE,
+                                realtime:
+                                  !n.notification_types.NEW_MESSAGE.realtime,
+                              },
+                            },
+                          }))
+                        }
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Event Registration */}
                 <div className="bg-[#0F122B] rounded-xl border border-white/5 p-5">
-                  <p className="text-white text-sm font-semibold mb-3">Event Management</p>
+                  <p className="text-white text-sm font-semibold mb-3">
+                    Event Management
+                  </p>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="flex flex-col items-center gap-2">
-                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Email</span>
-                       <SquareCheckbox 
-                         checked={notif.notification_types.EVENT_REGISTRATION.email} 
-                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, EVENT_REGISTRATION: {...n.notification_types.EVENT_REGISTRATION, email: !n.notification_types.EVENT_REGISTRATION.email}}}))}
-                       />
+                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                        Email
+                      </span>
+                      <SquareCheckbox
+                        checked={
+                          notif.notification_types.EVENT_REGISTRATION.email
+                        }
+                        onChange={() =>
+                          setNotif((n) => ({
+                            ...n,
+                            notification_types: {
+                              ...n.notification_types,
+                              EVENT_REGISTRATION: {
+                                ...n.notification_types.EVENT_REGISTRATION,
+                                email:
+                                  !n.notification_types.EVENT_REGISTRATION
+                                    .email,
+                              },
+                            },
+                          }))
+                        }
+                      />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Push</span>
-                       <SquareCheckbox 
-                         checked={notif.notification_types.EVENT_REGISTRATION.push} 
-                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, EVENT_REGISTRATION: {...n.notification_types.EVENT_REGISTRATION, push: !n.notification_types.EVENT_REGISTRATION.push}}}))}
-                       />
+                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                        Push
+                      </span>
+                      <SquareCheckbox
+                        checked={
+                          notif.notification_types.EVENT_REGISTRATION.push
+                        }
+                        onChange={() =>
+                          setNotif((n) => ({
+                            ...n,
+                            notification_types: {
+                              ...n.notification_types,
+                              EVENT_REGISTRATION: {
+                                ...n.notification_types.EVENT_REGISTRATION,
+                                push: !n.notification_types.EVENT_REGISTRATION
+                                  .push,
+                              },
+                            },
+                          }))
+                        }
+                      />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                       <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">Realtime</span>
-                       <SquareCheckbox 
-                         checked={notif.notification_types.EVENT_REGISTRATION.realtime} 
-                         onChange={() => setNotif(n => ({...n, notification_types: {...n.notification_types, EVENT_REGISTRATION: {...n.notification_types.EVENT_REGISTRATION, realtime: !n.notification_types.EVENT_REGISTRATION.realtime}}}))}
-                       />
+                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                        Realtime
+                      </span>
+                      <SquareCheckbox
+                        checked={
+                          notif.notification_types.EVENT_REGISTRATION.realtime
+                        }
+                        onChange={() =>
+                          setNotif((n) => ({
+                            ...n,
+                            notification_types: {
+                              ...n.notification_types,
+                              EVENT_REGISTRATION: {
+                                ...n.notification_types.EVENT_REGISTRATION,
+                                realtime:
+                                  !n.notification_types.EVENT_REGISTRATION
+                                    .realtime,
+                              },
+                            },
+                          }))
+                        }
+                      />
                     </div>
                   </div>
                 </div>
