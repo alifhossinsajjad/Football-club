@@ -5,6 +5,7 @@ export interface ChatUser {
   avatar?: string | null; // Legacy/Fallback field
   role?: string;
   email?: string;
+  receiverId?: string | number;
 }
 
 export interface LastMessage {
@@ -15,6 +16,7 @@ export interface LastMessage {
   sender_role: string;
   is_read: boolean;
   created_at: string;
+  receiverId?: string | number;
 }
 
 export interface Conversation {
@@ -29,12 +31,13 @@ export interface Conversation {
   avatar?: string | null;
   last_message_text?: string;
   time?: string;
+  receiverId?: string | number;
 }
 
 export interface ChatMessage {
   id: string | number;
-  messageId?: string | number;   // returned by create-conversation API
-  conversationId?: number;       // returned by create-conversation API
+  messageId?: string | number; // returned by create-conversation API
+  conversationId?: number; // returned by create-conversation API
   content?: string;
   text?: string;
   message?: string;

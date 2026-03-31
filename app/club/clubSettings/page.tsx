@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Bell, Shield, Cog, Lock, Globe, Clock, X } from "lucide-react";
+import { Bell, Shield, Cog, Lock, Globe, Clock, X, Check } from "lucide-react";
 import {
   useGetGeneralSettingsQuery,
   useUpdateGeneralSettingsMutation,

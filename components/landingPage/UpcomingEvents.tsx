@@ -11,11 +11,15 @@ import { format } from "date-fns";
 export default function UpcomingEvent() {
   const theme = useAppSelector((state) => state.theme);
   const { data: eventsData, isLoading } = useGetEventsQuery();
-  
+
   // Get active/upcoming events and limit to 4
   const upcomingEvents = (eventsData?.data || [])
-    .filter((e) => e.status !== "Cancelled" && e.status !== "Completed")
-    .slice(0, 4);
+    .filter(
+      (e) =>
+        e.status?.toUpperCase() !== "CANCELLED" &&
+        e.status?.toUpperCase() !== "COMPLETED",
+    )
+    .slice(0, 2);
 
   return (
     <div className="py-16 bg-[#07142b] text-white">
@@ -53,7 +57,9 @@ export default function UpcomingEvent() {
                     {(() => {
                       if (!event.date) return "TBD";
                       const d = new Date(event.date);
-                      return !isNaN(d.getTime()) ? format(d, "dd MMM yyyy") : event.date;
+                      return !isNaN(d.getTime())
+                        ? format(d, "dd MMM yyyy")
+                        : event.date;
                     })()}
                   </span>
                 </div>
@@ -76,7 +82,9 @@ export default function UpcomingEvent() {
                       className="w-5 h-5 text-cyan-400 flex-shrink-0"
                       style={{ color: theme.colors.primaryCyan }}
                     />
-                    <span className="text-[#06A295]">{event.location || "Location TBD"}</span>
+                    <span className="text-[#06A295]">
+                      {event.location || "Location TBD"}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -84,7 +92,11 @@ export default function UpcomingEvent() {
                       className="w-5 h-5 text-cyan-400 flex-shrink-0"
                       style={{ color: theme.colors.primaryCyan }}
                     />
-                    <span className="text-[#06A295]">{event.fee === "0.00" || !event.fee ? "Free Entry" : `$${event.fee}`}</span>
+                    <span className="text-[#06A295]">
+                      {event.fee === "0.00" || !event.fee
+                        ? "Free Entry"
+                        : `$${event.fee}`}
+                    </span>
                   </div>
                 </div>
 
@@ -145,7 +157,6 @@ export default function UpcomingEvent() {
         "
           >
             <div className="bg-[#171D36]/90 p-8">
-
               <div className="  gap-4 mb-6">
                 <div className="flex justify-center mb-3">
                   <div
@@ -165,7 +176,6 @@ export default function UpcomingEvent() {
                 </h2>
               </div>
 
-
               <div className="text-center">
                 <p className="text-[#7FB6B6] text-base leading-relaxed mb-8 font-bold">
                   Unlock premium features and accelerate your football career
@@ -173,7 +183,6 @@ export default function UpcomingEvent() {
                 </p>
               </div>
 
-        
               <ul className="space-y-4 mb-10 text-[#7FB6B6] text-sm">
                 <li className="flex items-start gap-3">
                   <span className="text-indigo-400 text-lg font-bold mt-0.5">
@@ -221,7 +230,6 @@ export default function UpcomingEvent() {
                 </li>
               </ul>
 
-       
               <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-baseline text-[#9CFFF0]">
                   <span className="text-4xl font-black ">$</span>
@@ -240,14 +248,15 @@ export default function UpcomingEvent() {
                 (introductory offer — usually $19.99/year)
               </p>
 
-        
               <div className="flex justify-center">
-                <Link href={"/login"} className="text-center bg-[#00F6FF] text-black px-3 py-2 font-bold rounded-full">
+                <Link
+                  href={"/login"}
+                  className="text-center bg-[#00F6FF] text-black px-3 py-2 font-bold rounded-full"
+                >
                   Sign Up
                 </Link>
               </div>
 
-      
               <p className="text-center mt-6 text-[#7FB6B6] hover:text-blue-300 text-sm cursor-pointer transition-colors">
                 Have a promo code?
               </p>

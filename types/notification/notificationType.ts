@@ -37,6 +37,7 @@ export interface NotificationTypeSetting {
   email: boolean;
   push: boolean;
   realtime: boolean;
+  
 }
 
 export interface NotificationSettings {

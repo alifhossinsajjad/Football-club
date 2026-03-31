@@ -18,7 +18,7 @@ export default function LatestNewsPage() {
   
   // Show only published articles
   const publishedArticles = articles.filter(
-    (article) => article.status === "Published"
+    (article) => article.status?.toUpperCase() === "PUBLISHED"
   );
 
   // Pagination logic
