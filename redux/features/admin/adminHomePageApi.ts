@@ -12,7 +12,7 @@ export interface HeroSettings {
   background_color: string;
   title_color: string;
   subtitle_color: string;
-  hero_image: string;
+  hero_image: string | File | null;
   is_active: boolean;
 }
 
@@ -30,7 +30,7 @@ export interface HeroListResponse {
 export interface FeaturedClub {
   id?: number;
   club_name: string;
-  club_logo: string;
+  club_logo: string | File | null;
   club_type: string;
   order: number;
   is_active?: boolean;
@@ -49,7 +49,7 @@ export const adminHomePageApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: HeroSettings[] }) => response?.data || response,
       providesTags: ["Dashboard"],
     }),
-    createHeroSettings: builder.mutation<HeroSettingsResponse, Partial<HeroSettings>>({
+    createHeroSettings: builder.mutation<HeroSettingsResponse, FormData>({
       query: (payload) => ({
         url: "/admin-dashboard/home/hero/",
         method: "POST",
@@ -57,12 +57,15 @@ export const adminHomePageApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard"],
     }),
-    updateHeroSettings: builder.mutation<HeroSettingsResponse, Partial<HeroSettings>>({
-      query: (payload) => ({
-        url: `/admin-dashboard/home/hero/${payload.id}/`,
-        method: "PUT",
-        body: payload,
-      }),
+    updateHeroSettings: builder.mutation<HeroSettingsResponse, FormData>({
+      query: (payload) => {
+        const id = payload.get("id");
+        return {
+          url: `/admin-dashboard/home/hero/${id}/`,
+          method: "PUT",
+          body: payload,
+        };
+      },
       invalidatesTags: ["Dashboard"],
     }),
     deleteHeroSettings: builder.mutation<{ success: boolean; message?: string }, number>({
@@ -77,7 +80,7 @@ export const adminHomePageApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: FeaturedClub[] }) => response?.data || response,
       providesTags: ["Dashboard"],
     }),
-    createFeaturedClub: builder.mutation<FeaturedClubResponse, Partial<FeaturedClub>>({
+    createFeaturedClub: builder.mutation<FeaturedClubResponse, FormData>({
       query: (payload) => ({
         url: "/admin-dashboard/home/featured-clubs/",
         method: "POST",
@@ -85,12 +88,15 @@ export const adminHomePageApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard"],
     }),
-    updateFeaturedClub: builder.mutation<FeaturedClubResponse, Partial<FeaturedClub>>({
-      query: (payload) => ({
-        url: `/admin-dashboard/home/featured-clubs/${payload.id}/`,
-        method: "PUT",
-        body: payload,
-      }),
+    updateFeaturedClub: builder.mutation<FeaturedClubResponse, FormData>({
+      query: (payload) => {
+        const id = payload.get("id");
+        return {
+          url: `/admin-dashboard/home/featured-clubs/${id}/`,
+          method: "PUT",
+          body: payload,
+        };
+      },
       invalidatesTags: ["Dashboard"],
     }),
     deleteFeaturedClub: builder.mutation<{ success: boolean; message?: string }, number>({

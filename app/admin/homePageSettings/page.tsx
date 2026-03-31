@@ -66,7 +66,7 @@ export default function HomePageSettings() {
       background_color: "#080D2C",
       title_color: "#FFFFFF",
       subtitle_color: "#B0B0B0",
-      hero_image: "",
+      hero_image: null,
       is_active: true
     });
     setEditingHero(null);
@@ -76,6 +76,13 @@ export default function HomePageSettings() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, hero_image: file }));
+    }
   };
 
   const handleToggle = (val: boolean) => {
@@ -104,13 +111,36 @@ export default function HomePageSettings() {
 
   const handleSave = async () => {
     try {
+      const data = new FormData();
+      
+      // Append all fields to FormData
+      if (!isCreating && formData.id) {
+        data.append("id", formData.id.toString());
+      }
+      
+      data.append("title", formData.title || "");
+      data.append("subtitle", formData.subtitle || "");
+      data.append("description", formData.description || "");
+      data.append("primary_button_text", formData.primary_button_text || "");
+      data.append("primary_button_url", formData.primary_button_url || "");
+      data.append("secondary_button_text", formData.secondary_button_text || "");
+      data.append("secondary_button_url", formData.secondary_button_url || "");
+      data.append("background_color", formData.background_color || "");
+      data.append("title_color", formData.title_color || "");
+      data.append("subtitle_color", formData.subtitle_color || "");
+      data.append("is_active", String(!!formData.is_active));
+
+      // Append image if it's a File
+      if (formData.hero_image instanceof File) {
+        data.append("hero_image", formData.hero_image);
+      }
+
       if (isCreating) {
-        await createHero(formData).unwrap();
+        await createHero(data).unwrap();
         toast.success("Hero section created successfully");
         setIsCreating(false);
       } else {
-        if (!formData.id) return;
-        await updateHero(formData).unwrap();
+        await updateHero(data).unwrap();
         toast.success("Hero settings updated successfully");
         setEditingHero(null);
       }
@@ -134,7 +164,7 @@ export default function HomePageSettings() {
     <div className="min-h-screen bg-[#0B0D2C] text-white p-6 md:p-12 font-sans overflow-x-hidden relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full mb-12">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold tracking-tight mb-2 bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
             Home Page Settings
           </h1>
           <p className="text-gray-500 text-lg">Manage landing page hero sections</p>
@@ -171,7 +201,7 @@ export default function HomePageSettings() {
                           <div className="w-24 h-16 rounded-lg overflow-hidden border border-gray-700">
                             {hero.hero_image ? (
                               <Image 
-                                src={hero.hero_image} 
+                                src={hero.hero_image as string} 
                                 alt="Hero" 
                                 width={96} 
                                 height={64} 
@@ -340,20 +370,52 @@ export default function HomePageSettings() {
               </div>
 
               <div>
-                <label className={labelClass}>Hero Image URL</label>
-                <input name="hero_image" value={formData.hero_image || ""} onChange={handleChange} className={inputClass} placeholder="https://cloudinary.com/..." />
-                {formData.hero_image && (
-                  <div className="mt-4 rounded-xl overflow-hidden border border-gray-800 w-full max-w-md">
-                    <Image 
-                      src={formData.hero_image} 
-                      alt="Hero Preview" 
-                      width={400} 
-                      height={225} 
-                      className="w-full h-auto object-cover"
-                      unoptimized
+                <label className={labelClass}>Hero Image</label>
+                <div className="flex flex-col gap-4">
+                  <div className="relative group">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleFileChange} 
+                      className="hidden" 
+                      id="hero-image-upload" 
                     />
+                    <label 
+                      htmlFor="hero-image-upload" 
+                      className="flex items-center justify-center gap-3 w-full h-32 border-2 border-dashed border-gray-800 rounded-2xl cursor-pointer hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all group-hover:bg-[#0a0c16]"
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <ImageIcon className="w-8 h-8 text-gray-500 group-hover:text-cyan-400 transition-colors" />
+                        <span className="text-sm text-gray-500 group-hover:text-gray-300">
+                          {formData.hero_image instanceof File ? formData.hero_image.name : "Click to upload or drag and drop"}
+                        </span>
+                      </div>
+                    </label>
                   </div>
-                )}
+
+                  {formData.hero_image && (
+                    <div className="rounded-xl overflow-hidden border border-gray-800 w-full max-w-md bg-[#0a0c16]">
+                      <div className="p-3 border-b border-gray-800 flex justify-between items-center bg-[#171b2f]">
+                        <span className="text-xs font-medium text-gray-400">Image Preview</span>
+                        <button 
+                          onClick={() => setFormData(prev => ({ ...prev, hero_image: null }))}
+                          className="text-gray-500 hover:text-red-400 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                      <div className="relative aspect-video">
+                        <Image 
+                          src={formData.hero_image instanceof File ? URL.createObjectURL(formData.hero_image) : (typeof formData.hero_image === 'string' ? formData.hero_image : '')} 
+                          alt="Hero Preview" 
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

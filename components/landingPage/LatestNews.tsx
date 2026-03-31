@@ -29,7 +29,7 @@ export default function LatestNews() {
   };
 
   return (
-    <div className="bg-[#07142b] text-white">
+    <div className="bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center mb-9">
           <SectionTitel
@@ -50,7 +50,7 @@ export default function LatestNews() {
           <div className="mb-12">
             <div className="grid md:grid-cols-2 gap-8 items-stretch">
               {latestPublishedArticles.map((article, idx) => (
-                <div key={article.id} className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl md:col-span-1" style={{ backgroundColor: theme.colors.backgroundCard }}>
+                <div key={article.id} className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl md:col-span-1 bg-[var(--bg-card,#12143A)]">
                   {/* TEXT CONTENT */}
                   <div className="p-8 flex flex-col h-full justify-between">
                     {/* TOP INFO */}

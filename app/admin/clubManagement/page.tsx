@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { Loader2, Shield, ImageIcon, Type, Edit, Trash2, X, Check, Plus, Hash } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -74,6 +74,13 @@ export default function ClubManagementPage() {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, club_logo: file }));
+    }
+  };
+
   const handleToggle = (val: boolean) => {
     setFormData(prev => ({ ...prev, is_active: val }));
   };
@@ -105,19 +112,41 @@ export default function ClubManagementPage() {
         return;
       }
 
+      const data = new FormData();
+      
+      // Bundle text fields into 'data' key as JSON string
+      const jsonPayload = {
+        club_name: formData.club_name,
+        club_type: formData.club_type,
+        order: Number(formData.order || 0),
+        is_active: !!formData.is_active
+      };
+
+      data.append("data", JSON.stringify(jsonPayload));
+
+      // Also append ID to top level for the API URL constructor
+      if (!isCreating && formData.id) {
+        data.append("id", String(formData.id));
+      }
+      
+      if (formData.club_logo instanceof File) {
+        data.append("club_logo", formData.club_logo);
+      }
+
       if (isCreating) {
-        await createClub(formData as FeaturedClub).unwrap();
+        await createClub(data).unwrap();
         toast.success("Featured club created successfully");
         setIsCreating(false);
       } else {
-        if (!formData.id) return;
-        await updateClub(formData as FeaturedClub).unwrap();
+        await updateClub(data).unwrap();
         toast.success("Featured club updated successfully");
         setEditingClub(null);
       }
     } catch (error) {
-      const err = error as { data?: { message?: string } };
-      toast.error(err?.data?.message || `Failed to ${isCreating ? 'create' : 'update'} featured club`);
+      console.error("Save error:", error);
+      const err = error as any;
+      const backendError = err?.data?.errors || err?.data;
+      toast.error(backendError?.message || backendError?.club_name?.[0] || `Failed to ${isCreating ? 'create' : 'update'} featured club`);
     }
   };
 
@@ -174,7 +203,7 @@ export default function ClubManagementPage() {
                           <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-700 bg-white/5 flex items-center justify-center p-2">
                             {club.club_logo ? (
                               <Image 
-                                src={club.club_logo} 
+                                src={club.club_logo as string} 
                                 alt="Club Logo" 
                                 width={64} 
                                 height={64} 
@@ -299,22 +328,49 @@ export default function ClubManagementPage() {
               <h2 className={sectionTitleClass}><ImageIcon size={20} className="text-amber-400" /> Branding & Media</h2>
               
               <div>
-                <label className={labelClass}>Club Logo URL *</label>
-                <input name="club_logo" value={formData.club_logo || ""} onChange={handleChange} className={inputClass} placeholder="https://cloudinary.com/..." />
-                {formData.club_logo && (
-                  <div className="mt-6 flex justify-center bg-white/5 border border-gray-800 rounded-xl p-6">
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-700 bg-white">
-                      <Image 
-                        src={formData.club_logo} 
-                        alt="Club Preview" 
-                        width={128} 
-                        height={128} 
-                        className="w-full h-full object-contain p-2" 
-                        unoptimized
-                      />
-                    </div>
+                <label className={labelClass}>Club Logo *</label>
+                <div className="space-y-4">
+                  <div 
+                    onClick={() => document.getElementById('club_logo_input')?.click()}
+                    className="w-full aspect-video md:aspect-square md:w-64 mx-auto bg-[#0a0c16] border-2 border-dashed border-gray-800 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:border-cyan-500/50 hover:bg-[#0a0c16]/80 transition-all group overflow-hidden relative"
+                  >
+                    {formData.club_logo ? (
+                      <>
+                        <Image 
+                          src={formData.club_logo instanceof File ? URL.createObjectURL(formData.club_logo) : (formData.club_logo as string)} 
+                          alt="Club Preview" 
+                          fill
+                          className="object-contain p-6"
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                          <Plus size={24} className="text-cyan-400" />
+                          <p className="text-xs font-bold text-white uppercase tracking-wider">Change Logo</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="p-4 rounded-2xl bg-gray-900/50 mb-4 group-hover:scale-110 transition-transform">
+                          <ImageIcon size={32} className="text-gray-600 group-hover:text-cyan-400 transition-colors" />
+                        </div>
+                        <p className="text-sm font-bold text-gray-400">Click to upload logo</p>
+                        <p className="text-xs text-gray-600 mt-1">PNG, JPG up to 5MB</p>
+                      </>
+                    )}
                   </div>
-                )}
+                  <input 
+                    id="club_logo_input"
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleFileChange} 
+                    className="hidden" 
+                  />
+                  {typeof formData.club_logo === 'string' && formData.club_logo && (
+                    <p className="text-xs text-center text-gray-500 truncate max-w-xs mx-auto">
+                      Current: {formData.club_logo.split('/').pop()}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 

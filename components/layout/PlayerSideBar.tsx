@@ -26,7 +26,7 @@ import { useDispatch } from "react-redux";
 
 import Image from "next/image";
 import { logout } from "@/redux/features/auth/authSlice";
-import Logo from "../reuseable/Logo";
+import BrandedLogo from "../reuseable/BrandedLogo";
 import { BsCalendar4Event } from "react-icons/bs";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
@@ -181,10 +181,8 @@ const PlayerSideBar: React.FC = () => {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="mx-auto py-4">
-            <Link href="/">
-              <Logo />
-            </Link>
+          <div className="px-6 py-6 overflow-hidden">
+            <BrandedLogo variant="stacked" size="md" />
           </div>
 
           {/* Menu Items */}
