@@ -42,13 +42,18 @@ const MessagingContent = () => {
   const urlRole = searchParams.get("role"); // 'PLAYER', 'CLUB_ACADEMY', 'SCOUT_AGENT'
   const targetConvId = searchParams.get("id");
 
-  const [selectedConvId, setSelectedConvId] = useState<number | string | null>(null);
+  const [selectedConvId, setSelectedConvId] = useState<number | string | null>(
+    null,
+  );
   const [targetUserId, setTargetUserId] = useState<string | null>(urlUserId);
   const [playerId, setPlayerId] = useState<string | null>(urlPlayerId);
 
   // FIX: Use sessionStorage to avoid stale cache and fix race conditions.
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? sessionStorage.getItem("club_lastMessagingState") : null;
+    const saved =
+      typeof window !== "undefined"
+        ? sessionStorage.getItem("club_lastMessagingState")
+        : null;
     const parsed = saved ? JSON.parse(saved) : null;
 
     if (urlUserId || urlPlayerId || targetConvId) {
@@ -63,9 +68,12 @@ const MessagingContent = () => {
   // Save persistence
   useEffect(() => {
     if (selectedConvId && typeof window !== "undefined") {
-      sessionStorage.setItem("club_lastMessagingState", JSON.stringify({
-        selectedConvId,
-      }));
+      sessionStorage.setItem(
+        "club_lastMessagingState",
+        JSON.stringify({
+          selectedConvId,
+        }),
+      );
     }
   }, [selectedConvId]);
 
@@ -76,12 +84,15 @@ const MessagingContent = () => {
   const currentUser = useAppSelector((state) => state.auth.user);
 
   // FIX: Separate strict matching logic for users
-  const normalizeUserId = useCallback((id: string | number | undefined | null) => {
-    if (id === undefined || id === null) return "";
-    const s = String(id).trim();
-    if (s.startsWith("USR-")) return s.replace("USR-", "").replace(/^0+/, "");
-    return s.replace(/^0+/, "");
-  }, []);
+  const normalizeUserId = useCallback(
+    (id: string | number | undefined | null) => {
+      if (id === undefined || id === null) return "";
+      const s = String(id).trim();
+      if (s.startsWith("USR-")) return s.replace("USR-", "").replace(/^0+/, "");
+      return s.replace(/^0+/, "");
+    },
+    [],
+  );
 
   const {
     data: convsData,
@@ -141,66 +152,82 @@ const MessagingContent = () => {
 
   const { data: targetPlayerData, isLoading: loadingTargetPlayer } =
     useGetPlayerDetailsQuery(
-      Number(playerId) || Number(String(effectiveUserId).replace("USR-", "")) || 0,
+      Number(playerId) ||
+        Number(String(effectiveUserId).replace("USR-", "")) ||
+        0,
       {
         skip: effectiveRole !== "PLAYER" || (!playerId && !effectiveUserId),
       },
     );
 
-  const { data: targetClubData, isLoading: loadingTargetClub } = 
-    useGetClubQuery(
-      Number(String(effectiveUserId).replace("USR-", "")) || 0,
-      {
-        skip: effectiveRole !== "CLUB_ACADEMY" || !effectiveUserId,
-      }
-    );
+  const { data: targetClubData, isLoading: loadingTargetClub } =
+    useGetClubQuery(Number(String(effectiveUserId).replace("USR-", "")) || 0, {
+      skip: effectiveRole !== "CLUB_ACADEMY" || !effectiveUserId,
+    });
 
-  const { data: targetScoutData, isLoading: loadingTargetScout } = 
+  const { data: targetScoutData, isLoading: loadingTargetScout } =
     useGetScoutProfileByIdQuery(
       Number(String(effectiveUserId).replace("USR-", "")) || 0,
       {
         skip: effectiveRole !== "SCOUT_AGENT" || !effectiveUserId,
-      }
+      },
     );
 
   const targetData = useMemo(() => {
-    if (effectiveRole === "PLAYER") return targetPlayerData ? {
-      id: (targetPlayerData as any).user?.id || effectiveUserId,
-      name: `${targetPlayerData.first_name || ""} ${targetPlayerData.last_name || ""}`,
-      profile_image: targetPlayerData.profile_image,
-      role: "PLAYER",
-      email: (targetPlayerData as any).email || ""
-    } : null;
-    
-    if (effectiveRole === "CLUB_ACADEMY") return targetClubData ? {
-      id: (targetClubData as any).user?.id || effectiveUserId,
-      name: targetClubData.club_name,
-      profile_image: targetClubData.club_logo,
-      role: "CLUB_ACADEMY",
-      email: (targetClubData as any).email || ""
-    } : null;
+    if (effectiveRole === "PLAYER")
+      return targetPlayerData
+        ? {
+            id: (targetPlayerData as any).user?.id || effectiveUserId,
+            name: `${targetPlayerData.first_name || ""} ${targetPlayerData.last_name || ""}`,
+            profile_image: targetPlayerData.profile_image,
+            role: "PLAYER",
+            email: (targetPlayerData as any).email || "",
+          }
+        : null;
 
-    if (effectiveRole === "SCOUT_AGENT") return targetScoutData ? {
-      id: (targetScoutData as any).user?.id || effectiveUserId,
-      name: targetScoutData.scout_name,
-      profile_image: targetScoutData.profile_image,
-      role: "SCOUT_AGENT",
-      email: targetScoutData.email || ""
-    } : null;
+    if (effectiveRole === "CLUB_ACADEMY")
+      return targetClubData
+        ? {
+            id: (targetClubData as any).user?.id || effectiveUserId,
+            name: targetClubData.club_name,
+            profile_image: targetClubData.club_logo,
+            role: "CLUB_ACADEMY",
+            email: (targetClubData as any).email || "",
+          }
+        : null;
+
+    if (effectiveRole === "SCOUT_AGENT")
+      return targetScoutData
+        ? {
+            id: (targetScoutData as any).user?.id || effectiveUserId,
+            name: targetScoutData.scout_name,
+            profile_image: targetScoutData.profile_image,
+            role: "SCOUT_AGENT",
+            email: targetScoutData.email || "",
+          }
+        : null;
 
     return null;
-  }, [effectiveRole, effectiveUserId, targetPlayerData, targetClubData, targetScoutData]);
+  }, [
+    effectiveRole,
+    effectiveUserId,
+    targetPlayerData,
+    targetClubData,
+    targetScoutData,
+  ]);
 
-  const isLoadingTarget = loadingTargetPlayer || loadingTargetClub || loadingTargetScout;
+  const isLoadingTarget =
+    loadingTargetPlayer || loadingTargetClub || loadingTargetScout;
 
   const { data: messagesData, isLoading: loadingMessages } =
     useGetMessagesQuery(selectedConvId as number, {
-      skip: !selectedConvId || (typeof selectedConvId === 'number' && selectedConvId < 0),
+      skip:
+        !selectedConvId ||
+        (typeof selectedConvId === "number" && selectedConvId < 0),
       pollingInterval: 3000,
     });
 
   const [sendReply, { isLoading: isSending }] = useSendReplyMutation();
-
 
   // Logic for Virtual Conversation
   const conversations = useMemo(() => {
@@ -211,7 +238,12 @@ const MessagingContent = () => {
       !list.some((c) => {
         const cid = normalizeUserId(c.other_participant?.id);
         const tid = normalizeUserId(targetUserId);
-        return cid === tid || (cid !== "" && tid !== "" && c.other_participant?.name === targetData.name);
+        return (
+          cid === tid ||
+          (cid !== "" &&
+            tid !== "" &&
+            c.other_participant?.name === targetData.name)
+        );
       })
     ) {
       const virtualConv: Conversation = {
@@ -235,8 +267,9 @@ const MessagingContent = () => {
     let msgs: ChatMessage[] = [];
     if (Array.isArray(messagesData)) msgs = messagesData;
     else if (messagesData?.messages) msgs = messagesData.messages;
-    else if ((messagesData as any)?.results) msgs = (messagesData as any).results;
-    
+    else if ((messagesData as any)?.results)
+      msgs = (messagesData as any).results;
+
     return [...msgs].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
       const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
@@ -247,9 +280,11 @@ const MessagingContent = () => {
   const selectedConv = useMemo(
     () =>
       conversations.find((c) => {
-        if (typeof selectedConvId === 'number' && selectedConvId < 0)
+        if (typeof selectedConvId === "number" && selectedConvId < 0)
           return c.id === selectedConvId;
-        return selectedConvId !== null && String(c.id) === String(selectedConvId);
+        return (
+          selectedConvId !== null && String(c.id) === String(selectedConvId)
+        );
       }),
     [conversations, selectedConvId],
   );
@@ -289,14 +324,18 @@ const MessagingContent = () => {
       let foundTarget = false;
 
       if (targetConvId) {
-        const found = conversations.find((c) => String(c.id) === String(targetConvId));
+        const found = conversations.find(
+          (c) => String(c.id) === String(targetConvId),
+        );
         if (found) {
           nextId = found.id;
           foundTarget = true;
         }
       } else if (targetUserId) {
-        const found = conversations.find((c: Conversation) =>
-          normalizeUserId(c.other_participant?.id) === normalizeUserId(targetUserId),
+        const found = conversations.find(
+          (c: Conversation) =>
+            normalizeUserId(c.other_participant?.id) ===
+            normalizeUserId(targetUserId),
         );
         if (found) {
           nextId = found.id;
@@ -315,7 +354,13 @@ const MessagingContent = () => {
         }
       }
     }
-  }, [conversations, selectedConvId, targetConvId, targetUserId, normalizeUserId]);
+  }, [
+    conversations,
+    selectedConvId,
+    targetConvId,
+    targetUserId,
+    normalizeUserId,
+  ]);
 
   const handleSend = async () => {
     if (!inputValue.trim() || !selectedConv) return;
@@ -342,11 +387,9 @@ const MessagingContent = () => {
         if (!receiverId && messages.length > 0) {
           const otherMsg = messages.find((m) => {
             const s = m.sender || m.senderId;
-            return (
-              s && normalizeUserId(s) !== normalizeUserId(currentUser?.id)
-            );
+            return s && normalizeUserId(s) !== normalizeUserId(currentUser?.id);
           });
-          receiverId = otherMsg?.sender || otherMsg?.senderId;
+          receiverId = otherMsg?.sender || (otherMsg?.senderId as number);
         }
 
         if (!receiverId) {
@@ -419,26 +462,33 @@ const MessagingContent = () => {
             {loadingConvs ? (
               <div className="flex flex-col items-center justify-center p-12 gap-3">
                 <Loader2 className="h-8 w-8 animate-spin text-teal-400/60" />
-                <p className="text-[10px] text-teal-400/40 font-bold uppercase tracking-[0.2em]">Syncing Feed...</p>
+                <p className="text-[10px] text-teal-400/40 font-bold uppercase tracking-[0.2em]">
+                  Syncing Feed...
+                </p>
               </div>
             ) : filteredConvs.length === 0 && !isLoadingTarget ? (
               <div className="flex flex-col items-center justify-center p-10 h-64 text-center opacity-40">
                 <div className="w-16 h-16 rounded-3xl bg-[#2A3560]/40 flex items-center justify-center mb-4 border border-white/5">
                   <MessageSquare className="h-8 w-8 text-white/20" />
                 </div>
-                <p className="text-sm font-bold uppercase tracking-widest">No Active Channels</p>
+                <p className="text-sm font-bold uppercase tracking-widest">
+                  No Active Channels
+                </p>
               </div>
             ) : (
               <div className="space-y-1 p-3">
-                {isLoadingTarget && !filteredConvs.some(c => typeof c.id === 'number' && c.id < 0) && (
-                  <div className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white/5 animate-pulse mb-1">
-                    <div className="h-14 w-14 rounded-full bg-white/10" />
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-24 bg-white/10 rounded" />
-                      <div className="h-3 w-32 bg-white/10 rounded" />
+                {isLoadingTarget &&
+                  !filteredConvs.some(
+                    (c) => typeof c.id === "number" && c.id < 0,
+                  ) && (
+                    <div className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white/5 animate-pulse mb-1">
+                      <div className="h-14 w-14 rounded-full bg-white/10" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-24 bg-white/10 rounded" />
+                        <div className="h-3 w-32 bg-white/10 rounded" />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
                 {filteredConvs.map((conv: Conversation) => (
                   <div
                     key={conv.id}
@@ -454,7 +504,9 @@ const MessagingContent = () => {
                       <Avatar
                         className={cn(
                           "h-14 w-14 transition-all duration-300",
-                          selectedConvId === conv.id ? "ring-2 ring-teal-400 p-[2px] bg-[#161C39]" : "ring-0",
+                          selectedConvId === conv.id
+                            ? "ring-2 ring-teal-400 p-[2px] bg-[#161C39]"
+                            : "ring-0",
                         )}
                       >
                         <AvatarImage
@@ -489,7 +541,9 @@ const MessagingContent = () => {
                         <p
                           className={cn(
                             "font-bold truncate text-[15px]",
-                            selectedConvId === conv.id ? "text-white" : "text-white/80",
+                            selectedConvId === conv.id
+                              ? "text-white"
+                              : "text-white/80",
                           )}
                         >
                           {conv.other_participant?.name}
@@ -500,10 +554,12 @@ const MessagingContent = () => {
                           </p>
                         )}
                         <span className="text-[11px] text-white/40 whitespace-nowrap font-medium">
-                          {typeof conv.id === 'number' && conv.id < 0
+                          {typeof conv.id === "number" && conv.id < 0
                             ? "just now"
                             : conv.last_message?.created_at
-                              ? new Date(conv.last_message.created_at).toLocaleTimeString([], {
+                              ? new Date(
+                                  conv.last_message.created_at,
+                                ).toLocaleTimeString([], {
                                   hour: "2-digit",
                                   minute: "2-digit",
                                 })
@@ -511,13 +567,14 @@ const MessagingContent = () => {
                         </span>
                       </div>
                       <p className="text-[13px] text-white/60 truncate">
-                        {typeof conv.id === 'number' && conv.id < 0
+                        {typeof conv.id === "number" && conv.id < 0
                           ? "Start a conversation..."
                           : conv.last_message?.content || "Message open"}
                       </p>
                       <div className="mt-1 flex gap-1">
                         <span className="px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-400 text-[10px] font-bold uppercase">
-                          {conv.other_participant?.role?.toLowerCase() || "user"}
+                          {conv.other_participant?.role?.toLowerCase() ||
+                            "user"}
                         </span>
                       </div>
                     </div>
@@ -566,9 +623,11 @@ const MessagingContent = () => {
                     <h2 className="font-bold text-white text-[17px] tracking-tight leading-tight">
                       {targetData?.name || selectedConv.other_participant?.name}
                     </h2>
-                    {(targetData?.email || selectedConv.other_participant?.email) && (
+                    {(targetData?.email ||
+                      selectedConv.other_participant?.email) && (
                       <p className="text-[11px] text-white/40 mb-1 font-medium italic lowercase">
-                        {targetData?.email || selectedConv.other_participant.email}
+                        {targetData?.email ||
+                          selectedConv.other_participant.email}
                       </p>
                     )}
                     <div className="flex items-center gap-1.5 text-[10px] text-green-400 font-bold uppercase tracking-wider">
@@ -593,9 +652,12 @@ const MessagingContent = () => {
                       <MessageSquare className="h-10 w-10 text-teal-400/40" />
                     </div>
                     <div>
-                      <h3 className="text-white font-bold text-lg">Message Channel Open</h3>
+                      <h3 className="text-white font-bold text-lg">
+                        Message Channel Open
+                      </h3>
                       <p className="text-xs text-white/40 font-medium max-w-xs mx-auto mt-1 leading-relaxed">
-                        Secure frequency established. All data exchange is encrypted.
+                        Secure frequency established. All data exchange is
+                        encrypted.
                       </p>
                     </div>
                   </div>
@@ -606,10 +668,14 @@ const MessagingContent = () => {
                         msg.is_sender === true ||
                         msg.is_own === true ||
                         (msg as any).isOwn === true ||
-                        (msg.senderId && currentUser?.id && normalizeUserId(msg.senderId) === normalizeUserId(currentUser.id)) ||
+                        (msg.senderId &&
+                          currentUser?.id &&
+                          normalizeUserId(msg.senderId) ===
+                            normalizeUserId(currentUser.id)) ||
                         (msg.sender &&
                           currentUser?.id &&
-                          normalizeUserId(msg.sender) === normalizeUserId(currentUser.id));
+                          normalizeUserId(msg.sender) ===
+                            normalizeUserId(currentUser.id));
                       return (
                         <div
                           key={msg.id || idx}
@@ -628,14 +694,21 @@ const MessagingContent = () => {
                           >
                             <p>{msg.content || msg.text || msg.message}</p>
                           </div>
-                          <span className={cn(
-                            "text-[11px] text-white/40 mt-1 font-medium",
-                            isOwn ? "mr-1" : "ml-1"
-                          )}>
-                            {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }) : ''}
+                          <span
+                            className={cn(
+                              "text-[11px] text-white/40 mt-1 font-medium",
+                              isOwn ? "mr-1" : "ml-1",
+                            )}
+                          >
+                            {msg.created_at
+                              ? new Date(msg.created_at).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  },
+                                )
+                              : ""}
                           </span>
                         </div>
                       );
@@ -689,8 +762,12 @@ const MessagingContent = () => {
                 <MessageSquare className="h-12 w-12 text-teal-400/30" />
               </div>
               <div className="text-center">
-                <p className="text-xl font-black text-white/40 tracking-tighter uppercase mb-2">Terminal Standby</p>
-                <p className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase">Select Active Channel to Monitor</p>
+                <p className="text-xl font-black text-white/40 tracking-tighter uppercase mb-2">
+                  Terminal Standby
+                </p>
+                <p className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase">
+                  Select Active Channel to Monitor
+                </p>
               </div>
             </div>
           )}

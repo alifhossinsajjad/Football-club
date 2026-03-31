@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Bell, Shield, Cog, Lock, Globe, Clock, X } from "lucide-react";
+import { Bell, Shield, Cog, Lock, Globe, Clock, X, Check } from "lucide-react";
 import {
   useGetGeneralSettingsQuery,
   useUpdateGeneralSettingsMutation,
@@ -12,9 +12,9 @@ import {
   useChangePasswordMutation,
   useSignOutAllSessionsMutation,
 } from "@/redux/features/club/clubSettingsApi";
-import { 
-  useGetNotificationSettingsQuery, 
-  useUpdateNotificationSettingsMutation 
+import {
+  useGetNotificationSettingsQuery,
+  useUpdateNotificationSettingsMutation,
 } from "@/redux/features/notification/notificationApi";
 import { NotificationSettings as NotifSettings } from "@/types/notification/notificationType";
 import { toast } from "react-hot-toast";
@@ -25,16 +25,21 @@ const ClubSettingsPage = () => {
   const [activeTab, setActiveTab] = useState<Tab>("security");
 
   // RTK Query Hooks
-  const { data: generalData, isLoading: generalLoading } = useGetGeneralSettingsQuery();
+  const { data: generalData, isLoading: generalLoading } =
+    useGetGeneralSettingsQuery();
   const [updateGeneral] = useUpdateGeneralSettingsMutation();
 
-  const { data: privacyData, isLoading: privacyLoading } = useGetPrivacySettingsQuery();
+  const { data: privacyData, isLoading: privacyLoading } =
+    useGetPrivacySettingsQuery();
   const [updatePrivacy] = useUpdatePrivacySettingsMutation();
 
-  const { data: notifData, isLoading: notifLoading } = useGetNotificationSettingsQuery();
-  const [updateNotif, { isLoading: isUpdatingNotif }] = useUpdateNotificationSettingsMutation();
+  const { data: notifData, isLoading: notifLoading } =
+    useGetNotificationSettingsQuery();
+  const [updateNotif, { isLoading: isUpdatingNotif }] =
+    useUpdateNotificationSettingsMutation();
 
-  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
+  const [changePassword, { isLoading: isChangingPassword }] =
+    useChangePasswordMutation();
   const [signOutAll] = useSignOutAllSessionsMutation();
 
   // Local State for Toggles
@@ -148,9 +153,15 @@ const ClubSettingsPage = () => {
         new_password: passwords.new_password,
       }).unwrap();
       toast.success("Password updated successfully");
-      setPasswords({ current_password: "", new_password: "", confirm_password: "" });
+      setPasswords({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
     } catch (err: any) {
-      toast.error(err?.data?.error || err?.data?.message || "Failed to update password");
+      toast.error(
+        err?.data?.error || err?.data?.message || "Failed to update password",
+      );
     }
   };
 
@@ -175,7 +186,13 @@ const ClubSettingsPage = () => {
   }
 
   // Common UI Elements
-  const ToggleSwitch = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+  const ToggleSwitch = ({
+    checked,
+    onChange,
+  }: {
+    checked: boolean;
+    onChange: () => void;
+  }) => (
     <div
       className={`w-11 h-6 rounded-full flex items-center p-1 cursor-pointer transition-colors ${
         checked ? "bg-[#00D9FF]" : "bg-[#1A2160]"
@@ -195,12 +212,16 @@ const ClubSettingsPage = () => {
           <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
             Settings
           </h1>
-          <p className="text-[#5B6397] text-sm mt-1">Manage your club account and preferences</p>
+          <p className="text-[#5B6397] text-sm mt-1">
+            Manage your club account and preferences
+          </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
-          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div
+          className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
+          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           {(
             [
               { id: "security", label: "Security & Privacy", icon: Shield },
@@ -217,7 +238,16 @@ const ClubSettingsPage = () => {
                   : "text-[#5B6397] hover:text-[#8891BB]"
               }`}
             >
-              <Icon size={16} className={activeTab === id ? (id === "notifications" ? "text-purple-400" : "text-cyan-400") : ""} />
+              <Icon
+                size={16}
+                className={
+                  activeTab === id
+                    ? id === "notifications"
+                      ? "text-purple-400"
+                      : "text-cyan-400"
+                    : ""
+                }
+              />
               {label}
             </button>
           ))}
@@ -234,45 +264,69 @@ const ClubSettingsPage = () => {
                   Change Password
                 </h2>
                 <div className="space-y-4 w-full">
-                <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Current Password</label>
-                  <input
-                    type="password"
-                    value={passwords.current_password}
-                    onChange={(e) => setPasswords({ ...passwords, current_password: e.target.value })}
-                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
-                    placeholder="Enter current password"
-                  />
+                  <div>
+                    <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                      Current Password
+                    </label>
+                    <input
+                      type="password"
+                      value={passwords.current_password}
+                      onChange={(e) =>
+                        setPasswords({
+                          ...passwords,
+                          current_password: e.target.value,
+                        })
+                      }
+                      className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                      placeholder="Enter current password"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={passwords.new_password}
+                      onChange={(e) =>
+                        setPasswords({
+                          ...passwords,
+                          new_password: e.target.value,
+                        })
+                      }
+                      className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                      placeholder="Enter new password"
+                    />
+                    <p className="text-[9px] text-[#5B6397] mt-1.5">
+                      Must be at least 8 characters with uppercase, lowercase,
+                      and numbers
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                      Confirm New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={passwords.confirm_password}
+                      onChange={(e) =>
+                        setPasswords({
+                          ...passwords,
+                          confirm_password: e.target.value,
+                        })
+                      }
+                      className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
+                      placeholder="Confirm new password"
+                    />
+                  </div>
+                  <button
+                    onClick={handleUpdatePassword}
+                    disabled={isChangingPassword}
+                    className="w-full py-2.5 bg-[#00D9FF] text-[#070B24] rounded-lg font-bold text-sm hover:bg-cyan-300 transition-colors mt-2"
+                  >
+                    {isChangingPassword ? "Updating..." : "Update Password"}
+                  </button>
                 </div>
-                <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">New Password</label>
-                  <input
-                    type="password"
-                    value={passwords.new_password}
-                    onChange={(e) => setPasswords({ ...passwords, new_password: e.target.value })}
-                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
-                    placeholder="Enter new password"
-                  />
-                  <p className="text-[9px] text-[#5B6397] mt-1.5">Must be at least 8 characters with uppercase, lowercase, and numbers</p>
-                </div>
-                <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Confirm New Password</label>
-                  <input
-                    type="password"
-                    value={passwords.confirm_password}
-                    onChange={(e) => setPasswords({ ...passwords, confirm_password: e.target.value })}
-                    className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
-                    placeholder="Confirm new password"
-                  />
-                </div>
-                <button
-                  onClick={handleUpdatePassword}
-                  disabled={isChangingPassword}
-                  className="w-full py-2.5 bg-[#00D9FF] text-[#070B24] rounded-lg font-bold text-sm hover:bg-cyan-300 transition-colors mt-2"
-                >
-                  {isChangingPassword ? "Updating..." : "Update Password"}
-                </button>
-              </div>
               </div>
             </div>
 
@@ -309,12 +363,20 @@ const ClubSettingsPage = () => {
                     desc: "Display event attendance and success metrics",
                   },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-6">
+                  <div
+                    key={item.key}
+                    className="flex items-center justify-between p-6"
+                  >
                     <div>
                       <h3 className="text-sm font-semibold">{item.title}</h3>
-                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
+                      <p className="text-[11px] text-[#5B6397] mt-1">
+                        {item.desc}
+                      </p>
                     </div>
-                    <ToggleSwitch checked={!!privacy[item.key]} onChange={() => handlePrivacyToggle(item.key)} />
+                    <ToggleSwitch
+                      checked={!!privacy[item.key]}
+                      onChange={() => handlePrivacyToggle(item.key)}
+                    />
                   </div>
                 ))}
               </div>
@@ -334,9 +396,13 @@ const ClubSettingsPage = () => {
                     <div>
                       <p className="text-sm font-semibold flex items-center gap-2">
                         Chrome on Windows
-                        <span className="px-2 py-0.5 bg-green-500/10 text-green-400 text-[9px] rounded font-bold uppercase">Current</span>
+                        <span className="px-2 py-0.5 bg-green-500/10 text-green-400 text-[9px] rounded font-bold uppercase">
+                          Current
+                        </span>
                       </p>
-                      <p className="text-[11px] text-[#5B6397]">Barcelona, Spain • Active now</p>
+                      <p className="text-[11px] text-[#5B6397]">
+                        Barcelona, Spain • Active now
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -347,10 +413,14 @@ const ClubSettingsPage = () => {
                     </div>
                     <div>
                       <p className="text-sm font-semibold">Safari on MacBook</p>
-                      <p className="text-[11px] text-[#5B6397]">Barcelona, Spain • 3 hours ago</p>
+                      <p className="text-[11px] text-[#5B6397]">
+                        Barcelona, Spain • 3 hours ago
+                      </p>
                     </div>
                   </div>
-                  <button className="text-red-400 hover:text-red-300 p-2"><X size={16} /></button>
+                  <button className="text-red-400 hover:text-red-300 p-2">
+                    <X size={16} />
+                  </button>
                 </div>
                 <button
                   onClick={handleSignOutAll}
@@ -375,18 +445,42 @@ const ClubSettingsPage = () => {
               </div>
               <div className="divide-y divide-[#1A2160]">
                 {[
-                  { key: "email_notifications", title: "Email Notifications", desc: "Global master switch for all emails" },
-                  { key: "push_notifications", title: "Push Notifications", desc: "Receive alerts on your mobile device" },
-                  { key: "realtime_notifications", title: "Real-time Notifications", desc: "In-app alerts and instant updates" },
+                  {
+                    key: "email_notifications",
+                    title: "Email Notifications",
+                    desc: "Global master switch for all emails",
+                  },
+                  {
+                    key: "push_notifications",
+                    title: "Push Notifications",
+                    desc: "Receive alerts on your mobile device",
+                  },
+                  {
+                    key: "realtime_notifications",
+                    title: "Real-time Notifications",
+                    desc: "In-app alerts and instant updates",
+                  },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-6">
+                  <div
+                    key={item.key}
+                    className="flex items-center justify-between p-6"
+                  >
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-200">{item.title}</h3>
-                      <p className="text-[11px] text-[#5B6397] mt-1">{item.desc}</p>
+                      <h3 className="text-sm font-semibold text-gray-200">
+                        {item.title}
+                      </h3>
+                      <p className="text-[11px] text-[#5B6397] mt-1">
+                        {item.desc}
+                      </p>
                     </div>
-                    <ToggleSwitch 
-                      checked={!!(notif as any)[item.key]} 
-                      onChange={() => setNotif((prev: NotifSettings) => ({ ...prev, [item.key]: !(prev as any)[item.key] }))} 
+                    <ToggleSwitch
+                      checked={!!(notif as any)[item.key]}
+                      onChange={() =>
+                        setNotif((prev: NotifSettings) => ({
+                          ...prev,
+                          [item.key]: !(prev as any)[item.key],
+                        }))
+                      }
                     />
                   </div>
                 ))}
@@ -395,79 +489,119 @@ const ClubSettingsPage = () => {
 
             {/* Notification Types */}
             <div className="bg-[#0C1033] border border-[#1A2160] rounded-xl p-6">
-               <h2 className="text-white font-bold mb-6">Notification Types</h2>
-               
-               <div className="space-y-4">
-                  {/* New Messages */}
-                  <div className="bg-[#12143A] border border-[#1A2160] rounded-xl p-5">
-                    <p className="text-sm font-bold mb-4">New Messages</p>
-                    <div className="grid grid-cols-3 gap-4">
-                       {['email', 'push', 'realtime'].map(type => (
-                         <div key={type} className="flex flex-col items-center gap-2">
-                            <span className="text-[9px] text-[#5B6397] font-bold uppercase">{type}</span>
-                            <div 
-                              className={`w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer border transition-all ${
-                                (notif.notification_types.NEW_MESSAGE as any)[type] 
-                                ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400" 
-                                : "bg-[#070B24] border-[#1A2160] text-[#5B6397]"
-                              }`}
-                              onClick={() => setNotif((n: NotifSettings) => ({
-                                ...n, 
-                                notification_types: {
-                                  ...n.notification_types, 
-                                  NEW_MESSAGE: {
-                                    ...n.notification_types.NEW_MESSAGE, 
-                                    [type]: !(n.notification_types.NEW_MESSAGE as any)[type]
-                                  }
-                                }
-                              }))}
-                            >
-                              <Check size={16} className={ (notif.notification_types.NEW_MESSAGE as any)[type] ? "opacity-100" : "opacity-0" } />
-                            </div>
-                         </div>
-                       ))}
-                    </div>
-                  </div>
+              <h2 className="text-white font-bold mb-6">Notification Types</h2>
 
-                  {/* Event Registration */}
-                  <div className="bg-[#12143A] border border-[#1A2160] rounded-xl p-5">
-                    <p className="text-sm font-bold mb-4">Event Management</p>
-                    <div className="grid grid-cols-3 gap-4">
-                       {['email', 'push', 'realtime'].map(type => (
-                         <div key={type} className="flex flex-col items-center gap-2">
-                            <span className="text-[9px] text-[#5B6397] font-bold uppercase">{type}</span>
-                            <div 
-                              className={`w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer border transition-all ${
-                                (notif.notification_types.EVENT_REGISTRATION as any)[type] 
-                                ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400" 
-                                : "bg-[#070B24] border-[#1A2160] text-[#5B6397]"
-                              }`}
-                              onClick={() => setNotif((n: NotifSettings) => ({
-                                ...n, 
-                                notification_types: {
-                                  ...n.notification_types, 
-                                  EVENT_REGISTRATION: {
-                                    ...n.notification_types.EVENT_REGISTRATION, 
-                                    [type]: !(n.notification_types.EVENT_REGISTRATION as any)[type]
-                                  }
-                                }
-                              }))}
-                            >
-                              <Check size={16} className={ (notif.notification_types.EVENT_REGISTRATION as any)[type] ? "opacity-100" : "opacity-0" } />
-                            </div>
-                         </div>
-                       ))}
-                    </div>
+              <div className="space-y-4">
+                {/* New Messages */}
+                <div className="bg-[#12143A] border border-[#1A2160] rounded-xl p-5">
+                  <p className="text-sm font-bold mb-4">New Messages</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    {["email", "push", "realtime"].map((type) => (
+                      <div
+                        key={type}
+                        className="flex flex-col items-center gap-2"
+                      >
+                        <span className="text-[9px] text-[#5B6397] font-bold uppercase">
+                          {type}
+                        </span>
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer border transition-all ${
+                            (notif.notification_types.NEW_MESSAGE as any)[type]
+                              ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
+                              : "bg-[#070B24] border-[#1A2160] text-[#5B6397]"
+                          }`}
+                          onClick={() =>
+                            setNotif((n: NotifSettings) => ({
+                              ...n,
+                              notification_types: {
+                                ...n.notification_types,
+                                NEW_MESSAGE: {
+                                  ...n.notification_types.NEW_MESSAGE,
+                                  [type]: !(
+                                    n.notification_types.NEW_MESSAGE as any
+                                  )[type],
+                                },
+                              },
+                            }))
+                          }
+                        >
+                          <Check
+                            size={16}
+                            className={
+                              (notif.notification_types.NEW_MESSAGE as any)[
+                                type
+                              ]
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-               </div>
+                </div>
 
-               <button
-                  onClick={handleSaveNotifications}
-                  disabled={isUpdatingNotif}
-                  className="w-full mt-8 py-3 bg-[#00D9FF] text-[#070B24] rounded-xl font-extrabold text-sm hover:bg-cyan-300 transition-colors"
-                >
-                  {isUpdatingNotif ? "Saving..." : "Save Notification Settings"}
-                </button>
+                {/* Event Registration */}
+                <div className="bg-[#12143A] border border-[#1A2160] rounded-xl p-5">
+                  <p className="text-sm font-bold mb-4">Event Management</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    {["email", "push", "realtime"].map((type) => (
+                      <div
+                        key={type}
+                        className="flex flex-col items-center gap-2"
+                      >
+                        <span className="text-[9px] text-[#5B6397] font-bold uppercase">
+                          {type}
+                        </span>
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer border transition-all ${
+                            (
+                              notif.notification_types.EVENT_REGISTRATION as any
+                            )[type]
+                              ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
+                              : "bg-[#070B24] border-[#1A2160] text-[#5B6397]"
+                          }`}
+                          onClick={() =>
+                            setNotif((n: NotifSettings) => ({
+                              ...n,
+                              notification_types: {
+                                ...n.notification_types,
+                                EVENT_REGISTRATION: {
+                                  ...n.notification_types.EVENT_REGISTRATION,
+                                  [type]: !(
+                                    n.notification_types
+                                      .EVENT_REGISTRATION as any
+                                  )[type],
+                                },
+                              },
+                            }))
+                          }
+                        >
+                          <Check
+                            size={16}
+                            className={
+                              (
+                                notif.notification_types
+                                  .EVENT_REGISTRATION as any
+                              )[type]
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleSaveNotifications}
+                disabled={isUpdatingNotif}
+                className="w-full mt-8 py-3 bg-[#00D9FF] text-[#070B24] rounded-xl font-extrabold text-sm hover:bg-cyan-300 transition-colors"
+              >
+                {isUpdatingNotif ? "Saving..." : "Save Notification Settings"}
+              </button>
             </div>
           </div>
         )}
@@ -481,10 +615,14 @@ const ClubSettingsPage = () => {
               </h2>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Platform Language</label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                    Platform Language
+                  </label>
                   <select
                     value={general.platform_language}
-                    onChange={(e) => handleGeneralChange("platform_language", e.target.value)}
+                    onChange={(e) =>
+                      handleGeneralChange("platform_language", e.target.value)
+                    }
                     className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
                   >
                     <option>English (UK)</option>
@@ -493,10 +631,14 @@ const ClubSettingsPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Time Zone</label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                    Time Zone
+                  </label>
                   <select
                     value={general.time_zone}
-                    onChange={(e) => handleGeneralChange("time_zone", e.target.value)}
+                    onChange={(e) =>
+                      handleGeneralChange("time_zone", e.target.value)
+                    }
                     className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
                   >
                     <option>GMT+1 (Madrid, Barcelona)</option>
@@ -504,10 +646,14 @@ const ClubSettingsPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Date Format</label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                    Date Format
+                  </label>
                   <select
                     value={general.date_format}
-                    onChange={(e) => handleGeneralChange("date_format", e.target.value)}
+                    onChange={(e) =>
+                      handleGeneralChange("date_format", e.target.value)
+                    }
                     className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
                   >
                     <option>DD/MM/YYYY</option>
@@ -515,10 +661,14 @@ const ClubSettingsPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Currency</label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                    Currency
+                  </label>
                   <select
                     value={general.currency}
-                    onChange={(e) => handleGeneralChange("currency", e.target.value)}
+                    onChange={(e) =>
+                      handleGeneralChange("currency", e.target.value)
+                    }
                     className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400"
                   >
                     <option value="EUR">€ EUR</option>
@@ -533,10 +683,17 @@ const ClubSettingsPage = () => {
               <h2 className="text-white font-bold mb-6">Event Preferences</h2>
               <div className="space-y-5">
                 <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Default Event Duration</label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                    Default Event Duration
+                  </label>
                   <select
                     value={general.default_event_duration}
-                    onChange={(e) => handleGeneralChange("default_event_duration", e.target.value)}
+                    onChange={(e) =>
+                      handleGeneralChange(
+                        "default_event_duration",
+                        e.target.value,
+                      )
+                    }
                     className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-cyan-400"
                   >
                     <option>1 hour</option>
@@ -545,10 +702,17 @@ const ClubSettingsPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">Auto-approve Applications</label>
+                  <label className="text-[11px] text-[#5B6397] font-bold mb-1.5 block">
+                    Auto-approve Applications
+                  </label>
                   <select
                     value={general.auto_approve_applications}
-                    onChange={(e) => handleGeneralChange("auto_approve_applications", e.target.value)}
+                    onChange={(e) =>
+                      handleGeneralChange(
+                        "auto_approve_applications",
+                        e.target.value,
+                      )
+                    }
                     className="w-full bg-[#070B24] border border-[#1A2160] rounded-lg px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-cyan-400"
                   >
                     <option>Manual approval</option>
@@ -557,19 +721,27 @@ const ClubSettingsPage = () => {
                 </div>
                 <div className="flex items-center justify-between p-4 bg-[#070B24] border border-[#1A2160] rounded-lg mt-2">
                   <div>
-                    <h3 className="text-sm font-semibold">Send Confirmation Emails</h3>
-                    <p className="text-[11px] text-[#5B6397] mt-1">Automatically send confirmation to applicants</p>
+                    <h3 className="text-sm font-semibold">
+                      Send Confirmation Emails
+                    </h3>
+                    <p className="text-[11px] text-[#5B6397] mt-1">
+                      Automatically send confirmation to applicants
+                    </p>
                   </div>
                   <ToggleSwitch
                     checked={!!general.send_confirmation_emails}
-                    onChange={() => handleGeneralChange("send_confirmation_emails", !general.send_confirmation_emails)}
+                    onChange={() =>
+                      handleGeneralChange(
+                        "send_confirmation_emails",
+                        !general.send_confirmation_emails,
+                      )
+                    }
                   />
                 </div>
               </div>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
