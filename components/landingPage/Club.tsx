@@ -13,6 +13,7 @@ export default function Club() {
 
   const theme = useAppSelector((state) => state.theme);
   const { data: featuredClubs = [], isLoading } = useGetFeaturedClubsQuery();
+  console.log(featuredClubs, "feature club data")
 
   useEffect(() => {
     setMounted(true);
@@ -37,7 +38,7 @@ export default function Club() {
   // Filter active and by type
   const filteredItems = featuredClubs.filter((item) => {
     if (item.is_active === false) return false;
-    
+
     // Attempt to match tab to club_type. 
     // Fallback: if 'club_type' isn't explicitly 'Academy', treat as 'Club'
     const type = item.club_type?.toLowerCase() || "club";
@@ -68,28 +69,26 @@ export default function Club() {
   const visibleClubs = filteredItems.slice(currentIndex, currentIndex + visibleCount);
 
   return (
-    <section id="academies" className="py-16 bg-[#07142b] text-white">
+    <section id="academies" className="py-16 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto px-4">
         {/* Tabs */}
         <div className="flex justify-center mb-6 text-white">
-          <div className="flex bg-[#12143A] rounded-lg overflow-hidden border border-[#1D1445] px-2 shadow-sm">
+          <div className="flex bg-[var(--bg-card,#12143A)] rounded-lg overflow-hidden border border-white/10 px-2 shadow-sm">
             <button
               onClick={() => setActiveTab("clubs")}
-              className={`px-6 py-2 text-sm font-medium transition-colors  ${
-                activeTab === "clubs"
+              className={`px-6 py-2 text-sm font-medium transition-colors  ${activeTab === "clubs"
                   ? "bg-[#1A1C3D] text-white border-b-2 rounded-md border-cyan-400 m-2 shadow-sm"
                   : "text-gray-400 hover:text-white"
-              }`}
+                }`}
             >
               Clubs
             </button>
             <button
               onClick={() => setActiveTab("academies")}
-              className={`px-6 py-2 text-sm font-medium transition-colors ${
-                activeTab === "academies"
+              className={`px-6 py-2 text-sm font-medium transition-colors ${activeTab === "academies"
                   ? "bg-[#1A1C3D] text-white border-b-2 border-cyan-400 m-2 rounded-md shadow-sm"
                   : "text-gray-400 hover:text-white"
-              }`}
+                }`}
             >
               Academies
             </button>
@@ -104,7 +103,7 @@ export default function Club() {
         {/* Carousel / Loading Area */}
         {isLoading ? (
           <div className="flex justify-center items-center h-48">
-             <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="text-center text-gray-400 h-48 flex flex-col justify-center items-center border border-[#12143A] rounded-2xl bg-[#090C22]">
@@ -115,7 +114,7 @@ export default function Club() {
             {maxIndex > 0 && (
               <button
                 onClick={prevSlide}
-                className="absolute left-0 lg:-left-12 z-10 w-10 h-10 flex items-center justify-center text-white hover:text-cyan-400 hover:bg-[#1A1C3D] transition-colors bg-[#12143A] border border-[#1A1C3D] rounded-full shadow-lg"
+                className="absolute left-0 lg:-left-12 z-10 w-10 h-10 flex items-center justify-center text-white hover:text-[var(--primary-cyan)] hover:bg-white/5 transition-colors bg-[var(--bg-card,#12143A)] border border-white/10 rounded-full shadow-lg"
               >
                 <ChevronLeft size={24} />
               </button>
@@ -125,7 +124,7 @@ export default function Club() {
               {visibleClubs.map((club, i) => (
                 <div
                   key={club.id || i}
-                  className="flex-1 min-w-[150px] sm:min-w-[180px] bg-[#12143A] border border-transparent hover:border-[#1E2554] md:min-w-[220px] rounded-xl p-6 text-center transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
+                  className="flex-1 min-w-[150px] sm:min-w-[180px] bg-[var(--bg-card,#12143A)] border border-white/5 hover:border-[var(--primary-cyan)]/30 md:min-w-[220px] rounded-xl p-6 text-center transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
                 >
                   <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center p-2 bg-white/5 rounded-full">
                     <img
@@ -133,7 +132,7 @@ export default function Club() {
                       alt={club.club_name}
                       className="max-w-full max-h-full object-contain drop-shadow-md"
                       onError={(e) => {
-                         (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name='+club.club_name+'&background=0D8ABC&color=fff';
+                        (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=' + club.club_name + '&background=0D8ABC&color=fff';
                       }}
                     />
                   </div>
@@ -150,7 +149,7 @@ export default function Club() {
             {maxIndex > 0 && (
               <button
                 onClick={nextSlide}
-                className="absolute right-0 lg:-right-12 z-10 w-10 h-10 flex items-center justify-center text-white hover:text-cyan-400 hover:bg-[#1A1C3D] transition-colors bg-[#12143A] border border-[#1A1C3D] rounded-full shadow-lg"
+                className="absolute right-0 lg:-right-12 z-10 w-10 h-10 flex items-center justify-center text-white hover:text-[var(--primary-cyan)] hover:bg-white/5 transition-colors bg-[var(--bg-card,#12143A)] border border-white/10 rounded-full shadow-lg"
               >
                 <ChevronRight size={24} />
               </button>
@@ -160,7 +159,7 @@ export default function Club() {
 
         {/* View All Button */}
         <div className="flex justify-center mt-12">
-          <button className="px-8 py-2.5 border border-[#1E2554] bg-[#12143A] hover:bg-[#1A1C3D] hover:border-cyan-400/50 rounded-full transition-all flex items-center gap-2 text-white font-medium shadow-sm">
+          <button className="px-8 py-2.5 border border-white/10 bg-[var(--bg-card,#12143A)] hover:bg-white/5 hover:border-[var(--primary-cyan)] rounded-full transition-all flex items-center gap-2 text-white font-medium shadow-sm">
             View All {activeTab === "clubs" ? "Clubs" : "Academies"} <Lock size={14} className="text-cyan-400" />
           </button>
         </div>

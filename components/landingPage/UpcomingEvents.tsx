@@ -22,7 +22,7 @@ export default function UpcomingEvent() {
     .slice(0, 2);
 
   return (
-    <div className="py-16 bg-[#07142b] text-white">
+    <div className="py-16 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-9">
           <SectionTitel
@@ -44,10 +44,7 @@ export default function UpcomingEvent() {
             {upcomingEvents.map((event) => (
               <div
                 key={event.id}
-                className="rounded-2xl p-8"
-                style={{
-                  backgroundColor: theme.colors.backgroundCard,
-                }}
+                className="rounded-2xl p-8 bg-[var(--bg-card,#12143A)]"
               >
                 <div className="flex items-center justify-between mb-6">
                   <span className="text-[#06A295] font-semibold text-sm uppercase tracking-wider">

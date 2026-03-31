@@ -12,8 +12,8 @@ export interface BrandColors {
 export interface GeneralSettings {
   platformName: string;
   tagline: string;
-  platformLogo: string;
-  favicon: string;
+  platformLogo: string | File;
+  favicon: string | File;
   brandColors: BrandColors;
 }
 
@@ -123,7 +123,7 @@ export const adminSettingsApi = baseApi.injectEndpoints({
         }
       },
     }),
-    updateGeneralSettings: builder.mutation<UpdateSettingsResponse, GeneralSettings>({
+    updateGeneralSettings: builder.mutation<UpdateSettingsResponse, FormData>({
       query: (payload) => ({
         url: "/admin-dashboard/settings/general/",
         method: "PUT",

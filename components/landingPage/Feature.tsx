@@ -45,7 +45,7 @@ const players = [
 const Feature = () => {
   const theme = useAppSelector((state) => state.theme);
   return (
-    <section id="players" className="py-20 px-4 bg-[#07142b] text-white">
+    <section id="players" className="py-20 px-4 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -71,7 +71,7 @@ const Feature = () => {
           {players.map((player, index) => (
             <div
               key={index}
-              className="relative p-8 bg-[#12143A] rounded-lg   flex items-center justify-between  transition-colors duration-300"
+              className="relative p-8 bg-[var(--bg-card,#12143A)] rounded-lg flex items-center justify-between transition-colors duration-300"
             >
               {/* Player Info */}
               <div className="flex-1">

@@ -26,19 +26,12 @@ const steps = [
 const HowItWorks = () => {
   const theme = useAppSelector((state) => state.theme);
   return (
-    <section className="py-10 px-4 bg-[#07142b] text-white">
+    <section className="py-10 px-4 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
           <h2
-            className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
-            style={{
-              backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block text-white"
           >
             HOW IT WORKS
           </h2>
@@ -56,7 +49,7 @@ const HowItWorks = () => {
               className="group relative"
             >
               {/* Main Card with Gradient Border */}
-              <div className="relative p-8 md:p-10 rounded-2xl bg-[#0A1424] h-full">
+              <div className="relative p-8 md:p-10 rounded-2xl bg-[var(--bg-card,#0A1424)] h-full">
                 {/* Gradient Border using pseudo-element */}
                 <div
                   className="absolute inset-0 rounded-2xl p-[2px] bg-gradient-to-br opacity-60 group-hover:opacity-100 transition-opacity duration-300"
@@ -78,12 +71,7 @@ const HowItWorks = () => {
                       index === 1 ? 'self-center' : 
                       'self-end -mt-2 mr-[-0.5rem]'
                     }`}
-                    style={{
-                      background: `linear-gradient(135deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                    }}
+                    style={{ color: "#09585E" }}
                   >
                     {step.number}
                   </div>

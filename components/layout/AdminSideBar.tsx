@@ -27,6 +27,7 @@ import { useDispatch } from "react-redux";
 
 
 import { logout } from "@/redux/features/auth/authSlice";
+import BrandedLogo from "../reuseable/BrandedLogo";
 import Logo from "../reuseable/Logo";
 
 import { useAppSelector } from "@/redux/hooks";
@@ -221,10 +222,8 @@ const ScoutSideBar: React.FC = () => {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="mx-auto py-4">
-            <Link href="/">
-              <Logo />
-            </Link>
+          <div className="px-6 py-6 overflow-hidden">
+            <BrandedLogo variant="stacked" size="md" />
           </div>
 
           {/* Menu Items */}

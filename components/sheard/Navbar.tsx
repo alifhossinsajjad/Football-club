@@ -12,6 +12,8 @@ import { UserRole } from "@/types/auth";
 import { useNotifications } from "@/components/providers/NotificationProvider";
 import NotificationDropdown from "./NotificationDropdown";
 import { cn } from "@/lib/utils";
+import { useGetPublicSettingsQuery } from "@/redux/features/home/homeApi";
+import BrandedLogo from "../reuseable/BrandedLogo";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -25,11 +27,12 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifMenuOpen, setNotifMenuOpen] = useState(false);
-  
+
   const auth = useAppSelector((state) => state.auth);
   const { unreadCount } = useNotifications();
   const dispatch = useAppDispatch();
-  
+  const { data: settings } = useGetPublicSettingsQuery();
+
   const navRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notifMenuRef = useRef<HTMLDivElement>(null);
@@ -60,7 +63,7 @@ const Navbar = () => {
     const onMouseDown = (e: MouseEvent) => {
       const target = e.target as Node | null;
       if (!target) return;
-      
+
       if (userMenuOpen && userMenuRef.current && !userMenuRef.current.contains(target)) {
         setUserMenuOpen(false);
       }
@@ -89,16 +92,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4 lg:px-6 relative bg-white/10 backdrop-blur-md rounded-xl border border-white/5 shadow-lg">
         <div className="flex items-center justify-between h-20 lg:h-24">
           {/* Logo - Left */}
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/images/logo.png"
-              alt="NextGen Pros Logo"
-              width={70}
-              height={40}
-              className="w-[120px] lg:w-[150px] h-auto opacity-90 hover:opacity-100 transition-opacity"
-              priority
-            />
-          </Link>
+          <BrandedLogo 
+            variant="stacked" 
+            size="sm" 
+            hideNameOnMobile={true} 
+            className="hover:scale-105 transition-transform duration-200" 
+          />
 
           {/* Desktop Nav Links - Center */}
           <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
@@ -128,8 +127,8 @@ const Navbar = () => {
                     }}
                     className={cn(
                       "p-2.5 rounded-xl border transition-all relative group",
-                      notifMenuOpen 
-                        ? "bg-teal-400 text-teal-950 border-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.3)]" 
+                      notifMenuOpen
+                        ? "bg-teal-400 text-teal-950 border-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.3)]"
                         : "bg-[#050B14]/40 border-white/10 text-white hover:bg-[#050B14]/60"
                     )}
                   >
@@ -140,7 +139,7 @@ const Navbar = () => {
                       </span>
                     )}
                   </button>
-                  
+
                   {notifMenuOpen && (
                     <NotificationDropdown onClose={() => setNotifMenuOpen(false)} />
                   )}
@@ -184,11 +183,10 @@ const Navbar = () => {
                   </button>
                   <div
                     role="menu"
-                    className={`absolute right-0 mt-3 w-44 rounded-xl bg-[#161C39]/95 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition origin-top-right z-[60] overflow-hidden ${
-                      userMenuOpen
+                    className={`absolute right-0 mt-3 w-44 rounded-xl bg-[#161C39]/95 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition origin-top-right z-[60] overflow-hidden ${userMenuOpen
                         ? "opacity-100 scale-100 pointer-events-auto"
                         : "opacity-0 scale-95 pointer-events-none"
-                    }`}
+                      }`}
                   >
                     <Link
                       href={getDashboardHref(auth.user?.role)}

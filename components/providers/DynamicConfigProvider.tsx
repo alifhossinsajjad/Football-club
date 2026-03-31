@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
-import { useGetGeneralSettingsQuery } from "@/redux/features/admin/adminSettingsApi";
+import { useGetPublicSettingsQuery } from "@/redux/features/home/homeApi";
+import { useAppDispatch } from "@/redux/hooks";
+import { setTheme } from "@/redux/features/themeSlice";
 
 export function DynamicConfigProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: config, isLoading } = useGetGeneralSettingsQuery();
+  const dispatch = useAppDispatch();
+  const { data: config, isLoading } = useGetPublicSettingsQuery();
 
   useEffect(() => {
     if (config) {
@@ -16,16 +19,33 @@ export function DynamicConfigProvider({
 
       // 1. Inject Dynamic Theme (CSS Variables)
       if (config.brandColors) {
+        // Standard Tailwind/Shadcn variables
         root.style.setProperty("--primary", config.brandColors.primaryCyan);
         root.style.setProperty("--secondary", config.brandColors.primaryMagenta);
-        // Assuming backgroundDark maps to background, backgroundCard maps to card etc:
         root.style.setProperty("--background", config.brandColors.backgroundDark);
         root.style.setProperty("--card", config.brandColors.backgroundCard);
+
+        // Specific branding variables for direct use
+        root.style.setProperty("--primary-cyan", config.brandColors.primaryCyan);
+        root.style.setProperty("--primary-magenta", config.brandColors.primaryMagenta);
+        root.style.setProperty("--bg-dark", config.brandColors.backgroundDark);
+        root.style.setProperty("--bg-card", config.brandColors.backgroundCard);
+
+        // SYNC REDUX state
+        dispatch(setTheme({
+          colors: {
+            primaryCyan: config.brandColors.primaryCyan,
+            primaryMagenta: config.brandColors.primaryMagenta,
+            primaryGreen: config.brandColors.primaryCyan, // Fallback or mapping
+            backgroundCard: config.brandColors.backgroundCard,
+          }
+        }));
       }
 
       // 2. Real-time Title Injection (Client-side sync)
       if (config.platformName) {
         document.title = config.platformName;
+        dispatch(setTheme({ platformName: config.platformName }));
       }
 
       // 3. Dynamic Favicon sync

@@ -4,11 +4,12 @@ import Image from "next/image";
 import { useEffect, useRef, useMemo } from "react";
 import gsap from "gsap";
 import Link from "next/link";
-import { useGetHeroDataQuery } from "@/redux/features/home/homeApi";
+import { useGetHeroDataQuery, useGetPublicSettingsQuery } from "@/redux/features/home/homeApi";
 import { HeroData } from "@/types/home";
 
 const Banner = () => {
   const { data, isLoading, isError } = useGetHeroDataQuery();
+  const { data: settings } = useGetPublicSettingsQuery();
 
   const activeHero = useMemo(() => {
     return data?.data?.find((hero: HeroData) => hero.is_active);
@@ -93,15 +94,52 @@ const Banner = () => {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center max-w-5xl">
-        <div className="flex items-center mb-8">
-          <Image
-            src="/images/banner-log.png"
-            alt="NextGen Pros Logo"
-            width={180}
-            height={180}
-            className="drop-shadow-2xl"
-            priority
-          />
+        <div className="flex flex-col items-center mb-8">
+          {settings?.platformLogo ? (
+            <Image
+              src={settings.platformLogo}
+              alt={settings.platformName || "Logo"}
+              width={180}
+              height={180}
+              style={{ width: "auto" }}
+              className="drop-shadow-2xl h-[120px] md:h-[180px] object-contain mb-4"
+              priority
+              unoptimized
+            />
+          ) : (
+            <Image
+              src="/images/banner-log.png"
+              alt="NextGen Pros Logo"
+              width={180}
+              height={180}
+              className="drop-shadow-2xl mb-4"
+              priority
+            />
+          )}
+          {(() => {
+            const name = settings?.platformName || "NextGen Pros";
+            const firstSpaceIndex = name.indexOf(" ");
+            if (firstSpaceIndex !== -1) {
+              return (
+                <div className="flex flex-col items-center leading-tight">
+                  <span className="text-white font-bold text-3xl md:text-4xl tracking-tight">
+                    {name.substring(0, firstSpaceIndex)}
+                  </span>
+                  <span 
+                    className="font-black text-2xl md:text-3xl tracking-widest uppercase"
+                    style={{ color: "var(--primary-cyan, #00E5FF)" }}
+                  >
+                    {name.substring(firstSpaceIndex + 1)}
+                  </span>
+                </div>
+              );
+            }
+            return (
+              <span className="text-white font-bold text-4xl mt-2 italic shadow-2xl">
+                {name}
+              </span>
+            );
+          })()}
         </div>
 
         {/* Dynamic Subtitle */}
