@@ -6,10 +6,8 @@ import { poppins } from "../font";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    // <ProtectedRoute allowedRole="PLAYER">
-      
-    // </ProtectedRoute>
-    <div className={`min-h-screen bg-gray-50 ${poppins.className} `}>
+    <ProtectedRoute allowedRole="PLAYER">
+       <div className={`min-h-screen bg-gray-50 ${poppins.className} `}>
         <PlayerSideBar/>
         <div className="lg:ml-58.75 min-h-screen flex flex-col">
           <PlayerTopBar/>
@@ -18,6 +16,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           </main>
         </div>
       </div>
+    </ProtectedRoute>
+   
   )
 }
 
