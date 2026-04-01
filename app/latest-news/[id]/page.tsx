@@ -8,18 +8,23 @@ import { Loader2, ArrowLeft, Clock, Share2, Eye } from "lucide-react";
 import { useGetNewsArticleDetailsQuery } from "@/redux/features/admin/adminNewsApi";
 import Navbar from "@/components/sheard/Navbar";
 import Footer from "@/components/sheard/Footer";
+import { useAppSelector } from "@/redux/hooks";
+import { useRouter } from "next/navigation";
 import DOMPurify from "isomorphic-dompurify";
 
 export default function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   
+  const router = useRouter();
+  const user = useAppSelector((state) => state.auth.user);
+  
   const { data: articleData, isLoading } = useGetNewsArticleDetailsQuery(unwrappedParams.id);
   const article = articleData?.data;
 
-  // Scroll to top on load
+  // Scroll to top and auth check
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [isLoading]);
 
   if (isLoading) {
     return (

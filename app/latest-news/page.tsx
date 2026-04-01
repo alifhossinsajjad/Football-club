@@ -8,10 +8,14 @@ import { Loader2, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
 import Navbar from "@/components/sheard/Navbar";
 import Footer from "@/components/sheard/Footer";
+import { useAppSelector } from "@/redux/hooks";
+import { useRouter } from "next/navigation";
 
 export default function LatestNewsPage() {
+  const router = useRouter();
+  const user = useAppSelector((state) => state.auth.user);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 8;
   
   const { data: newsData, isLoading } = useGetNewsArticlesQuery();
   const articles = newsData?.data || [];
@@ -39,6 +43,12 @@ export default function LatestNewsPage() {
 
   const setPage = (page: number) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleArticleClick = (e: React.MouseEvent, id: number) => {
+    e.preventDefault();
+    router.push(`/latest-news/${id}`);
   };
 
   return (
@@ -105,12 +115,12 @@ export default function LatestNewsPage() {
                     </h3>
                     
                     <div className="mt-auto pt-4">
-                      <Link 
-                        href={`/latest-news/${article.id}`}
-                        className="text-sm text-cyan-400 font-medium hover:text-cyan-300 inline-flex items-center"
+                      <button
+                        onClick={(e) => handleArticleClick(e, article.id)}
+                        className="text-sm text-cyan-400 font-medium hover:text-cyan-300 inline-flex items-center group/btn"
                       >
-                        Read Full Article <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
-                      </Link>
+                        Read Full Article <span className="ml-1 group-hover/btn:translate-x-1 transition-transform">→</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -119,35 +129,29 @@ export default function LatestNewsPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center mt-12 gap-2">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg border border-[#1A2049] bg-[#0B0D2C] text-gray-400 hover:text-white hover:border-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setPage(page)}
-                    className={`w-10 h-10 flex items-center justify-center rounded-lg border transition-colors ${
-                      currentPage === page
-                        ? "bg-cyan-400/10 border-cyan-400 text-cyan-400 font-bold"
-                        : "border-[#1A2049] bg-[#0B0D2C] text-gray-400 hover:text-white hover:border-[#2A3560]"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+              <div className="flex justify-center items-center mt-16 gap-3">
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setPage(page)}
+                      className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-bold transition-all ${
+                        currentPage === page
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-500 border-transparent text-white shadow-lg shadow-cyan-500/20"
+                          : "border-[#1E2554] bg-[#0B0D2C] text-gray-400 hover:text-white hover:border-cyan-400/50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
                 
                 <button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg border border-[#1A2049] bg-[#0B0D2C] text-gray-400 hover:text-white hover:border-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-6 h-10 flex items-center justify-center rounded-lg border border-[#1E2554] bg-[#0B0D2C] text-gray-400 hover:text-white hover:border-cyan-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold text-sm"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  Next <ChevronRight className="w-4 h-4 ml-1" />
                 </button>
               </div>
             )}

@@ -14,11 +14,13 @@ import {
 import Link from "next/link";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
 import { useGetClubEventsQuery } from "@/redux/features/club/clubEventManagementApi";
+import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
 import { formatDistanceToNow, format } from "date-fns";
 
 const ClubDashboard: React.FC = () => {
   const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
   const { data: eventsResponse, isLoading: isEventsLoading } = useGetClubEventsQuery(undefined);
+  const { data: newsData, isLoading: isNewsLoading } = useGetNewsArticlesQuery();
 
   const eventsData = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse?.results || eventsResponse?.data || []);
   const activeEvents = eventsData.slice(0, 4);
@@ -115,6 +117,54 @@ const ClubDashboard: React.FC = () => {
                <div className="col-span-full py-12 text-center text-slate-400 border border-slate-700/50 rounded-xl border-dashed">
                  <p>No active events found. Create one to get started!</p>
                </div>
+            )}
+          </div>
+        </section>
+
+        {/* Latest Platform News */}
+        <section className="space-y-5 bg-[#12143A] border border-[#04B5A3]/30 p-8 rounded-lg">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold">Latest Platform News</h2>
+            <Link href="/latest-news">
+              <span className="text-sm text-cyan-400 hover:underline cursor-pointer font-medium">View All</span>
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {isNewsLoading ? (
+               <div className="col-span-full flex justify-center py-4">
+                 <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
+               </div>
+            ) : newsData?.data?.filter(a => a.status?.toUpperCase() === "PUBLISHED").slice(0, 2).map((article) => (
+              <Link href={`/latest-news/${article.id}`} key={article.id}>
+                <div className="flex gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800/70 transition-colors cursor-pointer h-full">
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={article.image || "/images/event-banner.jpg"} 
+                      alt={article.title} 
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-between min-w-0">
+                    <div>
+                      <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider mb-1">
+                        {article.category_name || "News"}
+                      </p>
+                      <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
+                        {article.title}
+                      </h3>
+                    </div>
+                    <p className="text-[10px] text-slate-500">
+                      {article.date ? format(new Date(article.date), "MMM d, yyyy") : "Recent"}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {(!newsData?.data || newsData.data.length === 0) && !isNewsLoading && (
+              <div className="col-span-full py-8 text-center text-slate-400 border border-slate-700/50 rounded-xl border-dashed">
+                <p className="text-sm">No recent news found</p>
+              </div>
             )}
           </div>
         </section>

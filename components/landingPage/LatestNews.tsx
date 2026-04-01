@@ -10,16 +10,19 @@ import { format } from "date-fns";
 
 export default function LatestNews() {
   const theme = useAppSelector((state) => state.theme);
+  const user = useAppSelector((state) => state.auth.user);
   const router = useRouter();
 
   const { data: newsData, isLoading } = useGetNewsArticlesQuery();
+  
   console.log(newsData, "newsData");
+
   const articles = newsData?.data || [];
 
   // Show only published articles, limited to the latest 4
   const latestPublishedArticles = articles
     .filter((article) => article.status?.toUpperCase() === "PUBLISHED")
-    .slice(0, 4);
+    .slice(0, 2);
 
   const handleViewAllNews = () => {
     router.push("/latest-news");
@@ -51,7 +54,10 @@ export default function LatestNews() {
           <div className="mb-12">
             <div className="grid md:grid-cols-2 gap-8 items-stretch">
               {latestPublishedArticles.map((article, idx) => (
-                <div key={article.id} className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl md:col-span-1 bg-[var(--bg-card,#12143A)]">
+                <div
+                  key={article.id}
+                  className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl md:col-span-1 bg-[var(--bg-card,#12143A)]"
+                >
                   {/* TEXT CONTENT */}
                   <div className="p-8 flex flex-col h-full justify-between">
                     {/* TOP INFO */}

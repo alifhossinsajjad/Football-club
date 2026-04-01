@@ -7,7 +7,8 @@ import {
 } from "@/redux/features/player/playerDashboard/playerDashboardApi";
 import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
-import { formatDistanceToNow } from "date-fns";
+import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
+import { formatDistanceToNow, format } from "date-fns";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa";
 import { FiMessageSquare } from "react-icons/fi";
@@ -96,6 +97,7 @@ export default function PlayerDashboard() {
   const { data: upcomingEventsData, isLoading: isEventsLoading } =
     useGetUpcomingEventsQuery();
   const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
+  const { data: newsData, isLoading: isNewsLoading } = useGetNewsArticlesQuery();
 
   const completeness = profile?.profile_completeness ?? 0;
   const upcomingEvents = upcomingEventsData ?? [];
@@ -281,6 +283,60 @@ export default function PlayerDashboard() {
               </button>
             </div>
           </Link>
+        </div>
+
+        {/* Latest Platform News */}
+        <div className="bg-[#11163C] rounded-xl border border-[#1E2554] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#1E2554] flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Latest Platform News</h2>
+            <Link href="/latest-news">
+              <span className="text-sm text-[#00E5FF] hover:underline cursor-pointer font-medium">View All</span>
+            </Link>
+          </div>
+
+          <div className="p-6 grid md:grid-cols-2 gap-4">
+            {isNewsLoading ? (
+              [...Array(2)].map((_, i) => (
+                <div key={i} className="animate-pulse flex gap-4">
+                  <div className="w-20 h-20 bg-[#1E2554] rounded-lg" />
+                  <div className="flex-1 space-y-2 py-1">
+                    <div className="h-4 bg-[#1E2554] rounded w-3/4" />
+                    <div className="h-4 bg-[#1E2554] rounded w-1/2" />
+                  </div>
+                </div>
+              ))
+            ) : newsData?.data?.filter(a => a.status?.toUpperCase() === "PUBLISHED").slice(0, 2).map((article) => (
+              <Link href={`/latest-news/${article.id}`} key={article.id}>
+                <div className="flex gap-4 p-3 rounded-lg hover:bg-[#0A0F2C] transition-colors cursor-pointer border border-transparent hover:border-[#1E2554]">
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={article.image || "/images/event-banner.jpg"} 
+                      alt={article.title} 
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-between min-w-0">
+                    <div>
+                      <p className="text-[10px] text-[#00E5FF] font-bold uppercase tracking-wider mb-1">
+                        {article.category_name || "News"}
+                      </p>
+                      <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
+                        {article.title}
+                      </h3>
+                    </div>
+                    <p className="text-[10px] text-[#9BA3C8]">
+                      {article.date ? format(new Date(article.date), "MMM d, yyyy") : "Recent"}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {(!newsData?.data || newsData.data.length === 0) && !isNewsLoading && (
+              <div className="col-span-full py-4 text-center text-[#9BA3C8] border border-dashed border-[#1E2554] rounded-lg">
+                <p className="text-sm">No recent news found</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Recent Messages */}
