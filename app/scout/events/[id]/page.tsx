@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -27,7 +28,8 @@ const EventDetailsPage = () => {
     useGetScoutRegistrationsQuery();
 
   const isRegistered = registrations?.results
-    ? registrations.results.some((reg: any) => reg.event === Number(eventId))
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      registrations.results.some((reg: any) => reg.event === Number(eventId))
     : registrations?.some((reg: any) => reg.event === Number(eventId));
 
   if (eventLoading || regsLoading)
@@ -214,7 +216,9 @@ const EventDetailsPage = () => {
                   <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
                     Location
                   </p>
-                  <p className="text-white text-sm md:text-base font-semibold truncate">{event.venue_name}</p>
+                  <p className="text-white text-sm md:text-base font-semibold truncate">
+                    {event.venue_name}
+                  </p>
                   <p className="text-white/60 text-xs md:text-sm mt-0.5 line-clamp-1">
                     {event.street_address}
                   </p>
@@ -223,7 +227,9 @@ const EventDetailsPage = () => {
 
               <div className="flex items-start gap-4">
                 <div className="bg-[#00E5FF]/10 p-2.5 md:p-3 rounded-xl flex-shrink-0">
-                  <span className="text-[#00E5FF] font-bold text-sm md:text-base">$</span>
+                  <span className="text-[#00E5FF] font-bold text-sm md:text-base">
+                    $
+                  </span>
                 </div>
                 <div>
                   <p className="text-white/40 text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">
@@ -318,9 +324,13 @@ const EventDetailsPage = () => {
                           {player.role}
                         </span>
                         <span className="hidden xs:inline">•</span>
-                        <span className="whitespace-nowrap">{player.age} years</span>
+                        <span className="whitespace-nowrap">
+                          {player.age} years
+                        </span>
                         <span className="hidden xs:inline">•</span>
-                        <span className="whitespace-nowrap">{player.country}</span>
+                        <span className="whitespace-nowrap">
+                          {player.country}
+                        </span>
                       </p>
                       <p className="text-[10px] md:text-xs text-white/30 mt-1 truncate">
                         {player.club}
@@ -390,7 +400,7 @@ const EventDetailsPage = () => {
                     <MdOutlinePhone className="text-white/60" />
                   </div>
                   <span className="text-xs text-white/70 font-medium font-mono">
-                   {/* {event.phone_number} */}
+                    {/* {event.phone_number} */}
                   </span>
                 </div>
               </div>
