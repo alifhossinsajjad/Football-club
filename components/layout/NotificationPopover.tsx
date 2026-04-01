@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  useGetNotificationSummaryQuery, 
-  useMarkAsReadMutation,
-  useGetNotificationsQuery
-} from "@/redux/features/notification/notificationApi";
+import { useGetNotificationSummaryQuery, useMarkAsReadMutation, useGetNotificationsQuery } from "@/redux/features/notification/notificationApi";
 import { Bell, BellDot, Loader2, MessageSquare, Calendar, ShieldAlert, Trash2, LogIn, CreditCard, Rocket } from "lucide-react";
+import { useAppSelector } from "@/redux/hooks";
 import {
   Popover,
   PopoverContent,
@@ -21,14 +18,25 @@ const NotificationPopover = () => {
   const { data: summaryData, isLoading: loadingSummary, refetch: refetchSummary } = useGetNotificationSummaryQuery();
   const { data: notificationData } = useGetNotificationsQuery(undefined, { skip: !open });
   const [markAsRead] = useMarkAsReadMutation();
+  const user = useAppSelector((state) => state.auth.user);
 
   const unreadCount = summaryData?.summary?.total_unread || (summaryData as any)?.total_unread || 0;
   const notifications: any[] = React.useMemo(() => {
-    if (Array.isArray(notificationData)) return notificationData;
-    if (notificationData?.notifications) return notificationData.notifications;
-    if ((notificationData as any)?.results) return (notificationData as any).results;
-    return [];
-  }, [notificationData]);
+    let allNotifications: any[] = [];
+    if (Array.isArray(notificationData)) allNotifications = notificationData;
+    else if (notificationData?.notifications) allNotifications = notificationData.notifications;
+    else if ((notificationData as any)?.results) allNotifications = (notificationData as any).results;
+    
+    // Admin filtering
+    if (user?.role?.toUpperCase() === "ADMIN") {
+      return allNotifications.filter((n: any) => {
+        const type = n.type?.toUpperCase() || n.notification_type?.toUpperCase();
+        return type !== "NEW_MESSAGE";
+      });
+    }
+
+    return allNotifications;
+  }, [notificationData, user]);
 
   const handleMarkAllAsRead = async () => {
     const unreadIds = notifications

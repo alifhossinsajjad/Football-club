@@ -9,7 +9,9 @@ import {
   useGetShortlistedPlayersQuery 
 } from "@/redux/features/scout/scoutProfileApi";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
-import { formatDistanceToNow } from "date-fns";
+import { useGetEventsQuery } from "@/redux/features/admin/adminEventApi";
+import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
+import { formatDistanceToNow, format } from "date-fns";
 import Link from "next/link";
 
 /* ─── Fake Data ─────────────────────────────────────────────── */
@@ -40,32 +42,7 @@ const shortlistedPlayers = [
   },
 ];
 
-const upcomingEvents = [
-  {
-    title: "Elite Youth Trial",
-    club: "Elite Football Academy",
-    location: "Madrid, Spain",
-    date: "15/09/2025",
-    time: "10:00 AM",
-    logo: "https://ui-avatars.com/api/?name=EFA&background=1a1a3e&color=00e5ff&size=48&bold=true",
-  },
-  {
-    title: "Football Academy Showcase",
-    club: "FC Barcelona Youth",
-    location: "Barcelona, Spain",
-    date: "20/09/2025",
-    time: "2:00 PM",
-    logo: "https://ui-avatars.com/api/?name=FCB&background=a50044&color=fff&size=48&bold=true",
-  },
-  {
-    title: "Talent Scouting Day",
-    club: "Portuguese FA",
-    location: "Lisbon, Portugal",
-    date: "25/09/2025",
-    time: "9:00 AM",
-    logo: "https://ui-avatars.com/api/?name=FPF&background=006600&color=fff&size=48&bold=true",
-  },
-];
+
 
 /* ─── Stat Card ─────────────────────────────────────────────── */
 interface StatCardProps {
@@ -88,10 +65,12 @@ const StatCard = ({ icon, label, value, sub, iconColor, subColor }: StatCardProp
 
 /* ─── Main Component ─────────────────────────────────────────── */
 const ScoutDashboard: React.FC = () => {
-  const { data: profile, isLoading: isProfileLoading } = useGetProfileQuery();
-  const { data: stats, isLoading: isStatsLoading } = useGetDashboardStatsQuery();
-  const { data: shortlistData, isLoading: isShortlistLoading } = useGetShortlistedPlayersQuery();
+  const { data: profile } = useGetProfileQuery();
+  const { data: stats } = useGetDashboardStatsQuery();
+  const { data: shortlistData } = useGetShortlistedPlayersQuery();
   const { data: chatData } = useGetConversationsQuery();
+  const { data: eventsData, isLoading: isEventsLoading } = useGetEventsQuery();
+  const { data: newsData, isLoading: isNewsLoading } = useGetNewsArticlesQuery();
 
   const scoutName = profile?.first_name || "Member";
   const shortlistedPlayers = shortlistData?.results || [];
@@ -234,6 +213,54 @@ const ScoutDashboard: React.FC = () => {
         </div>
       </section>
 
+      {/* ── Latest News ── */}
+      <section className="px-6 mb-6">
+        <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-base font-bold text-white">Latest Platform News</h2>
+            <Link href="/latest-news">
+              <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-3 py-1 rounded-md hover:bg-[#00E5FF]/10 transition-colors">
+                View All
+              </button>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {newsData?.data?.filter(a => a.status?.toUpperCase() === "PUBLISHED").slice(0, 2).map((article) => (
+              <Link href={`/latest-news/${article.id}`} key={article.id}>
+                <div className="bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-4 flex gap-4 hover:border-[#00E5FF1A] transition-colors h-full">
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={article.image || "/images/event-banner.jpg"} 
+                      alt={article.title} 
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-between min-w-0">
+                    <div>
+                      <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider mb-1">
+                        {article.category_name || "News"}
+                      </p>
+                      <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
+                        {article.title}
+                      </h3>
+                    </div>
+                    <p className="text-[10px] text-white/40">
+                      {article.date ? format(new Date(article.date), "MMM d, yyyy") : "Recent"}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {(!newsData?.data || newsData.data.length === 0) && !isNewsLoading && (
+              <div className="col-span-full py-8 text-center text-white/30 border border-white/[0.05] border-dashed rounded-xl">
+                <p className="text-sm">No recent news found</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* ── Upcoming Scouting Events ── */}
       <section className="px-6 mb-6">
         <div className="bg-[#12143A] border border-white/[0.07] rounded-xl p-5">
@@ -242,37 +269,45 @@ const ScoutDashboard: React.FC = () => {
           </h2>
 
           <div className="space-y-3">
-            {upcomingEvents.map((event) => (
+            {eventsData?.data?.filter(e => e.status?.toUpperCase() !== "CANCELLED").slice(0, 3).map((event) => (
               <div
-                key={event.title}
+                key={event.id}
                 className="flex items-center gap-4 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-4"
               >
-                {/* Logo */}
-                <img
-                  src={event.logo}
-                  alt={event.club}
-                  className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
-                />
+                {/* Logo/Icon */}
+                <div className="w-12 h-12 rounded-xl bg-[#1A1C3D] flex items-center justify-center border border-white/10 flex-shrink-0">
+                  <CalendarDays size={20} className="text-[#00E5FF]" />
+                </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-white">{event.title}</p>
-                  <p className="text-xs text-white/50">{event.club}</p>
-                  <p className="text-xs text-white/40 mt-0.5">{event.location}</p>
+                  <p className="font-semibold text-sm text-white truncate">{event.event_name}</p>
+                  <p className="text-xs text-white/50 truncate">{event.location || "Location TBD"}</p>
+                  <p className="text-[10px] text-cyan-400/60 mt-0.5 font-bold uppercase tracking-widest">
+                    {event.fee === "0.00" || !event.fee ? "Free Entry" : `$${event.fee}`}
+                  </p>
                 </div>
 
-                {/* Date & Time */}
+                {/* Date */}
                 <div className="text-right flex-shrink-0">
-                  <p className="text-xs text-[#00E5FF] font-medium">{event.date}</p>
-                  <p className="text-xs text-white/45">{event.time}</p>
+                  <p className="text-xs text-[#00E5FF] font-medium">
+                    {event.date ? format(new Date(event.date), "dd MMM yyyy") : "TBD"}
+                  </p>
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold mt-1">
+                    {event.status}
+                  </p>
                 </div>
               </div>
             ))}
+            {(!eventsData?.data || eventsData.data.length === 0) && !isEventsLoading && (
+              <div className="py-8 text-center text-white/30 border border-white/[0.05] border-dashed rounded-xl">
+                <p className="text-sm">No upcoming events found</p>
+              </div>
+            )}
           </div>
 
-          {/* View All Events */}
           <div className="mt-4 text-center">
-            <Link href="/scout/events">
+            <Link href="/latest-news">
               <button className="text-xs text-[#00E5FF] border border-[#00E5FF]/40 px-5 py-2 rounded-lg hover:bg-[#00E5FF]/10 transition-colors w-full">
                 View All Events
               </button>

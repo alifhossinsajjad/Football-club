@@ -5,11 +5,14 @@ import { Button } from "../ui/button";
 import { useAppSelector } from "@/redux/hooks";
 import SectionTitel from "../reuseable/SectionTitel";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useGetEventsQuery } from "@/redux/features/admin/adminEventApi";
 import { format } from "date-fns";
 
 export default function UpcomingEvent() {
+  const router = useRouter();
   const theme = useAppSelector((state) => state.theme);
+  const user = useAppSelector((state) => state.auth.user);
   const { data: eventsData, isLoading } = useGetEventsQuery();
 
   // Get active/upcoming events and limit to 4
@@ -125,6 +128,10 @@ export default function UpcomingEvent() {
 
                 <Button
                   variant="common"
+                  onClick={() => {
+                    // Redirect to appropriate dashboard or details
+                    router.push(`/latest-news`); // Or events detail if available
+                  }}
                   className="w-full text-white font-semibold py-3 rounded-md transition-colors duration-200"
                 >
                   See more details

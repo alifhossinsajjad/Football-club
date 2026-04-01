@@ -11,14 +11,17 @@ import {
   ArrowUpRight,
   MoreVertical,
 } from "lucide-react";
-import { useGetAdminDashboardDataQuery, AdminActivity } from "@/redux/features/admin/adminDashboardApi";
+import {
+  useGetAdminDashboardDataQuery,
+  AdminActivity,
+} from "@/redux/features/admin/adminDashboardApi";
 
-// ─── Skeleton Loader 
+// ─── Skeleton Loader
 const Skeleton = ({ className }: { className: string }) => (
   <div className={`animate-pulse rounded bg-[#1a2e45] ${className}`} />
 );
 
-// ─── Stat Card Component 
+// ─── Stat Card Component
 const StatCard = ({
   icon: Icon,
   label,
@@ -89,7 +92,8 @@ const ActivityItem = ({ activity }: { activity: AdminActivity }) => {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-white truncate">
-          <span className="text-slate-400">{activity.user}</span> {activity.action}
+          <span className="text-slate-400">{activity.user}</span>{" "}
+          {activity.action}
         </p>
         <p className="text-xs text-slate-500 mt-0.5">{activity.timestamp}</p>
       </div>
@@ -127,11 +131,17 @@ const AdminDashboard = () => {
     return (
       <div className="p-6 space-y-4">
         <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8 text-center">
-          <h2 className="text-xl font-bold text-red-500">Failed to load Dashboard</h2>
-          <p className="text-slate-400 mt-2">There was an error connecting to the server.</p>
+          <h2 className="text-xl font-bold text-red-500">
+            Failed to load Dashboard
+          </h2>
+          <p className="text-slate-400 mt-2">
+            There was an error connecting to the server.
+          </p>
           <div className="mt-6 p-4 bg-black/30 rounded-lg text-left overflow-auto max-h-40">
             <p className="text-xs font-mono text-red-400">Error Details:</p>
-            <pre className="text-[10px] font-mono text-slate-500 mt-2">{JSON.stringify(error, null, 2)}</pre>
+            <pre className="text-[10px] font-mono text-slate-500 mt-2">
+              {JSON.stringify(error, null, 2)}
+            </pre>
           </div>
           <button
             onClick={() => window.location.reload()}
@@ -186,8 +196,7 @@ const AdminDashboard = () => {
             Dashboard overview
           </h1>
         </div>
-        <div className="flex items-center gap-3">
-        </div>
+        <div className="flex items-center gap-3"></div>
       </div>
 
       {/* Stats Grid */}
@@ -201,18 +210,28 @@ const AdminDashboard = () => {
       <div className="bg-[#0D1B2A]/50 border border-[#162d45] rounded-2xl overflow-hidden backdrop-blur-sm">
         <div className="p-6 border-b border-[#162d45] flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">Recent Activities</h2>
-          <button className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">View All</button>
+          <button className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">
+            View All
+          </button>
         </div>
         <div className="divide-y divide-[#162d45]">
-          {data?.recent_activity?.length ? (
-            data.recent_activity.map((activity) => (
-              <ActivityItem key={activity.id} activity={activity} />
-            ))
-          ) : (
-            <div className="p-12 text-center">
-              <p className="text-slate-400">No recent activities found.</p>
-            </div>
-          )}
+          {(() => {
+            const filteredActivities = data?.recent_activity?.filter((a: AdminActivity) => {
+              const action = a.action?.toLowerCase() || "";
+              const type = a.type?.toLowerCase() || "";
+              return !action.includes("message") && !action.includes("chat") && type !== "message";
+            }) || [];
+
+            return filteredActivities.length ? (
+              filteredActivities.map((activity) => (
+                <ActivityItem key={activity.id} activity={activity} />
+              ))
+            ) : (
+              <div className="p-12 text-center">
+                <p className="text-slate-400">No recent activities found.</p>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>
