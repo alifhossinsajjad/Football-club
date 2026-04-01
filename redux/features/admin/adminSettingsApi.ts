@@ -82,6 +82,56 @@ export interface NotificationSettingsResponse {
   notifications: NotificationSettings;
 }
 
+export interface FooterLink {
+  id?: number;
+  category: string;
+  link_text: string;
+  link_url: string;
+  order: number;
+  is_active?: boolean;
+}
+
+export interface FooterContent {
+  id?: number;
+  about_text: string;
+  facebook_url: string;
+  twitter_url: string;
+  instagram_url: string;
+  linkedin_url: string;
+  youtube_url: string;
+  copyright_text: string;
+  background_color: string;
+  text_color: string;
+  is_active?: boolean;
+  links: FooterLink[];
+  platform_links?: FooterLink[];
+  resources_links?: FooterLink[];
+  support_links?: FooterLink[];
+}
+
+export interface FooterContentResponse {
+  success: boolean;
+  message?: string;
+  data: FooterContent | FooterContent[];
+}
+
+export interface FeaturedPlayer {
+  id?: number;
+  player_name: string;
+  country_name: string;
+  position: string;
+  order: number;
+  is_active?: boolean;
+  flag_image?: string | File | null;
+  player_image?: string | File | null;
+}
+
+export interface FeaturedPlayerResponse {
+  success: boolean;
+  message?: string;
+  data: FeaturedPlayer | FeaturedPlayer[];
+}
+
 export interface UpdateSettingsResponse {
   message: string;
 }
@@ -181,6 +231,60 @@ export const adminSettingsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard"],
     }),
+    getFooterContent: builder.query<FooterContentResponse, void>({
+      query: () => "/admin-dashboard/home/footer/",
+      providesTags: ["Dashboard"],
+    }),
+    createFooterContent: builder.mutation<FooterContentResponse, Partial<FooterContent>>({
+      query: (payload) => ({
+        url: "/admin-dashboard/home/footer/",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Dashboard"],
+    }),
+    updateFooterContent: builder.mutation<FooterContentResponse, { id: number; data: Partial<FooterContent> }>({
+      query: ({ id, data }) => ({
+        url: `/admin-dashboard/home/footer/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Dashboard"],
+    }),
+    deleteFooterContent: builder.mutation<FooterContentResponse, number>({
+      query: (id) => ({
+        url: `/admin-dashboard/home/footer/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Dashboard"],
+    }),
+    getFeaturedPlayers: builder.query<FeaturedPlayerResponse, void>({
+      query: () => "/admin-dashboard/home/featured-players/",
+      providesTags: ["Dashboard"],
+    }),
+    createFeaturedPlayer: builder.mutation<FeaturedPlayerResponse, FormData>({
+      query: (payload) => ({
+        url: "/admin-dashboard/home/featured-players/",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Dashboard"],
+    }),
+    updateFeaturedPlayer: builder.mutation<FeaturedPlayerResponse, { id: number; data: FormData }>({
+      query: ({ id, data }) => ({
+        url: `/admin-dashboard/home/featured-players/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Dashboard"],
+    }),
+    deleteFeaturedPlayer: builder.mutation<FeaturedPlayerResponse, number>({
+      query: (id) => ({
+        url: `/admin-dashboard/home/featured-players/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -195,4 +299,12 @@ export const {
   useUpdateMonetizationSettingsMutation,
   useGetNotificationSettingsQuery,
   useUpdateNotificationSettingsMutation,
+  useGetFooterContentQuery,
+  useCreateFooterContentMutation,
+  useUpdateFooterContentMutation,
+  useDeleteFooterContentMutation,
+  useGetFeaturedPlayersQuery,
+  useCreateFeaturedPlayerMutation,
+  useUpdateFeaturedPlayerMutation,
+  useDeleteFeaturedPlayerMutation,
 } = adminSettingsApi;
