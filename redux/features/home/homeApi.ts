@@ -20,6 +20,18 @@ export const homeApi = baseApi.injectEndpoints({
       query: () => "/admin-dashboard/home/hero/",
       providesTags: ["Dashboard"],
     }),
+    getUpcomingEvents: builder.query<any, void>({
+      query: () => "/admin-dashboard/home/upcoming-events/",
+      providesTags: ["Events"],
+    }),
+    getLatestNewsArticles: builder.query<any, void>({
+      query: () => "/admin-dashboard/home/latest-news/",
+      providesTags: ["Dashboard"],
+    }),
+    getFeaturedPlayers: builder.query<any, void>({
+      query: () => "/admin-dashboard/home/featured-players/",
+      providesTags: ["Discovery"],
+    }),
     getPublicSettings: builder.query<PublicSettings, void>({
       query: () => "/admin-dashboard/settings/public/",
       transformResponse: (response: { data: PublicSettings }) => response.data || response,
@@ -28,4 +40,10 @@ export const homeApi = baseApi.injectEndpoints({
    }),
 });
 
-export const { useGetHeroDataQuery, useGetPublicSettingsQuery } = homeApi;
+export const { 
+  useGetHeroDataQuery, 
+  useGetPublicSettingsQuery, 
+  useGetUpcomingEventsQuery, 
+  useGetLatestNewsArticlesQuery, 
+  useGetFeaturedPlayersQuery 
+} = homeApi;

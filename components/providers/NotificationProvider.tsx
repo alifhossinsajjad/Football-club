@@ -57,7 +57,18 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
   const [markAsReadMutation] = useMarkAsReadMutation();
 
   const notifications = useMemo(() => notificationsData?.notifications || [], [notificationsData]);
-  const unreadCount = useMemo(() => notificationsData?.unread_count || 0, [notificationsData]);
+  const rawUnreadCount = notificationsData?.unread_count || 0;
+  
+  const unreadCount = useMemo(() => {
+    if (currentUser?.role === "ADMIN") {
+      return notifications.filter(n => {
+        const type = (n.notification_type || n.type || "").toLowerCase();
+        return !n.is_read && !type.includes("message") && !type.includes("chat");
+      }).length;
+    }
+    return rawUnreadCount;
+  }, [notifications, rawUnreadCount, currentUser?.role]);
+
   const summary = useMemo(() => summaryData?.summary || null, [summaryData]);
   const loading = loadingNotifications;
 

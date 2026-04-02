@@ -6,19 +6,24 @@ import { useAppSelector } from "@/redux/hooks";
 import SectionTitel from "../reuseable/SectionTitel";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useGetEventsQuery } from "@/redux/features/admin/adminEventApi";
+import { useGetUpcomingEventsQuery } from "@/redux/features/home/homeApi";
+import { useGetMyRegistrationsQuery } from "@/redux/features/player/eventsDirectoryApi";
 import { format } from "date-fns";
+import { CheckCircle } from "lucide-react";
 
 export default function UpcomingEvent() {
   const router = useRouter();
   const theme = useAppSelector((state) => state.theme);
   const user = useAppSelector((state) => state.auth.user);
-  const { data: eventsData, isLoading } = useGetEventsQuery();
+  const { data: eventsData, isLoading } = useGetUpcomingEventsQuery();
+  const { data: registrations = [] } = useGetMyRegistrationsQuery(undefined, {
+    skip: !user || user.role !== "PLAYER",
+  });
 
   // Get active/upcoming events and limit to 4
   const upcomingEvents = (eventsData?.data || [])
     .filter(
-      (e) =>
+      (e: any) =>
         e.status?.toUpperCase() !== "CANCELLED" &&
         e.status?.toUpperCase() !== "COMPLETED",
     )
@@ -44,7 +49,7 @@ export default function UpcomingEvent() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {upcomingEvents.map((event) => (
+            {upcomingEvents.map((event: any) => (
               <div
                 key={event.id}
                 className="rounded-2xl p-8 bg-[var(--bg-card,#12143A)]"
@@ -126,16 +131,58 @@ export default function UpcomingEvent() {
                   </div>
                 </div>
 
-                <Button
-                  variant="common"
-                  onClick={() => {
-                    // Redirect to appropriate dashboard or details
-                    router.push(`/latest-news`); // Or events detail if available
-                  }}
-                  className="w-full text-white font-semibold py-3 rounded-md transition-colors duration-200"
-                >
-                  See more details
-                </Button>
+                {(() => {
+                  const reg = registrations.find((r: any) => (r.event === event.id || r.event_id === event.id));
+                  const isRegistered = !!reg && reg.status !== "CANCELLED";
+                  const isFull = event.is_full || (event.maximum_capacity > 0 && event.registered_count >= event.maximum_capacity);
+
+                  return (
+                    <Button
+                      variant="common"
+                      disabled={isFull && !isRegistered && user?.role === "PLAYER"}
+                      onClick={() => {
+                        if (!user) {
+                          router.push("/login");
+                          return;
+                        }
+                        
+                        const role = user.role?.toUpperCase();
+                        if (role === "PLAYER") {
+                          if (isRegistered) {
+                            router.push("/player/eventsDirectory");
+                          } else if (isFull) {
+                            return;
+                          } else {
+                            router.push(`/latest-events/${event.id}`);
+                          }
+                        } else if (role === "CLUB") {
+                          router.push("/club/eventManagement");
+                        } else if (role === "SCOUT") {
+                          router.push("/scout/events");
+                        } else if (role === "ADMIN") {
+                          router.push("/admin/event-management");
+                        } else {
+                          router.push(`/latest-events/${event.id}`);
+                        }
+                      }}
+                      className={`w-full font-semibold py-3 rounded-md transition-all duration-200 flex items-center justify-center gap-2 ${
+                        isRegistered 
+                          ? "bg-[#0B0E1E] text-cyan-400 border border-cyan-400/30" 
+                          : isFull && user?.role === "PLAYER"
+                          ? "bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed"
+                          : "text-white"
+                      }`}
+                    >
+                      {isRegistered ? (
+                         <>Already Registered</>
+                      ) : isFull && user?.role === "PLAYER" ? (
+                        "Event Full"
+                      ) : (
+                        "See more details"
+                      )}
+                    </Button>
+                  );
+                })()}
               </div>
             ))}
           </div>
@@ -143,7 +190,10 @@ export default function UpcomingEvent() {
 
         <div className="flex justify-center">
           <div className="flex justify-center mt-10">
-            <button className="px-8 py-2 border border-purple-700 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2 text-white ">
+            <button
+              onClick={() => router.push("/latest-events")} 
+              className="px-8 py-2 border border-purple-700 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2 text-white"
+            >
               View All Events <Lock size={14} className="hidden" />
             </button>
           </div>
@@ -254,10 +304,14 @@ export default function UpcomingEvent() {
 
               <div className="flex justify-center">
                 <Link
-                  href={"/login"}
-                  className="text-center bg-[#00F6FF] text-black px-3 py-2 font-bold rounded-full"
+                  href={user ? (
+                    user.role === "PLAYER" ? "/player" : 
+                    user.role === "CLUB_ACADEMY" ? "/club" : 
+                    user.role === "SCOUT_AGENT" ? "/scout" : "/admin"
+                  ) : "/login"}
+                  className="text-center bg-[#00F6FF] text-black px-8 py-3 font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
                 >
-                  Sign Up
+                  {user ? "Go to Dashboard" : "Sign Up"}
                 </Link>
               </div>
 

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { 
   useGetEventsQuery,
-  useGetRegistrationStatusQuery,
+  useGetMyRegistrationsQuery,
 } from "../../../redux/features/player/eventsDirectoryApi";
 
 interface EventData {
@@ -27,29 +27,20 @@ interface EventData {
 }
 
 // ── Single event card. Fetches its own status if a registrationId exists ──────
-const EventCard = ({ event, onViewDetails }: { event: EventData; onViewDetails: (id: number) => void }) => {
-  const [registration_id] = useState<string | null>(() => {
-    try {
-      const map = JSON.parse(localStorage.getItem("playerRegistrations") || "{}");
-      return map[String(event.id)] || null;
-    } catch {
-      return null;
-    }
-  });
-
-  // Fetch real-time status from the API only if we have a registration id
-  const { data: statusData } = useGetRegistrationStatusQuery(registration_id!, {
-    skip: !registration_id,
-    pollingInterval: 30000, // refresh every 30 seconds
-  });
-
-  const rawStatus: string | null =
-    statusData?.data?.registration_status ||
-    statusData?.registration_status ||
-    null;
-
-  const isRegistered = !!registration_id;
-  const isPending = rawStatus === "PENDING";
+const EventCard = ({ 
+  event, 
+  onViewDetails, 
+  isRegistered, 
+  isFull,
+  status 
+}: { 
+  event: EventData; 
+  onViewDetails: (id: number) => void;
+  isRegistered: boolean;
+  isFull: boolean;
+  status?: string;
+}) => {
+  const isPending = status === "PENDING";
 
   return (
     <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] overflow-hidden hover:border-cyan-400/30 transition-all group">
@@ -93,13 +84,16 @@ const EventCard = ({ event, onViewDetails }: { event: EventData; onViewDetails: 
           </div>
           <button
             onClick={() => onViewDetails(event.id)}
+            disabled={isFull && !isRegistered}
             className={`px-8 py-3 rounded-xl font-bold transition-all border ${
               isRegistered
                 ? "bg-[#0B0E1E] text-[#04B5A3] border-[#04B5A3] hover:bg-[#04B5A3]/5"
+                : isFull
+                ? "bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed"
                 : "bg-[#04B5A3] text-white border-transparent hover:bg-[#039d8f] shadow-[0_4px_12px_rgba(4,181,163,0.3)]"
             }`}
           >
-            {isRegistered ? "View Details" : "Register Now"}
+            {isRegistered ? "View Details" : isFull ? "Event Full" : "Register Now"}
           </button>
         </div>
       </div>
@@ -117,7 +111,13 @@ const EventsDirectoryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const { data: events = [], isLoading } = useGetEventsQuery();
+  const { data: eventsData, isLoading } = useGetEventsQuery();
+  console.log('player events ', eventsData);
+  const events = eventsData?.results || eventsData?.data || (Array.isArray(eventsData) ? eventsData : []);
+
+
+  const { data: registrationsData } = useGetMyRegistrationsQuery();
+  const registrationsArray = Array.isArray(registrationsData) ? registrationsData : (registrationsData as any)?.data || [];
 
   const filteredEvents = useMemo(() => {
     let result = events.filter((event: EventData) => {
@@ -204,9 +204,22 @@ const EventsDirectoryPage = () => {
       ) : (
         <div className="space-y-8">
           <div className="grid lg:grid-cols-2 gap-6">
-            {paginatedEvents.map((event: EventData) => (
-              <EventCard key={event.id} event={event} onViewDetails={handleViewDetails} />
-            ))}
+            {paginatedEvents.map((event: any) => {
+              const reg = registrationsArray.find((r: any) => (r.event === event.id || r.event_id === event.id));
+              const isRegistered = !!reg && (reg.status === "PENDING" || reg.status === "CONFIRMED" || reg.status === "PAID" || reg.status === "CONFIRM" || reg.status === "SUCCESS");
+              const isFull = event.is_full || (event.maximum_capacity > 0 && event.registered_count >= event.maximum_capacity);
+              
+              return (
+                <EventCard 
+                  key={event.id} 
+                  event={event} 
+                  onViewDetails={handleViewDetails} 
+                  isRegistered={isRegistered}
+                  isFull={isFull}
+                  status={reg?.status}
+                />
+              );
+            })}
           </div>
 
           {/* Pagination */}

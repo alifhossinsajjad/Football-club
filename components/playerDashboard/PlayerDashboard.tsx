@@ -7,7 +7,7 @@ import {
 } from "@/redux/features/player/playerDashboard/playerDashboardApi";
 import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
-import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
+import { useGetLatestNewsArticlesQuery } from "@/redux/features/home/homeApi";
 import { formatDistanceToNow, format } from "date-fns";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa";
@@ -97,7 +97,7 @@ export default function PlayerDashboard() {
   const { data: upcomingEventsData, isLoading: isEventsLoading } =
     useGetUpcomingEventsQuery();
   const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
-  const { data: newsData, isLoading: isNewsLoading } = useGetNewsArticlesQuery();
+  const { data: newsData, isLoading: isNewsLoading } = useGetLatestNewsArticlesQuery();
 
   const completeness = profile?.profile_completeness ?? 0;
   const upcomingEvents = upcomingEventsData ?? [];
@@ -121,7 +121,7 @@ export default function PlayerDashboard() {
       <div className=" mx-auto space-y-6">
         {/* Welcome */}
         <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
-          Welcome Back,
+          Welcome Back, {profile?.first_name || "Athlete"}
         </h1>
         {/* Profile Completeness */}
         <div className="bg-[#11163C] rounded-xl p-6 border border-[#1E2554]">
@@ -206,9 +206,11 @@ export default function PlayerDashboard() {
               <SlCalender size={30} className="text-white" />
               <p className="text-sm text-[#9BA3C8]">Events Registered</p>
               <p className="text-3xl font-bold">
-                {stats?.events_registered ?? 5}
+                {stats?.events_registered ?? 0}
               </p>
-              <p className="text-xs text-[#00E5FF]">2 upcoming</p>
+              <p className="text-xs text-[#00E5FF]">
+                {upcomingEvents.length} upcoming
+              </p>
             </div>
           </div>
         </div>
@@ -305,31 +307,19 @@ export default function PlayerDashboard() {
                   </div>
                 </div>
               ))
-            ) : newsData?.data?.filter(a => a.status?.toUpperCase() === "PUBLISHED").slice(0, 2).map((article) => (
-              <Link href={`/latest-news/${article.id}`} key={article.id}>
-                <div className="flex gap-4 p-3 rounded-lg hover:bg-[#0A0F2C] transition-colors cursor-pointer border border-transparent hover:border-[#1E2554]">
-                  <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                    <img 
-                      src={article.image || "/images/event-banner.jpg"} 
-                      alt={article.title} 
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between min-w-0">
-                    <div>
-                      <p className="text-[10px] text-[#00E5FF] font-bold uppercase tracking-wider mb-1">
-                        {article.category_name || "News"}
-                      </p>
-                      <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
-                        {article.title}
-                      </h3>
-                    </div>
-                    <p className="text-[10px] text-[#9BA3C8]">
-                      {article.date ? format(new Date(article.date), "MMM d, yyyy") : "Recent"}
+            ) : newsData?.data?.slice(0, 2).map((article: any) => (
+              <div key={article.id} className="flex gap-4 p-3 rounded-lg bg-[#0A0F2C] border border-[#1E2554] transition-colors h-full">
+                <div className="flex flex-col justify-between min-w-0">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
+                      {article.title}
+                    </h3>
+                    <p className="text-[10px] text-[#9BA3C8] mt-2">
+                      {article.subtitle}
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
             {(!newsData?.data || newsData.data.length === 0) && !isNewsLoading && (
               <div className="col-span-full py-4 text-center text-[#9BA3C8] border border-dashed border-[#1E2554] rounded-lg">

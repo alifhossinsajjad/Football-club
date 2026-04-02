@@ -14,13 +14,14 @@ import {
 import Link from "next/link";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
 import { useGetClubEventsQuery } from "@/redux/features/club/clubEventManagementApi";
-import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
+import { useGetLatestNewsArticlesQuery } from "@/redux/features/home/homeApi";
 import { formatDistanceToNow, format } from "date-fns";
 
 const ClubDashboard: React.FC = () => {
   const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
   const { data: eventsResponse, isLoading: isEventsLoading } = useGetClubEventsQuery(undefined);
-  const { data: newsData, isLoading: isNewsLoading } = useGetNewsArticlesQuery();
+  
+  const { data: newsData, isLoading: isNewsLoading } = useGetLatestNewsArticlesQuery();
 
   const eventsData = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse?.results || eventsResponse?.data || []);
   const activeEvents = eventsData.slice(0, 4);
@@ -55,7 +56,7 @@ const ClubDashboard: React.FC = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 ">
           <StatCard
             icon={<CalendarDays size={26} />}
-            label="Events"
+            label="Total Events"
             value={eventsData.length.toString()}
             change="Active"
             changeColor="text-cyan-400"
@@ -63,15 +64,15 @@ const ClubDashboard: React.FC = () => {
           <StatCard
             icon={<Users size={26} />}
             label="Player Applications"
-            value="234"
-            change="52 pending"
+            value={eventsData.reduce((acc: number, ev: any) => acc + (ev.registered_count || ev.registrations_count || 0), 0).toString()}
+            change="Dynamic"
             changeColor="text-amber-400"
           />
           <StatCard
             icon={<Mail size={26} />}
-            label="Messages"
-            value="45"
-            change="12 unread"
+            label="Unread Messages"
+            value={conversations.reduce((acc: number, conv: any) => acc + (conv.unread_count || 0), 0).toString()}
+            change={`${conversations.filter((c: any) => c.unread_count > 0).length} chats`}
             changeColor="text-rose-400"
           />
         </div>
@@ -105,10 +106,10 @@ const ClubDashboard: React.FC = () => {
                     key={event.id || idx}
                     title={event.title || event.event_name || "Club Event"}
                     date={parsedDate}
-                    location={event.location || event.city || "TBD"}
-                    registrations={event.registrations_count || event.registered_count || event.current_registrations || 0}
-                    max={event.max_participants || event.capacity || 100}
-                    isFeatured={event.is_featured}
+                    location={event.location || event.city || event.venue_name || "TBD"}
+                    registrations={event.registered_count || event.registrations_count || event.current_registrations || 0}
+                    max={event.maximum_capacity || event.max_participants || event.capacity || 100}
+                    isFeatured={event.featured || event.is_featured}
                     isHighlighted={event.is_highlighted}
                   />
                 );
@@ -135,31 +136,19 @@ const ClubDashboard: React.FC = () => {
                <div className="col-span-full flex justify-center py-4">
                  <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
                </div>
-            ) : newsData?.data?.filter(a => a.status?.toUpperCase() === "PUBLISHED").slice(0, 2).map((article) => (
-              <Link href={`/latest-news/${article.id}`} key={article.id}>
-                <div className="flex gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800/70 transition-colors cursor-pointer h-full">
-                  <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                    <img 
-                      src={article.image || "/images/event-banner.jpg"} 
-                      alt={article.title} 
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between min-w-0">
-                    <div>
-                      <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider mb-1">
-                        {article.category_name || "News"}
-                      </p>
-                      <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
-                        {article.title}
-                      </h3>
-                    </div>
-                    <p className="text-[10px] text-slate-500">
-                      {article.date ? format(new Date(article.date), "MMM d, yyyy") : "Recent"}
+            ) : newsData?.data?.slice(0, 2).map((article: any) => (
+              <div key={article.id} className="flex gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800/70 transition-colors h-full">
+                <div className="flex flex-col justify-between min-w-0">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
+                      {article.title}
+                    </h3>
+                    <p className="text-[10px] text-slate-400 mt-2">
+                      {article.subtitle}
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
             {(!newsData?.data || newsData.data.length === 0) && !isNewsLoading && (
               <div className="col-span-full py-8 text-center text-slate-400 border border-slate-700/50 rounded-xl border-dashed">

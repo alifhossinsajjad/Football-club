@@ -40,7 +40,7 @@ export const notificationApi = baseApi.injectEndpoints({
     }),
     deleteNotification: builder.mutation<{ success: boolean }, number | string>({
       query: (id) => ({
-        url: `/notifications/${id}`,
+        url: `/notifications/${id}/`,
         method: "DELETE",
       }),
       invalidatesTags: ["Notification"],

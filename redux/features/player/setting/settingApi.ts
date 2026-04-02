@@ -19,7 +19,7 @@ export const settingApi = baseApi.injectEndpoints({
       Partial<NotificationSettings>
     >({
       query: (body) => ({
-        url: "/api/players/settings/notifications/",
+        url: "/players/settings/notifications/",
         method: "PATCH",
         body,
       }),
@@ -32,7 +32,7 @@ export const settingApi = baseApi.injectEndpoints({
       Partial<PrivacySettings>
     >({
       query: (body) => ({
-        url: "/api/players/settings/privacy/",
+        url: "/players/settings/privacy/",
         method: "PATCH",
         body,
       }),
