@@ -51,7 +51,7 @@ const Tab = ({
   <button
     onClick={onClick}
     className={`
-flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all duration-300
+flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap flex-1 sm:flex-none
 ${
   active
     ? "text-white border-b-2 border-cyan-400 bg-gradient-to-r from-[#00E5FF33] to-[#9C27B033]"
@@ -84,22 +84,22 @@ const Row = ({
   onClick?: () => void;
 }) => (
   <div
-    className={`flex items-center justify-between bg-[#0F122B] p-5 mb-3 border border-white/5
-       transition-colors rounded-xl ${onClick ? "cursor-pointer hover:border-white/10" : ""}`}
+    className={`flex items-center justify-between bg-[#0F122B] p-4 sm:p-5 mb-3 border border-white/5
+       transition-colors rounded-xl gap-2 sm:gap-4 ${onClick ? "cursor-pointer hover:border-white/10" : ""}`}
     onClick={onClick}
   >
-    <div className="flex items-center gap-4 flex-1">
-      {icon && <div className="text-xl flex-shrink-0">{icon}</div>}
-      <div>
-        <p className="text-white text-sm font-semibold">{title}</p>
+    <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+      {icon && <div className="text-xl sm:text-2xl flex-shrink-0">{icon}</div>}
+      <div className="min-w-0 flex-1">
+        <p className="text-white text-sm sm:text-base font-semibold break-words">{title}</p>
         {description && (
-          <p className="text-xs text-[#8A9ABF] mt-1 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8A9ABF] mt-0.5 sm:mt-1 leading-relaxed break-words">
             {description}
           </p>
         )}
       </div>
     </div>
-    <div className="flex-shrink-0 pl-3">{control}</div>
+    <div className="flex-shrink-0 pl-2 sm:pl-3">{control}</div>
   </div>
 );
 
@@ -348,18 +348,20 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen text-white font-sans p-6 md:p-8">
+    <div className="min-h-screen text-white font-sans p-4 sm:p-6 md:p-8">
       {/* Page Title */}
-      <h1 className="text-4xl">
-        <SectionTitel title="Settings" />
-      </h1>
+      <div className="mb-2 sm:mb-4">
+        <h1 className="text-3xl sm:text-4xl">
+          <SectionTitel title="Settings" />
+        </h1>
+      </div>
 
       <div
-        className="flex gap-2 border-b border-[#1A2160] mb-6 overflow-x-auto whitespace-nowrap pb-1 
+        className="flex gap-2 mb-6 overflow-x-auto whitespace-nowrap pb-1 
           [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         {/* Tabs Header */}
-        <div className="flex bg-[#12143A] border-b border-[#04B5A3]/20 ">
+        <div className="flex w-full sm:w-auto min-w-max bg-[#12143A] border-b border-[#04B5A3]/20 ">
           {[
             { key: "Account", icon: <CiUser size={18} />, label: "Account" },
             {
@@ -390,7 +392,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Content Area within borders */}
-        <div className="p-6">
+        <div className="px-0 sm:px-6 py-2 sm:py-6">
           {activeTab === "Account" && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div>
@@ -620,13 +622,13 @@ export default function SettingsPage() {
                 <SectionHeader>Notification Types</SectionHeader>
 
                 {/* New Messages */}
-                <div className="bg-[#0F122B] rounded-xl border border-white/5 p-5 mb-4">
+                <div className="bg-[#0F122B] rounded-xl border border-white/5 p-4 sm:p-5 mb-4">
                   <p className="text-white text-sm font-semibold mb-3">
                     New Messages
                   </p>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                      <span className="text-[9px] sm:text-[10px] text-[#8A9ABF] uppercase tracking-wider">
                         Email
                       </span>
                       <SquareCheckbox
@@ -646,7 +648,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                      <span className="text-[9px] sm:text-[10px] text-[#8A9ABF] uppercase tracking-wider">
                         Push
                       </span>
                       <SquareCheckbox
@@ -666,7 +668,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                      <span className="text-[9px] sm:text-[10px] text-[#8A9ABF] uppercase tracking-wider">
                         Realtime
                       </span>
                       <SquareCheckbox
@@ -690,13 +692,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Event Registration */}
-                <div className="bg-[#0F122B] rounded-xl border border-white/5 p-5">
+                <div className="bg-[#0F122B] rounded-xl border border-white/5 p-4 sm:p-5">
                   <p className="text-white text-sm font-semibold mb-3">
                     Event Management
                   </p>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                      <span className="text-[9px] sm:text-[10px] text-[#8A9ABF] uppercase tracking-wider">
                         Email
                       </span>
                       <SquareCheckbox
@@ -720,7 +722,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                      <span className="text-[9px] sm:text-[10px] text-[#8A9ABF] uppercase tracking-wider">
                         Push
                       </span>
                       <SquareCheckbox
@@ -743,7 +745,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-[10px] text-[#8A9ABF] uppercase tracking-wider">
+                      <span className="text-[9px] sm:text-[10px] text-[#8A9ABF] uppercase tracking-wider">
                         Realtime
                       </span>
                       <SquareCheckbox
@@ -866,7 +868,7 @@ export default function SettingsPage() {
       {/* ── Change Password Modal ────────────────────── */}
       {pwdModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0F122B] border border-white/5 rounded-2xl p-7 w-full max-w-md shadow-2xl">
+          <div className="bg-[#0F122B] border border-white/5 rounded-2xl p-5 sm:p-7 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-[17px] font-bold text-white">
                 Change Password
@@ -950,7 +952,7 @@ export default function SettingsPage() {
       {/* Delete modal */}
       {deleteModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0F122B] border border-white/5 rounded-2xl p-7 w-full max-w-md">
+          <div className="bg-[#0F122B] border border-white/5 rounded-2xl p-5 sm:p-7 w-full max-w-md">
             <h2 className="text-[17px] font-bold text-white mb-2">
               Delete Account
             </h2>
