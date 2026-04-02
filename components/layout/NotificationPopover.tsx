@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useGetNotificationSummaryQuery, useMarkAsReadMutation, useGetNotificationsQuery } from "@/redux/features/notification/notificationApi";
-import { Bell, BellDot, Loader2, MessageSquare, Calendar, ShieldAlert, Trash2, LogIn, CreditCard, Rocket } from "lucide-react";
+import { Bell, BellDot, Loader2, MessageSquare, Calendar, ShieldAlert, LogIn, CreditCard, Rocket, Users } from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 import {
   Popover,
