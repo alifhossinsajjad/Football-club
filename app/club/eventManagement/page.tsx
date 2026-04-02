@@ -28,6 +28,7 @@ import {
   Globe,
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import toast from "react-hot-toast";
 import {
   useGetClubEventsQuery,
   useCreateEventMutation,
@@ -39,6 +40,7 @@ import {
 type Event = {
   id: string;
   name: string;
+  event_type: string;
   date: string;
   location: string;
   fee: string;
@@ -60,6 +62,7 @@ type Event = {
   country?: string;
   startTime?: string;
   endTime?: string;
+  banner?: string | File | null;
   _raw?: any;
 };
 
@@ -126,6 +129,7 @@ export default function EventManagementPage() {
         country: apiEvent.country || "",
         startTime: apiEvent.start_time || "10:00:00",
         endTime: apiEvent.end_time || "14:00:00",
+        banner: apiEvent.event_media || null,
         _raw: apiEvent,
       };
     });
@@ -173,18 +177,16 @@ export default function EventManagementPage() {
 
   const handleSaveEdit = async (updated: Event) => {
     try {
-      // Map back to API schema
-      const apiData = {
+      const formDataToSend = new FormData();
+      
+      const eventData = {
         event_name: updated.name,
         event_type: "TRIAL",
         event_date: updated.date,
         start_time: updated.startTime || "10:00:00",
         end_time: updated.endTime || "14:00:00",
         venue_name: updated.location.split(",")[0] || "Venue Name",
-        street_address:
-          updated.streetAddress ||
-          updated.location.split(",")[1]?.trim() ||
-          "Street Address",
+        street_address: updated.streetAddress || updated.location.split(",")[1]?.trim() || "Street Address",
         city: updated.city || "City",
         postal_code: updated.postalCode || "00000",
         country: updated.country || "Country",
@@ -198,22 +200,31 @@ export default function EventManagementPage() {
         status: updated.status.toUpperCase(),
       };
 
-      await updateEvent({ id: updated.id, ...apiData }).unwrap();
+      formDataToSend.append("data", JSON.stringify(eventData));
+
+      if (updated.banner instanceof File) {
+        formDataToSend.append("banner", updated.banner);
+      }
+
+      await updateEvent({ id: updated.id, body: formDataToSend }).unwrap();
       closeModal();
     } catch (error) {
       console.error("Update failed:", error);
+      toast.error("Failed to update event.");
     }
   };
 
   const handleCreateEvent = async (formData: any) => {
     const today = new Date().toISOString().split("T")[0];
     if (formData.date < today) {
-      alert("Event date cannot be in the past.");
+      toast.error("Event date cannot be in the past.");
       return;
     }
 
     try {
-      const apiData = {
+      const formDataToSend = new FormData();
+      
+      const eventData = {
         event_name: formData.name,
         event_type: formData.type.toUpperCase(),
         event_date: formData.date,
@@ -224,25 +235,32 @@ export default function EventManagementPage() {
         city: formData.location.city,
         postal_code: formData.location.postalCode,
         country: formData.location.country,
-        minimum_age: parseInt(formData.minAge),
-        maximum_age: parseInt(formData.maxAge),
+        minimum_age: parseInt(formData.minAge) || 12,
+        maximum_age: parseInt(formData.maxAge) || 18,
         registration_fee: formData.fee,
-        maximum_capacity: parseInt(formData.capacity),
+        maximum_capacity: parseInt(formData.capacity) || 100,
         description: formData.description,
         contact_email: formData.contactEmail,
         contact_phone: formData.contactPhone,
         status: "ACTIVE",
       };
 
-      await createEvent(apiData).unwrap();
+      formDataToSend.append("data", JSON.stringify(eventData));
+
+      if (formData.banner instanceof File) {
+        formDataToSend.append("banner", formData.banner);
+      }
+
+      await createEvent(formDataToSend).unwrap();
       setShowCreate(false);
+      toast.success("Event created successfully!");
     } catch (error: any) {
       console.error("Create failed:", error);
       const errorData = error?.data?.errors;
       if (errorData?.non_field_errors) {
-        alert(errorData.non_field_errors[0]);
+        toast.error(errorData.non_field_errors[0]);
       } else {
-        alert("Failed to create event. Please check your data.");
+        toast.error("Failed to create event. Please check your data.");
       }
     }
   };
@@ -479,6 +497,46 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
           <div className="p-8 grid lg:grid-cols-[1fr_360px] gap-8 overflow-y-auto custom-scrollbar">
             {/* Left Column: Form Cards */}
             <div className="space-y-6">
+              {/* Event Image */}
+              <div className="bg-[#121433] rounded-[20px] p-7 border border-[#1E2550]">
+                <h3 className="text-xl font-bold text-white mb-6">
+                  Event Media
+                </h3>
+                <input
+                  type="file"
+                  id="edit-event-banner-upload"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setForm((prev) => ({ ...prev, banner: file }));
+                    }
+                  }}
+                />
+                <div
+                  className="relative h-[240px] rounded-2xl overflow-hidden border border-[#1E2550] bg-[#0B0E1E] group cursor-pointer"
+                  onClick={() =>
+                    document.getElementById("edit-event-banner-upload")?.click()
+                  }
+                >
+                  <img
+                    src={
+                      form.banner
+                        ? typeof form.banner === "string"
+                          ? form.banner
+                          : URL.createObjectURL(form.banner)
+                        : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"
+                    }
+                    alt="Event Banner"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Upload size={32} className="text-white mb-2" />
+                    <p className="text-white font-bold">Change Image</p>
+                  </div>
+                </div>
+              </div>
               {/* Basic Information */}
               <div className="bg-[#121433] rounded-[20px] p-7 border border-[#1E2550]">
                 <h3 className="text-xl font-bold text-white mb-6">
@@ -797,8 +855,22 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
 
         <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-6">
           {/* Hero Section */}
-          <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] p-8 relative overflow-hidden shrink-0">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] p-8 relative overflow-hidden shrink-0 min-h-[300px] flex flex-col justify-end">
+            {/* Background Image */}
+            <img
+              src={
+                typeof event.banner === "string"
+                  ? event.banner
+                  : event.banner
+                    ? URL.createObjectURL(event.banner)
+                    : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"
+              }
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-40"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#121433] via-[#121433]/60 to-transparent" />
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 mt-auto">
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                   {event.name}
@@ -982,28 +1054,24 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
                     role: "Midfielder",
                     age: 19,
                     registered: "2 days ago",
-                   
                   },
                   {
                     name: "Sarah Player",
                     role: "Forward",
                     age: 18,
                     registered: "3 days ago",
-                  
                   },
                   {
                     name: "Mike Johnson",
                     role: "Defender",
                     age: 20,
                     registered: "5 days ago",
-                    
                   },
                   {
                     name: "Emma Garcia",
                     role: "Goalkeeper",
                     age: 17,
                     registered: "1 week ago",
-                
                   },
                 ].map((participant, idx) => (
                   <div
@@ -1034,7 +1102,7 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
                           {participant.registered}
                         </p>
                       </div>
-                      
+
                       <button className="text-gray-500 hover:text-cyan-400 transition-colors">
                         <Eye size={18} />
                       </button>
@@ -1137,7 +1205,7 @@ function CreateEventModal({
     contactEmail: "",
     contactPhone: "",
     website: "",
-    banner: null as string | null,
+    banner: null as File | string | null,
   });
 
   const next = () => setStep((s) => Math.min(4, s + 1));
@@ -1820,30 +1888,62 @@ function Step3({
 
           <div className="space-y-4">
             <p className="text-gray-400 text-sm">Event Banner Image</p>
+            <input
+              type="file"
+              id="event-banner-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  updateData({
+                    ...data,
+                    banner: file,
+                  });
+                }
+              }}
+            />
             <div
-              className={`border-2 border-dashed rounded-[24px] p-12 text-center transition-all cursor-pointer group ${
+              className={`border-2 border-dashed rounded-[24px] p-12 text-center transition-all cursor-pointer group relative overflow-hidden h-[240px] flex items-center justify-center ${
                 data.banner
                   ? "border-cyan-400/50 bg-cyan-400/5"
                   : "border-[#1E2550] hover:border-cyan-400/30 hover:bg-white/5"
               }`}
-              onClick={() => {
-                // Mock upload
-                updateData({
-                  ...data,
-                  banner:
-                    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200",
-                });
-              }}
+              onClick={() =>
+                document.getElementById("event-banner-upload")?.click()
+              }
             >
-              <div className="w-16 h-16 bg-cyan-400/10 rounded-2xl flex items-center justify-center text-cyan-400 mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <Upload size={32} />
-              </div>
-              <h4 className="text-white font-bold mb-2">
-                Click to upload or drag and drop
-              </h4>
-              <p className="text-xs text-gray-500">
-                Recommended: 1200x400px, PNG or JPG (max 5MB)
-              </p>
+              {data.banner ? (
+                <>
+                  <img
+                    src={
+                      typeof data.banner === "string"
+                        ? data.banner
+                        : URL.createObjectURL(data.banner)
+                    }
+                    alt="Preview"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <Upload size={32} className="text-white mb-2" />
+                    <p className="text-white font-bold">Change Image</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <div className="w-16 h-16 bg-cyan-400/10 rounded-2xl flex items-center justify-center text-cyan-400 mx-auto mb-6 group-hover:scale-110 transition-transform">
+                      <Upload size={32} />
+                    </div>
+                    <h4 className="text-white font-bold mb-2">
+                      Click to upload or drag and drop
+                    </h4>
+                    <p className="text-xs text-gray-500">
+                      Recommended: 1200x400px, PNG or JPG (max 5MB)
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -1938,8 +2038,11 @@ function Step4({
       <div className="relative h-[240px] rounded-[32px] overflow-hidden border border-[#1E2550]">
         <img
           src={
-            data.banner ||
-            "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"
+            data.banner
+              ? typeof data.banner === "string"
+                ? data.banner
+                : URL.createObjectURL(data.banner)
+              : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"
           }
           alt="Event Banner"
           className="w-full h-full object-cover"
