@@ -10,21 +10,7 @@ import { PlayerCard } from "@/components/scoutDashboard/playerDiscovery/PlayerCa
 import SkeletonCard from "@/components/scoutDashboard/playerDiscovery/SkeletonCard";
 import { PlayerDetailModal } from "@/components/scoutDashboard/playerDiscovery/PlayerDetailModal";
 
-const FLAG: Record<string, string> = {
-  Spain: "🇪🇸",
-  Portugal: "🇵🇹",
-  France: "🇫🇷",
-  Germany: "🇩🇪",
-  England: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-  Brazil: "🇧🇷",
-  Argentina: "🇦🇷",
-  Italy: "🇮🇹",
-  Netherlands: "🇳🇱",
-  Belgium: "🇧🇪",
-  Croatia: "🇭🇷",
-  Morocco: "🇲🇦",
-};
-export const getFlag = (n: string) => FLAG[n] ?? "🌍";
+import { getFlagEmoji as getFlag } from "@/lib/utils/flagUtils";
 
 // Filter options (unchanged)
 const POSITIONS = [

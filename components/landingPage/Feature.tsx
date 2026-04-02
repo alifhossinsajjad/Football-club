@@ -1,56 +1,24 @@
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { Lock } from "lucide-react";
-
-const players = [
-  {
-    firstName: "Lionel",
-    lastName: "Messi",
-    country: "Argentina",
-    flag: "🇦🇷",
-    position: "Forward",
-    image:
-      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    firstName: "Kevin",
-    lastName: "Bruyne",
-    country: "Belgium",
-    flag: "🇧🇪",
-    position: "Midfielder",
-    image:
-      "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    firstName: "Virgil",
-    lastName: "van",
-    country: "Netherlands",
-    flag: "🇳🇱",
-    position: "Defender",
-    image:
-      "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    firstName: "Mbappé",
-    lastName: "",
-    country: "France",
-    flag: "🇫🇷",
-    position: "Forward",
-    image:
-      "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=150&h=150&fit=crop&crop=face",
-  },
-];
+import { Lock, Loader2, ArrowRight } from "lucide-react";
+import { useGetFeaturedPlayersQuery } from "@/redux/features/home/homeApi";
+import { getFlagEmoji } from "@/lib/utils/flagUtils";
+import Link from "next/link";
 
 const Feature = () => {
   const theme = useAppSelector((state) => state.theme);
+  const { data: playersData, isLoading } = useGetFeaturedPlayersQuery();
+
+  const players = playersData?.data || playersData || [];
+
   return (
     <section id="players" className="py-20 px-4 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h2
-            className="text-4xl md:text-5xl lg:text-6xl  font-bold mb-2 inline-block"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block"
             style={{
               backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
               WebkitBackgroundClip: "text",
@@ -66,56 +34,70 @@ const Feature = () => {
           </p>
         </div>
 
-        {/* Players Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {players.map((player, index) => (
-            <div
-              key={index}
-              className="relative p-8 bg-[var(--bg-card,#12143A)] rounded-lg flex items-center justify-between transition-colors duration-300"
-            >
-              {/* Player Info */}
-              <div className="flex-1">
-                <h3
-                  className="font-display text-lg font-semibold mb-2"
-                  style={{
-                    backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  <span>{player.firstName}</span>
-                  {player.lastName && <span> {player.lastName}</span>}
-                </h3>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">{player.flag}</span>
-                  <span className="text-muted-foreground text-sm">
-                    {player.country}
-                  </span>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-48">
+            <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+          </div>
+        ) : players.length === 0 ? (
+          <div className="text-center text-gray-400 h-32 flex flex-col justify-center border border-dashed border-gray-700 rounded-2xl">
+            <p>No featured players available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {players.map((player: any, index: number) => (
+              <div
+                key={player.id || index}
+                className="relative p-8 bg-[var(--bg-card,#12143A)] rounded-lg flex items-center justify-between transition-all duration-300 hover:scale-[1.02] border border-transparent hover:border-cyan-500/30"
+              >
+                {/* Player Info */}
+                <div className="flex-1">
+                  <h3
+                    className="font-display text-lg font-semibold mb-2"
+                    style={{
+                      backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }}
+                  >
+                    <span>{player.first_name || player.firstName}</span>
+                    {(player.last_name || player.lastName) && <span> {player.last_name || player.lastName}</span>}
+                  </h3>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">
+                      {getFlagEmoji(player.nationality || player.country || "")}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      {player.nationality || player.country || "Unknown"}
+                    </span>
+                  </div>
+                  <p className="text-purple-400 text-sm">
+                    Position: {player.designation || player.position || "N/A"}
+                  </p>
                 </div>
-                <p className="text-purple-400 text-sm">
-                  Position: {player.position}
-                </p>
-              </div>
 
-              {/* Player Image */}
-              <div className="w-32 h-24 rounded-lg overflow-hidden bg-navy-700">
-                <img
-                  src={player.image}
-                  alt={`${player.firstName} ${player.lastName}`}
-                  className="w-full h-full object-cover"
-                />
+                {/* Player Image */}
+                <div className="w-32 h-24 rounded-lg overflow-hidden bg-navy-700 border border-gray-800">
+                  <img
+                    src={player.profile_image || player.image || "/images/player-placeholder.jpg"}
+                    alt={`${player.first_name} ${player.last_name}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* View All Button */}
-          <div className="flex justify-center mt-10">
-          <button className="px-8 py-2 border border-purple-700 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2 text-white ">
-            View All Clubs <Lock size={14} />
-          </button>
+        <div className="flex justify-center mt-10">
+          <Link
+            href={!useAppSelector((state) => state.auth.user) ? "/login" : "/scout/playerDiscovery"}
+            className="px-10 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center gap-3"
+          >
+            Explore All Players <ArrowRight size={18} />
+          </Link>
         </div>
       </div>
     </section>

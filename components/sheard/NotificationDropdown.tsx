@@ -4,6 +4,7 @@ import React from "react";
 import { useNotifications } from "@/components/providers/NotificationProvider";
 import { formatDistanceToNow } from "date-fns";
 import { Bell, Check, Trash2, X, MessageSquare, Calendar, CreditCard, Info } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useMarkAsReadMutation, useDeleteNotificationMutation } from "@/redux/features/notification/notificationApi";
@@ -13,6 +14,19 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
   const { notifications, unreadCount, loading } = useNotifications();
   const [markAsRead] = useMarkAsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
+  const user = useAppSelector((state) => state.auth.user);
+
+  const filteredNotifications = React.useMemo(() => {
+    if (user?.role === "ADMIN") {
+      return notifications.filter(n => {
+        const type = (n.notification_type || n.type || "").toLowerCase();
+        // User specifically wants to exclude chat/messages and keep:
+        // register, profile boost, and plan purchase
+        return !type.includes("message") && !type.includes("chat");
+      });
+    }
+    return notifications;
+  }, [notifications, user?.role]);
 
   const handleMarkAllRead = async () => {
     const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id as number);
@@ -26,12 +40,12 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
   };
 
   const getIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case "message": return <MessageSquare className="h-4 w-4 text-teal-400" />;
-      case "event": return <Calendar className="h-4 w-4 text-purple-400" />;
-      case "payment": return <CreditCard className="h-4 w-4 text-teal-400" />;
-      default: return <Info className="h-4 w-4 text-teal-400" />;
-    }
+    const t = type.toLowerCase();
+    if (t.includes("message") || t.includes("chat")) return <MessageSquare className="h-4 w-4 text-teal-400" />;
+    if (t.includes("event") || t.includes("register")) return <Calendar className="h-4 w-4 text-purple-400" />;
+    if (t.includes("payment") || t.includes("plan") || t.includes("purchase")) return <CreditCard className="h-4 w-4 text-teal-400" />;
+    if (t.includes("boost") || t.includes("profile")) return <Check className="h-4 w-4 text-cyan-400" />;
+    return <Info className="h-4 w-4 text-teal-400" />;
   };
 
   return (
@@ -74,7 +88,7 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
             <p className="text-[10px] font-medium leading-relaxed">No data transmissions logged in the current cycle.</p>
           </div>
         ) : (
-          notifications.map((notif) => (
+          filteredNotifications.map((notif) => (
             <div 
               key={notif.id}
               className={cn(
@@ -86,7 +100,7 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
                 "h-9 w-9 rounded-xl flex items-center justify-center shrink-0 shadow-inner",
                 !notif.is_read ? "bg-teal-400/20" : "bg-white/5"
               )}>
-                {getIcon(notif.type || "info")}
+                {getIcon(notif.notification_type || notif.type || "info")}
               </div>
               <div className="flex-1 min-w-0">
                 <p className={cn(
@@ -104,7 +118,8 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
               </div>
               
               <button 
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   try {
                     console.log("Deleting notification ID:", notif.id);
                     await deleteNotification(notif.id as number).unwrap();
@@ -114,7 +129,7 @@ const NotificationDropdown = ({ onClose }: { onClose: () => void }) => {
                     toast.error("Failed to delete notification");
                   }
                 }}
-                className="opacity-0 group-hover:opacity-100 p-1.5 text-white/20 hover:text-red-400 transition-all absolute top-2 right-2"
+                className="opacity-0 group-hover:opacity-100 p-1.5 text-white/20 hover:text-red-400 transition-all absolute top-2 right-2 z-10"
               >
                 <Trash2 size={12} />
               </button>
