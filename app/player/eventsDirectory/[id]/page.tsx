@@ -21,7 +21,8 @@ import {
   useCheckoutMutation, 
   useVerifyPaymentMutation,
   useGetRegistrationStatusQuery,
-  useValidatePromoMutation
+  useValidatePromoMutation,
+  useGetMyRegistrationsQuery,
 } from "../../../../redux/features/player/eventsDirectoryApi";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -39,11 +40,14 @@ interface EventData {
   minimum_age: number;
   maximum_age: number;
   maximum_capacity: number;
+  registered_count: number;
+  is_full: boolean;
 }
 
 interface RegistrationStatusData {
   registration_status?: string;
   payment_status?: string;
+  status?: string;
   data?: {
     registration_status?: string;
   };
@@ -58,19 +62,18 @@ const EventDetailsPage = () => {
 
   const [view, setView] = useState<ViewState>("DETAILS");
 
-  // Read registration_id from localStorage for this specific event
-  const [localRegistrationId] = useState<string | null>(() => {
-    try {
-      const map = JSON.parse(localStorage.getItem("playerRegistrations") || "{}");
-      return map[String(id)] || null;
-    } catch {
-      return null;
-    }
-  });
+  const { data: registrationsData } = useGetMyRegistrationsQuery();
+  console.log('register data ',registrationsData);
+  const registrationsArray = Array.isArray(registrationsData) ? registrationsData : (registrationsData as any)?.data || [];
+  
+  const reg = registrationsArray.find((r: any) => (r.event === Number(id) || r.event_id === Number(id)));
+  const isRegistered = !!reg && (reg.status === "PENDING" || reg.status === "CONFIRMED" || reg.status === "PAID" || reg.status === "CONFIRM" || reg.status === "SUCCESS");
+  const localRegistrationId = reg?.registration_id || reg?.id;
 
-  const { data: event, isLoading: isDetailsLoading } = useGetEventDetailsQuery(id, {
+  const { data: eventResponse, isLoading: isDetailsLoading } = useGetEventDetailsQuery(id, {
     skip: !id,
   });
+  const event = eventResponse?.data || eventResponse; // Handle different potential response structures
 
   // Fetch real-time registration status ONLY if we have a stored registration_id
   const { data: registrationStatus } = useGetRegistrationStatusQuery(localRegistrationId!, {
@@ -120,8 +123,8 @@ const EventDetailsPage = () => {
       <EventDetailsView 
         event={event} 
         onRegister={handleRegister} 
-        registrationStatus={registrationStatus?.data || registrationStatus}
-        isRegistered={!!localRegistrationId}
+        registrationStatus={registrationStatus?.data || registrationStatus || reg}
+        isRegistered={isRegistered}
       />
     </div>
   );
@@ -138,14 +141,12 @@ const EventDetailsView = ({
   registrationStatus?: RegistrationStatusData,
   isRegistered?: boolean,
 }) => {
-  // Get the real status from the registration status API response
-  const rawStatus: string | null = 
-    registrationStatus?.registration_status || 
+  const status = registrationStatus?.registration_status || 
     registrationStatus?.payment_status || 
+    registrationStatus?.status ||
     null;
 
-  const isPending = rawStatus === "PENDING";
-  const status = rawStatus;
+  const isFull = event.is_full || (event.maximum_capacity > 0 && event.registered_count >= event.maximum_capacity);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -285,15 +286,19 @@ const EventDetailsView = ({
             <div className="space-y-4">
               <button 
                 disabled
-                className="w-full py-5 rounded-2xl bg-[#0B0E1E] text-[#8B97B5] font-black text-lg cursor-not-allowed uppercase tracking-widest shadow-inner border border-[#1E2548] flex items-center justify-center gap-2"
+                className="w-full py-5 rounded-2xl bg-[#0B0E1E] text-[#04B5A3] font-black text-lg cursor-not-allowed uppercase tracking-widest shadow-inner border border-[#1E2548] flex items-center justify-center gap-2"
               >
                 {status === "PENDING" ? <Clock size={20} /> : <Check size={20} />}
                 {status === "PENDING" ? "Registration Pending" : "Already Registered"}
               </button>
-              {status === "PENDING" && (
-                <p className="text-[10px] text-amber-500 text-center font-bold">Please complete your payment to finalize registration.</p>
-              )}
             </div>
+          ) : isFull ? (
+            <button 
+              disabled
+              className="w-full py-5 rounded-2xl bg-gray-800 text-gray-500 font-black text-lg cursor-not-allowed uppercase tracking-widest border border-gray-700"
+            >
+              Event Full
+            </button>
           ) : (
             <button 
               onClick={onRegister}
@@ -360,8 +365,8 @@ const RegistrationFlow = ({ event, onBack, onComplete }: { event: EventData, onB
           emergency_contact_name: data.emergencyName,
           emergency_phone: data.emergencyPhone,
           relationship: data.relationship,
-          medical_conditions: data.medical || "None",
-          allergies: data.allergies || "None",
+          medical_conditions: data.medical || "",
+          allergies: data.allergies || "",
           ...(isPromoApplied && promoCode ? { promo_code: promoCode } : {})
         };
         const res = await createRegistration(payload).unwrap();

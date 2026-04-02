@@ -7,7 +7,7 @@ import { DiscoveryPlayer } from "@/types/scout/playerDicoverType";
 
 // Reusable components (assume they exist, or define them inline)
 import { Avatar } from "./Avatar";
-import { getFlag } from "@/app/scout/playerDiscovery/page";
+import { getFlagEmoji as getFlag } from "@/lib/utils/flagUtils";
 
 
 // Custom icon (no direct lucide match)

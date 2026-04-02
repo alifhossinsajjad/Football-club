@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useGetNotificationSummaryQuery, useMarkAsReadMutation, useGetNotificationsQuery } from "@/redux/features/notification/notificationApi";
-import { Bell, BellDot, Loader2, MessageSquare, Calendar, ShieldAlert, Trash2, LogIn, CreditCard, Rocket } from "lucide-react";
+import { Bell, BellDot, Loader2, MessageSquare, Calendar, ShieldAlert, LogIn, CreditCard, Rocket, Users } from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 import {
   Popover,
@@ -20,14 +20,15 @@ const NotificationPopover = () => {
   const [markAsRead] = useMarkAsReadMutation();
   const user = useAppSelector((state) => state.auth.user);
 
-  const unreadCount = summaryData?.summary?.total_unread || (summaryData as any)?.total_unread || 0;
+  const unreadCountHeader = summaryData?.summary?.total_unread || (summaryData as any)?.total_unread || 0;
+  
   const notifications: any[] = React.useMemo(() => {
     let allNotifications: any[] = [];
     if (Array.isArray(notificationData)) allNotifications = notificationData;
     else if (notificationData?.notifications) allNotifications = notificationData.notifications;
     else if ((notificationData as any)?.results) allNotifications = (notificationData as any).results;
     
-    // Admin filtering
+    // Admin filtering: Exclude chat messages
     if (user?.role?.toUpperCase() === "ADMIN") {
       return allNotifications.filter((n: any) => {
         const type = n.type?.toUpperCase() || n.notification_type?.toUpperCase();
@@ -37,6 +38,15 @@ const NotificationPopover = () => {
 
     return allNotifications;
   }, [notificationData, user]);
+
+  // For Admin, we recalibrate the unread count based on visible notifications 
+  // because the header summary might include hidden messages
+  const displayUnreadCount = React.useMemo(() => {
+    if (user?.role?.toUpperCase() === "ADMIN") {
+      return notifications.filter(n => !n.is_read).length;
+    }
+    return unreadCountHeader;
+  }, [notifications, unreadCountHeader, user]);
 
   const handleMarkAllAsRead = async () => {
     const unreadIds = notifications
@@ -53,6 +63,8 @@ const NotificationPopover = () => {
     switch (type?.toUpperCase()) {
       case "NEW_MESSAGE": return <MessageSquare className="h-4 w-4 text-blue-400" />;
       case "EVENT_REGISTRATION": return <Calendar className="h-4 w-4 text-green-400" />;
+      case "USER_REGISTRATION": return <Users className="h-4 w-4 text-cyan-400" />;
+      case "EVENT_CREATED": return <Calendar className="h-4 w-4 text-orange-400" />;
       case "USER_LOGIN": return <LogIn className="h-4 w-4 text-indigo-400" />;
       case "SUBSCRIPTION_PURCHASE": return <CreditCard className="h-4 w-4 text-yellow-400" />;
       case "PROFILE_BOOST": return <Rocket className="h-4 w-4 text-purple-400" />;
@@ -67,11 +79,11 @@ const NotificationPopover = () => {
           type="button"
           className="relative p-2 rounded-full hover:bg-[#242E5A] text-gray-400 hover:text-[#00E5FF] transition-all"
         >
-          {unreadCount > 0 ? (
+          {displayUnreadCount > 0 ? (
             <>
               <BellDot className="h-5 w-5 animate-pulse text-[#00E5FF]" />
               <Badge className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center bg-red-500 text-white border-2 border-[#1A2049] text-[10px] p-0 font-bold">
-                {unreadCount > 99 ? "99+" : unreadCount}
+                {displayUnreadCount > 99 ? "99+" : displayUnreadCount}
               </Badge>
             </>
           ) : (
@@ -82,7 +94,7 @@ const NotificationPopover = () => {
       <PopoverContent className="w-80 md:w-96 p-0 bg-[#1A2049] border-[#2A3560] shadow-2xl rounded-2xl overflow-hidden z-[100]" align="end">
         <div className="p-4 border-b border-[#2A3560] flex items-center justify-between bg-[#242E5A]/50">
           <h3 className="font-bold text-white tracking-wide">Notifications</h3>
-          {unreadCount > 0 && (
+          {displayUnreadCount > 0 && (
             <button 
               onClick={handleMarkAllAsRead}
               className="text-[10px] text-[#00E5FF] hover:underline font-bold uppercase tracking-wider"

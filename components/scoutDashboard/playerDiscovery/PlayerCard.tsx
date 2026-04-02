@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getFlag } from "@/app/scout/playerDiscovery/page";
+import { getFlagEmoji as getFlag } from "@/lib/utils/flagUtils";
 import { useCreateConversationMutation } from "@/redux/features/chat/chatApi";
 import {
   useAddToShortlistMutation,

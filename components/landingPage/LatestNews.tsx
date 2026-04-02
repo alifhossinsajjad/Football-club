@@ -5,7 +5,7 @@ import Image from "next/image";
 import SectionTitel from "@/components/reuseable/SectionTitel";
 import { useAppSelector } from "@/redux/hooks";
 import { Lock, Loader2 } from "lucide-react";
-import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
+import { useGetLatestNewsArticlesQuery } from "@/redux/features/home/homeApi";
 import { format } from "date-fns";
 
 export default function LatestNews() {
@@ -13,23 +13,14 @@ export default function LatestNews() {
   const user = useAppSelector((state) => state.auth.user);
   const router = useRouter();
 
-  const { data: newsData, isLoading } = useGetNewsArticlesQuery();
+  const { data: newsData, isLoading } = useGetLatestNewsArticlesQuery();
   
   console.log(newsData, "newsData");
 
-  const articles = newsData?.data || [];
-
-  // Show only published articles, limited to the latest 4
-  const latestPublishedArticles = articles
-    .filter((article) => article.status?.toUpperCase() === "PUBLISHED")
-    .slice(0, 2);
+  const newsItems = newsData?.data || [];
 
   const handleViewAllNews = () => {
     router.push("/latest-news");
-  };
-
-  const handleReadMore = (id: number) => {
-    router.push(`/latest-news/${id}`);
   };
 
   return (
@@ -46,61 +37,47 @@ export default function LatestNews() {
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
           </div>
-        ) : latestPublishedArticles.length === 0 ? (
+        ) : newsItems.length === 0 ? (
           <div className="text-center text-gray-400 h-32 flex flex-col justify-center">
             <p>No latest news available right now.</p>
           </div>
         ) : (
           <div className="mb-12">
             <div className="grid md:grid-cols-2 gap-8 items-stretch">
-              {latestPublishedArticles.map((article, idx) => (
+              {newsItems.slice(0, 2).map((item: any) => (
                 <div
-                  key={article.id}
-                  className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl md:col-span-1 bg-[var(--bg-card,#12143A)]"
+                  key={item.id}
+                  className="overflow-hidden rounded-2xl md:col-span-1 border border-cyan-500/10 transition-all duration-300 hover:border-cyan-500/40 group"
+                  style={{ backgroundColor: item.background_color || "var(--bg-card,#12143A)" }}
                 >
-                  {/* TEXT CONTENT */}
-                  <div className="p-8 flex flex-col h-full justify-between">
-                    {/* TOP INFO */}
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-landing-number text-cyan-400 text-xs uppercase tracking-wider font-bold truncate max-w-[60%]">
-                        {article.category_name || "News"}
-                      </span>
-                      <span className="text-gray-400 font-medium text-xs whitespace-nowrap">
-                        {article.date
-                          ? format(new Date(article.date), "MMM d, yyyy")
-                          : "Recent"}
-                      </span>
-                    </div>
+                  <div className="p-8 flex flex-col h-full min-h-[300px] justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <span className="text-cyan-400 text-xs uppercase tracking-widest font-bold px-3 py-1 bg-cyan-400/10 rounded-full border border-cyan-400/20">
+                          News Update
+                        </span>
+                      </div>
 
-                    {/* MAIN TEXT BELOW */}
-                    <div className="flex-1">
-                      <h2 className="text-lg font-bold mb-2 text-white leading-tight line-clamp-3">
-                        {article?.title}
+                      <h2 
+                        className="text-2xl md:text-3xl font-black mb-6 leading-tight"
+                        style={{ color: item.title_color || "white" }}
+                      >
+                        {item.title}
                       </h2>
-                      <p className="text-gray-400 mb-4 text-xs leading-relaxed line-clamp-2">
-                        By {article?.author_name || "Admin"}
+                      
+                      <p className="text-gray-400 text-lg leading-relaxed mb-8">
+                        {item.subtitle}
                       </p>
                     </div>
 
-                    {/* BUTTON */}
-                    <button
-                      onClick={() => handleReadMore(article.id)}
-                      className="text-sm transition-colors duration-200 text-left hover:text-cyan-400 font-medium"
-                    >
-                      Read More <span className="ml-1">→</span>
-                    </button>
-                  </div>
-
-                  {/* IMAGE */}
-                  <div className="relative w-full h-48 md:h-full">
-                    <Image
-                      src={article.image || "/images/event-banner.jpg"}
-                      alt={article.title}
-                      fill
-                      priority={idx === 0}
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
-                    />
+                    <div className="mt-auto">
+                      <button
+                        onClick={handleViewAllNews}
+                        className="text-sm font-bold uppercase tracking-widest text-[#00E5FF] hover:text-white transition-colors duration-300 flex items-center gap-2 group-hover:translate-x-2 transition-transform"
+                      >
+                        Read Full Story <span className="text-xl">→</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
