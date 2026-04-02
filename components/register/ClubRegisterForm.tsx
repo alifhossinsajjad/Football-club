@@ -312,7 +312,7 @@ const ClubRegisterForm = () => {
                      <DarkPhoneInput
                         label="Phone Number *"
                         name="phone_number"
-                        control={control}
+                        control={control as any}
                         error={errors.phone_number?.message}
                         icon={<Phone size={14} />}
                         placeholder="XXX XXX XXX"
@@ -476,7 +476,7 @@ const ClubRegisterForm = () => {
                            <DarkPhoneInput
                               label="Contact Phone"
                               name="contact_phone_number"
-                              control={control}
+                              control={control as never}
                               error={errors.contact_phone_number?.message}
                               icon={<Phone size={14} />}
                               placeholder="XXX XXX XXX"

@@ -27,7 +27,14 @@ import {
   Flag,
 } from "lucide-react";
 import { useUpdateProfileMutation } from "@/redux/features/scout/scoutProfileApi";
-import { ScoutProfile, Achievement, NotableDiscovery, ScoutingRegion, ProfessionalHistory, ScoutingStatistic } from "@/types/scout/profileType";
+import {
+  ScoutProfile,
+  Achievement,
+  NotableDiscovery,
+  ScoutingRegion,
+  ProfessionalHistory,
+  ScoutingStatistic,
+} from "@/types/scout/profileType";
 import DarkPhoneInput from "../../reuseable/DarkPhoneInput";
 
 // Form types
@@ -71,7 +78,17 @@ const FieldLabel = ({ children }: { children: React.ReactNode }) => (
 const inputCls =
   "w-full bg-[#111640] border border-[#1A2160] text-white text-xs rounded-lg px-4 py-3 placeholder-[#2D3568] focus:outline-none focus:border-[#00D9FF] focus:ring-1 focus:ring-[#00D9FF]/20 transition-all shadow-inner";
 
-const Card = ({ title, onAdd, children, headerAction }: { title: string; onAdd?: () => void; children: React.ReactNode; headerAction?: React.ReactNode }) => (
+const Card = ({
+  title,
+  onAdd,
+  children,
+  headerAction,
+}: {
+  title: string;
+  onAdd?: () => void;
+  children: React.ReactNode;
+  headerAction?: React.ReactNode;
+}) => (
   <div className="bg-[#12143A] border border-white/[0.08] rounded-2xl p-6 md:p-8 mb-6 shadow-xl relative animate-in fade-in slide-in-from-bottom-4 duration-500">
     <div className="flex items-center justify-between mb-6">
       <h3 className="text-sm font-bold text-white uppercase tracking-widest">
@@ -83,9 +100,11 @@ const Card = ({ title, onAdd, children, headerAction }: { title: string; onAdd?:
           onClick={onAdd}
           className="flex items-center gap-1.5 text-[#00D9FF] text-[10px] font-bold hover:brightness-125 transition-all"
         >
-          <Plus size={10} /> Add {title.replace(/s$/, '')}
+          <Plus size={10} /> Add {title.replace(/s$/, "")}
         </button>
-      ) : headerAction}
+      ) : (
+        headerAction
+      )}
     </div>
     {children}
   </div>
@@ -109,10 +128,20 @@ const Toggle = ({
   </button>
 );
 
-const SuccessRateInput = ({ register, name }: { register: any; name: string }) => (
+const SuccessRateInput = ({
+  register,
+  name,
+}: {
+  register: any;
+  name: string;
+}) => (
   <div className="relative border-b border-white/5 pb-2">
     <div className="flex items-center gap-1">
-      <input {...register(name)} className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0" placeholder="e.g. 89" />
+      <input
+        {...register(name)}
+        className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0"
+        placeholder="e.g. 89"
+      />
       <span className="text-white/30 text-xs font-bold">%</span>
     </div>
   </div>
@@ -131,7 +160,9 @@ export default function ProfileEditForm({
   const coverRef = useRef<HTMLInputElement>(null);
   const avatarRef = useRef<HTMLInputElement>(null);
   const [coverPreview, setCoverPreview] = useState(profile.cover_image ?? "");
-  const [avatarPreview, setAvatarPreview] = useState(profile.profile_image ?? "");
+  const [avatarPreview, setAvatarPreview] = useState(
+    profile.profile_image ?? "",
+  );
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -145,7 +176,8 @@ export default function ProfileEditForm({
     formState: { isDirty },
   } = useForm<FormValues>({
     defaultValues: {
-      full_name: `${profile.first_name || ""} ${profile.last_name || ""}`.trim(),
+      full_name:
+        `${profile.first_name || ""} ${profile.last_name || ""}`.trim(),
       bio: profile.bio ?? "",
       about: profile.about ?? "",
       location: profile.location ?? "",
@@ -168,11 +200,14 @@ export default function ProfileEditForm({
       specialization: profile.specialization?.join(", ") ?? "",
       scouting_statistics: {
         players_scouted: profile.scouting_statistics?.players_scouted ?? "",
-        players_recommended: profile.scouting_statistics?.players_recommended ?? "",
-        professional_placements: profile.scouting_statistics?.professional_placements ?? "",
+        players_recommended:
+          profile.scouting_statistics?.players_recommended ?? "",
+        professional_placements:
+          profile.scouting_statistics?.professional_placements ?? "",
         success_rate: profile.scouting_statistics?.success_rate ?? "",
         clubs_worked_with: profile.scouting_statistics?.clubs_worked_with ?? "",
-        international_coverage: profile.scouting_statistics?.international_coverage ?? "",
+        international_coverage:
+          profile.scouting_statistics?.international_coverage ?? "",
       },
       achievements: (profile.achievements ?? []).map((a) => ({
         id: a.id,
@@ -202,10 +237,26 @@ export default function ProfileEditForm({
     },
   });
 
-  const { fields: achFields, append: appendAch, remove: removeAch } = useFieldArray({ control, name: "achievements" });
-  const { fields: discoveryFields, append: appendDiscovery, remove: removeDiscovery } = useFieldArray({ control, name: "notable_discoveries" });
-  const { fields: regionFields, append: appendRegion, remove: removeRegion } = useFieldArray({ control, name: "scouting_regions" });
-  const { fields: historyFields, append: appendHistory, remove: removeHistory } = useFieldArray({ control, name: "professional_history" });
+  const {
+    fields: achFields,
+    append: appendAch,
+    remove: removeAch,
+  } = useFieldArray({ control, name: "achievements" });
+  const {
+    fields: discoveryFields,
+    append: appendDiscovery,
+    remove: removeDiscovery,
+  } = useFieldArray({ control, name: "notable_discoveries" });
+  const {
+    fields: regionFields,
+    append: appendRegion,
+    remove: removeRegion,
+  } = useFieldArray({ control, name: "scouting_regions" });
+  const {
+    fields: historyFields,
+    append: appendHistory,
+    remove: removeHistory,
+  } = useFieldArray({ control, name: "professional_history" });
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -231,18 +282,31 @@ export default function ProfileEditForm({
       const nameParts = data.full_name.trim().split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
-      
+
       fd.append("first_name", firstName);
       fd.append("last_name", lastName);
 
       // Other fields
       const scalar: (keyof FormValues)[] = [
-        "bio", "about", "location", "experience_years",
-        "connections", "email", "phone", "website", "twitter", "facebook", "youtube", "instagram",
-        "profile_visibility", "preferred_leagues", "contact_status", "availability"
+        "bio",
+        "about",
+        "location",
+        "experience_years",
+        "connections",
+        "email",
+        "phone",
+        "website",
+        "twitter",
+        "facebook",
+        "youtube",
+        "instagram",
+        "profile_visibility",
+        "preferred_leagues",
+        "contact_status",
+        "availability",
       ];
-      
-      scalar.forEach(k => {
+
+      scalar.forEach((k) => {
         const v = (data as any)[k];
         if (v !== undefined && v !== null && v !== "") fd.append(k, String(v));
       });
@@ -251,12 +315,29 @@ export default function ProfileEditForm({
       fd.append("show_online_status", String(data.show_online_status));
       fd.append("activity_history", String(data.activity_history));
 
-      fd.append("specialization", JSON.stringify(data.specialization.split(",").map(s => s.trim()).filter(Boolean)));
-      fd.append("scouting_statistics", JSON.stringify(data.scouting_statistics));
+      fd.append(
+        "specialization",
+        JSON.stringify(
+          data.specialization
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        ),
+      );
+      fd.append(
+        "scouting_statistics",
+        JSON.stringify(data.scouting_statistics),
+      );
       fd.append("achievements", JSON.stringify(data.achievements));
-      fd.append("notable_discoveries", JSON.stringify(data.notable_discoveries));
+      fd.append(
+        "notable_discoveries",
+        JSON.stringify(data.notable_discoveries),
+      );
       fd.append("scouting_regions", JSON.stringify(data.scouting_regions));
-      fd.append("professional_history", JSON.stringify(data.professional_history));
+      fd.append(
+        "professional_history",
+        JSON.stringify(data.professional_history),
+      );
 
       await updateProfile({ id: profile.id, data: fd }).unwrap();
       toast.success("Profile updated successfully!");
@@ -269,311 +350,514 @@ export default function ProfileEditForm({
 
   return (
     <div className="pb-24">
-      <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
-      <input ref={avatarRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+      <input
+        ref={coverRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleCoverChange}
+      />
+      <input
+        ref={avatarRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleAvatarChange}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* ── Banner ── */}
         <div className="relative h-[280px] w-full rounded-3xl overflow-hidden mb-12 shadow-2xl">
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
-            style={{ backgroundImage: `url(${coverPreview || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2693&auto=format&fit=crop'})` }}
+            style={{
+              backgroundImage: `url(${coverPreview || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2693&auto=format&fit=crop"})`,
+            }}
           >
             <div className="absolute inset-0 bg-[#0B0D2C]/60" />
           </div>
-          
+
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10">
-             <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mb-1">
-                <Cloud size={24} className="text-white/60" />
-             </div>
-             <button
-               type="button"
-               onClick={() => coverRef.current?.click()}
-               className="text-[#00D9FF] text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:brightness-125 transition-all"
-             >
-                <Cloud size={14} className="mb-0.5" /> Upload Cover Photo
-             </button>
+            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mb-1">
+              <Cloud size={24} className="text-white/60" />
+            </div>
+            <button
+              type="button"
+              onClick={() => coverRef.current?.click()}
+              className="text-[#00D9FF] text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:brightness-125 transition-all"
+            >
+              <Cloud size={14} className="mb-0.5" /> Upload Cover Photo
+            </button>
           </div>
 
           <div className="absolute top-6 right-6 z-20 flex gap-3">
-             <button
-               type="submit"
-               disabled={isSaving}
-               className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold bg-[#00D9FF] text-[#070B24] border border-[#00D9FF] hover:brightness-110 transition-all shadow-[0_0_20px_rgba(0,217,255,0.3)] disabled:opacity-50"
-             >
-                <Save size={16} /> {isSaving ? "Saving..." : "Save Changes"}
-             </button>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold bg-[#00D9FF] text-[#070B24] border border-[#00D9FF] hover:brightness-110 transition-all shadow-[0_0_20px_rgba(0,217,255,0.3)] disabled:opacity-50"
+            >
+              <Save size={16} /> {isSaving ? "Saving..." : "Save Changes"}
+            </button>
           </div>
         </div>
 
         {/* ── Basic Information Card ── */}
         <div className="max-w-7xl mx-auto px-6 -mt-32 relative z-30 mb-12">
-           <div className="bg-[#12143C] border border-white/[0.1] rounded-[24px] p-8 md:p-10 shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center gap-12">
-              {/* Profile Photo */}
-              <div className="flex flex-col items-center gap-6">
-                 <div className="w-44 h-44 rounded-full border-4 border-[#1A2160] overflow-hidden bg-[#111640] shadow-2xl relative">
-                    {avatarPreview ? (
-                       <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover" />
-                    ) : (
-                       <div className="w-full h-full flex items-center justify-center h-full"><X size={48} className="text-white/10" /></div>
-                    )}
-                    <div className="absolute inset-0 border-[6px] border-[#12143C] rounded-full pointer-events-none" />
-                 </div>
-                 <div className="flex flex-col items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => avatarRef.current?.click()}
-                      className="px-6 py-2 rounded-lg bg-[#111640] border border-[#1A2160] text-[#00D9FF] text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-[#1A2160] transition-all"
-                    >
-                       <Plus size={12} /> Upload Photo
-                    </button>
-                    <p className="text-[9px] text-white/30 text-center max-w-[160px] leading-relaxed">
-                      Please upload a recent, high-quality portrait photo (clear face, no sunglasses/caps, minimum 800x800px).
-                    </p>
-                 </div>
+          <div className="bg-[#12143C] border border-white/[0.1] rounded-[24px] p-8 md:p-10 shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center gap-12">
+            {/* Profile Photo */}
+            <div className="flex flex-col items-center gap-6">
+              <div className="w-44 h-44 rounded-full border-4 border-[#1A2160] overflow-hidden bg-[#111640] shadow-2xl relative">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center h-full">
+                    <X size={48} className="text-white/10" />
+                  </div>
+                )}
+                <div className="absolute inset-0 border-[6px] border-[#12143C] rounded-full pointer-events-none" />
               </div>
+              <div className="flex flex-col items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => avatarRef.current?.click()}
+                  className="px-6 py-2 rounded-lg bg-[#111640] border border-[#1A2160] text-[#00D9FF] text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-[#1A2160] transition-all"
+                >
+                  <Plus size={12} /> Upload Photo
+                </button>
+                <p className="text-[9px] text-white/30 text-center max-w-[160px] leading-relaxed">
+                  Please upload a recent, high-quality portrait photo (clear
+                  face, no sunglasses/caps, minimum 800x800px).
+                </p>
+              </div>
+            </div>
 
-              {/* Form Grid */}
-              <div className="flex-1 w-full space-y-6">
-                 <h2 className="text-lg font-bold text-white">Basic Information</h2>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                    <div className="col-span-full">
-                       <FieldLabel>Full Name</FieldLabel>
-                       <input {...register("full_name")} className={inputCls} placeholder="Roberto Martinez" />
-                    </div>
-                    <div className="col-span-full">
-                       <FieldLabel>Professional Title</FieldLabel>
-                       <input {...register("contact_status")} className={inputCls} placeholder="Senior Scout - Youth Development" />
-                    </div>
-                    <div>
-                       <FieldLabel>Location</FieldLabel>
-                       <input {...register("location")} className={inputCls} placeholder="Madrid, Spain" />
-                    </div>
-                    <div>
-                       <FieldLabel>Experience</FieldLabel>
-                       <input {...register("experience_years")} className={inputCls} placeholder="22 years" />
-                    </div>
-                 </div>
+            {/* Form Grid */}
+            <div className="flex-1 w-full space-y-6">
+              <h2 className="text-lg font-bold text-white">
+                Basic Information
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div className="col-span-full">
+                  <FieldLabel>Full Name</FieldLabel>
+                  <input
+                    {...register("full_name")}
+                    className={inputCls}
+                    placeholder="Roberto Martinez"
+                  />
+                </div>
+                <div className="col-span-full">
+                  <FieldLabel>Professional Title</FieldLabel>
+                  <input
+                    {...register("contact_status")}
+                    className={inputCls}
+                    placeholder="Senior Scout - Youth Development"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Location</FieldLabel>
+                  <input
+                    {...register("location")}
+                    className={inputCls}
+                    placeholder="Madrid, Spain"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Experience</FieldLabel>
+                  <input
+                    {...register("experience_years")}
+                    className={inputCls}
+                    placeholder="22 years"
+                  />
+                </div>
               </div>
-           </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Two Column Layout ── */}
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-           
-           {/* Left Column */}
-           <div className="lg:col-span-2 space-y-6">
-              <Card title="About">
-                 <div className="space-y-6">
-                    <div>
-                       <FieldLabel>Biography</FieldLabel>
-                       <textarea {...register("about")} rows={8} className={`${inputCls} resize-none`} placeholder="Describe your philosophy, success stories, and background in detail..." />
-                       <p className="text-[10px] text-white/20 mt-2">250 characters.</p>
-                    </div>
-                    <div>
-                       <FieldLabel>Specializations (comma-separated)</FieldLabel>
-                       <input {...register("specialization")} className={inputCls} placeholder="Youth Scouting, Technical Analysis, Player Development, International Scouting" />
-                    </div>
-                 </div>
-              </Card>
-
-              <Card title="Scouting Statistics">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                       <FieldLabel>Players Scouted</FieldLabel>
-                       <div className="relative border-b border-white/5 pb-2">
-                          <input {...register("scouting_statistics.players_scouted")} className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0" placeholder="e.g. 1,200+" />
-                       </div>
-                    </div>
-                    <div>
-                       <FieldLabel>Players Recommended</FieldLabel>
-                       <div className="relative border-b border-white/5 pb-2">
-                          <input {...register("scouting_statistics.players_recommended")} className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0" placeholder="e.g. 145" />
-                       </div>
-                    </div>
-                    <div>
-                       <FieldLabel>Success Rate (%)</FieldLabel>
-                       <SuccessRateInput register={register} name="scouting_statistics.success_rate" />
-                    </div>
-                    <div>
-                       <FieldLabel>Clubs Worked With</FieldLabel>
-                       <div className="relative border-b border-white/5 pb-2">
-                          <input {...register("scouting_statistics.clubs_worked_with")} className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0" placeholder="e.g. 81%" />
-                       </div>
-                    </div>
-                    <div className="col-span-full">
-                       <FieldLabel>International Coverage</FieldLabel>
-                       <div className="relative border-b border-white/5 pb-2">
-                          <input {...register("scouting_statistics.international_coverage")} className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0" placeholder="e.g. 26" />
-                       </div>
-                    </div>
-                 </div>
-              </Card>
-
-              <Card title="Notable Discoveries" onAdd={() => appendDiscovery({ player_name: "", position: "", current_team: "", discovered_year: "" })}>
-                 <div className="space-y-4">
-                    {discoveryFields.map((field, i) => (
-                       <div key={field.id} className="p-6 rounded-2xl bg-[#0B0D2C] border border-white/5 relative group">
-                          <div className="grid grid-cols-2 gap-4">
-                             <div>
-                                <input {...register(`notable_discoveries.${i}.player_name`)} className={inputCls} placeholder="Carlos Fernandez" />
-                             </div>
-                             <div>
-                                <input {...register(`notable_discoveries.${i}.position`)} className={inputCls} placeholder="Midfielder" />
-                             </div>
-                             <div>
-                                <input {...register(`notable_discoveries.${i}.current_team`)} className={inputCls} placeholder="Real Madrid CF" />
-                             </div>
-                             <div>
-                                <input {...register(`notable_discoveries.${i}.discovered_year`)} className={inputCls} placeholder="2018" />
-                             </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeDiscovery(i)}
-                            className="mt-4 text-[10px] text-red-500/80 flex items-center gap-1.5 font-bold uppercase hover:brightness-125 transition-all"
-                          >
-                             <Trash2 size={12} /> Remove Discovery
-                          </button>
-                       </div>
-                    ))}
-                 </div>
-              </Card>
-              <Card title="Scouting Regions" onAdd={() => appendRegion({ country: "", coverage_type: "", active_since: "" })}>
-              <div className="space-y-4">
-                 {regionFields.map((field, i) => (
-                    <div key={field.id} className="p-6 rounded-2xl bg-[#0B0D2C] border border-white/5 relative group">
-                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <input {...register(`scouting_regions.${i}.country`)} className={inputCls} placeholder="England" />
-                          <input {...register(`scouting_regions.${i}.coverage_type`)} className={inputCls} placeholder="Full Coverage" />
-                          <input {...register(`scouting_regions.${i}.active_since`)} className={inputCls} placeholder="18 years" />
-                       </div>
-                       <button
-                         type="button"
-                         onClick={() => removeRegion(i)}
-                         className="mt-4 text-[10px] text-red-500/80 flex items-center gap-1.5 font-bold uppercase hover:brightness-125 transition-all"
-                       >
-                          <Trash2 size={12} /> Remove Region
-                       </button>
-                    </div>
-                 ))}
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card title="About">
+              <div className="space-y-6">
+                <div>
+                  <FieldLabel>Biography</FieldLabel>
+                  <textarea
+                    {...register("about")}
+                    rows={8}
+                    className={`${inputCls} resize-none`}
+                    placeholder="Describe your philosophy, success stories, and background in detail..."
+                  />
+                  <p className="text-[10px] text-white/20 mt-2">
+                    250 characters.
+                  </p>
+                </div>
+                <div>
+                  <FieldLabel>Specializations (comma-separated)</FieldLabel>
+                  <input
+                    {...register("specialization")}
+                    className={inputCls}
+                    placeholder="Youth Scouting, Technical Analysis, Player Development, International Scouting"
+                  />
+                </div>
               </div>
-           </Card>
+            </Card>
 
-           <Card title="Professional History" onAdd={() => appendHistory({ organization: "", role: "", duration: "", is_current: false, description: "" })}>
-              <div className="space-y-4">
-                 {historyFields.map((field, i) => (
-                    <div key={field.id} className="p-6 rounded-2xl bg-[#0B0D2C] border border-white/5 relative group">
-                       <div className="space-y-4">
-                          <input {...register(`professional_history.${i}.organization`)} className={inputCls} placeholder="Manchester United Youth Academy" />
-                          <input {...register(`professional_history.${i}.role`)} className={inputCls} placeholder="Senior Scout - Youth Scouting" />
-                          <input {...register(`professional_history.${i}.duration`)} className={inputCls} placeholder="Mar 2018 - Present" />
-                          
-                          <div className="flex items-center gap-3 pt-1">
-                             <div 
-                                onClick={() => setValue(`professional_history.${i}.is_current`, !watch(`professional_history.${i}.is_current`))}
-                                className={`w-10 h-5.5 rounded-full relative cursor-pointer transition-all ${watch(`professional_history.${i}.is_current`) ? 'bg-cyan-500' : 'bg-[#1A2160]'}`}
-                             >
-                                <div className={`absolute top-0.5 w-4.5 h-4.5 bg-white rounded-full transition-all ${watch(`professional_history.${i}.is_current`) ? 'left-5' : 'left-0.5'}`} />
-                             </div>
-                             <span className="text-xs text-white/60">Current Position</span>
-                          </div>
-                          
-                          <button
-                            type="button"
-                            onClick={() => removeHistory(i)}
-                            className="mt-2 text-[10px] text-red-500/80 flex items-center gap-1.5 font-bold uppercase hover:brightness-125 transition-all"
-                          >
-                             <Trash2 size={12} /> Remove Position
-                          </button>
-                       </div>
-                    </div>
-                 ))}
+            <Card title="Scouting Statistics">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <FieldLabel>Players Scouted</FieldLabel>
+                  <div className="relative border-b border-white/5 pb-2">
+                    <input
+                      {...register("scouting_statistics.players_scouted")}
+                      className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0"
+                      placeholder="e.g. 1,200+"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <FieldLabel>Players Recommended</FieldLabel>
+                  <div className="relative border-b border-white/5 pb-2">
+                    <input
+                      {...register("scouting_statistics.players_recommended")}
+                      className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0"
+                      placeholder="e.g. 145"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <FieldLabel>Success Rate (%)</FieldLabel>
+                  <SuccessRateInput
+                    register={register}
+                    name="scouting_statistics.success_rate"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Clubs Worked With</FieldLabel>
+                  <div className="relative border-b border-white/5 pb-2">
+                    <input
+                      {...register("scouting_statistics.clubs_worked_with")}
+                      className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0"
+                      placeholder="e.g. 81%"
+                    />
+                  </div>
+                </div>
+                <div className="col-span-full">
+                  <FieldLabel>International Coverage</FieldLabel>
+                  <div className="relative border-b border-white/5 pb-2">
+                    <input
+                      {...register(
+                        "scouting_statistics.international_coverage",
+                      )}
+                      className="w-full bg-transparent border-none text-white font-bold p-0 focus:ring-0"
+                      placeholder="e.g. 26"
+                    />
+                  </div>
+                </div>
               </div>
-           </Card>
-           </div>
+            </Card>
 
-           {/* Right Column (Sidebar) */}
-           <div className="space-y-6">
-              <Card title="Contact Information">
-                 <div className="space-y-5">
-                    <div>
-                       <FieldLabel>Email</FieldLabel>
-                       <input {...register("email")} className={inputCls} placeholder="john.doe@email.com" />
+            <Card
+              title="Notable Discoveries"
+              onAdd={() =>
+                appendDiscovery({
+                  player_name: "",
+                  position: "",
+                  current_team: "",
+                  discovered_year: "",
+                })
+              }
+            >
+              <div className="space-y-4">
+                {discoveryFields.map((field, i) => (
+                  <div
+                    key={field.id}
+                    className="p-6 rounded-2xl bg-[#0B0D2C] border border-white/5 relative group"
+                  >
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <input
+                          {...register(`notable_discoveries.${i}.player_name`)}
+                          className={inputCls}
+                          placeholder="Carlos Fernandez"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          {...register(`notable_discoveries.${i}.position`)}
+                          className={inputCls}
+                          placeholder="Midfielder"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          {...register(`notable_discoveries.${i}.current_team`)}
+                          className={inputCls}
+                          placeholder="Real Madrid CF"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          {...register(
+                            `notable_discoveries.${i}.discovered_year`,
+                          )}
+                          className={inputCls}
+                          placeholder="2018"
+                        />
+                      </div>
                     </div>
-                    <div>
-                       <FieldLabel>Phone</FieldLabel>
-                       <DarkPhoneInput
-                         name="phone"
-                         control={control}
-                         placeholder="XXX XXX XXX"
-                         className="flex items-center w-full bg-[#111640] border border-[#1A2160] text-white text-xs rounded-lg overflow-hidden focus-within:border-[#00D9FF] focus-within:ring-1 focus-within:ring-[#00D9FF]/20 transition-all shadow-inner"
-                       />
+                    <button
+                      type="button"
+                      onClick={() => removeDiscovery(i)}
+                      className="mt-4 text-[10px] text-red-500/80 flex items-center gap-1.5 font-bold uppercase hover:brightness-125 transition-all"
+                    >
+                      <Trash2 size={12} /> Remove Discovery
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            <Card
+              title="Scouting Regions"
+              onAdd={() =>
+                appendRegion({
+                  country: "",
+                  coverage_type: "",
+                  active_since: "",
+                })
+              }
+            >
+              <div className="space-y-4">
+                {regionFields.map((field, i) => (
+                  <div
+                    key={field.id}
+                    className="p-6 rounded-2xl bg-[#0B0D2C] border border-white/5 relative group"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <input
+                        {...register(`scouting_regions.${i}.country`)}
+                        className={inputCls}
+                        placeholder="England"
+                      />
+                      <input
+                        {...register(`scouting_regions.${i}.coverage_type`)}
+                        className={inputCls}
+                        placeholder="Full Coverage"
+                      />
+                      <input
+                        {...register(`scouting_regions.${i}.active_since`)}
+                        className={inputCls}
+                        placeholder="18 years"
+                      />
                     </div>
-                 </div>
-              </Card>
+                    <button
+                      type="button"
+                      onClick={() => removeRegion(i)}
+                      className="mt-4 text-[10px] text-red-500/80 flex items-center gap-1.5 font-bold uppercase hover:brightness-125 transition-all"
+                    >
+                      <Trash2 size={12} /> Remove Region
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
 
-              <Card title="Social Media">
-                 <div className="space-y-5">
-                    {[
-                       { icon: Instagram, label: "Instagram", name: "instagram" as const },
-                       { icon: Twitter, label: "Twitter", name: "twitter" as const },
-                       { icon: Facebook, label: "Facebook", name: "facebook" as const },
-                       { icon: Youtube, label: "YouTube", name: "youtube" as const },
-                    ].map(s => (
-                       <div key={s.name}>
-                          <div className="flex items-center gap-2 mb-2">
-                             <s.icon size={14} className="text-[#5B6397]" />
-                             <span className="text-[10px] text-[#5B6397] font-bold uppercase">{s.label}</span>
-                          </div>
-                          <input {...register(s.name)} className={inputCls} placeholder={`@johndoe_${s.name.slice(0,2)}`} />
-                       </div>
-                    ))}
-                 </div>
-              </Card>
+            <Card
+              title="Professional History"
+              onAdd={() =>
+                appendHistory({
+                  organization: "",
+                  role: "",
+                  duration: "",
+                  is_current: false,
+                  description: "",
+                })
+              }
+            >
+              <div className="space-y-4">
+                {historyFields.map((field, i) => (
+                  <div
+                    key={field.id}
+                    className="p-6 rounded-2xl bg-[#0B0D2C] border border-white/5 relative group"
+                  >
+                    <div className="space-y-4">
+                      <input
+                        {...register(`professional_history.${i}.organization`)}
+                        className={inputCls}
+                        placeholder="Manchester United Youth Academy"
+                      />
+                      <input
+                        {...register(`professional_history.${i}.role`)}
+                        className={inputCls}
+                        placeholder="Senior Scout - Youth Scouting"
+                      />
+                      <input
+                        {...register(`professional_history.${i}.duration`)}
+                        className={inputCls}
+                        placeholder="Mar 2018 - Present"
+                      />
 
-              <Card 
-                title="Achievements" 
-                headerAction={
-                  <button type="button" onClick={() => appendAch({ club_name: "", achievement: "", year: new Date().getFullYear(), affiliation_type: "" })} className="w-6 h-6 rounded bg-[#00D9FF]/10 flex items-center justify-center text-[#00D9FF] hover:bg-[#00D9FF]/20 transition-all">
-                    <Plus size={14} />
-                  </button>
-                }
-              >
-                 <div className="space-y-2">
-                    {achFields.map((field, i) => (
-                       <div key={field.id} className="flex items-center gap-2 group">
-                          <div className="flex-1 bg-[#111640] border border-[#1A2160] rounded-lg px-4 py-2.5">
-                             <input {...register(`achievements.${i}.achievement`)} className="w-full bg-transparent text-xs text-white border-none p-0 focus:ring-0" placeholder="Achievement title" />
-                          </div>
-                          <button type="button" onClick={() => removeAch(i)} className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500/60 hover:text-red-500 hover:bg-red-500/20 transition-all">
-                             <Trash2 size={14} />
-                          </button>
-                       </div>
-                    ))}
-                 </div>
-              </Card>
+                      <div className="flex items-center gap-3 pt-1">
+                        <div
+                          onClick={() =>
+                            setValue(
+                              `professional_history.${i}.is_current`,
+                              !watch(`professional_history.${i}.is_current`),
+                            )
+                          }
+                          className={`w-10 h-5.5 rounded-full relative cursor-pointer transition-all ${watch(`professional_history.${i}.is_current`) ? "bg-cyan-500" : "bg-[#1A2160]"}`}
+                        >
+                          <div
+                            className={`absolute top-0.5 w-4.5 h-4.5 bg-white rounded-full transition-all ${watch(`professional_history.${i}.is_current`) ? "left-5" : "left-0.5"}`}
+                          />
+                        </div>
+                        <span className="text-xs text-white/60">
+                          Current Position
+                        </span>
+                      </div>
 
-              <Card title="Preferences">
-                 <div className="space-y-6">
-                    <div>
-                       <FieldLabel>Preferred Leagues</FieldLabel>
-                       <input {...register("preferred_leagues")} className={inputCls} placeholder="Premier League, La Liga, Bundesliga" />
+                      <button
+                        type="button"
+                        onClick={() => removeHistory(i)}
+                        className="mt-2 text-[10px] text-red-500/80 flex items-center gap-1.5 font-bold uppercase hover:brightness-125 transition-all"
+                      >
+                        <Trash2 size={12} /> Remove Position
+                      </button>
                     </div>
-                    <div>
-                       <FieldLabel>Contract Status</FieldLabel>
-                       <input {...register("contact_status")} className={inputCls} />
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Column (Sidebar) */}
+          <div className="space-y-6">
+            <Card title="Contact Information">
+              <div className="space-y-5">
+                <div>
+                  <FieldLabel>Email</FieldLabel>
+                  <input
+                    {...register("email")}
+                    className={inputCls}
+                    placeholder="john.doe@email.com"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Phone</FieldLabel>
+                  <DarkPhoneInput
+                    name="phone"
+                    control={control as any}
+                    placeholder="XXX XXX XXX"
+                    className="flex items-center w-full bg-[#111640] border border-[#1A2160] text-white text-xs rounded-lg overflow-hidden focus-within:border-[#00D9FF] focus-within:ring-1 focus-within:ring-[#00D9FF]/20 transition-all shadow-inner"
+                  />
+                </div>
+              </div>
+            </Card>
+
+            <Card title="Social Media">
+              <div className="space-y-5">
+                {[
+                  {
+                    icon: Instagram,
+                    label: "Instagram",
+                    name: "instagram" as const,
+                  },
+                  { icon: Twitter, label: "Twitter", name: "twitter" as const },
+                  {
+                    icon: Facebook,
+                    label: "Facebook",
+                    name: "facebook" as const,
+                  },
+                  { icon: Youtube, label: "YouTube", name: "youtube" as const },
+                ].map((s) => (
+                  <div key={s.name}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <s.icon size={14} className="text-[#5B6397]" />
+                      <span className="text-[10px] text-[#5B6397] font-bold uppercase">
+                        {s.label}
+                      </span>
                     </div>
-                    <div>
-                       <FieldLabel>Availability</FieldLabel>
-                       <input {...register("availability")} className={inputCls} placeholder="Available from Summer 2025" />
+                    <input
+                      {...register(s.name)}
+                      className={inputCls}
+                      placeholder={`@johndoe_${s.name.slice(0, 2)}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card
+              title="Achievements"
+              headerAction={
+                <button
+                  type="button"
+                  onClick={() =>
+                    appendAch({
+                      club_name: "",
+                      achievement: "",
+                      year: new Date().getFullYear(),
+                      affiliation_type: "",
+                    })
+                  }
+                  className="w-6 h-6 rounded bg-[#00D9FF]/10 flex items-center justify-center text-[#00D9FF] hover:bg-[#00D9FF]/20 transition-all"
+                >
+                  <Plus size={14} />
+                </button>
+              }
+            >
+              <div className="space-y-2">
+                {achFields.map((field, i) => (
+                  <div key={field.id} className="flex items-center gap-2 group">
+                    <div className="flex-1 bg-[#111640] border border-[#1A2160] rounded-lg px-4 py-2.5">
+                      <input
+                        {...register(`achievements.${i}.achievement`)}
+                        className="w-full bg-transparent text-xs text-white border-none p-0 focus:ring-0"
+                        placeholder="Achievement title"
+                      />
                     </div>
-                 </div>
-              </Card>
-           </div>
+                    <button
+                      type="button"
+                      onClick={() => removeAch(i)}
+                      className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500/60 hover:text-red-500 hover:bg-red-500/20 transition-all"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card title="Preferences">
+              <div className="space-y-6">
+                <div>
+                  <FieldLabel>Preferred Leagues</FieldLabel>
+                  <input
+                    {...register("preferred_leagues")}
+                    className={inputCls}
+                    placeholder="Premier League, La Liga, Bundesliga"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Contract Status</FieldLabel>
+                  <input {...register("contact_status")} className={inputCls} />
+                </div>
+                <div>
+                  <FieldLabel>Availability</FieldLabel>
+                  <input
+                    {...register("availability")}
+                    className={inputCls}
+                    placeholder="Available from Summer 2025"
+                  />
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
-
-      
       </form>
     </div>
   );

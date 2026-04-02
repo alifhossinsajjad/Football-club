@@ -26,13 +26,19 @@ build:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - apt-get update
     - echo "Logging in to docker hub"
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    # install make file and setup for run make file
+    - apt-get install -y make
+    - touch .env.local
+    - touch .env.production
+    - touch .env
 
   script:
     - echo "Docker information...."
     - docker info
     - echo "Building image"
-    - sudo docker build --no-cache -t softvence/carolineatta997-frontend-lab .
+    - make build
     - echo "Pushing image to docker hub"
-    - sudo docker push softvence/carolineatta997-frontend-lab
+    - make push

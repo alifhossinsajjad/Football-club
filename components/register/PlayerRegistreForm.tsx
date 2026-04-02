@@ -16,21 +16,21 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import { countries } from "@/constants/countries";
 import { useGetAllClubsQuery } from "@/redux/features/scout/clubDireactoryApi";
-import { 
-  User, 
-  Calendar, 
-  Globe, 
-  Phone, 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  ChevronRight, 
+import {
+  User,
+  Calendar,
+  Globe,
+  Phone,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ChevronRight,
   ChevronLeft,
   Trophy,
   Shield,
   AlertCircle,
-  FileText
+  FileText,
 } from "lucide-react";
 
 interface FormData {
@@ -76,7 +76,7 @@ const PlayerRegisterForm = () => {
     mode: "onChange",
     defaultValues: {
       accept_privacy: false,
-    }
+    },
   });
 
   const [registerPlayer, { isLoading }] = useRegisterPlayerMutation();
@@ -94,8 +94,8 @@ const PlayerRegisterForm = () => {
 
   const filteredClubs = useMemo(() => {
     if (!clubSearch) return [];
-    return allClubs.filter(club => 
-      club.club_name.toLowerCase().includes(clubSearch.toLowerCase())
+    return allClubs.filter((club) =>
+      club.club_name.toLowerCase().includes(clubSearch.toLowerCase()),
     );
   }, [clubSearch, allClubs]);
 
@@ -113,11 +113,16 @@ const PlayerRegisterForm = () => {
 
   const handleNextStep = async () => {
     let fieldsToValidate: (keyof FormData)[] = [];
-    
+
     if (step === 0) {
-      const isDobValid = dob && new Date(dob).getFullYear() >= 1900 && new Date(dob) <= new Date();
+      const isDobValid =
+        dob &&
+        new Date(dob).getFullYear() >= 1900 &&
+        new Date(dob) <= new Date();
       if (!isDobValid) {
-        toast.error("Please enter a valid date of birth (after 1900 and not in the future)");
+        toast.error(
+          "Please enter a valid date of birth (after 1900 and not in the future)",
+        );
         return;
       }
       if (password !== confirmPassword) {
@@ -125,24 +130,44 @@ const PlayerRegisterForm = () => {
         return;
       }
       fieldsToValidate = [
-        "first_name", "last_name", "date_of_birth", "nationality", 
-        "phone_number", "email", "password", "confirm_password"
+        "first_name",
+        "last_name",
+        "date_of_birth",
+        "nationality",
+        "phone_number",
+        "email",
+        "password",
+        "confirm_password",
       ];
     } else if (step === 1) {
       fieldsToValidate = [
-        "playing_position", "preferred_foot", "height", "weight", "city", "country"
+        "playing_position",
+        "preferred_foot",
+        "height",
+        "weight",
+        "city",
+        "country",
       ];
     } else if (step === 2) {
       const contractDate = watch("contract_valid_until");
-      if (contractDate && new Date(contractDate) < new Date(new Date().setHours(0,0,0,0))) {
+      if (
+        contractDate &&
+        new Date(contractDate) < new Date(new Date().setHours(0, 0, 0, 0))
+      ) {
         toast.error("Contract validity date cannot be in the past");
         return;
       }
-      fieldsToValidate = ["current_club_academy", "type_of_commitment", "contract_valid_until"];
+      fieldsToValidate = [
+        "current_club_academy",
+        "type_of_commitment",
+        "contract_valid_until",
+      ];
     } else if (step === 3 && isMinor) {
       fieldsToValidate = [
-        "parent_guardian_first_name", "parent_guardian_last_name", 
-        "parent_id_number", "parent_guardian_digital_signature"
+        "parent_guardian_first_name",
+        "parent_guardian_last_name",
+        "parent_id_number",
+        "parent_guardian_digital_signature",
       ];
     }
 
@@ -177,8 +202,12 @@ const PlayerRegisterForm = () => {
       date_of_birth: data.date_of_birth,
       nationality: data.nationality,
       phone_number: data.phone_number,
-      playing_position: data.playing_position.charAt(0).toUpperCase() + data.playing_position.slice(1),
-      preferred_foot: data.preferred_foot.charAt(0).toUpperCase() + data.preferred_foot.slice(1),
+      playing_position:
+        data.playing_position.charAt(0).toUpperCase() +
+        data.playing_position.slice(1),
+      preferred_foot:
+        data.preferred_foot.charAt(0).toUpperCase() +
+        data.preferred_foot.slice(1),
       height: parseFloat(data.height),
       weight: parseFloat(data.weight),
       city: data.city,
@@ -190,7 +219,8 @@ const PlayerRegisterForm = () => {
       parent_guardian_last_name: data.parent_guardian_last_name,
       parent_guardian_email: data.parent_guardian_email,
       parent_id_number: data.parent_id_number,
-      parent_guardian_digital_signature: data.parent_guardian_digital_signature || null,
+      parent_guardian_digital_signature:
+        data.parent_guardian_digital_signature || null,
     };
 
     if (!isMinor) {
@@ -224,17 +254,21 @@ const PlayerRegisterForm = () => {
         {/* Logo and Header - Only for Step 0 */}
         {step === 0 && (
           <div className="flex flex-col items-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
-             <div className="w-24 h-24 relative mb-6">
-                <Image 
-                  src="/images/banner-log.png" 
-                  alt="NextGen Pros" 
-                  width={96} 
-                  height={96}
-                  className="drop-shadow-[0_0_15px_rgba(0,229,255,0.4)]"
-                />
-             </div>
-             <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">Start Your Journey</h1>
-             <p className="text-gray-400 text-sm">Create your NextGen Pros player profile</p>
+            <div className="w-24 h-24 relative mb-6">
+              <Image
+                src="/images/banner-log.png"
+                alt="NextGen Pros"
+                width={96}
+                height={96}
+                className="drop-shadow-[0_0_15px_rgba(0,229,255,0.4)]"
+              />
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
+              Start Your Journey
+            </h1>
+            <p className="text-gray-400 text-sm">
+              Create your NextGen Pros player profile
+            </p>
           </div>
         )}
 
@@ -263,7 +297,7 @@ const PlayerRegisterForm = () => {
                     placeholder="Doe"
                   />
                 </div>
-                  <DarkInput
+                <DarkInput
                   label="Date of Birth"
                   name="date_of_birth"
                   type="date"
@@ -272,18 +306,18 @@ const PlayerRegisterForm = () => {
                   icon={<Calendar size={16} />}
                   value={watch("date_of_birth")}
                 />
-                  <DarkSelect
-                    label="Nationality"
-                    name="nationality"
-                    register={register}
-                    error={errors.nationality?.message}
-                    icon={<Globe size={16} />}
-                    options={countries}
-                  />
+                <DarkSelect
+                  label="Nationality"
+                  name="nationality"
+                  register={register}
+                  error={errors.nationality?.message}
+                  icon={<Globe size={16} />}
+                  options={countries}
+                />
                 <DarkPhoneInput
                   label="Phone Number"
                   name="phone_number"
-                  control={control}
+                  control={control as any}
                   error={errors.phone_number?.message}
                   icon={<Phone size={16} />}
                   placeholder="XXX XXX XXX"
@@ -347,11 +381,15 @@ const PlayerRegisterForm = () => {
             {step === 1 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex flex-col items-center mb-4">
-                   <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
-                      <User size={32} className="text-white" />
-                   </div>
-                   <h2 className="text-2xl font-bold text-white mb-2">Complete Your Profile</h2>
-                   <p className="text-gray-400 text-xs">Tell us about your football profile</p>
+                  <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
+                    <User size={32} className="text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Complete Your Profile
+                  </h2>
+                  <p className="text-gray-400 text-xs">
+                    Tell us about your football profile
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -380,12 +418,32 @@ const PlayerRegisterForm = () => {
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                   <DarkInput label="Height (cm)" name="height" type="number" register={register} error={errors.height?.message} placeholder="175" />
-                   <DarkInput label="Weight (kg)" name="weight" type="number" register={register} error={errors.weight?.message} placeholder="70" />
+                  <DarkInput
+                    label="Height (cm)"
+                    name="height"
+                    type="number"
+                    register={register}
+                    error={errors.height?.message}
+                    placeholder="175"
+                  />
+                  <DarkInput
+                    label="Weight (kg)"
+                    name="weight"
+                    type="number"
+                    register={register}
+                    error={errors.weight?.message}
+                    placeholder="70"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                   <DarkInput label="City" name="city" register={register} error={errors.city?.message} placeholder="Barcelona" />
-                   <DarkSelect
+                  <DarkInput
+                    label="City"
+                    name="city"
+                    register={register}
+                    error={errors.city?.message}
+                    placeholder="Barcelona"
+                  />
+                  <DarkSelect
                     label="Country"
                     name="country"
                     register={register}
@@ -395,14 +453,25 @@ const PlayerRegisterForm = () => {
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                   <button type="button" onClick={handleBackStep} className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                      <ChevronLeft size={18} />
-                      Back
-                   </button>
-                   <button type="button" onClick={handleNextStep} className="flex-[2] py-4 bg-white/10 border border-white/10 rounded-2xl text-white font-semibold hover:bg-white/20 transition-all flex items-center justify-center gap-2 group">
-                      Continue
-                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                   </button>
+                  <button
+                    type="button"
+                    onClick={handleBackStep}
+                    className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                  >
+                    <ChevronLeft size={18} />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="flex-[2] py-4 bg-white/10 border border-white/10 rounded-2xl text-white font-semibold hover:bg-white/20 transition-all flex items-center justify-center gap-2 group"
+                  >
+                    Continue
+                    <ChevronRight
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
+                  </button>
                 </div>
               </div>
             )}
@@ -410,20 +479,29 @@ const PlayerRegisterForm = () => {
             {/* STEP 2 - SPORTS COMMITMENT */}
             {step === 2 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                 <div className="flex flex-col items-center mb-4">
-                   <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full shadow-lg shadow-purple-500/20 mb-4">
-                      <Trophy size={32} className="text-white" />
-                   </div>
-                   <h2 className="text-2xl font-bold text-white mb-2">Sports Commitment</h2>
-                   <p className="text-gray-400 text-xs">Tell us about your current club situation</p>
+                <div className="flex flex-col items-center mb-4">
+                  <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full shadow-lg shadow-purple-500/20 mb-4">
+                    <Trophy size={32} className="text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Sports Commitment
+                  </h2>
+                  <p className="text-gray-400 text-xs">
+                    Tell us about your current club situation
+                  </p>
                 </div>
 
                 <div className="bg-blue-500/5 border border-blue-500/20 p-4 rounded-2xl flex gap-3">
-                   <AlertCircle size={20} className="text-blue-400 shrink-0" />
-                   <div className="space-y-1">
-                      <h4 className="text-blue-400 text-sm font-semibold uppercase tracking-wider">Required Information</h4>
-                      <p className="text-gray-400 text-[10px] leading-relaxed">These details are mandatory to complete your registration and help clubs understand your availability.</p>
-                   </div>
+                  <AlertCircle size={20} className="text-blue-400 shrink-0" />
+                  <div className="space-y-1">
+                    <h4 className="text-blue-400 text-sm font-semibold uppercase tracking-wider">
+                      Required Information
+                    </h4>
+                    <p className="text-gray-400 text-[10px] leading-relaxed">
+                      These details are mandatory to complete your registration
+                      and help clubs understand your availability.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="relative">
@@ -449,22 +527,36 @@ const PlayerRegisterForm = () => {
                             setClubSearch(club.club_name);
                             setShowClubSuggestions(false);
                             control._names.mount.add("current_club_academy");
-                            const input = document.getElementsByName("current_club_academy")[0] as HTMLInputElement;
+                            const input = document.getElementsByName(
+                              "current_club_academy",
+                            )[0] as HTMLInputElement;
                             if (input) {
                               input.value = club.club_name;
-                              input.dispatchEvent(new Event('input', { bubbles: true }));
+                              input.dispatchEvent(
+                                new Event("input", { bubbles: true }),
+                              );
                             }
                           }}
                           className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
                         >
                           {club.club_logo ? (
-                            <img src={club.club_logo} alt={club.club_name} className="w-8 h-8 rounded-full object-cover border border-white/10" />
+                            <img
+                              src={club.club_logo}
+                              alt={club.club_name}
+                              className="w-8 h-8 rounded-full object-cover border border-white/10"
+                            />
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs text-gray-400">?</div>
+                            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs text-gray-400">
+                              ?
+                            </div>
                           )}
                           <div className="flex flex-col">
-                            <span className="text-sm text-white font-medium">{club.club_name}</span>
-                            <span className="text-[10px] text-gray-500 uppercase">{club.location}</span>
+                            <span className="text-sm text-white font-medium">
+                              {club.club_name}
+                            </span>
+                            <span className="text-[10px] text-gray-500 uppercase">
+                              {club.location}
+                            </span>
                           </div>
                         </button>
                       ))}
@@ -478,10 +570,22 @@ const PlayerRegisterForm = () => {
                   error={errors.type_of_commitment?.message}
                   options={[
                     { label: "Academy Player", value: "academy_player" },
-                    { label: "Youth / Nursery Player", value: "youth_nursery_player" },
-                    { label: "Amateur Club Player", value: "amateur_club_player" },
-                    { label: "Semi-Professional Player", value: "semi_professional_player" },
-                    { label: "Professional Player", value: "professional_player" },
+                    {
+                      label: "Youth / Nursery Player",
+                      value: "youth_nursery_player",
+                    },
+                    {
+                      label: "Amateur Club Player",
+                      value: "amateur_club_player",
+                    },
+                    {
+                      label: "Semi-Professional Player",
+                      value: "semi_professional_player",
+                    },
+                    {
+                      label: "Professional Player",
+                      value: "professional_player",
+                    },
                     { label: "Free Agent", value: "free_agent" },
                   ]}
                 />
@@ -495,17 +599,30 @@ const PlayerRegisterForm = () => {
                   icon={<Calendar size={16} />}
                   value={watch("contract_valid_until")}
                 />
-                <p className="text-[10px] text-gray-500 pl-1 -mt-4">If you're a free agent, select today's date or a future date</p>
+                <p className="text-[10px] text-gray-500 pl-1 -mt-4">
+                  If you're a free agent, select today's date or a future date
+                </p>
 
                 <div className="flex gap-4 pt-4">
-                   <button type="button" onClick={handleBackStep} className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                      <ChevronLeft size={18} />
-                      Back
-                   </button>
-                   <button type="button" onClick={handleNextStep} className="flex-[2] py-4 bg-white/10 border border-white/10 rounded-2xl text-white font-semibold hover:bg-white/20 transition-all flex items-center justify-center gap-2 group">
-                      Continue
-                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                   </button>
+                  <button
+                    type="button"
+                    onClick={handleBackStep}
+                    className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                  >
+                    <ChevronLeft size={18} />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="flex-[2] py-4 bg-white/10 border border-white/10 rounded-2xl text-white font-semibold hover:bg-white/20 transition-all flex items-center justify-center gap-2 group"
+                  >
+                    Continue
+                    <ChevronRight
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
+                  </button>
                 </div>
               </div>
             )}
@@ -513,60 +630,127 @@ const PlayerRegisterForm = () => {
             {/* STEP 3 - PARENT CONSENT (MINOR ONLY) */}
             {step === 3 && isMinor && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                 <div className="flex flex-col items-center mb-4">
-                   <div className="p-4 bg-gradient-to-br from-cyan-500 to-indigo-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
-                      <User size={32} className="text-white" />
-                   </div>
-                   <h2 className="text-2xl font-bold text-white mb-2">Parent / Guardian Consent</h2>
-                   <p className="text-gray-400 text-xs">Required for players under 18 years old</p>
+                <div className="flex flex-col items-center mb-4">
+                  <div className="p-4 bg-gradient-to-br from-cyan-500 to-indigo-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
+                    <User size={32} className="text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Parent / Guardian Consent
+                  </h2>
+                  <p className="text-gray-400 text-xs">
+                    Required for players under 18 years old
+                  </p>
                 </div>
 
                 <div className="bg-red-500/5 border border-red-500/20 p-5 rounded-2xl space-y-3">
-                   <div className="flex items-center gap-2 text-red-500">
-                      <AlertCircle size={18} />
-                      <h4 className="text-sm font-bold uppercase tracking-wider">Registration Blocked</h4>
-                   </div>
-                   <p className="text-white text-xs font-semibold">You are under 18 years old. <span className="text-gray-400 font-normal">To continue registration, parent or guardian must provide the following information consent.</span></p>
-                   
-                   <div className="bg-[#141b2b] p-4 rounded-xl space-y-3">
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Required to proceed:</p>
-                      <ul className="space-y-2">
-                         {[ "Parent/Guardian First Name", "Parent/Guardian Last Name", "Parent/Guardian ID Number", "Parent/Guardian Digital Signature" ].map(item => (
-                            <li key={item} className="flex items-center gap-2 text-[10px] text-gray-300 font-medium">
-                               <div className="w-4 h-4 rounded-full border border-red-500 flex items-center justify-center text-red-500 text-[8px] font-bold">X</div>
-                               {item}
-                            </li>
-                         ))}
-                      </ul>
-                   </div>
-                   <p className="text-red-400 text-[10px] italic flex items-center gap-2 px-1">
-                      <AlertCircle size={12} />
-                      You cannot complete registration without parent/guardian consent.
-                   </p>
+                  <div className="flex items-center gap-2 text-red-500">
+                    <AlertCircle size={18} />
+                    <h4 className="text-sm font-bold uppercase tracking-wider">
+                      Registration Blocked
+                    </h4>
+                  </div>
+                  <p className="text-white text-xs font-semibold">
+                    You are under 18 years old.{" "}
+                    <span className="text-gray-400 font-normal">
+                      To continue registration, parent or guardian must provide
+                      the following information consent.
+                    </span>
+                  </p>
+
+                  <div className="bg-[#141b2b] p-4 rounded-xl space-y-3">
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                      Required to proceed:
+                    </p>
+                    <ul className="space-y-2">
+                      {[
+                        "Parent/Guardian First Name",
+                        "Parent/Guardian Last Name",
+                        "Parent/Guardian ID Number",
+                        "Parent/Guardian Digital Signature",
+                      ].map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-center gap-2 text-[10px] text-gray-300 font-medium"
+                        >
+                          <div className="w-4 h-4 rounded-full border border-red-500 flex items-center justify-center text-red-500 text-[8px] font-bold">
+                            X
+                          </div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <p className="text-red-400 text-[10px] italic flex items-center gap-2 px-1">
+                    <AlertCircle size={12} />
+                    You cannot complete registration without parent/guardian
+                    consent.
+                  </p>
                 </div>
 
                 <div className="bg-blue-500/5 border border-blue-500/20 p-4 rounded-2xl flex gap-3">
-                   <AlertCircle size={16} className="text-blue-400 shrink-0 mt-0.5" />
-                   <div className="space-y-1">
-                      <h4 className="text-blue-400 text-[11px] font-semibold">Instructions for Parent/Guardian</h4>
-                      <p className="text-gray-400 text-[10px] leading-relaxed">Please ask your parent or legal guardian to sit with you and complete the following fields. They will need their identification document and must provide a digital signature.</p>
-                   </div>
+                  <AlertCircle
+                    size={16}
+                    className="text-blue-400 shrink-0 mt-0.5"
+                  />
+                  <div className="space-y-1">
+                    <h4 className="text-blue-400 text-[11px] font-semibold">
+                      Instructions for Parent/Guardian
+                    </h4>
+                    <p className="text-gray-400 text-[10px] leading-relaxed">
+                      Please ask your parent or legal guardian to sit with you
+                      and complete the following fields. They will need their
+                      identification document and must provide a digital
+                      signature.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <DarkInput label="Parent/Guardian First Name" name="parent_guardian_first_name" register={register} error={errors.parent_guardian_first_name?.message} icon={<User size={14}/>} placeholder="Enter parent's first name" />
-                  <DarkInput label="Parent/Guardian Last Name" name="parent_guardian_last_name" register={register} error={errors.parent_guardian_last_name?.message} icon={<User size={14}/>} placeholder="Enter parent's last name" />
+                  <DarkInput
+                    label="Parent/Guardian First Name"
+                    name="parent_guardian_first_name"
+                    register={register}
+                    error={errors.parent_guardian_first_name?.message}
+                    icon={<User size={14} />}
+                    placeholder="Enter parent's first name"
+                  />
+                  <DarkInput
+                    label="Parent/Guardian Last Name"
+                    name="parent_guardian_last_name"
+                    register={register}
+                    error={errors.parent_guardian_last_name?.message}
+                    icon={<User size={14} />}
+                    placeholder="Enter parent's last name"
+                  />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <DarkInput label="Parent/Guardian ID Number" name="parent_id_number" register={register} error={errors.parent_id_number?.message} placeholder="National ID / Passport number" />
-                  <DarkInput label="Parent/Guardian Email Address" name="parent_guardian_email" register={register} error={errors.parent_guardian_email?.message} icon={<Mail size={14}/>} placeholder="guardian@example.com" />
+                  <DarkInput
+                    label="Parent/Guardian ID Number"
+                    name="parent_id_number"
+                    register={register}
+                    error={errors.parent_id_number?.message}
+                    placeholder="National ID / Passport number"
+                  />
+                  <DarkInput
+                    label="Parent/Guardian Email Address"
+                    name="parent_guardian_email"
+                    register={register}
+                    error={errors.parent_guardian_email?.message}
+                    icon={<Mail size={14} />}
+                    placeholder="guardian@example.com"
+                  />
                 </div>
-                <p className="text-[10px] text-gray-500 pl-1 -mt-4 italic">Required for identity verification and legal compliance</p>
+                <p className="text-[10px] text-gray-500 pl-1 -mt-4 italic">
+                  Required for identity verification and legal compliance
+                </p>
 
                 <Controller
                   name="parent_guardian_digital_signature"
                   control={control}
-                  rules={{ required: "Parent/Guardian signature is required for minors" }}
+                  rules={{
+                    required:
+                      "Parent/Guardian signature is required for minors",
+                  }}
                   render={({ field }) => (
                     <SignatureField
                       label="Parent/Guardian Digital Signature"
@@ -577,22 +761,44 @@ const PlayerRegisterForm = () => {
                 />
 
                 <div className="bg-cyan-500/5 border border-cyan-500/10 p-4 rounded-2xl space-y-3">
-                   <div className="flex items-center gap-2 text-cyan-400">
-                      <Shield size={16} />
-                      <h4 className="text-[11px] font-bold uppercase tracking-wider">Parent/Guardian Declaration</h4>
-                   </div>
-                   <p className="text-gray-400 text-[10px] leading-relaxed">By providing the above information and signature, I confirm that I am the parent or legal guardian of <span className="text-white font-bold">{formValues.first_name || '...'} {formValues.last_name || ''}</span> and I give consent for their registration on the NextGen Pros platform.</p>
+                  <div className="flex items-center gap-2 text-cyan-400">
+                    <Shield size={16} />
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider">
+                      Parent/Guardian Declaration
+                    </h4>
+                  </div>
+                  <p className="text-gray-400 text-[10px] leading-relaxed">
+                    By providing the above information and signature, I confirm
+                    that I am the parent or legal guardian of{" "}
+                    <span className="text-white font-bold">
+                      {formValues.first_name || "..."}{" "}
+                      {formValues.last_name || ""}
+                    </span>{" "}
+                    and I give consent for their registration on the NextGen
+                    Pros platform.
+                  </p>
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                   <button type="button" onClick={handleBackStep} className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                      <ChevronLeft size={18} />
-                      Back
-                   </button>
-                   <button type="button" onClick={handleNextStep} className="flex-[2] py-4 bg-white/10 border border-white/10 rounded-2xl text-white font-semibold hover:bg-white/20 transition-all flex items-center justify-center gap-2 group">
-                      Continue
-                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                   </button>
+                  <button
+                    type="button"
+                    onClick={handleBackStep}
+                    className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                  >
+                    <ChevronLeft size={18} />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="flex-[2] py-4 bg-white/10 border border-white/10 rounded-2xl text-white font-semibold hover:bg-white/20 transition-all flex items-center justify-center gap-2 group"
+                  >
+                    Continue
+                    <ChevronRight
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
+                  </button>
                 </div>
               </div>
             )}
@@ -600,85 +806,151 @@ const PlayerRegisterForm = () => {
             {/* STEP 4 - PRIVACY & CONSENT */}
             {step === 4 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                 <div className="flex flex-col items-center mb-4">
-                   <div className="p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
-                      <Shield size={32} className="text-white" />
-                   </div>
-                   <h2 className="text-2xl font-bold text-white mb-2">Privacy & Consent</h2>
-                   <p className="text-gray-400 text-xs">Review and accept our terms to continue</p>
+                <div className="flex flex-col items-center mb-4">
+                  <div className="p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
+                    <Shield size={32} className="text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Privacy & Consent
+                  </h2>
+                  <p className="text-gray-400 text-xs">
+                    Review and accept our terms to continue
+                  </p>
                 </div>
 
                 <div className="bg-white/5 border border-white/10 p-6 rounded-[2rem] space-y-4">
-                   <h4 className="text-white text-sm font-bold uppercase tracking-widest">Data Processing & Publishing Consent</h4>
-                   <p className="text-gray-400 text-xs leading-relaxed">By proceeding, you agree that NextGen Pros may:</p>
-                   <ul className="space-y-3">
-                      {[ 
-                        "Process and store your personal information securely",
-                        "Display your profile information to clubs, scouts, and academies",
-                        "Publish your photos and videos on your player profile",
-                        "Use your content for platform marketing purposes (with attribution)",
-                        "Share your performance statistics with interested parties"
-                      ].map(item => (
-                         <li key={item} className="flex items-start gap-3 text-[11px] text-gray-300 transition-all">
-                            <div className="w-4 h-4 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                               <ChevronRight size={10} className="text-cyan-400" />
-                            </div>
-                            {item}
-                         </li>
-                      ))}
-                   </ul>
-                   <p className="text-gray-500 text-[10px] leading-relaxed pt-2">You can manage your privacy settings and revoke consent at any time from your account settings.</p>
+                  <h4 className="text-white text-sm font-bold uppercase tracking-widest">
+                    Data Processing & Publishing Consent
+                  </h4>
+                  <p className="text-gray-400 text-xs leading-relaxed">
+                    By proceeding, you agree that NextGen Pros may:
+                  </p>
+                  <ul className="space-y-3">
+                    {[
+                      "Process and store your personal information securely",
+                      "Display your profile information to clubs, scouts, and academies",
+                      "Publish your photos and videos on your player profile",
+                      "Use your content for platform marketing purposes (with attribution)",
+                      "Share your performance statistics with interested parties",
+                    ].map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-3 text-[11px] text-gray-300 transition-all"
+                      >
+                        <div className="w-4 h-4 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                          <ChevronRight size={10} className="text-cyan-400" />
+                        </div>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="text-gray-500 text-[10px] leading-relaxed pt-2">
+                    You can manage your privacy settings and revoke consent at
+                    any time from your account settings.
+                  </p>
 
-                   <div className="pt-4">
-                      <label className="group flex items-center gap-4 p-5 bg-[#141b2b] border border-white/5 rounded-2xl cursor-pointer hover:border-cyan-500/30 transition-all duration-300">
-                         <div className="relative flex items-center">
-                            <input 
-                              type="checkbox" 
-                              {...register("accept_privacy", { required: true })}
-                              className="peer h-5 w-5 appearance-none rounded-md border border-white/20 bg-transparent checked:bg-cyan-500 checked:border-cyan-500 transition-all cursor-pointer" 
+                  <div className="pt-4">
+                    <label className="group flex items-center gap-4 p-5 bg-[#141b2b] border border-white/5 rounded-2xl cursor-pointer hover:border-cyan-500/30 transition-all duration-300">
+                      <div className="relative flex items-center">
+                        <input
+                          type="checkbox"
+                          {...register("accept_privacy", { required: true })}
+                          className="peer h-5 w-5 appearance-none rounded-md border border-white/20 bg-transparent checked:bg-cyan-500 checked:border-cyan-500 transition-all cursor-pointer"
+                        />
+                        <div className="absolute opacity-0 peer-checked:opacity-100 pointer-events-none text-white left-1">
+                          <svg
+                            className="w-3 h-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="4"
+                              d="M5 13l4 4L19 7"
                             />
-                            <div className="absolute opacity-0 peer-checked:opacity-100 pointer-events-none text-white left-1">
-                               <svg className="w-3 h-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                         </div>
-                         <span className="text-[11px] text-gray-300 font-medium select-none">I consent to NextGen Pros processing and publishing my information, photos, and videos for profile and marketing purposes.</span>
-                      </label>
-                      {errors.accept_privacy && <p className="text-red-500 text-[10px] mt-2 ml-2">You must accept the terms to proceed</p>}
-                   </div>
+                          </svg>
+                        </div>
+                      </div>
+                      <span className="text-[11px] text-gray-300 font-medium select-none">
+                        I consent to NextGen Pros processing and publishing my
+                        information, photos, and videos for profile and
+                        marketing purposes.
+                      </span>
+                    </label>
+                    {errors.accept_privacy && (
+                      <p className="text-red-500 text-[10px] mt-2 ml-2">
+                        You must accept the terms to proceed
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="bg-blue-500/5 border border-blue-500/20 p-4 rounded-2xl flex gap-3">
-                   <AlertCircle size={16} className="text-blue-400 shrink-0 mt-0.5" />
-                   <div className="space-y-1">
-                      <h4 className="text-blue-400 text-[11px] font-semibold">Your Privacy Matters</h4>
-                      <p className="text-gray-400 text-[10px] leading-relaxed">We are committed to protecting your data. Read our <Link href="/privacy" className="text-cyan-400 hover:underline">Privacy Policy</Link> and <Link href="/terms" className="text-cyan-400 hover:underline">Terms of Service</Link> for more details.</p>
-                   </div>
+                  <AlertCircle
+                    size={16}
+                    className="text-blue-400 shrink-0 mt-0.5"
+                  />
+                  <div className="space-y-1">
+                    <h4 className="text-blue-400 text-[11px] font-semibold">
+                      Your Privacy Matters
+                    </h4>
+                    <p className="text-gray-400 text-[10px] leading-relaxed">
+                      We are committed to protecting your data. Read our{" "}
+                      <Link
+                        href="/privacy"
+                        className="text-cyan-400 hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        href="/terms"
+                        className="text-cyan-400 hover:underline"
+                      >
+                        Terms of Service
+                      </Link>{" "}
+                      for more details.
+                    </p>
+                  </div>
                 </div>
 
-
                 <div className="flex gap-4 pt-4">
-                   <button type="button" onClick={handleBackStep} className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                      <ChevronLeft size={18} />
-                      Back
-                   </button>
-                   <button type="submit" disabled={isLoading} className="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-green-600 border border-emerald-400/20 rounded-2xl text-white font-bold hover:from-emerald-400 hover:to-green-500 transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                      {isLoading ? "Processing..." : (
-                        <>
-                          <FileText size={18} />
-                          Complete Registration
-                        </>
-                      )}
-                   </button>
+                  <button
+                    type="button"
+                    onClick={handleBackStep}
+                    className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-gray-300 font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                  >
+                    <ChevronLeft size={18} />
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-green-600 border border-emerald-400/20 rounded-2xl text-white font-bold hover:from-emerald-400 hover:to-green-500 transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                  >
+                    {isLoading ? (
+                      "Processing..."
+                    ) : (
+                      <>
+                        <FileText size={18} />
+                        Complete Registration
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             )}
           </form>
 
           {/* Error display if any required fields are missing before continue (matching yellow text in figma) */}
-          {(Object.keys(errors).length > 0 && step > 0) && (
+          {Object.keys(errors).length > 0 && step > 0 && (
             <div className="mt-4 flex items-center justify-center gap-2 text-amber-400">
-               <AlertCircle size={14} />
-               <span className="text-[10px] font-medium">Please complete all required fields to continue</span>
+              <AlertCircle size={14} />
+              <span className="text-[10px] font-medium">
+                Please complete all required fields to continue
+              </span>
             </div>
           )}
         </div>
@@ -686,9 +958,16 @@ const PlayerRegisterForm = () => {
         {/* Footer Links - Only for Step 0 */}
         {step === 0 && (
           <div className="mt-10 text-center animate-in fade-in duration-1000">
-             <p className="text-[10px] text-gray-500">
-                By creating an account, you agree to our <Link href="/terms" className="text-cyan-400 hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-cyan-400 hover:underline">Privacy Policy</Link>
-             </p>
+            <p className="text-[10px] text-gray-500">
+              By creating an account, you agree to our{" "}
+              <Link href="/terms" className="text-cyan-400 hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-cyan-400 hover:underline">
+                Privacy Policy
+              </Link>
+            </p>
           </div>
         )}
       </div>

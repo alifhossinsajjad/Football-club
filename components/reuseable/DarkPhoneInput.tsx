@@ -4,9 +4,11 @@ import React, { useState } from "react";
 import { Controller, Control } from "react-hook-form";
 import { countryCodes } from "@/constants/countryCodes";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface Props {
   label?: string;
   name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>;
   error?: string;
   placeholder?: string;
