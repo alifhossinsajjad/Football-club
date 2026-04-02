@@ -64,10 +64,21 @@ const EventDetailsPage = () => {
 
   const { data: registrationsData } = useGetMyRegistrationsQuery();
   console.log('register data ',registrationsData);
-  const registrationsArray = Array.isArray(registrationsData) ? registrationsData : (registrationsData as any)?.data || [];
+  const registrationsArray = React.useMemo(() => {
+    if (!registrationsData) return [];
+    if (Array.isArray(registrationsData)) return registrationsData;
+    if ((registrationsData as any)?.results) return (registrationsData as any).results;
+    if ((registrationsData as any)?.data) return (registrationsData as any).data;
+    return [];
+  }, [registrationsData]);
   
-  const reg = registrationsArray.find((r: any) => (r.event === Number(id) || r.event_id === Number(id)));
-  const isRegistered = !!reg && (reg.status === "PENDING" || reg.status === "CONFIRMED" || reg.status === "PAID" || reg.status === "CONFIRM" || reg.status === "SUCCESS");
+  const reg = registrationsArray.find((r: any) => {
+    const regEventId = r.event_id || (typeof r.event === 'object' ? r.event?.id : r.event);
+    return Number(regEventId) === Number(id);
+  });
+  
+  const status = (reg?.status || (reg as any)?.registration_status || "").toUpperCase();
+  const isRegistered = !!reg && ["PENDING", "CONFIRMED", "PAID", "CONFIRM", "SUCCESS"].includes(status);
   const localRegistrationId = reg?.registration_id || reg?.id;
 
   const { data: eventResponse, isLoading: isDetailsLoading } = useGetEventDetailsQuery(id, {

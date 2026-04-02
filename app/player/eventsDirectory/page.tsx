@@ -117,7 +117,13 @@ const EventsDirectoryPage = () => {
 
 
   const { data: registrationsData } = useGetMyRegistrationsQuery();
-  const registrationsArray = Array.isArray(registrationsData) ? registrationsData : (registrationsData as any)?.data || [];
+  const registrationsArray = useMemo(() => {
+    if (!registrationsData) return [];
+    if (Array.isArray(registrationsData)) return registrationsData;
+    if ((registrationsData as any)?.results) return (registrationsData as any).results;
+    if ((registrationsData as any)?.data) return (registrationsData as any).data;
+    return [];
+  }, [registrationsData]);
 
   const filteredEvents = useMemo(() => {
     let result = events.filter((event: EventData) => {
@@ -205,8 +211,12 @@ const EventsDirectoryPage = () => {
         <div className="space-y-8">
           <div className="grid lg:grid-cols-2 gap-6">
             {paginatedEvents.map((event: any) => {
-              const reg = registrationsArray.find((r: any) => (r.event === event.id || r.event_id === event.id));
-              const isRegistered = !!reg && (reg.status === "PENDING" || reg.status === "CONFIRMED" || reg.status === "PAID" || reg.status === "CONFIRM" || reg.status === "SUCCESS");
+              const reg = registrationsArray.find((r: any) => {
+                const regEventId = r.event_id || (typeof r.event === 'object' ? (r.event as any).id : r.event);
+                return Number(regEventId) === Number(event.id);
+              });
+              const status = (reg?.status || "").toUpperCase();
+              const isRegistered = !!reg && ["PENDING", "CONFIRMED", "PAID", "CONFIRM", "SUCCESS"].includes(status);
               const isFull = event.is_full || (event.maximum_capacity > 0 && event.registered_count >= event.maximum_capacity);
               
               return (
