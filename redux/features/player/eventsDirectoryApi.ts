@@ -1,19 +1,17 @@
+import { EventListResponse, EventRegistration } from "@/types/scout/eventsType";
 import { baseApi } from "../../api/baseApi";
 
 export const eventsDirectoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getEvents: builder.query<any, void>({
+    getEvents: builder.query<EventListResponse, void>({
       query: () => "/events/",
     }),
     getEventDetails: builder.query<any, string | number>({
       query: (id) => `/events/${id}/`,
     }),
-    createRegistration: builder.mutation<any, any>({
-      query: (data) => ({
-        url: "/players/event-registration/",
-        method: "POST",
-        body: data,
-      }),
+    getMyRegistrations: builder.query<EventRegistration[], void>({
+      query: () => `/players/event-registrations/`,
+      providesTags: ["Events"],
     }),
     checkout: builder.mutation<
       any,
@@ -40,16 +38,17 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    getRegistrationStatus: builder.query<
-      any,
-      { player_name: string; contact_email: string }
-    >({
-      query: (params) =>
-        `/events/registration-status/?player_name=${params.player_name}&contact_email=${params.contact_email}`,
-    }),
-    getMyRegistrations: builder.query<any[], void>({
-      query: () => `/players/event-registrations/`,
-      providesTags: ["Events"],
+ getRegistrationStatus: builder.query<any, string>({
+  query: (registration_id) =>
+    `/players/event-registration/${registration_id}/status/`,
+}),
+    createRegistration: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "/players/event-registration/",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Events"], // 🔥 important
     }),
     applyPromoCode: builder.mutation<
       any,

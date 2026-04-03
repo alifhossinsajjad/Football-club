@@ -36,6 +36,7 @@ import {
   useDeleteEventMutation,
   useToggleFeaturedEventMutation,
 } from "@/redux/features/club/clubEventManagementApi";
+import Image from "next/image";
 
 type Event = {
   id: string;
@@ -178,7 +179,7 @@ export default function EventManagementPage() {
   const handleSaveEdit = async (updated: Event) => {
     try {
       const formDataToSend = new FormData();
-      
+
       const eventData = {
         event_name: updated.name,
         event_type: "TRIAL",
@@ -186,7 +187,10 @@ export default function EventManagementPage() {
         start_time: updated.startTime || "10:00:00",
         end_time: updated.endTime || "14:00:00",
         venue_name: updated.location.split(",")[0] || "Venue Name",
-        street_address: updated.streetAddress || updated.location.split(",")[1]?.trim() || "Street Address",
+        street_address:
+          updated.streetAddress ||
+          updated.location.split(",")[1]?.trim() ||
+          "Street Address",
         city: updated.city || "City",
         postal_code: updated.postalCode || "00000",
         country: updated.country || "Country",
@@ -223,7 +227,7 @@ export default function EventManagementPage() {
 
     try {
       const formDataToSend = new FormData();
-      
+
       const eventData = {
         event_name: formData.name,
         event_type: formData.type.toUpperCase(),
@@ -857,7 +861,7 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
           {/* Hero Section */}
           <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] p-8 relative overflow-hidden shrink-0 min-h-[300px] flex flex-col justify-end">
             {/* Background Image */}
-            <img
+            <Image
               src={
                 typeof event.banner === "string"
                   ? event.banner
@@ -866,6 +870,8 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
                     : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"
               }
               alt=""
+              width={1200}
+              height={600}
               className="absolute inset-0 w-full h-full object-cover opacity-40"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#121433] via-[#121433]/60 to-transparent" />
@@ -1465,7 +1471,7 @@ function Step1({
                 onChange={(e) =>
                   updateData({ ...data, startTime: e.target.value })
                 }
-                className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all text-center"
+                className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl  text-white focus:outline-none focus:border-cyan-400/50 transition-all  px-2 py-4 text-center "
               />
             </div>
             <div>
@@ -1478,7 +1484,7 @@ function Step1({
                 onChange={(e) =>
                   updateData({ ...data, endTime: e.target.value })
                 }
-                className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all text-center"
+                className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-2 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all text-center"
               />
             </div>
           </div>
