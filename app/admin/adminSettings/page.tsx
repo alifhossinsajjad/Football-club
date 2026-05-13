@@ -9,7 +9,9 @@ import {
   Database,
   Loader2,
   X,
+  Lock,
 } from "lucide-react";
+import { useChangePasswordMutation } from "@/redux/features/auth/accountApi";
 import {
   useGetGeneralSettingsQuery,
   useUpdateGeneralSettingsMutation,
@@ -64,6 +66,7 @@ const TABS = [
   { id: "User Management", icon: <Users size={18} />, label: "User Management" },
   { id: "Monetization", icon: <DollarSign size={18} />, label: "Monetization" },
   { id: "Notifications", icon: <Bell size={18} />, label: "Notifications" },
+  { id: "Security", icon: <Lock size={18} />, label: "Security" },
 ];
 
 // ─── Sub-Components ──────────────────────────────────────────────────────────
@@ -895,6 +898,102 @@ const NotificationSettingsForm = () => {
   );
 };
 
+const SecuritySettingsForm = () => {
+  const [passwords, setPasswords] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+  const [changePassword, { isLoading: isChanging }] = useChangePasswordMutation();
+
+  const handleUpdatePassword = async () => {
+    if (passwords.new_password !== passwords.confirm_password) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+    if (!passwords.current_password || !passwords.new_password) {
+      toast.error("Please fill required fields");
+      return;
+    }
+    try {
+      await changePassword({
+        old_password: passwords.current_password,
+        new_password: passwords.new_password,
+        confirm_password: passwords.confirm_password,
+      }).unwrap();
+      toast.success("Password updated successfully");
+      setPasswords({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
+    } catch (err: any) {
+      toast.error(
+        err?.data?.error || err?.data?.message || "Failed to update password"
+      );
+    }
+  };
+
+  const cardClass = "bg-[#171b2f] border border-gray-800 rounded-[2rem] p-8 md:p-10 mb-8 shadow-2xl backdrop-blur-sm";
+  const sectionTitleClass = "text-xl font-bold text-white mb-8 flex items-center gap-3";
+  const labelClass = "text-sm font-medium text-gray-400 mb-2.5 block ml-1";
+  const inputClass = "w-full bg-[#0a0c16] border border-gray-800 rounded-xl px-4 py-4 text-sm text-gray-300 focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-gray-600";
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className={cardClass}>
+        <h2 className={sectionTitleClass}>
+          <Lock size={20} className="text-cyan-400" /> Security Settings
+        </h2>
+        <div className="max-w-2xl space-y-6">
+          <div>
+            <label className={labelClass}>Current Password</label>
+            <input
+              type="password"
+              value={passwords.current_password}
+              onChange={(e) => setPasswords({ ...passwords, current_password: e.target.value })}
+              className={inputClass}
+              placeholder="Enter current password"
+            />
+          </div>
+          <div>
+            <label className={labelClass}>New Password</label>
+            <input
+              type="password"
+              value={passwords.new_password}
+              onChange={(e) => setPasswords({ ...passwords, new_password: e.target.value })}
+              className={inputClass}
+              placeholder="Enter new password"
+            />
+            <p className="text-[10px] text-gray-500 mt-2 ml-1">
+              Minimum 8 characters with uppercase, lowercase, and numbers
+            </p>
+          </div>
+          <div>
+            <label className={labelClass}>Confirm New Password</label>
+            <input
+              type="password"
+              value={passwords.confirm_password}
+              onChange={(e) => setPasswords({ ...passwords, confirm_password: e.target.value })}
+              className={inputClass}
+              placeholder="Confirm new password"
+            />
+          </div>
+          <div className="pt-4">
+            <button
+              onClick={handleUpdatePassword}
+              disabled={isChanging}
+              className="px-10 py-4 rounded-xl bg-[#00E5FF] hover:bg-[#00D4FF] text-black font-bold transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+            >
+              {isChanging ? <Loader2 className="animate-spin" /> : "Update Password"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState("General");
   const { data: generalData, isLoading: genLoading } =
@@ -951,6 +1050,7 @@ export default function AdminSettingsPage() {
         {activeTab === "User Management" && <UserManagementSettingsForm />}
         {activeTab === "Monetization" && <MonetizationSettingsForm />}
         {activeTab === "Notifications" && <NotificationSettingsForm />}
+        {activeTab === "Security" && <SecuritySettingsForm />}
         {![
           "General",
           "User Management",
