@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import {
-  useChangePasswordMutation,
   useDeleteAccountMutation,
   useDownloadDataMutation,
   useGetAllSettingsQuery,
@@ -10,6 +9,7 @@ import {
   useUpdateNotificationSettingsMutation,
   useUpdatePrivacySettingsMutation,
 } from "@/redux/features/player/setting/settingApi";
+import { useChangePasswordMutation } from "@/redux/features/auth/accountApi";
 import {
   AccountSettings,
   NotificationSettings,

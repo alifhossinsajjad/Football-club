@@ -9,9 +9,9 @@ import {
   useUpdatePrivacySettingsMutation,
   useGetNotificationSettingsQuery as useGetClubNotificationSettingsQuery,
   useUpdateNotificationSettingsMutation as useUpdateClubNotificationSettingsMutation,
-  useChangePasswordMutation,
   useSignOutAllSessionsMutation,
 } from "@/redux/features/club/clubSettingsApi";
+import { useChangePasswordMutation } from "@/redux/features/auth/accountApi";
 import {
   useGetNotificationSettingsQuery,
   useUpdateNotificationSettingsMutation,
@@ -158,6 +158,7 @@ const ClubSettingsPage = () => {
       await changePassword({
         old_password: passwords.current_password,
         new_password: passwords.new_password,
+        confirm_password: passwords.confirm_password,
       }).unwrap();
       toast.success("Password updated successfully");
       setPasswords({

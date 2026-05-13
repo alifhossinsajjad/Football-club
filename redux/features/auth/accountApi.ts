@@ -30,6 +30,13 @@ export const accountApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    changePassword: builder.mutation<{ message: string }, { old_password: string; new_password: string; confirm_password: string }>({
+      query: (data) => ({
+        url: "/accounts/change-password/",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -38,4 +45,5 @@ export const {
   useVerifyEmailMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+  useChangePasswordMutation,
 } = accountApi;

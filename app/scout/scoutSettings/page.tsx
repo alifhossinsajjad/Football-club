@@ -15,6 +15,7 @@ import {
   useGetNotificationSettingsQuery,
   useUpdateNotificationSettingsMutation,
 } from "@/redux/features/notification/notificationApi";
+import { useChangePasswordMutation } from "@/redux/features/auth/accountApi";
 import { NotificationSettings } from "@/types/notification/notificationType";
 
 type Tab = "security" | "notifications" | "preferences";
@@ -27,15 +28,23 @@ const ScoutSettingsPage = () => {
   const [updateNotif, { isLoading: isUpdatingNotif }] =
     useUpdateNotificationSettingsMutation();
 
-const [notif, setNotif] = React.useState<NotificationSettings>({
-  email_notifications: true,
-  push_notifications: true,
-  realtime_notifications: true,
-  notification_types: {
-    NEW_MESSAGE: { email: true, push: true, realtime: true },
-    EVENT_REGISTRATION: { email: true, push: true, realtime: true },
-  },
-});
+  const [notif, setNotif] = React.useState<NotificationSettings>({
+    email_notifications: true,
+    push_notifications: true,
+    realtime_notifications: true,
+    notification_types: {
+      NEW_MESSAGE: { email: true, push: true, realtime: true },
+      EVENT_REGISTRATION: { email: true, push: true, realtime: true },
+    },
+  });
+
+  const [passwords, setPasswords] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+
+  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
   const [toggles, setToggles] = useState({
     profileVisibility: true,
@@ -73,6 +82,34 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
 
   const toggle = (key: keyof typeof toggles) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleUpdatePassword = async () => {
+    if (passwords.new_password !== passwords.confirm_password) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+    if (!passwords.current_password || !passwords.new_password) {
+      toast.error("Please fill required fields");
+      return;
+    }
+    try {
+      await changePassword({
+        old_password: passwords.current_password,
+        new_password: passwords.new_password,
+        confirm_password: passwords.confirm_password,
+      }).unwrap();
+      toast.success("Password updated successfully");
+      setPasswords({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
+    } catch (err: any) {
+      toast.error(
+        err?.data?.error || err?.data?.message || "Failed to update password"
+      );
+    }
   };
 
   return (
@@ -150,6 +187,8 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
                   </label>
                   <input
                     type="password"
+                    value={passwords.current_password}
+                    onChange={(e) => setPasswords({ ...passwords, current_password: e.target.value })}
                     placeholder="Enter current password"
                     className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60"
                   />
@@ -161,6 +200,8 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
                   </label>
                   <input
                     type="password"
+                    value={passwords.new_password}
+                    onChange={(e) => setPasswords({ ...passwords, new_password: e.target.value })}
                     placeholder="Enter new password"
                     className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60"
                   />
@@ -176,13 +217,19 @@ const [notif, setNotif] = React.useState<NotificationSettings>({
                   </label>
                   <input
                     type="password"
+                    value={passwords.confirm_password}
+                    onChange={(e) => setPasswords({ ...passwords, confirm_password: e.target.value })}
                     placeholder="Confirm new password"
                     className="w-full bg-[#0B0D2C] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500/60"
                   />
                 </div>
 
-                <button className="w-full md:w-auto bg-teal-600 hover:bg-teal-500 text-white font-medium px-8 py-3 rounded-lg transition-colors mt-4">
-                  Update Password
+                <button
+                  onClick={handleUpdatePassword}
+                  disabled={isChangingPassword}
+                  className="w-full md:w-auto bg-teal-600 hover:bg-teal-500 text-white font-medium px-8 py-3 rounded-lg transition-colors mt-4"
+                >
+                  {isChangingPassword ? "Updating..." : "Update Password"}
                 </button>
               </div>
             </div>
