@@ -211,7 +211,9 @@ const PlayerRegisterForm = () => {
       last_name: data.last_name,
       date_of_birth: data.date_of_birth,
       nationality: data.nationality,
-      phone_number: data.phone_number ? data.phone_number.replace(/\s+/g, "") : "",
+      phone_number: data.phone_number
+        ? data.phone_number.replace(/\s+/g, "")
+        : "",
       playing_position:
         data.playing_position.charAt(0).toUpperCase() +
         data.playing_position.slice(1),
@@ -230,7 +232,9 @@ const PlayerRegisterForm = () => {
       parent_guardian_email: data.parent_guardian_email,
       parent_id_number: data.parent_id_number,
       // Sending a placeholder instead of null to satisfy backend required field
-      parent_guardian_digital_signature: currentlyIsMinor ? "signature_captured" : null,
+      parent_guardian_digital_signature: currentlyIsMinor
+        ? "signature_captured"
+        : null,
     };
 
     if (!currentlyIsMinor) {
@@ -314,15 +318,32 @@ const PlayerRegisterForm = () => {
                   name="date_of_birth"
                   type="date"
                   register={register}
-                  rules={{ 
+                  rules={{
                     required: "Date of birth is required",
                     validate: (value: string) => {
                       const date = new Date(value);
                       const today = new Date();
-                      if (date.getFullYear() < 1900) return "Invalid date (year too old)";
-                      if (date > today) return "Date of birth cannot be in the future";
+
+                      if (isNaN(date.getTime())) return "Invalid date";
+
+                      const year = date.getFullYear();
+
+                      if (year < 1900) return "Year too old";
+                      if (date > today) return "Cannot be in future";
+
+                      // Optional: age logic for football players (5–45)
+                      const age =
+                        today.getFullYear() -
+                        year -
+                        (today < new Date(date.setFullYear(today.getFullYear()))
+                          ? 1
+                          : 0);
+
+                      if (age < 5 || age > 45)
+                        return "Invalid player age range";
+
                       return true;
-                    }
+                    },
                   }}
                   error={errors.date_of_birth?.message}
                   icon={<Calendar size={16} />}
@@ -345,12 +366,15 @@ const PlayerRegisterForm = () => {
                     required: "Phone number is required",
                     validate: (value: string) => {
                       if (!value) return true;
-                      const number = value.includes(" ") ? value.split(" ")[1] : value.replace(/^\+\d+\s*/, "");
+                      const number = value.includes(" ")
+                        ? value.split(" ")[1]
+                        : value.replace(/^\+\d+\s*/, "");
                       const totalLength = value.replace(/\s+/g, "").length;
                       if (number.length < 7) return "Phone number is too short";
-                      if (totalLength > 15) return "Phone number cannot exceed 15 digits";
+                      if (totalLength > 15)
+                        return "Phone number cannot exceed 15 digits";
                       return true;
-                    }
+                    },
                   }}
                   error={errors.phone_number?.message}
                   icon={<Phone size={16} />}
@@ -361,12 +385,12 @@ const PlayerRegisterForm = () => {
                   name="email"
                   type="email"
                   register={register}
-                  rules={{ 
+                  rules={{
                     required: "Email is required",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address"
-                    }
+                      message: "Invalid email address",
+                    },
                   }}
                   error={errors.email?.message}
                   icon={<Mail size={16} />}
@@ -377,9 +401,12 @@ const PlayerRegisterForm = () => {
                   name="password"
                   type="password"
                   register={register}
-                  rules={{ 
+                  rules={{
                     required: "Password is required",
-                    minLength: { value: 8, message: "Password must be at least 8 characters" }
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters",
+                    },
                   }}
                   error={errors.password?.message}
                   icon={<Lock size={16} />}
@@ -390,9 +417,10 @@ const PlayerRegisterForm = () => {
                   name="confirm_password"
                   type="password"
                   register={register}
-                  rules={{ 
+                  rules={{
                     required: "Please confirm your password",
-                    validate: (value: string) => value === watch("password") || "Passwords do not match"
+                    validate: (value: string) =>
+                      value === watch("password") || "Passwords do not match",
                   }}
                   error={errors.confirm_password?.message}
                   icon={<Lock size={16} />}
@@ -474,7 +502,18 @@ const PlayerRegisterForm = () => {
                     name="height"
                     type="number"
                     register={register}
-                    rules={{ required: "Height is required" }}
+                    rules={{
+                      required: "Height is required",
+                      min: { value: 140, message: "Height too low" },
+                      max: { value: 220, message: "Height too high (cm)" },
+                      validate: (value: any) => {
+                        const num = Number(value);
+                        if (isNaN(num) || !Number.isFinite(num)) return "Invalid height";
+                        if (value.toString().length > 3)
+                          return "Invalid height format";
+                        return true;
+                      },
+                    }}
                     error={errors.height?.message}
                     placeholder="175"
                   />
@@ -483,7 +522,18 @@ const PlayerRegisterForm = () => {
                     name="weight"
                     type="number"
                     register={register}
-                    rules={{ required: "Weight is required" }}
+                    rules={{
+                      required: "Weight is required",
+                      min: { value: 35, message: "Weight too low" },
+                      max: { value: 130, message: "Weight too high (kg)" },
+                      validate: (value: any) => {
+                        const num = Number(value);
+                        if (isNaN(num) || !Number.isFinite(num)) return "Invalid weight";
+                        if (value.toString().length > 3)
+                          return "Invalid weight format";
+                        return true;
+                      },
+                    }}
                     error={errors.weight?.message}
                     placeholder="70"
                   />
@@ -651,15 +701,16 @@ const PlayerRegisterForm = () => {
                   name="contract_valid_until"
                   type="date"
                   register={register}
-                  rules={{ 
+                  rules={{
                     required: "Contract validity date is required",
                     validate: (value: string) => {
-                       const date = new Date(value);
-                       const today = new Date();
-                       today.setHours(0,0,0,0);
-                       if (date < today) return "Contract date cannot be in the past";
-                       return true;
-                    }
+                      const date = new Date(value);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      if (date < today)
+                        return "Contract date cannot be in the past";
+                      return true;
+                    },
                   }}
                   error={errors.contract_valid_until?.message}
                   placeholder="dd/mm/yyyy"
@@ -777,7 +828,11 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian First Name"
                     name="parent_guardian_first_name"
                     register={register}
-                    rules={{ required: isMinor ? "Parent's first name is required" : false }}
+                    rules={{
+                      required: isMinor
+                        ? "Parent's first name is required"
+                        : false,
+                    }}
                     error={errors.parent_guardian_first_name?.message}
                     icon={<User size={14} />}
                     placeholder="Enter parent's first name"
@@ -786,7 +841,11 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian Last Name"
                     name="parent_guardian_last_name"
                     register={register}
-                    rules={{ required: isMinor ? "Parent's last name is required" : false }}
+                    rules={{
+                      required: isMinor
+                        ? "Parent's last name is required"
+                        : false,
+                    }}
                     error={errors.parent_guardian_last_name?.message}
                     icon={<User size={14} />}
                     placeholder="Enter parent's last name"
@@ -797,7 +856,11 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian ID Number"
                     name="parent_id_number"
                     register={register}
-                    rules={{ required: isMinor ? "Parent's ID number is required" : false }}
+                    rules={{
+                      required: isMinor
+                        ? "Parent's ID number is required"
+                        : false,
+                    }}
                     error={errors.parent_id_number?.message}
                     placeholder="National ID / Passport number"
                   />
@@ -805,12 +868,14 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian Email Address"
                     name="parent_guardian_email"
                     register={register}
-                    rules={{ 
+                    rules={{
                       required: isMinor ? "Parent's email is required" : false,
-                      pattern: isMinor ? {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address"
-                      } : undefined
+                      pattern: isMinor
+                        ? {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "Invalid email address",
+                          }
+                        : undefined,
                     }}
                     error={errors.parent_guardian_email?.message}
                     icon={<Mail size={14} />}
