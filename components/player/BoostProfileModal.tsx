@@ -39,8 +39,7 @@ export default function BoostProfileModal({
   const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
     null,
   );
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+
   const [boostRequestId, setBoostRequestId] = useState<string | null>(null);
 
   // Queries
@@ -76,8 +75,7 @@ export default function BoostProfileModal({
     if (isOpen) {
       setStep(1);
       setSelectedPackageId(null);
-      setStartDate("");
-      setEndDate("");
+
       setBoostRequestId(null);
       setPromoCode("");
       setPromoAmount(0);
@@ -107,16 +105,14 @@ export default function BoostProfileModal({
   };
 
   const handleProceedToPayment = async () => {
-    if (!selectedPackageId || !startDate || !endDate) {
-      toast.error("Please select a package and valid date range.");
+    if (!selectedPackageId) {
+      toast.error("Please select a package.");
       return;
     }
 
     try {
       const response = await requestBoost({
         boostPackageId: selectedPackageId,
-        startDate,
-        endDate,
       }).unwrap();
 
       toast.success(response.message || "Boost request submitted.");
@@ -284,36 +280,7 @@ export default function BoostProfileModal({
                   )}
                 </div>
 
-                {/* Step 2: Date Range */}
-                <div>
-                  <h3 className="text-white font-bold mb-4">
-                    Step 2: Set Date Range
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-[#8B97B5] mb-2 uppercase tracking-wide">
-                        Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full bg-[#11163C] border border-[#1E2554] text-white p-3.5 rounded-xl focus:border-[#00E5FF] focus:outline-none focus:ring-1 focus:ring-[#00E5FF] transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-[#8B97B5] mb-2 uppercase tracking-wide">
-                        End Date
-                      </label>
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full bg-[#11163C] border border-[#1E2554] text-white p-3.5 rounded-xl focus:border-[#00E5FF] focus:outline-none focus:ring-1 focus:ring-[#00E5FF] transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
+               
               </div>
             )}
 
@@ -585,20 +552,6 @@ export default function BoostProfileModal({
                       <span>Duration</span>
                       <span className="font-medium text-white">
                         {selectedPackage?.duration}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[#8B97B5]">
-                      <span>Start Date</span>
-                      <span className="font-medium text-white">
-                        {startDate
-                          ? new Date(startDate).toLocaleDateString()
-                          : "-"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[#8B97B5]">
-                      <span>End Date</span>
-                      <span className="font-medium text-white">
-                        {endDate ? new Date(endDate).toLocaleDateString() : "-"}
                       </span>
                     </div>
                   </div>
