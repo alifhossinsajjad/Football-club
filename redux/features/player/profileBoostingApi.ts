@@ -7,7 +7,7 @@ export const profileBoostingApi = baseApi.injectEndpoints({
       query: () => "/players/profile-boost/packages/",
       providesTags: ["Profile"],
     }),
-    requestBoost: builder.mutation<any, { boostPackageId: number; startDate: string; endDate: string }>({
+    requestBoost: builder.mutation<any, { boostPackageId: number; startDate?: string; endDate?: string }>({
       query: (data) => ({
         url: "/players/profile-boost/request/",
         method: "POST",

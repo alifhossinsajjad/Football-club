@@ -115,31 +115,34 @@ const SubscriptionContent = () => {
   const plans: Plan[] = plansData?.data || [];
   const paymentHistory: PaymentHistoryItem[] = historyRes?.data || [];
 
+  const isFreePlan = activeSub?.plan_name?.toUpperCase() === "FREE" || activeSub?.plan_type?.toUpperCase() === "FREE";
+  
   const displaySub =
     activeSub &&
-    activeSub.plan_name !== "FREE" &&
-    activeSub.is_active &&
-    !activeSub.is_expired &&
+    !isFreePlan &&
+    activeSub.is_expired !== true &&
     activeSub.auto_renewal !== false
       ? activeSub
       : null;
 
   const handleSubscribeClick = async (plan: Plan) => {
     setSelectedPlan(plan);
-// console.log('Initiating checkout for plan:', plan);
+    // console.log('Initiating checkout for plan:', plan);
     toast.loading("Preparing secure checkout...", { id: "checkoutLoading" });
 
     try {
       const payload = { plan_id: plan.id };
       const res = await createCheckout(payload).unwrap();
-      
+
       const checkoutUrl = res.checkout_url || res.data?.checkout_url;
 
       if (checkoutUrl) {
         toast.success("Navigating to Stripe...", { id: "checkoutLoading" });
         window.location.href = checkoutUrl;
       } else if (res.success || res.status === 200 || res.message) {
-        toast.success("Subscription activated successfully!", { id: "checkoutLoading" });
+        toast.success("Subscription activated successfully!", {
+          id: "checkoutLoading",
+        });
         setTimeout(() => {
           window.location.reload();
         }, 1000);
@@ -149,8 +152,10 @@ const SubscriptionContent = () => {
     } catch (err: any) {
       console.error("Checkout Error:", err);
       toast.error(
-        err?.data?.message || err?.message || "Payment bridge failed. Try again.",
-        { id: "checkoutLoading" }
+        err?.data?.message ||
+          err?.message ||
+          "Payment bridge failed. Try again.",
+        { id: "checkoutLoading" },
       );
     }
   };
@@ -174,9 +179,16 @@ const SubscriptionContent = () => {
 
       <div className="flex flex-wrap justify-center gap-6 sm:gap-8 lg:gap-10 w-full  mx-auto px-4">
         {plans.map((plan: Plan) => {
-          const planName = plan.plan_name || plan.planName || plan.plan_type || "Pro Plan";
-          const isPopular = planName.toLowerCase().includes("elite") || planName.toLowerCase().includes("pro");
-          const billingCycle = (plan.billing_cycle || plan.billingInterval || "Month").toLowerCase();
+          const planName =
+            plan.plan_name || plan.planName || plan.plan_type || "Pro Plan";
+          const isPopular =
+            planName.toLowerCase().includes("elite") ||
+            planName.toLowerCase().includes("pro");
+          const billingCycle = (
+            plan.billing_cycle ||
+            plan.billingInterval ||
+            "Month"
+          ).toLowerCase();
 
           return (
             <div
@@ -187,9 +199,9 @@ const SubscriptionContent = () => {
               {isPopular && (
                 <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-400/10 blur-[80px] rounded-full pointer-events-none" />
               )}
-              
+
               <div className="absolute inset-0 bg-linear-to-b from-white/[0.02] to-transparent pointer-events-none" />
-              
+
               <div className="relative z-10 text-center mb-8">
                 <div className="inline-block relative">
                   <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-widest mb-1">
@@ -202,9 +214,15 @@ const SubscriptionContent = () => {
                   )}
                 </div>
                 <div className="mt-6 flex justify-center items-end gap-1">
-                  <span className="text-xl text-gray-400 font-bold mb-2">€</span>
-                  <span className="text-5xl sm:text-6xl font-black text-white tracking-tighter shadow-sm">{plan.price}</span>
-                  <span className="text-gray-500 font-medium text-xs sm:text-sm mb-2 ml-1">/{billingCycle}</span>
+                  <span className="text-xl text-gray-400 font-bold mb-2">
+                    €
+                  </span>
+                  <span className="text-5xl sm:text-6xl font-black text-white tracking-tighter shadow-sm">
+                    {plan.price}
+                  </span>
+                  <span className="text-gray-500 font-medium text-xs sm:text-sm mb-2 ml-1">
+                    /{billingCycle}
+                  </span>
                 </div>
               </div>
 
@@ -222,9 +240,16 @@ const SubscriptionContent = () => {
                           Object.values(feature)[0] ||
                           JSON.stringify(feature);
                   return (
-                    <div key={i} className="flex gap-4 items-start group/feature">
+                    <div
+                      key={i}
+                      className="flex gap-4 items-start group/feature"
+                    >
                       <div className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-cyan-400/10 flex items-center justify-center border border-cyan-400/20 group-hover/feature:bg-cyan-400/30 transition-colors">
-                        <Check size={12} className="text-cyan-400" strokeWidth={3} />
+                        <Check
+                          size={12}
+                          className="text-cyan-400"
+                          strokeWidth={3}
+                        />
                       </div>
                       <span className="text-gray-300 font-medium text-sm sm:text-base leading-snug group-hover/feature:text-white transition-colors">
                         {featureText}
@@ -241,7 +266,11 @@ const SubscriptionContent = () => {
               >
                 <div className="absolute inset-0 bg-linear-to-r from-cyan-400 via-purple-500 to-pink-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  Get Started <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                  Get Started{" "}
+                  <ChevronRight
+                    size={18}
+                    className="group-hover/btn:translate-x-1 transition-transform"
+                  />
                 </span>
               </button>
             </div>
@@ -286,10 +315,10 @@ const SubscriptionContent = () => {
         ...(isPromoApplied && promoCode ? { promo_code: promoCode } : {}),
       };
 
-// console.log("Sending checkout payload:", payload);
+      // console.log("Sending checkout payload:", payload);
 
       const res = await createCheckout(payload).unwrap();
-// console.log("Checkout API Response:", res);
+      // console.log("Checkout API Response:", res);
 
       const checkoutUrl = res.checkout_url || res.data?.checkout_url;
 
@@ -411,7 +440,7 @@ const SubscriptionContent = () => {
             })}
           </div>
 
-          {displaySub.is_active && (
+          {displaySub.auto_renewal !== false && (
             <div className="mt-2">
               <button
                 onClick={() => setIsCancelModalOpen(true)}

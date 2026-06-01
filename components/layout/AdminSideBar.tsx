@@ -20,6 +20,7 @@ import {
   FileText,
   Ticket,
   Plus,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -84,6 +85,11 @@ const ScoutSideBar: React.FC = () => {
       icon: CreditCard,
       label: "Subscription Tracking",
       href: "/admin/subscriptionTracking",
+    },
+    {
+      icon: TrendingUp,
+      label: "Boosting Subscription",
+      href: "/admin/boostSubscription",
     },
 
     {

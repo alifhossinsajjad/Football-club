@@ -3,12 +3,31 @@ import type { RootState } from "../store";
 import { logout } from "../features/auth/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://98.81.136.120:9000/api",
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   prepareHeaders: (headers, { getState, endpoint }) => {
     const state = getState() as RootState;
     const token = state.auth?.accessToken;
 
-    if (token && endpoint !== "login" && !headers.has("Authorization")) {
+    const publicEndpoints = new Set([
+      "getHeroData",
+      "getUpcomingEvents",
+      "getLatestNews",
+      "getNewsById",
+      "getPublicSettings",
+      "getFeaturedClubs",
+      "getAllAds",
+      "getAllFaqs",
+      "getFeaturedPlayers",
+      "getPublicSpecialAds",
+      "getPublicBottomSpecialAds"
+    ]);
+
+    if (
+      token && 
+      endpoint !== "login" && 
+      !publicEndpoints.has(endpoint) && 
+      !headers.has("Authorization")
+    ) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
@@ -64,7 +83,8 @@ export const baseApi = createApi({
     "Config",
     "Ads",
     "Faq",
-    "Testimonials"
+    "Testimonials",
+    "BoostPackages"
   ],
   endpoints: () => ({}),
 });

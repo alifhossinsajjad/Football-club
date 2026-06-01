@@ -25,6 +25,7 @@ const Feature = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2
+            suppressHydrationWarning
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block"
             style={{
               backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
@@ -59,6 +60,7 @@ const Feature = () => {
                 {/* Player Info */}
                 <div className="flex-1">
                   <h3
+                    suppressHydrationWarning
                     className="font-display text-lg font-semibold mb-2"
                     style={{
                       backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
