@@ -1,14 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BoostProfileModal from "./BoostProfileModal";
-import { useGetBoostStatusQuery } from "@/redux/features/player/profileBoostingApi";
+import {
+  useGetMyBoostsQuery,
+  useVerifyBoostPaymentMutation,
+  BoostRecord,
+} from "@/redux/features/player/profileBoostingApi";
 import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
-import { 
-  MapPin, Edit, Zap, Mail, Phone, 
-  Instagram, Twitter, Facebook, Youtube, 
-  Calendar, Ruler, Weight, Flag, TrendingUp
+import {
+  MapPin, Edit, Zap, Mail, Phone,
+  Instagram, Twitter, Facebook, Youtube,
+  Calendar, Ruler, Weight, Flag, TrendingUp, Clock,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Props {
   profile: any;
@@ -54,11 +59,35 @@ const SkillBar = ({ label, value }: { label: string, value: number }) => (
 export default function ProfileView({ profile, onEdit }: Props) {
   const [isBoostModalOpen, setIsBoostModalOpen] = useState(false);
 
-  // Fallback to fetch boost status if we have the profile with an active boostRequestId
-  const boostRequestId = profile?.active_boost_request_id || ""; 
-  const { data: boostStatus } = useGetBoostStatusQuery(boostRequestId, {
-    skip: !boostRequestId
-  });
+  const { data: myBoostsData, refetch: refetchBoosts } = useGetMyBoostsQuery();
+  const [verifyBoostPayment] = useVerifyBoostPaymentMutation();
+
+  // Active boost = first record with status "Active"
+  const activeBoost: BoostRecord | undefined = myBoostsData?.data?.find(
+    (b) => b.status === "Active"
+  );
+
+  // Days remaining calculation
+  const daysRemaining = activeBoost
+    ? Math.max(0, Math.ceil((new Date(activeBoost.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
+
+  // Handle Stripe redirect: verify payment if session_id stored in sessionStorage
+  useEffect(() => {
+    const sessionId = sessionStorage.getItem("boost_session_id");
+    if (!sessionId) return;
+    sessionStorage.removeItem("boost_session_id");
+
+    verifyBoostPayment({ session_id: sessionId })
+      .unwrap()
+      .then(() => {
+        toast.success("🚀 Profile Boost activated successfully!", { duration: 5000 });
+        refetchBoosts();
+      })
+      .catch((err: { data?: { message?: string } }) => {
+        toast.error(err?.data?.message ?? "Failed to verify boost payment.");
+      });
+  }, []);  // run once on mount
 
   if (!profile) return null;
 
@@ -354,19 +383,45 @@ export default function ProfileView({ profile, onEdit }: Props) {
               <TrendingUp size={18} className="text-[#00E5FF]" /> Profile Insights
             </h2>
 
-            {(boostStatus?.status === "Active" || profile?.is_boosted) && (
-              <div className="mb-6 bg-linear-to-r from-[#00E5FF]/10 to-[#B026FF]/10 border border-[#00E5FF]/30 p-3 rounded-xl flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-[#0A0D1F] flex items-center justify-center shadow-[0_0_10px_rgba(0,229,255,0.2)]">
+            {activeBoost && (
+              <div className="mb-6 bg-linear-to-r from-[#00E5FF]/10 to-[#B026FF]/10 border border-[#00E5FF]/30 p-4 rounded-xl space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#0A0D1F] flex items-center justify-center shadow-[0_0_10px_rgba(0,229,255,0.2)]">
                     <Zap size={14} className="text-[#00E5FF]" />
-                 </div>
-                 <div>
-                    <h4 className="font-bold text-white text-sm tracking-wide">Boost Active</h4>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white text-sm tracking-wide">Boost Active — {activeBoost.duration}</h4>
                     <p className="text-[10px] text-[#00E5FF]">Profile visibility increased by 4x</p>
-                 </div>
+                  </div>
+                </div>
+                {/* Countdown timer */}
+                <div className="bg-[#080B1A] rounded-xl p-3 flex items-center justify-between border border-[#1E2548]">
+                  <div className="flex items-center gap-2 text-[#8B97B5] text-xs">
+                    <Clock size={12} />
+                    <span>Expires {new Date(activeBoost.endDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black text-[#00E5FF]">{daysRemaining}</span>
+                    <span className="text-xs text-[#8B97B5]">days left</span>
+                  </div>
+                </div>
+                {/* Progress bar */}
+                {(() => {
+                  const total = Math.ceil((new Date(activeBoost.endDate).getTime() - new Date(activeBoost.startDate).getTime()) / (1000 * 60 * 60 * 24));
+                  const pct = total > 0 ? Math.round((daysRemaining / total) * 100) : 0;
+                  return (
+                    <div className="h-1.5 bg-[#1E2548] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-linear-to-r from-[#00E5FF] to-[#B026FF] rounded-full transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  );
+                })()}
               </div>
             )}
             
-            <div className="space-y-5">
+            {/* <div className="space-y-5">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-[#8B97B5]">Profile Views</span>
                 <span className="text-sm text-white font-medium">{profile.insights?.profile_views ?? 0}</span>
@@ -384,7 +439,7 @@ export default function ProfileView({ profile, onEdit }: Props) {
                 <span className="text-sm text-white font-medium">{profile.insights?.club_interest ?? 0} clubs</span>
               </div>
               <div className="text-[11px] text-[#00E5FF] -mt-4">+{profile.insights?.club_interest_this_month ?? 0} new this month</div>
-            </div>
+            </div> */}
           </div>
 
           <div className="bg-[#121730] rounded-2xl p-6 border border-[#1E2548]">
