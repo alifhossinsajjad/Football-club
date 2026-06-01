@@ -2,30 +2,38 @@ import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError 
 import type { RootState } from "../store";
 import { logout } from "../features/auth/authSlice";
 
+// These endpoints do NOT require authentication.
+// We must NOT send the auth token to them — otherwise if the token
+// happens to be expired, the backend may return 401 and trigger an
+// accidental logout for a visiting user.
+const PUBLIC_ENDPOINTS = new Set([
+  "getHeroData",
+  "getUpcomingEvents",
+  "getLatestNews",
+  "getNewsById",
+  "getPublicSettings",
+  "getFeaturedClubs",
+  "getAllAds",
+  "getAllFaqs",
+  "getFeaturedPlayers",
+  "getPublicSpecialAds",
+  "getPublicBottomSpecialAds",
+  "getSubscriptionPlans",
+  "createPublicCheckout",
+  "getBoostPackages",
+]);
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "http://98.81.136.120:9000/api",
   prepareHeaders: (headers, { getState, endpoint }) => {
     const state = getState() as RootState;
     const token = state.auth?.accessToken;
 
-    const publicEndpoints = new Set([
-      "getHeroData",
-      "getUpcomingEvents",
-      "getLatestNews",
-      "getNewsById",
-      "getPublicSettings",
-      "getFeaturedClubs",
-      "getAllAds",
-      "getAllFaqs",
-      "getFeaturedPlayers",
-      "getPublicSpecialAds",
-      "getPublicBottomSpecialAds"
-    ]);
-
+    // Only attach token to protected endpoints
     if (
-      token && 
-      endpoint !== "login" && 
-      !publicEndpoints.has(endpoint) && 
+      token &&
+      endpoint !== "login" &&
+      !PUBLIC_ENDPOINTS.has(endpoint) &&
       !headers.has("Authorization")
     ) {
       headers.set("Authorization", `Bearer ${token}`);
@@ -46,14 +54,22 @@ const baseQueryWithReauth: BaseQueryFn<
 
   const result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401 && hadToken) {
-    // Only clear credentials if the user actually had a token (session expired).
-    // This prevents 401s from public API endpoints from logging out anonymous
-    // visitors or clearing valid sessions.
-    // NOTE: No redirect here — ProtectedRoute handles redirecting to /login
-    // for protected pages. The public landing page must stay accessible.
+  // Only dispatch logout when:
+  // 1. The response is 401 (Unauthorized)
+  // 2. The user actually had a token (prevents public-endpoint 401s from logging out visitors)
+  // 3. The endpoint that failed is NOT a public endpoint (prevents accidental logouts)
+  const endpointName = typeof args === "string" ? "" : (args as { url?: string }).url ?? "";
+  const isPublicUrl =
+    endpointName.includes("/home/") ||
+    endpointName.includes("/upcoming-events/") ||
+    endpointName.includes("/news/") ||
+    endpointName.includes("/settings/public") ||
+    endpointName.includes("/profile-boost/packages/");
+
+  if (result.error && result.error.status === 401 && hadToken && !isPublicUrl) {
     api.dispatch(logout());
   }
+
   return result;
 };
 
