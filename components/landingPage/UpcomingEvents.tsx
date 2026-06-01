@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -12,6 +13,7 @@ import {
 import { useAppSelector } from "@/redux/hooks";
 import SectionTitel from "../reuseable/SectionTitel";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useGetPlayerEventsQuery } from "@/redux/features/player/eventsDirectoryApi";
 import { format, isValid,} from "date-fns";
@@ -112,7 +114,7 @@ export default function UpcomingEventsSection() {
     if (!activePlan) return;
     try {
       const payload = {
-        plan_id: activePlan.plan_id || activePlan.id,
+        plan_id: activePlan.plan_id || (activePlan as any).id,
         billing_cycle: "YEARLY" as const,
       };
       const res = await createCheckout(payload as any).unwrap();
@@ -260,7 +262,7 @@ export default function UpcomingEventsSection() {
                 <div className="flex justify-center mb-3">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl font-black text-white shadow-lg overflow-hidden">
                     {activePlan.logo_url ? (
-                      <img src={activePlan.logo_url} alt={activePlan.title} className="w-full h-full object-cover" />
+                      <Image src={activePlan.logo_url} alt={activePlan.title || "Plan Logo"} width={48} height={48} className="w-full h-full object-cover" />
                     ) : (
                       "♔"
                     )}
