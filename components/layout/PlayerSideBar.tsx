@@ -6,15 +6,11 @@ import {
   LogOut,
   CreditCard,
   MessageSquare,
-  BarChart3,
-  User,
+ 
   Menu,
-  MessageCircle,
-  Package,
+ 
   LucideIcon,
-  ArrowDownLeft,
-  ArrowUpRight,
-  Landmark,
+ 
   ChevronDown,
   Calendar,
   LayoutDashboard,
@@ -24,10 +20,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 
-import Image from "next/image";
 import { logout } from "@/redux/features/auth/authSlice";
 import BrandedLogo from "../reuseable/BrandedLogo";
-import { BsCalendar4Event } from "react-icons/bs";
+
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
@@ -76,7 +71,7 @@ const PlayerSideBar: React.FC = () => {
       href: "/player/eventsDirectory",
     },
     { icon: MessageSquare, label: "Messaging", href: "/player/messaging" },
-    { icon: CreditCard, label: "Subscriptions", href: "/player/subscription" },
+    // { icon: CreditCard, label: "Subscriptions", href: "/player/subscription" },
     { icon: Settings, label: "Profile Settings", href: "/player/profileSetting" },
   ];
 

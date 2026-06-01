@@ -336,12 +336,12 @@ const Navbar = () => {
                   </>
                 ) : (
                   <>
-                    <Link href="/login">
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="nav" size="default" className="w-full">
                         Log in
                       </Button>
                     </Link>
-                    <Link href="/register">
+                    <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
                       <Button
                         variant="navFilled"
                         size="default"
