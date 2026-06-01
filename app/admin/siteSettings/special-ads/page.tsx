@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import { 
   Plus, 
   Pencil, 
@@ -132,6 +133,7 @@ function AdModal({ ad, onClose }: AdModalProps) {
             >
               {imagePreview ? (
                 <div className="relative aspect-[16/5] w-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
                     <p className="text-white text-sm font-medium">Change Image</p>
@@ -394,11 +396,13 @@ export default function SpecialAdsPage() {
               ) : ads.map((ad) => (
                 <tr key={ad.ad_id} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-6 py-4">
-                    <div className="w-40 h-14 rounded-lg overflow-hidden border border-gray-800 bg-[#0a0c16]">
-                      <img 
-                        src={ad.special_ad_image_url} 
-                        alt={ad.title} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    <div className="relative w-40 h-14 rounded-lg overflow-hidden border border-gray-800 bg-[#0a0c16]">
+                      <Image
+                        src={ad.special_ad_image_url}
+                        alt={ad.title}
+                        fill
+                        sizes="160px"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                   </td>

@@ -211,7 +211,13 @@ export const adminSettingsApi = baseApi.injectEndpoints({
     }),
     getMonetizationSettings: builder.query<MonetizationSettings, void>({
       query: () => "/admin-dashboard/settings/monetization/",
-      transformResponse: (response: MonetizationSettingsResponse) => response.data,
+      transformResponse: (response: MonetizationSettingsResponse | MonetizationSettings) => {
+        // Handle both { success: true, data: {...} } and direct settings object
+        if ('data' in response && response.data && typeof response.data === 'object') {
+          return (response as MonetizationSettingsResponse).data;
+        }
+        return response as MonetizationSettings;
+      },
       providesTags: ["Dashboard"],
     }),
     updateMonetizationSettings: builder.mutation<UpdateSettingsResponse, MonetizationSettings>({
