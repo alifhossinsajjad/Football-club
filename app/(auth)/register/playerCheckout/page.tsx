@@ -18,7 +18,7 @@ export default function PlayerCheckoutPage() {
     if (!activePlan) return;
     try {
       const payload = {
-        plan_id: activePlan.plan_id || activePlan.id,
+        plan_id: activePlan.plan_id || (activePlan as any).id,
         billing_cycle: "YEARLY" as const,
       };
       const res = await createCheckout(payload as any).unwrap();
