@@ -79,7 +79,7 @@ const RegisterPage = () => {
             Create your football profile and get discovered.
           </p>
           <Link
-            href="/register/playerRegister"
+            href="/register/playerCheckout"
             className="px-6 py-2 rounded-full text-black font-medium"
             style={{ backgroundColor: colors.primaryCyan }}
           >

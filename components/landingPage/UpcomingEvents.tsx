@@ -17,6 +17,8 @@ import { useGetPlayerEventsQuery } from "@/redux/features/player/eventsDirectory
 import { format, isValid,} from "date-fns";
 import React, { useState, useEffect, useMemo } from "react";
 import { EventDataApi } from "@/redux/features/player/eventsDirectoryApi";
+import { useGetSubscriptionPlansQuery, useCreatePublicCheckoutMutation } from "@/redux/features/player/singleSubscription/singleSubscriptionApi";
+import toast from "react-hot-toast";
 
 export default function UpcomingEventsSection() {
   const router = useRouter();
@@ -24,6 +26,11 @@ export default function UpcomingEventsSection() {
   const user = useAppSelector((state) => state.auth.user);
   const { data: eventsData, isLoading } = useGetPlayerEventsQuery();
   const [mounted, setMounted] = useState(false);
+
+  const {data :singlePlan} = useGetSubscriptionPlansQuery();
+  const [createCheckout, { isLoading: isCreatingCheckout }] = useCreatePublicCheckoutMutation();
+  const activePlan = singlePlan?.data?.find((p: any) => p.status === 'ACTIVE') || singlePlan?.data?.[0];
+  console.log(singlePlan, activePlan)
 
   useEffect(() => {
     setMounted(true);
@@ -98,6 +105,27 @@ export default function UpcomingEventsSection() {
         break;
       default:
         router.push("/latest-events");
+    }
+  };
+
+  const handleGuestCheckout = async () => {
+    if (!activePlan) return;
+    try {
+      const payload = {
+        plan_id: activePlan.plan_id || activePlan.id,
+        billing_cycle: "YEARLY" as const,
+      };
+      const res = await createCheckout(payload as any).unwrap();
+      const checkoutUrl = res.session_url || (res as any).data?.session_url;
+      
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error("No checkout URL returned from server.");
+      }
+    } catch (err: any) {
+      console.error("Checkout Error:", err);
+      toast.error(err?.data?.message || err?.message || "Payment failed. Try again.");
     }
   };
 
@@ -212,101 +240,126 @@ export default function UpcomingEventsSection() {
           </div>
         </div>
 
-        <div
-          id="membership"
-          className="mt-20 flex items-center justify-center p-4 sm:p-6"
-        >
+      {/* card for new player  */}
+
+        {activePlan && (
           <div
-            className="
-            w-full max-w-md 
-            bg-linear-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 
-            p-4 sm:p-6 md:p-8
-            border border-indigo-500/20 
-            shadow-2xl shadow-indigo-950/40 rounded-xl
-          "
+            id="membership"
+            className="mt-20 flex items-center justify-center p-4 sm:p-6"
           >
-            <div className="bg-[#171D36]/90 p-4 sm:p-6 md:p-8 rounded-xl">
-              <div className="flex justify-center mb-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl font-black text-white shadow-lg">
-                  ♔
+            <div
+              className="
+              w-full max-w-md 
+              bg-linear-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 
+              p-4 sm:p-6 md:p-8
+              border border-indigo-500/20 
+              shadow-2xl shadow-indigo-950/40 rounded-xl
+            "
+            >
+              <div className="bg-[#171D36]/90 p-4 sm:p-6 md:p-8 rounded-xl">
+                <div className="flex justify-center mb-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl font-black text-white shadow-lg overflow-hidden">
+                    {activePlan.logo_url ? (
+                      <img src={activePlan.logo_url} alt={activePlan.title} className="w-full h-full object-cover" />
+                    ) : (
+                      "♔"
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent text-center">
-                GO PRO
-              </h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent text-center">
+                  {activePlan.title?.toUpperCase() || "GO PRO"}
+                </h2>
 
-              <p className="text-[#7FB6B6] text-sm sm:text-base text-center mb-6 sm:mb-8 font-bold px-2">
-                Unlock premium features and accelerate your football career with
-                NextGen Pro membership
-              </p>
+                <p className="text-[#7FB6B6] text-sm sm:text-base text-center mb-6 sm:mb-8 font-bold px-2">
+                  {activePlan.description || "Unlock premium features and accelerate your football career with NextGen Pro membership"}
+                </p>
 
-              <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-[#7FB6B6] text-xs sm:text-sm">
-                {[
-                  "Exclusive scout network access",
-                  "Refined direct messaging system",
-                  "Exclusive scout & agent network access",
-                  "Newsletter with pre-season training content and priority event access",
-                  "Full access to all events with direct contact options",
-                  "Enhanced player profile creation with photos & videos to get noticed by clubs",
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 sm:gap-3">
-                    <span className="text-indigo-400 text-base sm:text-lg font-bold mt-0.5">
-                      ✓
+                <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-[#7FB6B6] text-xs sm:text-sm">
+                  {(activePlan.features && activePlan.features.length > 0
+                    ? activePlan.features
+                    : [
+                      "Exclusive scout network access",
+                      "Refined direct messaging system",
+                      "Exclusive scout & agent network access",
+                      "Newsletter with pre-season training content and priority event access",
+                      "Full access to all events with direct contact options",
+                      "Enhanced player profile creation with photos & videos to get noticed by clubs",
+                    ]
+                  ).map((item: any, i: number) => (
+                    <li key={i} className="flex items-start gap-2 sm:gap-3">
+                      <span className="text-indigo-400 text-base sm:text-lg font-bold mt-0.5">
+                        ✓
+                      </span>
+                      <span>
+                        {typeof item === 'string' 
+                          ? item 
+                          : (item?.name || (typeof item === 'object' ? Object.values(item)[0] : String(item)))}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3">
+                  <div className="flex items-baseline text-[#9CFFF0]">
+                    <span className="text-2xl sm:text-3xl font-black">$</span>
+                    <span className="text-3xl sm:text-5xl font-black tracking-tight">
+                      {activePlan.yearly_price_after_discount !== undefined && activePlan.yearly_price_after_discount !== null 
+                        ? activePlan.yearly_price_after_discount 
+                        : 9.99}
                     </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+                    <span className="text-sm sm:text-xl font-bold ml-1 sm:ml-2">
+                      /year
+                    </span>
+                  </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3">
-                <div className="flex items-baseline text-[#9CFFF0]">
-                  <span className="text-2xl sm:text-3xl font-black">$</span>
-                  <span className="text-3xl sm:text-5xl font-black tracking-tight">
-                    9.99
-                  </span>
-                  <span className="text-sm sm:text-xl font-bold ml-1 sm:ml-2">
-                    /year
-                  </span>
+                  {activePlan.discount_label && activePlan.discount_percentage ? (
+                    <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-lg uppercase tracking-wide">
+                      {activePlan.discount_label.split('(')[0].trim()}
+                    </div>
+                  ) : activePlan.discount_percentage ? (
+                    <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-lg uppercase tracking-wide">
+                      Save {activePlan.discount_percentage}%
+                    </div>
+                  ) : null}
                 </div>
 
-                <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-lg uppercase tracking-wide">
-                  Save 50%
-                </div>
-              </div>
-
-              <p className="text-[#7FB6B6] text-xs sm:text-sm text-center mb-6 sm:mb-8">
-                (introductory offer — usually $19.99/year)
-              </p>
-
-              <div className="flex justify-center">
-                {(!mounted || !user) ? (
-                  <Link
-                    href="/login"
-                    className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
-                  >
-                    Sign Up
-                  </Link>
-                ) : (
-                  <Link
-                    href={
-                      user.role === "PLAYER"
-                        ? "/player"
-                        : user.role === "CLUB_ACADEMY"
-                          ? "/club"
-                          : user.role === "SCOUT_AGENT"
-                            ? "/scout"
-                            : "/admin"
-                    }
-                    className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
-                  >
-                    Go to Subscription
-                  </Link>
+                {activePlan.yearly_price && activePlan.discount_label && (
+                  <p className="text-[#7FB6B6] text-xs sm:text-sm text-center mb-6 sm:mb-8">
+                    ({activePlan.discount_label.includes('(') ? activePlan.discount_label.split('(')[1].replace(')', '') : 'introductory offer'} — usually ${activePlan.yearly_price}/year)
+                  </p>
                 )}
+
+                <div className="flex justify-center">
+                  {(!mounted || !user) ? (
+                    <button
+                      onClick={handleGuestCheckout}
+                      disabled={isCreatingCheckout}
+                      className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)] disabled:opacity-50"
+                    >
+                      {isCreatingCheckout ? "Redirecting..." : "Sign Up"}
+                    </button>
+                  ) : (
+                    <Link
+                      href={
+                        user.role === "PLAYER"
+                          ? "/player/subscription"
+                          : user.role === "CLUB_ACADEMY"
+                            ? "/club"
+                            : user.role === "SCOUT_AGENT"
+                              ? "/scout"
+                              : "/admin"
+                      }
+                      className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
+                    >
+                      Go to Subscription
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
