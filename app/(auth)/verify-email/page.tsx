@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import { Mail, ShieldCheck, ArrowRight, RefreshCw } from "lucide-react";
 import DarkInput from "@/components/reuseable/DarkInput";
+import OTPInput from "@/components/sheard/OTPInput";
 
 const VerifyEmailContent = () => {
   const searchParams = useSearchParams();
@@ -78,17 +79,7 @@ const VerifyEmailContent = () => {
               <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
                 Verification Code
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="Enter 6-digit code"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-12 text-white placeholder:text-gray-600 focus:outline-hidden focus:ring-2 focus:ring-cyan-500/50 transition-all text-center tracking-[0.5em]"
-                  maxLength={6}
-                />
-                <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
-              </div>
+              <OTPInput value={code} onChange={setCode} />
             </div>
 
             <button

@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import { Lock, ShieldCheck, CheckCircle2, RefreshCw, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import OTPInput from "@/components/sheard/OTPInput";
 
 const ResetPasswordContent = () => {
   const searchParams = useSearchParams();
@@ -85,15 +86,8 @@ const ResetPasswordContent = () => {
               <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
                 Verification Code
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  placeholder="6-digit code"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 px-12 text-white placeholder:text-gray-600 focus:outline-hidden focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                />
-                <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+              <div className="relative pt-2">
+                <OTPInput value={formData.code} onChange={(val) => setFormData({ ...formData, code: val })} />
               </div>
             </div>
 
