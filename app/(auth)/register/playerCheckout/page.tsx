@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export default function PlayerCheckoutPage() {
     if (!activePlan) return;
     try {
       const payload = {
-        plan_id: activePlan.plan_id || activePlan.id,
+        plan_id: (activePlan as any).plan_id || (activePlan as any).id,
         billing_cycle: "YEARLY" as const,
       };
       const res = await createCheckout(payload as any).unwrap();
