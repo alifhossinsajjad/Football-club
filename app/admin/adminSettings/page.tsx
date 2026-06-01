@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Settings,
   Users,
@@ -76,24 +77,20 @@ const GeneralSettingsForm = ({
   updateSettings,
   isUpdating,
 }: any) => {
-  const [formData, setFormData] = useState({
-    platformName: "",
-    tagline: "",
-    platformLogo: "",
-    favicon: "",
-    brandColors: {
-      primaryCyan: "#00E5FF",
-      primaryMagenta: "#9C2780",
-      backgroundDark: "#080D2C",
-      backgroundCard: "#12143A",
-    },
-  });
-
-  useEffect(() => {
-    if (settingsData) {
-      setFormData(settingsData);
+  const [formData, setFormData] = useState<any>(
+    settingsData || {
+      platformName: "",
+      tagline: "",
+      platformLogo: "",
+      favicon: "",
+      brandColors: {
+        primaryCyan: "#00E5FF",
+        primaryMagenta: "#9C2780",
+        backgroundDark: "#080D2C",
+        backgroundCard: "#12143A",
+      },
     }
-  }, [settingsData]);
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -101,7 +98,7 @@ const GeneralSettingsForm = ({
     const { name, value } = e.target;
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
-      setFormData((prev) => ({
+      setFormData((prev: any) => ({
         ...prev,
         [parent]: {
           ...(prev[parent as keyof typeof prev] as any),
@@ -109,12 +106,12 @@ const GeneralSettingsForm = ({
         },
       }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev: any) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleColorChange = (key: string, value: string) => {
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       brandColors: {
         ...prev.brandColors,
@@ -239,15 +236,6 @@ const UserManagementSettingsForm = () => {
     isLoading,
     isError,
   } = useGetUserManagementSettingsQuery();
-  const [updateUser, { isLoading: isUpdating }] =
-    useUpdateUserManagementSettingsMutation();
-  const [formData, setFormData] = useState<any>(null);
-
-  useEffect(() => {
-    if (userData) {
-      setFormData(userData);
-    }
-  }, [userData]);
 
   if (isLoading)
     return (
@@ -269,7 +257,18 @@ const UserManagementSettingsForm = () => {
     );
   }
 
-  if (!formData) return null;
+  return (
+    <UserManagementSettingsInner
+      key={JSON.stringify(userData)}
+      userData={userData}
+    />
+  );
+};
+
+const UserManagementSettingsInner = ({ userData }: { userData: any }) => {
+  const [updateUser, { isLoading: isUpdating }] =
+    useUpdateUserManagementSettingsMutation();
+  const [formData, setFormData] = useState<any>(userData);
 
   const handleToggle = (path: string, value: boolean) => {
     setFormData((prev: any) => {
@@ -498,16 +497,8 @@ const MonetizationSettingsForm = () => {
     data: monData,
     isLoading,
     isError,
+    refetch,
   } = useGetMonetizationSettingsQuery();
-  const [updateMon, { isLoading: isUpdating }] =
-    useUpdateMonetizationSettingsMutation();
-  const [formData, setFormData] = useState<any>(null);
-
-  useEffect(() => {
-    if (monData) {
-      setFormData(monData);
-    }
-  }, [monData]);
 
   if (isLoading)
     return (
@@ -522,12 +513,32 @@ const MonetizationSettingsForm = () => {
         <p className="text-red-400 font-bold">
           Failed to load monetization settings.
         </p>
-        <p className="text-gray-500 mt-2 text-sm">Please try again later.</p>
+        <p className="text-gray-500 mt-2 text-sm">
+          The backend endpoint may not be available yet.
+        </p>
+        <button
+          onClick={refetch}
+          className="mt-6 px-6 py-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-sm font-semibold hover:bg-cyan-500/20 transition-all flex items-center gap-2 mx-auto"
+        >
+          <Loader2 className="w-4 h-4" />
+          Retry
+        </button>
       </div>
     );
   }
 
-  if (!formData) return null;
+  return (
+    <MonetizationSettingsInner
+      key={JSON.stringify(monData)}
+      monData={monData}
+    />
+  );
+};
+
+const MonetizationSettingsInner = ({ monData }: { monData: any }) => {
+  const [updateMon, { isLoading: isUpdating }] =
+    useUpdateMonetizationSettingsMutation();
+  const [formData, setFormData] = useState<any>(monData);
 
   const handleToggle = (path: string, value: boolean) => {
     setFormData((prev: any) => {
@@ -788,15 +799,6 @@ const NotificationSettingsForm = () => {
     isLoading,
     isError,
   } = useGetNotificationSettingsQuery();
-  const [updateNotif, { isLoading: isUpdating }] =
-    useUpdateNotificationSettingsMutation();
-  const [formData, setFormData] = useState<any>(null);
-
-  useEffect(() => {
-    if (notifData) {
-      setFormData(notifData);
-    }
-  }, [notifData]);
 
   if (isLoading)
     return (
@@ -816,7 +818,18 @@ const NotificationSettingsForm = () => {
     );
   }
 
-  if (!formData) return null;
+  return (
+    <NotificationSettingsInner
+      key={JSON.stringify(notifData)}
+      notifData={notifData}
+    />
+  );
+};
+
+const NotificationSettingsInner = ({ notifData }: { notifData: any }) => {
+  const [updateNotif, { isLoading: isUpdating }] =
+    useUpdateNotificationSettingsMutation();
+  const [formData, setFormData] = useState<any>(notifData);
 
   const handleToggle = (key: string, value: boolean) => {
     setFormData((prev: any) => ({
@@ -1042,6 +1055,7 @@ export default function AdminSettingsPage() {
       <div className="w-full">
         {activeTab === "General" && (
           <GeneralSettingsForm
+            key={JSON.stringify(generalData)}
             settingsData={generalData}
             updateSettings={updateGeneral}
             isUpdating={genUpdating}
