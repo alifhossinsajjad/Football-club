@@ -1,46 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "res.cloudinary.com",
+        hostname: "**",
       },
       {
         protocol: "http",
-        hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "i.pinimg.com",
-      },
-      {
-        protocol: "https",
-        hostname: "www.pinterest.com",
-      },
-      {
-        protocol: "http",
-        hostname: "13.239.20.165",
-        port: "9000",
-      },
-      {
-        protocol: "http",
-        hostname: "98.81.136.120",
-        port: "9000",
-      },
-      {
-        protocol: "https",
-        hostname: "www.dtfdestash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "thundra.de",
+        hostname: "**",
       },
     ],
   },

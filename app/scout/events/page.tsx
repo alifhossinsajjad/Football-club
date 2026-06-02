@@ -34,15 +34,16 @@ const Page = () => {
   const { data: registrations } = useGetScoutRegistrationsQuery();
 
   const sortedEvents = useMemo(() => {
-    const events = data?.results;
-    if (!events) return [];
+    // Handle different backend response formats
+    const events = data?.results || data?.data || data?.events || (Array.isArray(data) ? data : []);
+    if (!events || events.length === 0) return [];
 
     return [...events]
       .filter((e: any) => {
         const s = (e.status || "").toUpperCase();
-        // Show ACTIVE, PENDING, COMPLETED. Exclude CANCELLED.
+        // Show ACTIVE, PENDING, COMPLETED, UPCOMING. Exclude CANCELLED.
         return (
-          (s === "ACTIVE" || s === "PENDING" || s === "COMPLETED" || !s) &&
+          (s === "ACTIVE" || s === "PENDING" || s === "COMPLETED" || s === "UPCOMING" || !s) &&
           s !== "CANCELLED"
         );
       })
@@ -68,8 +69,8 @@ const Page = () => {
   }, [data, registrations]);
 
   const eventTypes = useMemo(() => {
-    const events = data?.results;
-    if (!events) return [];
+    const events = data?.results || data?.data || data?.events || (Array.isArray(data) ? data : []);
+    if (!events || events.length === 0) return [];
     const types = new Set(events.map((e: any) => e.event_type));
     return Array.from(types);
   }, [data]);

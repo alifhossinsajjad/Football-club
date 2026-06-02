@@ -9,7 +9,7 @@ import {
   useGetShortlistedPlayersQuery 
 } from "@/redux/features/scout/scoutProfileApi";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
-import { useGetEventsQuery } from "@/redux/features/admin/adminEventApi";
+import { useGetAllEventsQuery } from "@/redux/features/scout/eventsApi";
 import { useGetLatestNewsQuery } from "@/redux/features/home/homeApi";
 import { formatDistanceToNow, format, parseISO } from "date-fns";
 import { useMemo } from "react";
@@ -70,7 +70,7 @@ const ScoutDashboard: React.FC = () => {
   const { data: stats } = useGetDashboardStatsQuery();
   const { data: shortlistData } = useGetShortlistedPlayersQuery();
   const { data: chatData } = useGetConversationsQuery();
-  const { data: eventsData, isLoading: isEventsLoading } = useGetEventsQuery();
+  const { data: eventsDataRaw, isLoading: isEventsLoading } = useGetAllEventsQuery({});
   const { data: newsData, isLoading: isNewsLoading } = useGetLatestNewsQuery();
 
   const newsItems = useMemo(() => {
@@ -93,6 +93,11 @@ const ScoutDashboard: React.FC = () => {
     unread: conv.unread_count > 0,
     avatar: conv.other_participant?.profile_image || conv.other_participant?.avatar || conv.avatar || `https://ui-avatars.com/api/?name=${conv.other_participant?.name || "U"}`,
   }));
+
+  const eventsList = useMemo(() => {
+    const raw = eventsDataRaw?.results || eventsDataRaw?.data || eventsDataRaw?.events || (Array.isArray(eventsDataRaw) ? eventsDataRaw : []);
+    return raw || [];
+  }, [eventsDataRaw]);
 
   return (
     <div className="min-h-screen bg-[#0B0D2C] text-white font-sans pb-12">
@@ -279,7 +284,7 @@ const ScoutDashboard: React.FC = () => {
           </h2>
 
           <div className="space-y-3">
-            {eventsData?.data?.filter(e => e.status?.toUpperCase() !== "CANCELLED").slice(0, 3).map((event) => (
+            {eventsList.filter((e: any) => e.status?.toUpperCase() !== "CANCELLED").slice(0, 3).map((event: any) => (
               <div
                 key={event.id}
                 className="flex items-center gap-4 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-4"
@@ -291,7 +296,7 @@ const ScoutDashboard: React.FC = () => {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-white truncate">{event.event_name}</p>
+                  <p className="font-semibold text-sm text-white truncate">{event.event_name || event.title}</p>
                   <p className="text-xs text-white/50 truncate">{event.location || "Location TBD"}</p>
                   <p className="text-[10px] text-cyan-400/60 mt-0.5 font-bold uppercase tracking-widest">
                     {event.fee === "0.00" || !event.fee ? "Free Entry" : `$${event.fee}`}
@@ -301,7 +306,7 @@ const ScoutDashboard: React.FC = () => {
                 {/* Date */}
                 <div className="text-right flex-shrink-0">
                   <p className="text-xs text-[#00E5FF] font-medium">
-                    {event.date ? format(new Date(event.date), "dd MMM yyyy") : "TBD"}
+                    {event.date || event.event_date ? format(new Date(event.date || event.event_date), "dd MMM yyyy") : "TBD"}
                   </p>
                   <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold mt-1">
                     {event.status}
@@ -309,7 +314,7 @@ const ScoutDashboard: React.FC = () => {
                 </div>
               </div>
             ))}
-            {(!eventsData?.data || eventsData.data.length === 0) && !isEventsLoading && (
+            {eventsList.length === 0 && !isEventsLoading && (
               <div className="py-8 text-center text-white/30 border border-white/[0.05] border-dashed rounded-xl">
                 <p className="text-sm">No upcoming events found</p>
               </div>
