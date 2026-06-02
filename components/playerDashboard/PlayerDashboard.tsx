@@ -3,7 +3,7 @@
 import {
   UpcomingEvent,
   useGetDashboardStatsQuery,
-  useGetUpcomingEventsQuery,
+  useGetPlayerUpcomingEventsQuery,
 } from "@/redux/features/player/playerDashboard/playerDashboardApi";
 import { useGetMyProfileQuery } from "@/redux/features/player/playerProfileAndEdit/profileAndEditApi";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
@@ -96,7 +96,7 @@ export default function PlayerDashboard() {
   const { data: stats } = useGetDashboardStatsQuery();
   const { data: profile } = useGetMyProfileQuery();
   const { data: upcomingEventsData, isLoading: isEventsLoading } =
-    useGetUpcomingEventsQuery();
+    useGetPlayerUpcomingEventsQuery();
   const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
   const { data: newsData, isLoading: isNewsLoading } = useGetLatestNewsQuery();
 

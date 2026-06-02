@@ -53,7 +53,7 @@ export const playerDashboardApi = baseApi.injectEndpoints({
     }),
 
     // GET upcoming events
-    getUpcomingEvents: builder.query<any[], void>({
+    getPlayerUpcomingEvents: builder.query<any[], void>({
       query: () => "/players/event-registrations/upcoming/",
       providesTags: ["Dashboard"],
     }),
@@ -69,5 +69,5 @@ export const playerDashboardApi = baseApi.injectEndpoints({
 export const {
   useGetDashboardStatsQuery,
   useGetCareerStatsQuery,
-  useGetUpcomingEventsQuery,
+  useGetPlayerUpcomingEventsQuery,
 } = playerDashboardApi;

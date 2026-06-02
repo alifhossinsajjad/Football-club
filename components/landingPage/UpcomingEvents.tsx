@@ -345,7 +345,7 @@ export default function UpcomingEventsSection() {
                     <Link
                       href={
                         user.role === "PLAYER"
-                          ? "/player/subscription"
+                          ? "/player"
                           : user.role === "CLUB_ACADEMY"
                             ? "/club"
                             : user.role === "SCOUT_AGENT"
@@ -354,7 +354,7 @@ export default function UpcomingEventsSection() {
                       }
                       className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
                     >
-                      Go to Subscription
+                      Go to Your Dashboard
                     </Link>
                   )}
                 </div>

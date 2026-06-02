@@ -38,6 +38,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.dtfdestash.com",
       },
+      {
+        protocol: "https",
+        hostname: "thundra.de",
+      },
     ],
   },
 };

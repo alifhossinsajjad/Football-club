@@ -49,16 +49,20 @@ const baseQueryWithReauth: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  const state = api.getState() as RootState;
-  const hadToken = !!state.auth?.accessToken;
+  const stateBefore = api.getState() as RootState;
+  const tokenBefore = stateBefore.auth?.accessToken;
 
   const result = await baseQuery(args, api, extraOptions);
 
+  const stateAfter = api.getState() as RootState;
+  const tokenAfter = stateAfter.auth?.accessToken;
+
   // Only dispatch logout when:
   // 1. The response is 401 (Unauthorized)
-  // 2. The user actually had a token (prevents public-endpoint 401s from logging out visitors)
-  // 3. The endpoint that failed is NOT a public endpoint (prevents accidental logouts)
-  const endpointName = typeof args === "string" ? "" : (args as { url?: string }).url ?? "";
+  // 2. The user actually had a token when the request started (prevents public-endpoint 401s from logging out visitors)
+  // 3. The token hasn't changed during the request (prevents race conditions with login)
+  // 4. The endpoint that failed is NOT a public endpoint (prevents accidental logouts)
+  const endpointName = typeof args === "string" ? args : (args as { url?: string }).url ?? "";
   const isPublicUrl =
     endpointName.includes("/home/") ||
     endpointName.includes("/upcoming-events/") ||
@@ -66,7 +70,13 @@ const baseQueryWithReauth: BaseQueryFn<
     endpointName.includes("/settings/public") ||
     endpointName.includes("/profile-boost/packages/");
 
-  if (result.error && result.error.status === 401 && hadToken && !isPublicUrl) {
+  if (
+    result.error &&
+    result.error.status === 401 &&
+    tokenBefore &&
+    tokenBefore === tokenAfter &&
+    !isPublicUrl
+  ) {
     api.dispatch(logout());
   }
 
