@@ -1,6 +1,7 @@
 "use client";
 import { useAppSelector } from "@/redux/hooks";
 import { UserPlus, FileText, Heart, Trophy } from "lucide-react";
+import { motion } from "framer-motion";
 
 const steps = [
   {
@@ -29,7 +30,13 @@ const HowItWorks = () => {
     <section className="py-10 px-4 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: -20, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-16"
+        >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block text-white">
             HOW IT WORKS
           </h2>
@@ -37,12 +44,20 @@ const HowItWorks = () => {
             Your journey to professional football starts with three simple
             steps.
           </p>
-        </div>
+        </motion.div>
 
         {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative">
           {steps.map((step, index) => (
-            <div key={index} className="group relative">
+            <motion.div 
+              initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-10%" }}
+              transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -8 }}
+              key={index} 
+              className="group relative"
+            >
               {/* Main Card with Gradient Border */}
               <div className="relative p-8 md:p-10 rounded-2xl bg-[var(--bg-card,#0A1424)] h-full">
                 {/* Gradient Border using pseudo-element */}
@@ -96,7 +111,7 @@ const HowItWorks = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

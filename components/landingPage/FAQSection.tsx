@@ -3,6 +3,7 @@
 import { useGetAllFaqsQuery } from "@/redux/features/faq/faq";
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
+import { motion } from "framer-motion";
 
 const FAQSection = () => {
   const { data, isLoading, isError } = useGetAllFaqsQuery();
@@ -22,20 +23,30 @@ const FAQSection = () => {
   return (
     <section className="relative w-full py-24 bg-transparent overflow-hidden">
       <div className="relative w-full max-w-4xl mx-auto px-6 z-10">
-        <div className="text-center mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: -20, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-16"
+        >
           <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
             Frequently Asked <span className="text-primary">Questions</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Everything you need to know about our services. Can&apos;t find the answer you&apos;re looking for? Feel free to contact our support team.
           </p>
-        </div>
+        </motion.div>
 
         <div className="space-y-4">
-          {data?.data.map((faq) => {
+          {data?.data.map((faq, index) => {
             const isOpen = openId === faq.id;
             return (
-              <div
+              <motion.div
+                initial={{ opacity: 0, y: 30, filter: "blur(5px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-10%" }}
+                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 key={faq.id}
                 className={`group rounded-2xl border transition-all duration-300 ease-out backdrop-blur-sm ${
                   isOpen 
@@ -69,7 +80,7 @@ const FAQSection = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

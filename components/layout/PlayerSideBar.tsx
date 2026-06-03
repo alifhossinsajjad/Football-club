@@ -16,8 +16,7 @@ import {
   LayoutDashboard,
   Settings,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+
 import { useDispatch } from "react-redux";
 
 import { logout } from "@/redux/features/auth/authSlice";
@@ -27,6 +26,9 @@ import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
 import { Conversation } from "@/types/chat/chatType";
+import { usePathname, useRouter } from "next/navigation";
+
+import Link from "next/link";
 
 export type MenuItem = {
   label: string;

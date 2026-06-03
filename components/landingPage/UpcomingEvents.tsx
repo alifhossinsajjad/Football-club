@@ -21,6 +21,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { EventDataApi } from "@/redux/features/player/eventsDirectoryApi";
 import { useGetSubscriptionPlansQuery, useCreatePublicCheckoutMutation } from "@/redux/features/player/singleSubscription/singleSubscriptionApi";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 export default function UpcomingEventsSection() {
   const router = useRouter();
@@ -134,12 +135,18 @@ export default function UpcomingEventsSection() {
   return (
     <div className="py-16 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-9">
+        <motion.div 
+          initial={{ opacity: 0, y: -30, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-9"
+        >
           <SectionTitel
             title="LATEST EVENTS"
             subtitle="Stay updated with training tips, nutrition advice, and gear reviews."
           />
-        </div>
+        </motion.div>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-48 mb-12">
@@ -151,10 +158,15 @@ export default function UpcomingEventsSection() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {upcomingEvents.map((event: EventDataApi) => (
-              <div
+            {upcomingEvents.map((event: EventDataApi, index: number) => (
+              <motion.div
+                initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-10%" }}
+                transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.3, ease: "easeOut" } }}
                 key={event.id}
-                className="rounded-2xl p-8 bg-[var(--bg-card,#12143A)] shadow-lg hover:shadow-cyan-900/10 transition-all duration-300"
+                className="rounded-2xl p-8 bg-[var(--bg-card,#12143A)] shadow-lg hover:shadow-[0_20px_40px_rgba(6,162,149,0.15)] transition-shadow duration-300 relative overflow-hidden group border border-transparent hover:border-[#06A295]/30"
               >
                 <div className="flex items-center justify-between mb-6">
                   <span className="text-[#06A295] font-semibold text-sm uppercase tracking-wider">
@@ -226,7 +238,7 @@ export default function UpcomingEventsSection() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
@@ -249,16 +261,27 @@ export default function UpcomingEventsSection() {
             id="membership"
             className="mt-20 p-4 sm:p-6"
           >
-            <div className="text-center mb-10">
+            <motion.div 
+              initial={{ opacity: 0, y: -30, filter: "blur(5px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-10%" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center mb-10"
+            >
               <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-linear-to-r from-cyan-400 to-purple-500">
                 Choose Your Plan
               </h2>
-            </div>
-            <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
-              {singlePlan.data.map((plan: any) => (
-                <div
+            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              {singlePlan.data.map((plan: any, index: number) => (
+                <motion.div
+                  initial={{ opacity: 0, y: 60, scale: 0.95, filter: "blur(10px)" }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                  viewport={{ once: true, margin: "-10%" }}
+                  transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -10, scale: 1.02, transition: { duration: 0.4, ease: "easeOut" } }}
                   key={plan.id || plan.plan_id}
-                  className="w-full max-w-md bg-linear-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 p-4 sm:p-6 md:p-8 border border-indigo-500/20 shadow-2xl shadow-indigo-950/40 rounded-xl flex flex-col"
+                  className="w-full bg-linear-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 p-4 sm:p-6 md:p-8 border border-indigo-500/20 shadow-[0_0_40px_rgba(156,39,176,0.1)] hover:shadow-[0_20px_60px_rgba(0,229,255,0.2)] hover:border-[#00E5FF]/50 rounded-xl flex flex-col transition-shadow duration-500 relative overflow-hidden group"
                 >
                   <div className="bg-[#171D36]/90 p-4 sm:p-6 md:p-8 rounded-xl flex flex-col h-full">
                     <div className="flex justify-center mb-3">
@@ -363,7 +386,7 @@ export default function UpcomingEventsSection() {
                       )}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

@@ -7,6 +7,7 @@ import { useGetFeaturedPlayersQuery } from "@/redux/features/admin/adminSettings
 import { getFlagEmoji } from "@/lib/utils/flagUtils";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 
 const Feature = () => {
@@ -23,7 +24,13 @@ const Feature = () => {
     <section id="players" className="py-20 px-4 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: -20, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-12"
+        >
           <h2
             suppressHydrationWarning
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block"
@@ -40,7 +47,7 @@ const Feature = () => {
           <p className="text-muted-foreground text-sm md:text-base">
             Browse top football talent and explore detailed player profiles.
           </p>
-        </div>
+        </motion.div>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-48">
@@ -53,9 +60,14 @@ const Feature = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {players.map((player: any, index: number) => (
-              <div
+              <motion.div
+                initial={{ opacity: 0, y: 40, filter: "blur(5px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-10%" }}
+                transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5, scale: 1.02 }}
                 key={player.id || index}
-                className="relative p-8 bg-[var(--bg-card,#12143A)] rounded-lg flex items-center justify-between transition-all duration-300 hover:scale-[1.02] border border-transparent hover:border-cyan-500/30"
+                className="relative p-8 bg-[var(--bg-card,#12143A)] rounded-lg flex items-center justify-between transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,229,255,0.15)] border border-transparent hover:border-cyan-500/30 group"
               >
                 {/* Player Info */}
                 <div className="flex-1">
@@ -98,7 +110,7 @@ const Feature = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
