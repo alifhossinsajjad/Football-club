@@ -110,11 +110,11 @@ export default function UpcomingEventsSection() {
     }
   };
 
-  const handleGuestCheckout = async () => {
-    if (!activePlan) return;
+  const handleGuestCheckout = async (plan: any) => {
+    if (!plan) return;
     try {
       const payload = {
-        plan_id: activePlan.plan_id || (activePlan as any).id,
+        plan_id: plan.plan_id || plan.id,
         billing_cycle: "YEARLY" as const,
       };
       const res = await createCheckout(payload as any).unwrap();
@@ -244,121 +244,127 @@ export default function UpcomingEventsSection() {
 
       {/* card for new player  */}
 
-        {activePlan && (
+        {singlePlan?.data && singlePlan.data.length > 0 && (
           <div
             id="membership"
-            className="mt-20 flex items-center justify-center p-4 sm:p-6"
+            className="mt-20 p-4 sm:p-6"
           >
-            <div
-              className="
-              w-full max-w-md 
-              bg-linear-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 
-              p-4 sm:p-6 md:p-8
-              border border-indigo-500/20 
-              shadow-2xl shadow-indigo-950/40 rounded-xl
-            "
-            >
-              <div className="bg-[#171D36]/90 p-4 sm:p-6 md:p-8 rounded-xl">
-                <div className="flex justify-center mb-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl font-black text-white shadow-lg overflow-hidden">
-                    {activePlan.logo_url ? (
-                      <Image src={activePlan.logo_url} alt={activePlan.title || "Plan Logo"} width={48} height={48} className="w-full h-full object-cover" />
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-linear-to-r from-cyan-400 to-purple-500">
+                Choose Your Plan
+              </h2>
+            </div>
+            <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
+              {singlePlan.data.map((plan: any) => (
+                <div
+                  key={plan.id || plan.plan_id}
+                  className="w-full max-w-md bg-linear-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 p-4 sm:p-6 md:p-8 border border-indigo-500/20 shadow-2xl shadow-indigo-950/40 rounded-xl flex flex-col"
+                >
+                  <div className="bg-[#171D36]/90 p-4 sm:p-6 md:p-8 rounded-xl flex flex-col h-full">
+                    <div className="flex justify-center mb-3">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl font-black text-white shadow-lg overflow-hidden">
+                        {plan.logo_url ? (
+                          <Image src={plan.logo_url} alt={plan.title || "Plan Logo"} width={48} height={48} className="w-full h-full object-cover" />
+                        ) : (
+                          "♔"
+                        )}
+                      </div>
+                    </div>
+
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent text-center">
+                      {plan.title?.toUpperCase() || "GO PRO"}
+                    </h2>
+
+                    <p className="text-[#7FB6B6] text-sm text-center mb-6 sm:mb-8 font-bold px-2">
+                      {plan.description || "Unlock premium features and accelerate your football career with NextGen Pro membership"}
+                    </p>
+
+                    <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-[#7FB6B6] text-xs sm:text-sm flex-grow">
+                      {(plan.features && plan.features.length > 0
+                        ? plan.features
+                        : [
+                          "Exclusive scout network access",
+                          "Refined direct messaging system",
+                          "Exclusive scout & agent network access",
+                          "Newsletter with pre-season training content and priority event access",
+                          "Full access to all events with direct contact options",
+                          "Enhanced player profile creation with photos & videos to get noticed by clubs",
+                        ]
+                      ).map((item: any, i: number) => (
+                        <li key={i} className="flex items-start gap-2 sm:gap-3">
+                          <span className="text-indigo-400 text-base sm:text-lg font-bold mt-0.5">
+                            ✓
+                          </span>
+                          <span>
+                            {typeof item === 'string' 
+                              ? item 
+                              : (item?.name || (typeof item === 'object' ? Object.values(item)[0] : String(item)))}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="flex flex-col xl:flex-row items-center justify-center gap-3 sm:gap-4 mb-3">
+                      <div className="flex items-baseline text-[#9CFFF0]">
+                        <span className="text-2xl sm:text-3xl font-black">$</span>
+                        <span className="text-3xl sm:text-4xl font-black tracking-tight">
+                          {plan.yearly_price_after_discount !== undefined && plan.yearly_price_after_discount !== null 
+                            ? plan.yearly_price_after_discount 
+                            : 9.99}
+                        </span>
+                        <span className="text-sm font-bold ml-1 sm:ml-2">
+                          /year
+                        </span>
+                      </div>
+
+                      {plan.discount_label && plan.discount_percentage ? (
+                        <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 rounded-lg uppercase tracking-wide text-center">
+                          {plan.discount_label.split('(')[0].trim()}
+                        </div>
+                      ) : plan.discount_percentage ? (
+                        <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 rounded-lg uppercase tracking-wide text-center">
+                          Save {plan.discount_percentage}%
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {plan.yearly_price && plan.discount_label ? (
+                      <p className="text-[#7FB6B6] text-xs text-center mb-6 sm:mb-8 min-h-[2rem]">
+                        ({plan.discount_label.includes('(') ? plan.discount_label.split('(')[1].replace(')', '') : 'introductory offer'} — usually ${plan.yearly_price}/year)
+                      </p>
                     ) : (
-                      "♔"
+                      <div className="mb-6 sm:mb-8 min-h-[2rem]"></div>
                     )}
+
+                    <div className="flex justify-center mt-auto">
+                      {(!mounted || !user) ? (
+                        <button
+                          onClick={() => handleGuestCheckout(plan)}
+                          disabled={isCreatingCheckout}
+                          className="w-full text-center bg-[#00F6FF] text-black px-6 py-3 text-sm font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)] disabled:opacity-50"
+                        >
+                          {isCreatingCheckout ? "Redirecting..." : "Sign Up"}
+                        </button>
+                      ) : (
+                        <Link
+                          href={
+                            user.role === "PLAYER"
+                              ? "/player"
+                              : user.role === "CLUB_ACADEMY"
+                                ? "/club"
+                                : user.role === "SCOUT_AGENT"
+                                  ? "/scout"
+                                  : "/admin"
+                          }
+                          className="w-full text-center bg-[#00F6FF] text-black px-6 py-3 text-sm font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
+                        >
+                          Go to Dashboard
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent text-center">
-                  {activePlan.title?.toUpperCase() || "GO PRO"}
-                </h2>
-
-                <p className="text-[#7FB6B6] text-sm sm:text-base text-center mb-6 sm:mb-8 font-bold px-2">
-                  {activePlan.description || "Unlock premium features and accelerate your football career with NextGen Pro membership"}
-                </p>
-
-                <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-[#7FB6B6] text-xs sm:text-sm">
-                  {(activePlan.features && activePlan.features.length > 0
-                    ? activePlan.features
-                    : [
-                      "Exclusive scout network access",
-                      "Refined direct messaging system",
-                      "Exclusive scout & agent network access",
-                      "Newsletter with pre-season training content and priority event access",
-                      "Full access to all events with direct contact options",
-                      "Enhanced player profile creation with photos & videos to get noticed by clubs",
-                    ]
-                  ).map((item: any, i: number) => (
-                    <li key={i} className="flex items-start gap-2 sm:gap-3">
-                      <span className="text-indigo-400 text-base sm:text-lg font-bold mt-0.5">
-                        ✓
-                      </span>
-                      <span>
-                        {typeof item === 'string' 
-                          ? item 
-                          : (item?.name || (typeof item === 'object' ? Object.values(item)[0] : String(item)))}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3">
-                  <div className="flex items-baseline text-[#9CFFF0]">
-                    <span className="text-2xl sm:text-3xl font-black">$</span>
-                    <span className="text-3xl sm:text-5xl font-black tracking-tight">
-                      {activePlan.yearly_price_after_discount !== undefined && activePlan.yearly_price_after_discount !== null 
-                        ? activePlan.yearly_price_after_discount 
-                        : 9.99}
-                    </span>
-                    <span className="text-sm sm:text-xl font-bold ml-1 sm:ml-2">
-                      /year
-                    </span>
-                  </div>
-
-                  {activePlan.discount_label && activePlan.discount_percentage ? (
-                    <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-lg uppercase tracking-wide">
-                      {activePlan.discount_label.split('(')[0].trim()}
-                    </div>
-                  ) : activePlan.discount_percentage ? (
-                    <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-lg uppercase tracking-wide">
-                      Save {activePlan.discount_percentage}%
-                    </div>
-                  ) : null}
-                </div>
-
-                {activePlan.yearly_price && activePlan.discount_label && (
-                  <p className="text-[#7FB6B6] text-xs sm:text-sm text-center mb-6 sm:mb-8">
-                    ({activePlan.discount_label.includes('(') ? activePlan.discount_label.split('(')[1].replace(')', '') : 'introductory offer'} — usually ${activePlan.yearly_price}/year)
-                  </p>
-                )}
-
-                <div className="flex justify-center">
-                  {(!mounted || !user) ? (
-                    <button
-                      onClick={handleGuestCheckout}
-                      disabled={isCreatingCheckout}
-                      className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)] disabled:opacity-50"
-                    >
-                      {isCreatingCheckout ? "Redirecting..." : "Sign Up"}
-                    </button>
-                  ) : (
-                    <Link
-                      href={
-                        user.role === "PLAYER"
-                          ? "/player"
-                          : user.role === "CLUB_ACADEMY"
-                            ? "/club"
-                            : user.role === "SCOUT_AGENT"
-                              ? "/scout"
-                              : "/admin"
-                      }
-                      className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
-                    >
-                      Go to Your Dashboard
-                    </Link>
-                  )}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         )}
