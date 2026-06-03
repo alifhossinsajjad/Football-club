@@ -37,8 +37,7 @@ import {
   useClubDeleteEventMutation,
   useClubToggleFeaturedEventMutation,
 } from "@/redux/features/club/clubEventManagementApi";
-import { countryCodes } from "@/constants/countryCodes";
-import { EventListResponse } from "@/types/scout/eventsType";
+import Image from "next/image";
 
 type Event = {
   id: string;
@@ -884,7 +883,7 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
           {/* Hero Section */}
           <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] p-8 relative overflow-hidden shrink-0 min-h-[300px] flex flex-col justify-end">
             {/* Background Image */}
-            <img
+            <Image
               src={
                 typeof event.banner === "string"
                   ? event.banner
@@ -893,6 +892,8 @@ function EventModal({ event, mode, onClose, onSave, setMode }: ModalProps) {
                     : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200"
               }
               alt=""
+              width={1200}
+              height={600}
               className="absolute inset-0 w-full h-full object-cover opacity-40"
             />
             <div className="absolute inset-0 bg-linear-to-t from-[#121433] via-[#121433]/60 to-transparent" />
@@ -1581,8 +1582,7 @@ function Step1({
                 onChange={(e) =>
                   updateData({ ...data, startTime: e.target.value })
                 }
-                className={`w-full bg-[#0B0E1E] border ${errors?.startTime ? "border-rose-500 focus:border-rose-500 bg-rose-500/5" : "border-[#1E2550] focus:border-cyan-400/50"} rounded-xl px-4 py-4 text-white focus:outline-none transition-all dark-picker`}
-                style={{ colorScheme: "dark" }}
+                className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl  text-white focus:outline-none focus:border-cyan-400/50 transition-all  px-2 py-4 text-center "
               />
               {errors?.startTime && <p className="text-rose-500 text-xs mt-1.5 font-medium">{errors.startTime}</p>}
             </div>
@@ -1596,8 +1596,7 @@ function Step1({
                 onChange={(e) =>
                   updateData({ ...data, endTime: e.target.value })
                 }
-                className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all dark-picker"
-                style={{ colorScheme: "dark" }}
+                className="w-full bg-[#0B0E1E] border border-[#1E2550] rounded-xl px-2 py-4 text-white focus:outline-none focus:border-cyan-400/50 transition-all text-center"
               />
             </div>
           </div>

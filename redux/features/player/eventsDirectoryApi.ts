@@ -1,3 +1,4 @@
+import { EventListResponse, EventRegistration } from "@/types/scout/eventsType";
 import { baseApi } from "../../api/baseApi";
 
 export interface EventDataApi {
@@ -97,21 +98,16 @@ export interface PromoValidateResponse {
 export const eventsDirectoryApi = baseApi.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    getPlayerEvents: builder.query<EventsResponse | EventDataApi[], void>({
-      query: () => "/players/events/",
-      providesTags: ["Events"],
+    getEvents: builder.query<EventListResponse, void>({
+      query: () => "/events/",
     }),
     getPlayerEventDetails: builder.query<EventDetailsResponse | EventDataApi, string | number>({
       query: (id) => `/players/events/${id}/`,
       providesTags: (result, error, id) => [{ type: "Events", id }, "Events"],
     }),
-    createRegistration: builder.mutation<RegistrationResponse, RegistrationPayload>({
-      query: (data) => ({
-        url: "/players/event-registration/",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Events"],
+    getMyRegistrations: builder.query<EventRegistration[], void>({
+      query: () => `/players/event-registrations/`,
+      providesTags: ["Events"],
     }),
     checkout: builder.mutation<
       CheckoutResponse,
@@ -152,20 +148,17 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Events"],
     }),
-    getPlayerRegistrationStatus: builder.query<
-      RegistrationStatusResponse,
-      { player_name?: string; contact_email?: string } | string | number
-    >({
-      query: (params) => {
-        if (typeof params === 'object') {
-          return `/players/event-registration/status/?player_name=${params.player_name}&contact_email=${params.contact_email}`;
-        }
-        return `/players/event-registration/status/${params}/`;
-      },
-    }),
-    getMyRegistrations: builder.query<MyRegistrationsResponse | MyRegistration[], void>({
-      query: () => `/players/event-registrations/`,
-      providesTags: ["Events"],
+ getRegistrationStatus: builder.query<any, string>({
+  query: (registration_id) =>
+    `/players/event-registration/${registration_id}/status/`,
+}),
+    createRegistration: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "/players/event-registration/",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Events"], // 🔥 important
     }),
     applyPromoCode: builder.mutation<
       { data?: unknown, message?: string },

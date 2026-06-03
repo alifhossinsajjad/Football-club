@@ -44,8 +44,3 @@ config.bat
 <<<<<<< HEAD
 temp_auto_push.bat
 temp_interactive_push.bat
-.env.local
-.env.*
-.env*
-.env.local
-.env.production

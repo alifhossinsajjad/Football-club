@@ -1,21 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
-import {
-  Check,
-  X,
-  AlertCircle,
-  CreditCard,
-  Download,
-  Calendar,
-  Lock,
-  ChevronRight,
-  Rocket,
-  CheckCircle,
-  Shield,
-  XCircle,
-} from "lucide-react";
+import React, { useState } from "react";
+import { Check, X, AlertCircle, CreditCard, Lock } from "lucide-react";
 import { formatRegistrationDate } from "@/lib/utils/dateFormatter";
 import {
   useGetSubscriptionQuery,
