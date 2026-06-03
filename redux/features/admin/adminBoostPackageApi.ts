@@ -52,6 +52,7 @@ export interface UpdateBoostPackagePayload {
 // ─── API Slice ────────────────────────────────────────────────────────────────
 
 export const adminBoostPackageApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getAdminBoostPackages: builder.query<BoostPackageListResponse, void>({
       query: () => "/admin-dashboard/boost-packages/",
