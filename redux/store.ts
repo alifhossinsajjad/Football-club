@@ -42,6 +42,7 @@ const authPersistConfig = {
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 
 export const store = configureStore({
+  
   reducer: {
     auth: persistedAuthReducer,
     theme: themeReducer,
