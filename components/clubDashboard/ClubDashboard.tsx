@@ -14,17 +14,35 @@ import {
 import Link from "next/link";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
 import { useGetClubEventsQuery } from "@/redux/features/club/clubEventManagementApi";
-import { useGetLatestNewsArticlesQuery } from "@/redux/features/home/homeApi";
-import { formatDistanceToNow, format } from "date-fns";
+import { useGetLatestNewsQuery } from "@/redux/features/home/homeApi";
+import { formatDistanceToNow, format, parseISO } from "date-fns";
+import { useMemo } from "react";
 
 const ClubDashboard: React.FC = () => {
   const { data: chatData, isLoading: isChatLoading } = useGetConversationsQuery();
   const { data: eventsResponse, isLoading: isEventsLoading } = useGetClubEventsQuery(undefined);
   
-  const { data: newsData, isLoading: isNewsLoading } = useGetLatestNewsArticlesQuery();
+  const { data: newsData, isLoading: isNewsLoading } = useGetLatestNewsQuery();
 
-  const eventsData = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse?.results || eventsResponse?.data || []);
-  const activeEvents = eventsData.slice(0, 4);
+  const newsItems = useMemo(() => {
+    const items = [...(newsData?.articles || newsData?.data || [])];
+    return items.sort((a: any, b: any) => {
+      const dateA = a.date_published ? parseISO(a.date_published).getTime() : 0;
+      const dateB = b.date_published ? parseISO(b.date_published).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [newsData]);
+
+  const eventsData = Array.isArray(eventsResponse) 
+    ? eventsResponse 
+    : (eventsResponse?.results || eventsResponse?.data || eventsResponse?.events || []);
+  
+  // Sort by created_at (descending) so new events appear at the top
+  const sortedEvents = [...eventsData].sort((a: any, b: any) => {
+    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+  });
+
+  const activeEvents = sortedEvents.slice(0, 3);
 
   const conversations = chatData?.conversations || [];
   const dynamicRecentMessages = conversations.slice(0, 3).map((conv) => ({
@@ -40,7 +58,7 @@ const ClubDashboard: React.FC = () => {
       <div className="mx-auto space-y-8">
         {/* Welcome Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="inline-block text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#00e5ff] to-[#9C27B0] bg-clip-text text-transparent">
+          <h1 className="inline-block text-2xl md:text-3xl font-bold bg-linear-to-r from-[#00e5ff] to-[#9C27B0] bg-clip-text text-transparent">
             Welcome Back
           </h1>
           <div className="text-sm text-slate-400">
@@ -136,19 +154,19 @@ const ClubDashboard: React.FC = () => {
                <div className="col-span-full flex justify-center py-4">
                  <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
                </div>
-            ) : newsData?.data?.slice(0, 2).map((article: any) => (
-              <div key={article.id} className="flex gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800/70 transition-colors h-full">
+            ) : newsItems.slice(0, 2).map((article: any) => (
+              <Link key={article.unique_id || article.id} href={`/latest-news/${article.unique_id}`} className="flex gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800/70 transition-colors h-full">
                 <div className="flex flex-col justify-between min-w-0">
                   <div>
                     <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
                       {article.title}
                     </h3>
                     <p className="text-[10px] text-slate-400 mt-2">
-                      {article.subtitle}
+                      {article.excerpt}
                     </p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
             {(!newsData?.data || newsData.data.length === 0) && !isNewsLoading && (
               <div className="col-span-full py-8 text-center text-slate-400 border border-slate-700/50 rounded-xl border-dashed">
@@ -271,7 +289,7 @@ function EventCard({
         </div>
         <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-cyan-600 to-blue-600 rounded-full transition-all duration-1000 ease-out"
+            className="h-full bg-linear-to-r from-cyan-600 to-blue-600 rounded-full transition-all duration-1000 ease-out"
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -311,7 +329,7 @@ function MessageItem({
         hover:bg-slate-800/70
       `}
     >
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-lg font-bold flex-shrink-0">
+      <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-lg font-bold flex-shrink-0">
         {sender[0]}
       </div>
 

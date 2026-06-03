@@ -8,8 +8,13 @@ import {
   Check,
   ArrowLeft,
   ArrowRight,
+  Calendar,
+  Check,
+  Clock,
+  CreditCard,
   Info,
   Mail,
+  MapPin,
   Phone,
   User,
   CreditCard,
@@ -23,26 +28,14 @@ import {
   useGetRegistrationStatusQuery,
   useValidatePromoMutation,
   useGetMyRegistrationsQuery,
+  useGetPastRegistrationsQuery,
+  useGetPlayerRegistrationStatusQuery,
+  useGetUpcomingRegistrationsQuery,
+  useValidatePromoMutation,
+  useVerifyPaymentMutation,
+  type EventDataApi,
+  type MyRegistration,
 } from "../../../../redux/features/player/eventsDirectoryApi";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import DarkPhoneInput from "@/components/reuseable/DarkPhoneInput";
-
-interface EventData {
-  id: number;
-  event_name: string;
-  venue_name: string;
-  venue_address?: string;
-  registration_fee: string;
-  description?: string;
-  event_date: string;
-  event_time?: string;
-  minimum_age: number;
-  maximum_age: number;
-  maximum_capacity: number;
-  registered_count: number;
-  is_full: boolean;
-}
 
 interface RegistrationStatusData {
   registration_status?: string;
@@ -59,8 +52,19 @@ const EventDetailsPage = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const currentUser = useAppSelector((state: any) => state.auth?.user);
 
   const [view, setView] = useState<ViewState>("DETAILS");
+
+  // On mount, check if url query has action=register
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("action") === "register") {
+        setView("REGISTRATION");
+      }
+    }
+  }, []);
 
   const { data: registrationsData } = useGetMyRegistrationsQuery();
   console.log("register data ", registrationsData);
@@ -108,6 +112,10 @@ const EventDetailsPage = () => {
   };
 
   const handleRegister = () => {
+    if (isRegistered) {
+      toast.error("You are already registered for this event.");
+      return;
+    }
     setView("REGISTRATION");
   };
 
@@ -472,7 +480,7 @@ const RegistrationFlow = ({
     }
   };
 
-  const handleNext = async (data: any) => {
+  const handleNext = async (data: Record<string, string>) => {
     if (step === 1) {
       setStep(2);
     } else if (step === 2) {
@@ -481,24 +489,26 @@ const RegistrationFlow = ({
       setRegistrationError(null);
       try {
         const payload = {
-          event_id: event.id,
+          event_id: Number(id),
           first_name: data.firstName,
           last_name: data.lastName,
           email: data.email,
-          phone: data.phone,
+          phone: data.phone ? data.phone.replace(/\s+/g, "") : "",
           date_of_birth: data.dob,
           emergency_contact_name: data.emergencyName,
-          emergency_phone: data.emergencyPhone,
+          emergency_phone: data.emergencyPhone ? data.emergencyPhone.replace(/\s+/g, "") : "",
           relationship: data.relationship,
           medical_conditions: data.medical || "",
           allergies: data.allergies || "",
           ...(isPromoApplied && promoCode ? { promo_code: promoCode } : {}),
         };
+
         const res = await createRegistration(payload).unwrap();
-        const regId = res?.data?.registration_id || res?.registration_id;
-        setRegistrationId(regId);
-        // Store registration_id in localStorage keyed by event id
-        if (regId && event.id) {
+        const regId = res?.data?.registration_id || res?.registration_id || res?.data?.id || res?.id;
+        const finalRegId = regId ? String(regId) : null;
+        setRegistrationId(finalRegId);
+        
+        if (finalRegId && event.id) {
           try {
             const existing = JSON.parse(
               localStorage.getItem("playerRegistrations") || "{}",
@@ -509,6 +519,8 @@ const RegistrationFlow = ({
               JSON.stringify(existing),
             );
           } catch {}
+          toast.success("Registration success! Now proceed to payment.");
+          setStep(4);
         }
         setStep(4);
       } catch (err: any) {

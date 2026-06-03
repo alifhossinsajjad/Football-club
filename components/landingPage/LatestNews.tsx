@@ -1,26 +1,38 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import Image from "next/image";
 import SectionTitel from "@/components/reuseable/SectionTitel";
-import { useAppSelector } from "@/redux/hooks";
-import { Lock, Loader2 } from "lucide-react";
-import { useGetLatestNewsArticlesQuery } from "@/redux/features/home/homeApi";
-import { format } from "date-fns";
+import { Loader2, ArrowRight } from "lucide-react";
+import { useGetLatestNewsQuery } from "@/redux/features/home/homeApi";
+import { parseISO } from "date-fns";
+import AdBanner from "./AdBanner";
+import { NewsArticle } from "@/types/home";
+import { 
+  formatNewsCategory, 
+  formatNewsImage 
+} from "@/utils/news";
 
 export default function LatestNews() {
-  const theme = useAppSelector((state) => state.theme);
-  const user = useAppSelector((state) => state.auth.user);
   const router = useRouter();
+  const { data: newsData, isLoading } = useGetLatestNewsQuery();
 
-  const { data: newsData, isLoading } = useGetLatestNewsArticlesQuery();
-  
-  console.log(newsData, "newsData");
-
-  const newsItems = newsData?.data || [];
+  const newsItems = useMemo(() => {
+    const items = [...(newsData?.articles || newsData?.data || [])];
+    return items.sort((a, b) => {
+      const dateA = a.date_published ? parseISO(a.date_published).getTime() : 0;
+      const dateB = b.date_published ? parseISO(b.date_published).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [newsData]);
 
   const handleViewAllNews = () => {
     router.push("/latest-news");
+  };
+
+  const handleStoryDetails = (unique_id: string) => {
+    router.push(`/latest-news/${unique_id}`);
   };
 
   return (
@@ -42,45 +54,65 @@ export default function LatestNews() {
             <p>No latest news available right now.</p>
           </div>
         ) : (
-          <div className="mb-12">
-            <div className="grid md:grid-cols-2 gap-8 items-stretch">
-              {newsItems.slice(0, 2).map((item: any) => (
-                <div
-                  key={item.id}
-                  className="overflow-hidden rounded-2xl md:col-span-1 border border-cyan-500/10 transition-all duration-300 hover:border-cyan-500/40 group"
-                  style={{ backgroundColor: item.background_color || "var(--bg-card,#12143A)" }}
-                >
-                  <div className="p-8 flex flex-col h-full min-h-[300px] justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-6">
-                        <span className="text-cyan-400 text-xs uppercase tracking-widest font-bold px-3 py-1 bg-cyan-400/10 rounded-full border border-cyan-400/20">
-                          News Update
-                        </span>
-                      </div>
-
-                      <h2 
-                        className="text-2xl md:text-3xl font-black mb-6 leading-tight"
-                        style={{ color: item.title_color || "white" }}
-                      >
-                        {item.title}
+          <div className="mb-8">
+            <div className="bg-white p-3 md:p-4 rounded-3xl w-full max-w-3xl mx-auto shadow-2xl">
+              <div className="flex flex-col gap-3 md:gap-4">
+                {/* Top News */}
+                {newsItems[0] && (
+                  <div
+                    key={newsItems[0].unique_id || newsItems[0].id}
+                    onClick={() => handleStoryDetails(newsItems[0].unique_id)}
+                    className="relative w-full h-[250px] md:h-[350px] rounded-[1.25rem] overflow-hidden cursor-pointer group"
+                  >
+                    <Image
+                      src={formatNewsImage(newsItems[0].image_url)}
+                      alt={newsItems[0].title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 p-5 md:p-6 w-full md:w-[90%]">
+                      <h2 className="text-white text-xl md:text-[26px] font-extrabold leading-tight drop-shadow-md">
+                        {newsItems[0].title}
                       </h2>
-                      
-                      <p className="text-gray-400 text-lg leading-relaxed mb-8">
-                        {item.subtitle}
-                      </p>
-                    </div>
-
-                    <div className="mt-auto">
-                      <button
-                        onClick={handleViewAllNews}
-                        className="text-sm font-bold uppercase tracking-widest text-[#00E5FF] hover:text-white transition-colors duration-300 flex items-center gap-2 group-hover:translate-x-2 transition-transform"
-                      >
-                        Read Full Story <span className="text-xl">→</span>
-                      </button>
                     </div>
                   </div>
-                </div>
-              ))}
+                )}
+
+                {/* Bottom row */}
+                {newsItems.length > 1 && (
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
+                    {newsItems.slice(1, 3).map((item: NewsArticle) => (
+                      <div
+                        key={item.unique_id || item.id}
+                        onClick={() => handleStoryDetails(item.unique_id)}
+                        className="flex flex-col cursor-pointer group"
+                      >
+                        <div className="relative w-full h-[130px] md:h-[180px] rounded-[1.25rem] overflow-hidden mb-3">
+                          <Image
+                            src={formatNewsImage(item.image_url)}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            unoptimized
+                          />
+                          {item.category && (
+                            <div className="absolute top-3 left-3 bg-linear-to-r from-fuchsia-600 to-pink-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest z-10 shadow-sm">
+                              {formatNewsCategory(item.category)}
+                            </div>
+                          )}
+                        </div>
+                        <div className="px-1 md:px-2 pb-2">
+                          <h3 className="text-gray-900 font-extrabold text-sm md:text-[15px] leading-snug line-clamp-3 group-hover:text-cyan-600 transition-colors">
+                            {item.title}
+                          </h3>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -89,13 +121,17 @@ export default function LatestNews() {
           <div className="flex justify-center">
             <button
               onClick={handleViewAllNews}
-              className="px-8 py-2 border border-purple-700 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2 text-white"
+              className="px-10 py-3 bg-linear-to-r from-cyan-500 to-purple-600 rounded-full text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center gap-3"
             >
-              View All News <Lock size={14} className="hidden" />
+              View All News <ArrowRight size={18} />
             </button>
           </div>
         </div>
       </div>
+
+       <div className="container mx-auto px-4 md:px-0">
+          <AdBanner position="BOTTOM" />
+        </div>
     </div>
   );
 }

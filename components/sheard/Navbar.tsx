@@ -11,13 +11,15 @@ import { logout } from "@/redux/features/auth/authSlice";
 import { UserRole } from "@/types/auth";
 import { useNotifications } from "@/components/providers/NotificationProvider";
 import NotificationDropdown from "./NotificationDropdown";
+import NotificationModal from "./NotificationModal";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 import { useGetPublicSettingsQuery } from "@/redux/features/home/homeApi";
 import BrandedLogo from "../reuseable/BrandedLogo";
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Membership", href: "#" },
+  { name: "Membership", href: "/#membership" },
   { name: "Academies", href: "/#academies" },
   { name: "Players", href: "/#players" },
   { name: "Latest News", href: "/latest-news" },
@@ -27,11 +29,17 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifMenuOpen, setNotifMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const [notifModalOpen, setNotifModalOpen] = useState(false);
 
   const auth = useAppSelector((state) => state.auth);
   const { unreadCount } = useNotifications();
   const dispatch = useAppDispatch();
-  const { data: settings } = useGetPublicSettingsQuery();
+  const pathname = usePathname();
 
   const navRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -92,31 +100,57 @@ const Navbar = () => {
       <div className="container mx-auto px-4 lg:px-6 relative bg-white/10 backdrop-blur-md rounded-xl border border-white/5 shadow-lg">
         <div className="flex items-center justify-between h-20 lg:h-24">
           {/* Logo - Left */}
-          <BrandedLogo 
-            variant="stacked" 
-            size="sm" 
-            hideNameOnMobile={true} 
-            className="hover:scale-105 transition-transform duration-200" 
+          <BrandedLogo
+            variant="stacked"
+            width={106}
+            height={63}
+            hideNameOnMobile={true}
+            hideFallback={true}
+            className="hover:scale-105 transition-transform duration-200"
           />
 
           {/* Desktop Nav Links - Center */}
           <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
             <div className="flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-[#B0B0B0] hover:text-white transition-colors font-medium text-[15px] whitespace-nowrap"
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={cn(
+                      "transition-all font-medium text-[15px] whitespace-nowrap relative group py-2",
+                      isActive ? "text-cyan-400" : "text-[#B0B0B0] hover:text-white"
+                    )}
+                  >
+                    {link.name}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
           {/* Desktop Right Section */}
           <div className="hidden lg:flex items-center gap-4">
-            {auth.user ? (
+            {(!mounted || !auth.user) ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/login"
+                  className="px-6 py-2.5 text-sm font-bold text-gray-300 hover:text-white transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-6 py-2.5 text-sm font-bold bg-linear-to-r from-cyan-500 to-blue-600 text-white rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            ) : (
               <>
                 {/* Notification Bell */}
                 <div ref={notifMenuRef} className="relative">
@@ -141,9 +175,20 @@ const Navbar = () => {
                   </button>
 
                   {notifMenuOpen && (
-                    <NotificationDropdown onClose={() => setNotifMenuOpen(false)} />
+                    <NotificationDropdown
+                      onClose={() => setNotifMenuOpen(false)}
+                      onOpenModal={() => {
+                        setNotifMenuOpen(false);
+                        setNotifModalOpen(true);
+                      }}
+                    />
                   )}
                 </div>
+
+                <NotificationModal
+                  isOpen={notifModalOpen}
+                  onClose={() => setNotifModalOpen(false)}
+                />
 
                 {/* User Menu */}
                 <div ref={userMenuRef} className="relative">
@@ -158,13 +203,17 @@ const Navbar = () => {
                     className="flex items-center gap-3 pr-4 p-1 rounded-full bg-[#050B14]/40 hover:bg-[#050B14]/60 backdrop-blur-md border border-white/10 transition-all group"
                   >
                     {auth.user.profile_image ? (
-                      <img
-                        src={auth.user.profile_image}
-                        alt="Profile"
-                        className="w-9 h-9 rounded-full object-cover border border-[#00E5FF]/30"
-                      />
+                      <div className="relative w-9 h-9">
+                        <Image
+                          src={auth.user.profile_image}
+                          alt="Profile"
+                          fill
+                          className="rounded-full object-cover border border-[#00E5FF]/30"
+                          unoptimized
+                        />
+                      </div>
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
+                      <div className="w-9 h-9 rounded-full bg-linear-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
                         {auth.user.first_name?.[0]}
                         {auth.user.last_name?.[0]}
                       </div>
@@ -184,8 +233,8 @@ const Navbar = () => {
                   <div
                     role="menu"
                     className={`absolute right-0 mt-3 w-44 rounded-xl bg-[#161C39]/95 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition origin-top-right z-[60] overflow-hidden ${userMenuOpen
-                        ? "opacity-100 scale-100 pointer-events-auto"
-                        : "opacity-0 scale-95 pointer-events-none"
+                      ? "opacity-100 scale-100 pointer-events-auto"
+                      : "opacity-0 scale-95 pointer-events-none"
                       }`}
                   >
                     <Link
@@ -208,19 +257,6 @@ const Navbar = () => {
                   </div>
                 </div>
               </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="login" className="px-6">
-                    Log in
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button variant="login" className="px-6">
-                    Sign up
-                  </Button>
-                </Link>
-              </>
             )}
           </div>
 
@@ -237,27 +273,38 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden p-7 rounded-xl border-t border-white/10 bg-blur backdrop-blur-md">
             <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-white/80 hover:text-[#00E5FF] text-base font-medium py-2 transition-colors"
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "text-base font-medium py-2 transition-colors",
+                      isActive ? "text-cyan-400" : "text-white/80 hover:text-[#00E5FF]"
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
               <div className="flex flex-col gap-3 pt-4">
                 {auth.user ? (
                   <>
                     <div className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 mb-2">
                       {auth.user.profile_image ? (
-                        <img
-                          src={auth.user.profile_image}
-                          alt="Profile"
-                          className="w-12 h-12 rounded-full object-cover border border-[#00E5FF]/30"
-                        />
+                        <div className="relative w-12 h-12">
+                          <Image
+                            src={auth.user.profile_image}
+                            alt="Profile"
+                            fill
+                            className="rounded-full object-cover border border-[#00E5FF]/30"
+                            unoptimized
+                          />
+                        </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-lg font-bold shadow-inner text-white">
+                        <div className="w-12 h-12 rounded-full bg-linear-to-br from-[#00E5FF] to-[#9C27B0] flex items-center justify-center text-lg font-bold shadow-inner text-white">
                           {auth.user.first_name?.[0]}
                           {auth.user.last_name?.[0]}
                         </div>
@@ -289,12 +336,12 @@ const Navbar = () => {
                   </>
                 ) : (
                   <>
-                    <Link href="/login">
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="nav" size="default" className="w-full">
                         Log in
                       </Button>
                     </Link>
-                    <Link href="/register">
+                    <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
                       <Button
                         variant="navFilled"
                         size="default"

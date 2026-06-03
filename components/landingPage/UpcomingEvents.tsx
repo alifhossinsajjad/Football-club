@@ -1,40 +1,142 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Lock, Clock, MapPin, Users, Mail, Phone, Loader2 } from "lucide-react";
-import { Button } from "../ui/button";
+import {
+  Clock,
+  MapPin,
+  Users,
+  Mail,
+  Phone,
+  Loader2,
+  ArrowRight,
+} from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 import SectionTitel from "../reuseable/SectionTitel";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useGetUpcomingEventsQuery } from "@/redux/features/home/homeApi";
-import { useGetMyRegistrationsQuery } from "@/redux/features/player/eventsDirectoryApi";
-import { format } from "date-fns";
-import { CheckCircle } from "lucide-react";
+import { useGetPlayerEventsQuery } from "@/redux/features/player/eventsDirectoryApi";
+import { format, isValid,} from "date-fns";
+import React, { useState, useEffect, useMemo } from "react";
+import { EventDataApi } from "@/redux/features/player/eventsDirectoryApi";
+import { useGetSubscriptionPlansQuery, useCreatePublicCheckoutMutation } from "@/redux/features/player/singleSubscription/singleSubscriptionApi";
+import toast from "react-hot-toast";
 
-export default function UpcomingEvent() {
+export default function UpcomingEventsSection() {
   const router = useRouter();
   const theme = useAppSelector((state) => state.theme);
   const user = useAppSelector((state) => state.auth.user);
-  const { data: eventsData, isLoading } = useGetUpcomingEventsQuery();
-  const { data: registrations = [] } = useGetMyRegistrationsQuery(undefined, {
-    skip: !user || user.role !== "PLAYER",
-  });
+  const { data: eventsData, isLoading } = useGetPlayerEventsQuery();
+  const [mounted, setMounted] = useState(false);
 
-  // Get active/upcoming events and limit to 4
-  const upcomingEvents = (eventsData?.data || [])
-    .filter(
-      (e: any) =>
-        e.status?.toUpperCase() !== "CANCELLED" &&
-        e.status?.toUpperCase() !== "COMPLETED",
-    )
-    .slice(0, 2);
+  const {data :singlePlan} = useGetSubscriptionPlansQuery();
+  const [createCheckout, { isLoading: isCreatingCheckout }] = useCreatePublicCheckoutMutation();
+  const activePlan = singlePlan?.data?.find((p: any) => p.status === 'ACTIVE') || singlePlan?.data?.[0];
+  console.log(singlePlan, activePlan)
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const eventsList = useMemo(() => {
+    if (!eventsData) return [];
+    return Array.isArray(eventsData)
+      ? eventsData
+      : eventsData.results || eventsData.data || [];
+  }, [eventsData]);
+
+  const upcomingEvents = useMemo(() => {
+    return [...eventsList]
+      .filter(
+        (e) =>
+          e.status?.toUpperCase() !== "CANCELLED" &&
+          e.status?.toUpperCase() !== "COMPLETED",
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime(),
+      )
+      .slice(0, 2);
+  }, [eventsList]);
+
+  const formatEventDate = (dateStr?: string) => {
+    if (!dateStr) return "TBD";
+    const d = new Date(dateStr);
+    return isValid(d) ? format(d, "dd MMM yyyy") : dateStr;
+  };
+
+  const formatEventTime = (timeStr?: string) => {
+    if (!timeStr) return "TBD";
+    try {
+      const [hours, minutes] = timeStr.split(":");
+      const d = new Date();
+      d.setHours(Number(hours), Number(minutes));
+      return format(d, "hh:mm a");
+    } catch (error) {
+      return timeStr;
+    }
+  };
+
+  const formatFee = (fee?: string) => {
+    return fee === "0.00" || !fee || Number(fee) === 0
+      ? "Free Entry"
+      : `$${fee}`;
+  };
+
+  const handleViewAllEvents = () => {
+    if (!user) {
+      router.push("/latest-events");
+      return;
+    }
+    const role = user.role?.toUpperCase();
+    switch (role) {
+      case "PLAYER":
+        router.push("/player/eventsDirectory");
+        break;
+      case "CLUB":
+      case "CLUB_ACADEMY":
+        router.push("/club/eventManagement");
+        break;
+      case "SCOUT":
+      case "SCOUT_AGENT":
+        router.push("/scout/events");
+        break;
+      case "ADMIN":
+        router.push("/admin/eventManagement");
+        break;
+      default:
+        router.push("/latest-events");
+    }
+  };
+
+  const handleGuestCheckout = async () => {
+    if (!activePlan) return;
+    try {
+      const payload = {
+        plan_id: activePlan.plan_id || (activePlan as any).id,
+        billing_cycle: "YEARLY" as const,
+      };
+      const res = await createCheckout(payload as any).unwrap();
+      const checkoutUrl = res.session_url || (res as any).data?.session_url;
+      
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error("No checkout URL returned from server.");
+      }
+    } catch (err: any) {
+      console.error("Checkout Error:", err);
+      toast.error(err?.data?.message || err?.message || "Payment failed. Try again.");
+    }
+  };
 
   return (
     <div className="py-16 bg-[var(--bg-dark,#07142b)] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-9">
           <SectionTitel
-            title="LATEST Events"
+            title="LATEST EVENTS"
             subtitle="Stay updated with training tips, nutrition advice, and gear reviews."
           />
         </div>
@@ -45,27 +147,21 @@ export default function UpcomingEvent() {
           </div>
         ) : upcomingEvents.length === 0 ? (
           <div className="text-center text-gray-400 h-48 flex flex-col justify-center items-center mb-12 border border-[#12143A] rounded-2xl bg-[#090C22]">
-            <p>No upcoming events at the moment. Please check back later.</p>
+            <p>Please login to show upcoming events</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {upcomingEvents.map((event: any) => (
+            {upcomingEvents.map((event: EventDataApi) => (
               <div
                 key={event.id}
-                className="rounded-2xl p-8 bg-[var(--bg-card,#12143A)]"
+                className="rounded-2xl p-8 bg-[var(--bg-card,#12143A)] shadow-lg hover:shadow-cyan-900/10 transition-all duration-300"
               >
                 <div className="flex items-center justify-between mb-6">
                   <span className="text-[#06A295] font-semibold text-sm uppercase tracking-wider">
                     {event.status || "Upcoming"}
                   </span>
                   <span className="text-[#06A295] font-medium text-sm">
-                    {(() => {
-                      if (!event.date) return "TBD";
-                      const d = new Date(event.date);
-                      return !isNaN(d.getTime())
-                        ? format(d, "dd MMM yyyy")
-                        : event.date;
-                    })()}
+                    {formatEventDate(event.event_date)}
                   </span>
                 </div>
 
@@ -79,7 +175,9 @@ export default function UpcomingEvent() {
                       className="w-5 h-5 text-cyan-400 flex-shrink-0"
                       style={{ color: theme.colors.primaryCyan }}
                     />
-                    <span className="text-[#06A295]">08:00 AM (TBD)</span>
+                    <span className="text-[#06A295]">
+                      {formatEventTime(event.event_time)}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -88,7 +186,7 @@ export default function UpcomingEvent() {
                       style={{ color: theme.colors.primaryCyan }}
                     />
                     <span className="text-[#06A295]">
-                      {event.location || "Location TBD"}
+                      {event.venue_name || event.venue_address || "Location TBD"}
                     </span>
                   </div>
 
@@ -98,9 +196,7 @@ export default function UpcomingEvent() {
                       style={{ color: theme.colors.primaryCyan }}
                     />
                     <span className="text-[#06A295]">
-                      {event.fee === "0.00" || !event.fee
-                        ? "Free Entry"
-                        : `$${event.fee}`}
+                      {formatFee(event.registration_fee)}
                     </span>
                   </div>
                 </div>
@@ -130,59 +226,6 @@ export default function UpcomingEvent() {
                     </div>
                   </div>
                 </div>
-
-                {(() => {
-                  const reg = registrations.find((r: any) => (r.event === event.id || r.event_id === event.id));
-                  const isRegistered = !!reg && reg.status !== "CANCELLED";
-                  const isFull = event.is_full || (event.maximum_capacity > 0 && event.registered_count >= event.maximum_capacity);
-
-                  return (
-                    <Button
-                      variant="common"
-                      disabled={isFull && !isRegistered && user?.role === "PLAYER"}
-                      onClick={() => {
-                        if (!user) {
-                          router.push("/login");
-                          return;
-                        }
-                        
-                        const role = user.role?.toUpperCase();
-                        if (role === "PLAYER") {
-                          if (isRegistered) {
-                            router.push("/player/eventsDirectory");
-                          } else if (isFull) {
-                            return;
-                          } else {
-                            router.push(`/latest-events/${event.id}`);
-                          }
-                        } else if (role === "CLUB") {
-                          router.push("/club/eventManagement");
-                        } else if (role === "SCOUT") {
-                          router.push("/scout/events");
-                        } else if (role === "ADMIN") {
-                          router.push("/admin/event-management");
-                        } else {
-                          router.push(`/latest-events/${event.id}`);
-                        }
-                      }}
-                      className={`w-full font-semibold py-3 rounded-md transition-all duration-200 flex items-center justify-center gap-2 ${
-                        isRegistered 
-                          ? "bg-[#0B0E1E] text-cyan-400 border border-cyan-400/30" 
-                          : isFull && user?.role === "PLAYER"
-                          ? "bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed"
-                          : "text-white"
-                      }`}
-                    >
-                      {isRegistered ? (
-                         <>Already Registered</>
-                      ) : isFull && user?.role === "PLAYER" ? (
-                        "Event Full"
-                      ) : (
-                        "See more details"
-                      )}
-                    </Button>
-                  );
-                })()}
               </div>
             ))}
           </div>
@@ -191,136 +234,134 @@ export default function UpcomingEvent() {
         <div className="flex justify-center">
           <div className="flex justify-center mt-10">
             <button
-              onClick={() => router.push("/latest-events")} 
-              className="px-8 py-2 border border-purple-700 rounded-full text-foreground hover:bg-purple/10 transition-colors flex items-center gap-2 text-white"
+              onClick={handleViewAllEvents}
+              className="px-10 py-3 bg-linear-to-r from-cyan-500 to-purple-600 rounded-full text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center gap-3"
             >
-              View All Events <Lock size={14} className="hidden" />
+              View All Events <ArrowRight size={18} />
             </button>
           </div>
         </div>
 
-        {/*  go pro*/}
-        <div className="min-h-screen flex items-center justify-center p-6 ">
+      {/* card for new player  */}
+
+        {activePlan && (
           <div
-            className="
-          w-full max-w-md 
-          bg-gradient-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 
-           p-8 
-          border border-indigo-500/20 
-          shadow-2xl shadow-indigo-950/40 rounded-xl
-        "
+            id="membership"
+            className="mt-20 flex items-center justify-center p-4 sm:p-6"
           >
-            <div className="bg-[#171D36]/90 p-8">
-              <div className="  gap-4 mb-6">
-                <div className="flex justify-center mb-3">
-                  <div
-                    className="
-              w-12 h-12 rounded-xl 
-              bg-gradient-to-br from-indigo-500 to-purple-600 
-              flex items-center justify-center 
-              text-2xl font-black text-white 
-              shadow-lg
+            <div
+              className="
+              w-full max-w-md 
+              bg-linear-to-br from-[#00E5FF]/20 via-[#00E5FF]/5 to-[#9C27B0]/30 
+              p-4 sm:p-6 md:p-8
+              border border-indigo-500/20 
+              shadow-2xl shadow-indigo-950/40 rounded-xl
             "
-                  >
-                    ♔
+            >
+              <div className="bg-[#171D36]/90 p-4 sm:p-6 md:p-8 rounded-xl">
+                <div className="flex justify-center mb-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl font-black text-white shadow-lg overflow-hidden">
+                    {activePlan.logo_url ? (
+                      <Image src={activePlan.logo_url} alt={activePlan.title || "Plan Logo"} width={48} height={48} className="w-full h-full object-cover" />
+                    ) : (
+                      "♔"
+                    )}
                   </div>
                 </div>
-                <h2 className="text-4xl font-bold mb-6  pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent text-center ">
-                  GO PRO
+
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent text-center">
+                  {activePlan.title?.toUpperCase() || "GO PRO"}
                 </h2>
-              </div>
 
-              <div className="text-center">
-                <p className="text-[#7FB6B6] text-base leading-relaxed mb-8 font-bold">
-                  Unlock premium features and accelerate your football career
-                  with NextGen Pro membership
+                <p className="text-[#7FB6B6] text-sm sm:text-base text-center mb-6 sm:mb-8 font-bold px-2">
+                  {activePlan.description || "Unlock premium features and accelerate your football career with NextGen Pro membership"}
                 </p>
-              </div>
 
-              <ul className="space-y-4 mb-10 text-[#7FB6B6] text-sm">
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 text-lg font-bold mt-0.5">
-                    ✓
-                  </span>
-                  <span>Exclusive scout network access</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 text-lg font-bold mt-0.5">
-                    ✓
-                  </span>
-                  <span>Refined direct messaging system</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 text-lg font-bold mt-0.5">
-                    ✓
-                  </span>
-                  <span>Exclusive scout & agent network access</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 text-lg font-bold mt-0.5">
-                    ✓
-                  </span>
-                  <span>
-                    Newsletter with pre-season training content and priority
-                    event access
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 text-lg font-bold mt-0.5">
-                    ✓
-                  </span>
-                  <span>
-                    Full access to all events with direct contact options
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 text-lg font-bold mt-0.5">
-                    ✓
-                  </span>
-                  <span>
-                    Enhanced player profile creation with photos & videos to get
-                    noticed by clubs
-                  </span>
-                </li>
-              </ul>
+                <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-[#7FB6B6] text-xs sm:text-sm">
+                  {(activePlan.features && activePlan.features.length > 0
+                    ? activePlan.features
+                    : [
+                      "Exclusive scout network access",
+                      "Refined direct messaging system",
+                      "Exclusive scout & agent network access",
+                      "Newsletter with pre-season training content and priority event access",
+                      "Full access to all events with direct contact options",
+                      "Enhanced player profile creation with photos & videos to get noticed by clubs",
+                    ]
+                  ).map((item: any, i: number) => (
+                    <li key={i} className="flex items-start gap-2 sm:gap-3">
+                      <span className="text-indigo-400 text-base sm:text-lg font-bold mt-0.5">
+                        ✓
+                      </span>
+                      <span>
+                        {typeof item === 'string' 
+                          ? item 
+                          : (item?.name || (typeof item === 'object' ? Object.values(item)[0] : String(item)))}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
 
-              <div className="flex items-center gap-4 mb-3">
-                <div className="flex items-baseline text-[#9CFFF0]">
-                  <span className="text-4xl font-black ">$</span>
-                  <span className="text-5xl font-black tracking-tight">
-                    9.99
-                  </span>
-                  <span className="text-xl font-bold ml-2">/year</span>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3">
+                  <div className="flex items-baseline text-[#9CFFF0]">
+                    <span className="text-2xl sm:text-3xl font-black">$</span>
+                    <span className="text-3xl sm:text-5xl font-black tracking-tight">
+                      {activePlan.yearly_price_after_discount !== undefined && activePlan.yearly_price_after_discount !== null 
+                        ? activePlan.yearly_price_after_discount 
+                        : 9.99}
+                    </span>
+                    <span className="text-sm sm:text-xl font-bold ml-1 sm:ml-2">
+                      /year
+                    </span>
+                  </div>
+
+                  {activePlan.discount_label && activePlan.discount_percentage ? (
+                    <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-lg uppercase tracking-wide">
+                      {activePlan.discount_label.split('(')[0].trim()}
+                    </div>
+                  ) : activePlan.discount_percentage ? (
+                    <div className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] text-white text-[10px] sm:text-xs font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-lg uppercase tracking-wide">
+                      Save {activePlan.discount_percentage}%
+                    </div>
+                  ) : null}
                 </div>
 
-                <div className="bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] text-white text-xs font-bold px-4 py-3 rounded-lg uppercase tracking-wide">
-                  Save 50%
+                {activePlan.yearly_price && activePlan.discount_label && (
+                  <p className="text-[#7FB6B6] text-xs sm:text-sm text-center mb-6 sm:mb-8">
+                    ({activePlan.discount_label.includes('(') ? activePlan.discount_label.split('(')[1].replace(')', '') : 'introductory offer'} — usually ${activePlan.yearly_price}/year)
+                  </p>
+                )}
+
+                <div className="flex justify-center">
+                  {(!mounted || !user) ? (
+                    <button
+                      onClick={handleGuestCheckout}
+                      disabled={isCreatingCheckout}
+                      className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)] disabled:opacity-50"
+                    >
+                      {isCreatingCheckout ? "Redirecting..." : "Sign Up"}
+                    </button>
+                  ) : (
+                    <Link
+                      href={
+                        user.role === "PLAYER"
+                          ? "/player"
+                          : user.role === "CLUB_ACADEMY"
+                            ? "/club"
+                            : user.role === "SCOUT_AGENT"
+                              ? "/scout"
+                              : "/admin"
+                      }
+                      className="w-full sm:w-auto text-center bg-[#00F6FF] text-black px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
+                    >
+                      Go to Your Dashboard
+                    </Link>
+                  )}
                 </div>
               </div>
-
-              <p className="text-[#7FB6B6] text-sm text-center mb-8">
-                (introductory offer — usually $19.99/year)
-              </p>
-
-              <div className="flex justify-center">
-                <Link
-                  href={user ? (
-                    user.role === "PLAYER" ? "/player" : 
-                    user.role === "CLUB_ACADEMY" ? "/club" : 
-                    user.role === "SCOUT_AGENT" ? "/scout" : "/admin"
-                  ) : "/login"}
-                  className="text-center bg-[#00F6FF] text-black px-8 py-3 font-bold rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(0,246,255,0.3)]"
-                >
-                  {user ? "Go to Dashboard" : "Sign Up"}
-                </Link>
-              </div>
-
-              <p className="text-center mt-6 text-[#7FB6B6] hover:text-blue-300 text-sm cursor-pointer transition-colors">
-                Have a promo code?
-              </p>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

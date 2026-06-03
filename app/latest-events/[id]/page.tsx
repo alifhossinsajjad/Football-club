@@ -25,10 +25,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const event = eventResponse?.data || eventResponse; // Handle different potential response structures
 
   const registrationsArray = Array.isArray(registrations) ? registrations : ((registrations as any)?.data || []);
-  const isRegistered = registrationsArray?.some((reg: any) => 
-    (reg.event === eventId || reg.event_id === eventId) && 
-    (reg.status === "PENDING" || reg.status === "CONFIRMED" || reg.status === "PAID" || reg.status === "CONFIRM")
-  );
+  const isRegistered = registrationsArray?.some((reg: any) => {
+    const regEventId = reg.event_id || (typeof reg.event === 'object' && reg.event !== null ? reg.event.id : reg.event);
+    return (Number(regEventId) === Number(eventId)) && 
+           (reg.status === "PENDING" || reg.status === "CONFIRMED" || reg.status === "PAID" || reg.status === "CONFIRM" || reg.status === "SUCCESS");
+  });
 
   const isFull = event?.is_full || (event?.maximum_capacity > 0 && event?.registered_count >= event?.maximum_capacity);
 
@@ -212,13 +213,13 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     ? "bg-[#0B0E1E] text-cyan-400 border border-cyan-400/30 cursor-not-allowed shadow-inner" 
                     : isFull 
                     ? "bg-gray-800/50 text-gray-500 border border-gray-700/50 cursor-not-allowed"
-                    : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-cyan-500/20"
+                    : "bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-cyan-500/20"
                 }`}
               >
                 {isRegistered ? (
                   "Already Registered"
                 ) : isFull ? (
-                  "Event Full"
+                  "Completed"
                 ) : (
                   "Register For Event"
                 )}

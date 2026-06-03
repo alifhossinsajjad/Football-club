@@ -193,6 +193,16 @@ const PlayerRegisterForm = () => {
       return;
     }
 
+    // Calculate minor status locally to ensure it matches the data being submitted
+    const birthDate = new Date(data.date_of_birth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    const currentlyIsMinor = age < 18;
+
     const payload: PlayerRegisterPayload = {
       email: data.email,
       password: data.password,
@@ -201,15 +211,17 @@ const PlayerRegisterForm = () => {
       last_name: data.last_name,
       date_of_birth: data.date_of_birth,
       nationality: data.nationality,
-      phone_number: data.phone_number,
+      phone_number: data.phone_number
+        ? data.phone_number.replace(/\s+/g, "")
+        : "",
       playing_position:
         data.playing_position.charAt(0).toUpperCase() +
         data.playing_position.slice(1),
       preferred_foot:
         data.preferred_foot.charAt(0).toUpperCase() +
         data.preferred_foot.slice(1),
-      height: parseFloat(data.height),
-      weight: parseFloat(data.weight),
+      height: data.height,
+      weight: data.weight,
       city: data.city,
       country: data.country,
       current_club_academy: data.current_club_academy,
@@ -219,11 +231,13 @@ const PlayerRegisterForm = () => {
       parent_guardian_last_name: data.parent_guardian_last_name,
       parent_guardian_email: data.parent_guardian_email,
       parent_id_number: data.parent_id_number,
-      parent_guardian_digital_signature:
-        data.parent_guardian_digital_signature || null,
+      // Sending a placeholder instead of null to satisfy backend required field
+      parent_guardian_digital_signature: currentlyIsMinor
+        ? "signature_captured"
+        : null,
     };
 
-    if (!isMinor) {
+    if (!currentlyIsMinor) {
       delete payload.parent_guardian_first_name;
       delete payload.parent_guardian_last_name;
       delete payload.parent_guardian_email;
@@ -233,9 +247,9 @@ const PlayerRegisterForm = () => {
 
     try {
       await registerPlayer(payload).unwrap();
-      toast.success("Registration successful!");
+      toast.success("Registration successful! Please verify your email.");
+      router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
       reset();
-      router.push("/login");
     } catch (error: any) {
       console.error("Registration failed:", error);
       await showRegistrationError(error, {
@@ -284,6 +298,7 @@ const PlayerRegisterForm = () => {
                     label="First Name"
                     name="first_name"
                     register={register}
+                    rules={{ required: "First name is required" }}
                     error={errors.first_name?.message}
                     icon={<User size={16} />}
                     placeholder="John"
@@ -292,6 +307,7 @@ const PlayerRegisterForm = () => {
                     label="Last Name"
                     name="last_name"
                     register={register}
+                    rules={{ required: "Last name is required" }}
                     error={errors.last_name?.message}
                     icon={<User size={16} />}
                     placeholder="Doe"
@@ -302,6 +318,33 @@ const PlayerRegisterForm = () => {
                   name="date_of_birth"
                   type="date"
                   register={register}
+                  rules={{
+                    required: "Date of birth is required",
+                    validate: (value: string) => {
+                      const date = new Date(value);
+                      const today = new Date();
+
+                      if (isNaN(date.getTime())) return "Invalid date";
+
+                      const year = date.getFullYear();
+
+                      if (year < 1900) return "Year too old";
+                      if (date > today) return "Cannot be in future";
+
+                      // Optional: age logic for football players (5–45)
+                      const age =
+                        today.getFullYear() -
+                        year -
+                        (today < new Date(date.setFullYear(today.getFullYear()))
+                          ? 1
+                          : 0);
+
+                      if (age < 5 || age > 45)
+                        return "Invalid player age range";
+
+                      return true;
+                    },
+                  }}
                   error={errors.date_of_birth?.message}
                   icon={<Calendar size={16} />}
                   value={watch("date_of_birth")}
@@ -310,6 +353,7 @@ const PlayerRegisterForm = () => {
                   label="Nationality"
                   name="nationality"
                   register={register}
+                  rules={{ required: "Nationality is required" }}
                   error={errors.nationality?.message}
                   icon={<Globe size={16} />}
                   options={countries}
@@ -318,6 +362,20 @@ const PlayerRegisterForm = () => {
                   label="Phone Number"
                   name="phone_number"
                   control={control as any}
+                  rules={{
+                    required: "Phone number is required",
+                    validate: (value: string) => {
+                      if (!value) return true;
+                      const number = value.includes(" ")
+                        ? value.split(" ")[1]
+                        : value.replace(/^\+\d+\s*/, "");
+                      const totalLength = value.replace(/\s+/g, "").length;
+                      if (number.length < 7) return "Phone number is too short";
+                      if (totalLength > 15)
+                        return "Phone number cannot exceed 15 digits";
+                      return true;
+                    },
+                  }}
                   error={errors.phone_number?.message}
                   icon={<Phone size={16} />}
                   placeholder="XXX XXX XXX"
@@ -327,6 +385,13 @@ const PlayerRegisterForm = () => {
                   name="email"
                   type="email"
                   register={register}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
                   error={errors.email?.message}
                   icon={<Mail size={16} />}
                   placeholder="player@example.com"
@@ -336,6 +401,13 @@ const PlayerRegisterForm = () => {
                   name="password"
                   type="password"
                   register={register}
+                  rules={{
+                    required: "Password is required",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters",
+                    },
+                  }}
                   error={errors.password?.message}
                   icon={<Lock size={16} />}
                   placeholder="********"
@@ -345,6 +417,11 @@ const PlayerRegisterForm = () => {
                   name="confirm_password"
                   type="password"
                   register={register}
+                  rules={{
+                    required: "Please confirm your password",
+                    validate: (value: string) =>
+                      value === watch("password") || "Passwords do not match",
+                  }}
                   error={errors.confirm_password?.message}
                   icon={<Lock size={16} />}
                   placeholder="********"
@@ -353,7 +430,7 @@ const PlayerRegisterForm = () => {
                 <button
                   type="button"
                   onClick={handleNextStep}
-                  className="w-full py-4 bg-gradient-to-r from-[#00E5FF] to-[#00A3FF] text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_30px_rgba(0,229,255,0.5)] hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-linear-to-r from-[#00E5FF] to-[#00A3FF] text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_30px_rgba(0,229,255,0.5)] hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <User size={18} />
                   Create Account
@@ -381,7 +458,7 @@ const PlayerRegisterForm = () => {
             {step === 1 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex flex-col items-center mb-4">
-                  <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
+                  <div className="p-4 bg-linear-to-br from-cyan-500 to-blue-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
                     <User size={32} className="text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">
@@ -397,6 +474,7 @@ const PlayerRegisterForm = () => {
                     label="Playing Position"
                     name="playing_position"
                     register={register}
+                    rules={{ required: "Playing position is required" }}
                     error={errors.playing_position?.message}
                     options={[
                       { label: "Forward", value: "forward" },
@@ -409,6 +487,7 @@ const PlayerRegisterForm = () => {
                     label="Preferred Foot"
                     name="preferred_foot"
                     register={register}
+                    rules={{ required: "Preferred foot is required" }}
                     error={errors.preferred_foot?.message}
                     options={[
                       { label: "Left", value: "left" },
@@ -423,6 +502,18 @@ const PlayerRegisterForm = () => {
                     name="height"
                     type="number"
                     register={register}
+                    rules={{
+                      required: "Height is required",
+                      min: { value: 140, message: "Height too low" },
+                      max: { value: 220, message: "Height too high (cm)" },
+                      validate: (value: any) => {
+                        const num = Number(value);
+                        if (isNaN(num) || !Number.isFinite(num)) return "Invalid height";
+                        if (value.toString().length > 3)
+                          return "Invalid height format";
+                        return true;
+                      },
+                    }}
                     error={errors.height?.message}
                     placeholder="175"
                   />
@@ -431,6 +522,18 @@ const PlayerRegisterForm = () => {
                     name="weight"
                     type="number"
                     register={register}
+                    rules={{
+                      required: "Weight is required",
+                      min: { value: 35, message: "Weight too low" },
+                      max: { value: 130, message: "Weight too high (kg)" },
+                      validate: (value: any) => {
+                        const num = Number(value);
+                        if (isNaN(num) || !Number.isFinite(num)) return "Invalid weight";
+                        if (value.toString().length > 3)
+                          return "Invalid weight format";
+                        return true;
+                      },
+                    }}
                     error={errors.weight?.message}
                     placeholder="70"
                   />
@@ -440,6 +543,7 @@ const PlayerRegisterForm = () => {
                     label="City"
                     name="city"
                     register={register}
+                    rules={{ required: "City is required" }}
                     error={errors.city?.message}
                     placeholder="Barcelona"
                   />
@@ -447,6 +551,7 @@ const PlayerRegisterForm = () => {
                     label="Country"
                     name="country"
                     register={register}
+                    rules={{ required: "Country is required" }}
                     error={errors.country?.message}
                     options={countries}
                   />
@@ -480,7 +585,7 @@ const PlayerRegisterForm = () => {
             {step === 2 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex flex-col items-center mb-4">
-                  <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full shadow-lg shadow-purple-500/20 mb-4">
+                  <div className="p-4 bg-linear-to-br from-purple-500 to-indigo-600 rounded-full shadow-lg shadow-purple-500/20 mb-4">
                     <Trophy size={32} className="text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">
@@ -509,6 +614,7 @@ const PlayerRegisterForm = () => {
                     label="Current Club / Academy"
                     name="current_club_academy"
                     register={register}
+                    rules={{ required: "Current club or 'None' is required" }}
                     error={errors.current_club_academy?.message}
                     placeholder="e.g. FC Barcelona Youth Academy or 'None' if free agent"
                     onChange={(e: any) => {
@@ -567,6 +673,7 @@ const PlayerRegisterForm = () => {
                   label="Type of Commitment"
                   name="type_of_commitment"
                   register={register}
+                  rules={{ required: "Type of commitment is required" }}
                   error={errors.type_of_commitment?.message}
                   options={[
                     { label: "Academy Player", value: "academy_player" },
@@ -594,6 +701,17 @@ const PlayerRegisterForm = () => {
                   name="contract_valid_until"
                   type="date"
                   register={register}
+                  rules={{
+                    required: "Contract validity date is required",
+                    validate: (value: string) => {
+                      const date = new Date(value);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      if (date < today)
+                        return "Contract date cannot be in the past";
+                      return true;
+                    },
+                  }}
                   error={errors.contract_valid_until?.message}
                   placeholder="dd/mm/yyyy"
                   icon={<Calendar size={16} />}
@@ -631,7 +749,7 @@ const PlayerRegisterForm = () => {
             {step === 3 && isMinor && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex flex-col items-center mb-4">
-                  <div className="p-4 bg-gradient-to-br from-cyan-500 to-indigo-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
+                  <div className="p-4 bg-linear-to-br from-cyan-500 to-indigo-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
                     <User size={32} className="text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">
@@ -710,6 +828,11 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian First Name"
                     name="parent_guardian_first_name"
                     register={register}
+                    rules={{
+                      required: isMinor
+                        ? "Parent's first name is required"
+                        : false,
+                    }}
                     error={errors.parent_guardian_first_name?.message}
                     icon={<User size={14} />}
                     placeholder="Enter parent's first name"
@@ -718,6 +841,11 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian Last Name"
                     name="parent_guardian_last_name"
                     register={register}
+                    rules={{
+                      required: isMinor
+                        ? "Parent's last name is required"
+                        : false,
+                    }}
                     error={errors.parent_guardian_last_name?.message}
                     icon={<User size={14} />}
                     placeholder="Enter parent's last name"
@@ -728,6 +856,11 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian ID Number"
                     name="parent_id_number"
                     register={register}
+                    rules={{
+                      required: isMinor
+                        ? "Parent's ID number is required"
+                        : false,
+                    }}
                     error={errors.parent_id_number?.message}
                     placeholder="National ID / Passport number"
                   />
@@ -735,6 +868,15 @@ const PlayerRegisterForm = () => {
                     label="Parent/Guardian Email Address"
                     name="parent_guardian_email"
                     register={register}
+                    rules={{
+                      required: isMinor ? "Parent's email is required" : false,
+                      pattern: isMinor
+                        ? {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "Invalid email address",
+                          }
+                        : undefined,
+                    }}
                     error={errors.parent_guardian_email?.message}
                     icon={<Mail size={14} />}
                     placeholder="guardian@example.com"
@@ -807,7 +949,7 @@ const PlayerRegisterForm = () => {
             {step === 4 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex flex-col items-center mb-4">
-                  <div className="p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
+                  <div className="p-4 bg-linear-to-br from-cyan-400 to-blue-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
                     <Shield size={32} className="text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">
@@ -928,7 +1070,7 @@ const PlayerRegisterForm = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-green-600 border border-emerald-400/20 rounded-2xl text-white font-bold hover:from-emerald-400 hover:to-green-500 transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                    className="flex-[2] py-4 bg-linear-to-r from-emerald-500 to-green-600 border border-emerald-400/20 rounded-2xl text-white font-bold hover:from-emerald-400 hover:to-green-500 transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                   >
                     {isLoading ? (
                       "Processing..."

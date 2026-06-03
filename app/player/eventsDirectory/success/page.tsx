@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
@@ -7,7 +6,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Check, XCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import { useVerifyPaymentMutation } from "../../../../redux/features/player/eventsDirectoryApi";
 
-export default function EventRegistrationSuccessPage() {
+import { Suspense, useRef } from "react";
+
+function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -21,6 +22,9 @@ export default function EventRegistrationSuccessPage() {
     "VERIFYING",
   );
   const [errorMsg, setErrorMsg] = useState("");
+  const [activeRegId, setActiveRegId] = useState<string | null>(null);
+  
+  const verifyAttempted = useRef(false);
 
   useEffect(() => {
   const session_id = searchParams.get("session_id");
@@ -128,5 +132,17 @@ export default function EventRegistrationSuccessPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function EventRegistrationSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[80vh] flex items-center justify-center p-6">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-cyan-400"></div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }

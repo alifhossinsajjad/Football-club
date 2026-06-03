@@ -20,6 +20,7 @@ import {
   FileText,
   Ticket,
   Plus,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -28,7 +29,6 @@ import { useDispatch } from "react-redux";
 
 import { logout } from "@/redux/features/auth/authSlice";
 import BrandedLogo from "../reuseable/BrandedLogo";
-import Logo from "../reuseable/Logo";
 
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
@@ -86,6 +86,11 @@ const ScoutSideBar: React.FC = () => {
       label: "Subscription Tracking",
       href: "/admin/subscriptionTracking",
     },
+    {
+      icon: TrendingUp,
+      label: "Boosting Subscription",
+      href: "/admin/boostSubscription",
+    },
 
     {
       icon: CircleDollarSign,
@@ -127,7 +132,17 @@ const ScoutSideBar: React.FC = () => {
       href: "/admin/contentManagement",
     },
 
-    { icon: Settings, label: " Settings", href: "/admin/adminSettings" },
+    {
+      icon: Settings,
+      label: "Site Settings",
+      children: [
+        { icon: FileText, label: "Ads Management", href: "/admin/siteSettings/ads" },
+        { icon: FileText, label: "Special Ads", href: "/admin/siteSettings/special-ads" },
+        { icon: FileText, label: "FAQ Management", href: "/admin/siteSettings/faq" },
+        { icon: FileText, label: "Testimonials", href: "/admin/siteSettings/testimonials" },
+        { icon: Settings, label: "Admin Settings", href: "/admin/adminSettings" },
+      ],
+    },
   ], []);
 
   // ✅ stable key for groups even without href
@@ -151,6 +166,11 @@ const ScoutSideBar: React.FC = () => {
 
   const [openGroups, setOpenGroups] =
     useState<Record<string, boolean>>(initialOpenGroups);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Keep the matching group open when route changes
   useEffect(() => {
@@ -183,6 +203,14 @@ const ScoutSideBar: React.FC = () => {
     localStorage.removeItem("user");
     router.replace("/auth/login");
   };
+
+  if (!mounted) {
+    return (
+      <aside className="fixed top-0 left-0 h-full w-58.75 border-2 border-[#00E5FF1A] bg-[#12143A] z-50 lg:translate-x-0 -translate-x-full">
+        {/* Skeleton for SSR */}
+      </aside>
+    );
+  }
 
   return (
     <>
@@ -242,7 +270,7 @@ const ScoutSideBar: React.FC = () => {
                     onClick={handleClose}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       active
-                        ? "bg-gradient-to-r from-[#9C27B033] to-[#00E5FF33] text-white"
+                        ? "bg-linear-to-r from-[#9C27B033] to-[#00E5FF33] text-white"
                         : "text-white/70 hover:bg-white/5 hover:text-white"
                     }`}
                   >

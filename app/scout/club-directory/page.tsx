@@ -43,7 +43,7 @@ const ClubDirectoryPage = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
+      <h1 className="text-4xl font-bold mb-6 inline-block pb-2 bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
         Player Discovery
       </h1>
 
@@ -107,6 +107,7 @@ const ClubDirectoryPage = () => {
                   width={60}
                   height={60}
                   sizes="60px"
+                  style={{ width: "auto", height: "auto" }}
                   className="rounded-full object-cover"
                 />
               ) : (

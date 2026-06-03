@@ -9,9 +9,10 @@ import {
   useGetShortlistedPlayersQuery 
 } from "@/redux/features/scout/scoutProfileApi";
 import { useGetConversationsQuery } from "@/redux/features/chat/chatApi";
-import { useGetEventsQuery } from "@/redux/features/admin/adminEventApi";
-import { useGetNewsArticlesQuery } from "@/redux/features/admin/adminNewsApi";
-import { formatDistanceToNow, format } from "date-fns";
+import { useGetAllEventsQuery } from "@/redux/features/scout/eventsApi";
+import { useGetLatestNewsQuery } from "@/redux/features/home/homeApi";
+import { formatDistanceToNow, format, parseISO } from "date-fns";
+import { useMemo } from "react";
 import Link from "next/link";
 
 /* ─── Fake Data ─────────────────────────────────────────────── */
@@ -69,8 +70,17 @@ const ScoutDashboard: React.FC = () => {
   const { data: stats } = useGetDashboardStatsQuery();
   const { data: shortlistData } = useGetShortlistedPlayersQuery();
   const { data: chatData } = useGetConversationsQuery();
-  const { data: eventsData, isLoading: isEventsLoading } = useGetEventsQuery();
-  const { data: newsData, isLoading: isNewsLoading } = useGetNewsArticlesQuery();
+  const { data: eventsDataRaw, isLoading: isEventsLoading } = useGetAllEventsQuery({});
+  const { data: newsData, isLoading: isNewsLoading } = useGetLatestNewsQuery();
+
+  const newsItems = useMemo(() => {
+    const items = [...(newsData?.articles || newsData?.data || [])];
+    return items.sort((a: any, b: any) => {
+      const dateA = a.date_published ? parseISO(a.date_published).getTime() : 0;
+      const dateB = b.date_published ? parseISO(b.date_published).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [newsData]);
 
   const scoutName = profile?.first_name || "Member";
   const shortlistedPlayers = shortlistData?.results || [];
@@ -84,6 +94,11 @@ const ScoutDashboard: React.FC = () => {
     avatar: conv.other_participant?.profile_image || conv.other_participant?.avatar || conv.avatar || `https://ui-avatars.com/api/?name=${conv.other_participant?.name || "U"}`,
   }));
 
+  const eventsList = useMemo(() => {
+    const raw = eventsDataRaw?.results || eventsDataRaw?.data || eventsDataRaw?.events || (Array.isArray(eventsDataRaw) ? eventsDataRaw : []);
+    return raw || [];
+  }, [eventsDataRaw]);
+
   return (
     <div className="min-h-screen bg-[#0B0D2C] text-white font-sans pb-12">
 
@@ -91,7 +106,7 @@ const ScoutDashboard: React.FC = () => {
       <div className="px-6 pt-6 pb-2">
         <h1 className="text-2xl font-bold">
           Welcome Back,{" "}
-          <span className="bg-gradient-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-[#00E5FF] to-[#9C27B0] bg-clip-text text-transparent">
             {scoutName}!
           </span>
         </h1>
@@ -226,12 +241,12 @@ const ScoutDashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {newsData?.data?.filter(a => a.status?.toUpperCase() === "PUBLISHED").slice(0, 2).map((article) => (
-              <Link href={`/latest-news/${article.id}`} key={article.id}>
+            {newsItems.slice(0, 2).map((article: any) => (
+              <Link href={`/latest-news/${article.unique_id}`} key={article.unique_id || article.id}>
                 <div className="bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-4 flex gap-4 hover:border-[#00E5FF1A] transition-colors h-full">
                   <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                     <img 
-                      src={article.image || "/images/event-banner.jpg"} 
+                      src={article.image_url || "/images/event-banner.jpg"} 
                       alt={article.title} 
                       className="object-cover w-full h-full"
                     />
@@ -239,14 +254,14 @@ const ScoutDashboard: React.FC = () => {
                   <div className="flex flex-col justify-between min-w-0">
                     <div>
                       <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider mb-1">
-                        {article.category_name || "News"}
+                        {article.category || "News"}
                       </p>
                       <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
                         {article.title}
                       </h3>
                     </div>
                     <p className="text-[10px] text-white/40">
-                      {article.date ? format(new Date(article.date), "MMM d, yyyy") : "Recent"}
+                      {article.date_published ? format(parseISO(article.date_published), "MMM d, yyyy") : "Recent"}
                     </p>
                   </div>
                 </div>
@@ -269,7 +284,7 @@ const ScoutDashboard: React.FC = () => {
           </h2>
 
           <div className="space-y-3">
-            {eventsData?.data?.filter(e => e.status?.toUpperCase() !== "CANCELLED").slice(0, 3).map((event) => (
+            {eventsList.filter((e: any) => e.status?.toUpperCase() !== "CANCELLED").slice(0, 3).map((event: any) => (
               <div
                 key={event.id}
                 className="flex items-center gap-4 bg-[#0B0D2C] border border-white/[0.06] rounded-xl p-4"
@@ -281,7 +296,7 @@ const ScoutDashboard: React.FC = () => {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-white truncate">{event.event_name}</p>
+                  <p className="font-semibold text-sm text-white truncate">{event.event_name || event.title}</p>
                   <p className="text-xs text-white/50 truncate">{event.location || "Location TBD"}</p>
                   <p className="text-[10px] text-cyan-400/60 mt-0.5 font-bold uppercase tracking-widest">
                     {event.fee === "0.00" || !event.fee ? "Free Entry" : `$${event.fee}`}
@@ -291,7 +306,7 @@ const ScoutDashboard: React.FC = () => {
                 {/* Date */}
                 <div className="text-right flex-shrink-0">
                   <p className="text-xs text-[#00E5FF] font-medium">
-                    {event.date ? format(new Date(event.date), "dd MMM yyyy") : "TBD"}
+                    {event.date || event.event_date ? format(new Date(event.date || event.event_date), "dd MMM yyyy") : "TBD"}
                   </p>
                   <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold mt-1">
                     {event.status}
@@ -299,7 +314,7 @@ const ScoutDashboard: React.FC = () => {
                 </div>
               </div>
             ))}
-            {(!eventsData?.data || eventsData.data.length === 0) && !isEventsLoading && (
+            {eventsList.length === 0 && !isEventsLoading && (
               <div className="py-8 text-center text-white/30 border border-white/[0.05] border-dashed rounded-xl">
                 <p className="text-sm">No upcoming events found</p>
               </div>

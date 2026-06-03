@@ -1,16 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { Lock, Loader2, ArrowRight } from "lucide-react";
-import { useGetFeaturedPlayersQuery } from "@/redux/features/home/homeApi";
+import {  Loader2, ArrowRight } from "lucide-react";
+import { useGetFeaturedPlayersQuery } from "@/redux/features/admin/adminSettingsApi";
 import { getFlagEmoji } from "@/lib/utils/flagUtils";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
 
 const Feature = () => {
+  const router = useRouter();
   const theme = useAppSelector((state) => state.theme);
+  const user = useAppSelector((state) => state.auth.user);
   const { data: playersData, isLoading } = useGetFeaturedPlayersQuery();
 
-  const players = playersData?.data || playersData || [];
+  const players = Array.isArray(playersData?.data) 
+    ? playersData.data 
+    : [];
 
   return (
     <section id="players" className="py-20 px-4 bg-[var(--bg-dark,#07142b)] text-white">
@@ -18,6 +25,7 @@ const Feature = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2
+            suppressHydrationWarning
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block"
             style={{
               backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
@@ -52,6 +60,7 @@ const Feature = () => {
                 {/* Player Info */}
                 <div className="flex-1">
                   <h3
+                    suppressHydrationWarning
                     className="font-display text-lg font-semibold mb-2"
                     style={{
                       backgroundImage: `linear-gradient(90deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
@@ -96,12 +105,37 @@ const Feature = () => {
 
         {/* View All Button */}
         <div className="flex justify-center mt-10">
-          <Link
-            href={!useAppSelector((state) => state.auth.user) ? "/login" : "/scout/playerDiscovery"}
-            className="px-10 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center gap-3"
+          <button
+            onClick={() => {
+              if (!user) {
+                router.push("/login");
+                return;
+              }
+              const role = user.role?.toUpperCase();
+              if (role === "CLUB" || role === "CLUB_ACADEMY") {
+                router.push("/club/playerDiscovery");
+              } else if (role === "SCOUT" || role === "SCOUT_AGENT") {
+                router.push("/scout/playerDiscovery");
+              } else if (role === "ADMIN") {
+                router.push("/admin/contentManagement");
+              } else {
+                toast.error("You don't have access to explore players.", {
+                  style: {
+                    background: "#090C22",
+                    color: "#fff",
+                    border: "1px solid #06A295",
+                  },
+                  iconTheme: {
+                    primary: "#06A295",
+                    secondary: "#fff",
+                  },
+                });
+              }
+            }}
+            className="px-10 py-3 bg-linear-to-r from-cyan-500 to-purple-600 rounded-full text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center gap-3"
           >
             Explore All Players <ArrowRight size={18} />
-          </Link>
+          </button>
         </div>
       </div>
     </section>

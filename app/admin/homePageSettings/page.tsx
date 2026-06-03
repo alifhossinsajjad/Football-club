@@ -62,7 +62,7 @@ export default function HomePageSettings() {
       primary_button_text: "Get Started",
       primary_button_url: "/register",
       secondary_button_text: "Join Now",
-      secondary_button_url: "/signup",
+      secondary_button_url: "/login",
       background_color: "#080D2C",
       title_color: "#FFFFFF",
       subtitle_color: "#B0B0B0",
@@ -117,18 +117,22 @@ export default function HomePageSettings() {
       if (!isCreating && formData.id) {
         data.append("id", formData.id.toString());
       }
+      // Append all text/boolean fields as a single JSON string in the 'data' key
+      const payloadData = {
+        title: formData.title || "",
+        subtitle: formData.subtitle || "",
+        description: formData.description || "",
+        primary_button_text: formData.primary_button_text || "",
+        primary_button_url: formData.primary_button_url || "",
+        secondary_button_text: formData.secondary_button_text || "",
+        secondary_button_url: formData.secondary_button_url || "",
+        background_color: formData.background_color || "",
+        title_color: formData.title_color || "",
+        subtitle_color: formData.subtitle_color || "",
+        is_active: !!formData.is_active
+      };
       
-      data.append("title", formData.title || "");
-      data.append("subtitle", formData.subtitle || "");
-      data.append("description", formData.description || "");
-      data.append("primary_button_text", formData.primary_button_text || "");
-      data.append("primary_button_url", formData.primary_button_url || "");
-      data.append("secondary_button_text", formData.secondary_button_text || "");
-      data.append("secondary_button_url", formData.secondary_button_url || "");
-      data.append("background_color", formData.background_color || "");
-      data.append("title_color", formData.title_color || "");
-      data.append("subtitle_color", formData.subtitle_color || "");
-      data.append("is_active", String(!!formData.is_active));
+      data.append("data", JSON.stringify(payloadData));
 
       // Append image if it's a File
       if (formData.hero_image instanceof File) {
@@ -205,6 +209,7 @@ export default function HomePageSettings() {
                                 alt="Hero" 
                                 width={96} 
                                 height={64} 
+                                style={{ width: "auto", height: "auto" }}
                                 className="w-full h-full object-cover"
                                 unoptimized
                               />

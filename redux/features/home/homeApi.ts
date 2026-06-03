@@ -1,5 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
-import { HeroResponse } from "@/types/home";
+import { HeroResponse, NewsArticle, NewsResponse } from "@/types/home";
 
 export interface PublicSettings {
   platformName: string;
@@ -15,6 +15,7 @@ export interface PublicSettings {
 }
 
 export const homeApi = baseApi.injectEndpoints({
+   overrideExisting: true,
    endpoints: (builder) => ({
     getHeroData: builder.query<HeroResponse, void>({
       query: () => "/admin-dashboard/home/hero/",
@@ -24,13 +25,13 @@ export const homeApi = baseApi.injectEndpoints({
       query: () => "/admin-dashboard/home/upcoming-events/",
       providesTags: ["Events"],
     }),
-    getLatestNewsArticles: builder.query<any, void>({
-      query: () => "/admin-dashboard/home/latest-news/",
+    getLatestNews: builder.query<NewsResponse, void>({
+      query: () => "/news/",
       providesTags: ["Dashboard"],
     }),
-    getFeaturedPlayers: builder.query<any, void>({
-      query: () => "/admin-dashboard/home/featured-players/",
-      providesTags: ["Discovery"],
+    getNewsById: builder.query<{ success: boolean; data: NewsArticle }, string>({
+      query: (id) => `/news/${id}/`,
+      providesTags: ["Dashboard"],
     }),
     getPublicSettings: builder.query<PublicSettings, void>({
       query: () => "/admin-dashboard/settings/public/",
@@ -44,6 +45,6 @@ export const {
   useGetHeroDataQuery, 
   useGetPublicSettingsQuery, 
   useGetUpcomingEventsQuery, 
-  useGetLatestNewsArticlesQuery, 
-  useGetFeaturedPlayersQuery 
+  useGetLatestNewsQuery, 
+  useGetNewsByIdQuery,
 } = homeApi;

@@ -3,33 +3,48 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Loader2, ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, ExternalLink } from "lucide-react";
-import { useGetLatestNewsArticlesQuery } from "@/redux/features/home/homeApi";
+import { 
+  useGetLatestNewsQuery 
+} from "@/redux/features/home/homeApi";
 import Navbar from "@/components/sheard/Navbar";
 import Footer from "@/components/sheard/Footer";
-import { useAppSelector } from "@/redux/hooks";
 import { useRouter } from "next/navigation";
+import { 
+  formatNewsCategory, 
+  formatNewsExcerpt, 
+  formatNewsImage 
+} from "@/utils/news";
+import { NewsArticle } from "@/types/home";
 
 const CATEGORIES = ["All", "Training", "Nutrition", "Academies", "Gear", "News"];
 
 export default function LatestNewsPage() {
   const router = useRouter();
-  const user = useAppSelector((state) => state.auth.user);
   const [activeCategory, setActiveCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   
-  const { data: newsData, isLoading } = useGetLatestNewsArticlesQuery();
-  const newsItems = newsData?.data || [];
+  const { data: newsData, isLoading } = useGetLatestNewsQuery();
+  
+  // Sort and initial data
+  const newsItems = useMemo(() => {
+    const items = [...(newsData?.articles || newsData?.data || [])];
+    return items.sort((a, b) => {
+      const dateA = a.date_published ? parseISO(a.date_published).getTime() : 0;
+      const dateB = b.date_published ? parseISO(b.date_published).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [newsData]);
   
   // Filter by category
   const filteredItems = useMemo(() => {
     if (activeCategory === "All") return newsItems;
-    return newsItems.filter((item: any) => 
-      item.category_name?.toLowerCase() === activeCategory.toLowerCase() ||
-      item.category?.toLowerCase() === activeCategory.toLowerCase()
-    );
+    return newsItems.filter((item) => {
+      const cat = formatNewsCategory(item.category);
+      return cat.toLowerCase() === activeCategory.toLowerCase();
+    });
   }, [newsItems, activeCategory]);
 
   // Pagination logic
@@ -66,7 +81,7 @@ export default function LatestNewsPage() {
           </Link>
           
           <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
-            LATEST <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">NEWS</span>
+            LATEST <span className="bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">NEWS</span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
             Stay updated with training tips, nutrition advice, and gear reviews. Our blog shares the latest insights to help you excel in your professional journey.
@@ -106,9 +121,9 @@ export default function LatestNewsPage() {
           <div className="space-y-8">
             {/* News List */}
             <div className="grid grid-cols-1 gap-8">
-              {currentItems.map((item: any) => (
+              {currentItems.map((item: NewsArticle) => (
                 <div 
-                  key={item.id}
+                  key={item.unique_id || item.id}
                   className="bg-[#12143A] border border-[#1E2554] rounded-[32px] overflow-hidden hover:border-cyan-400/30 transition-all duration-500 group relative flex flex-col md:flex-row h-full md:min-h-[300px] shadow-2xl shadow-black/40"
                 >
                   {/* Text Content */}
@@ -116,11 +131,11 @@ export default function LatestNewsPage() {
                     <div>
                       <div className="flex items-center gap-4 mb-6">
                         <span className="text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1.5 bg-cyan-400/10 rounded-full border border-cyan-400/20">
-                          {item.category_name || item.category || "Training"}
+                          {formatNewsCategory(item.category)}
                         </span>
                         <span className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
                            <Clock size={12} className="text-cyan-400" />
-                           {item.formatted_read_time || "5 min read"}
+                           {item.read_time || "5 min read"}
                         </span>
                       </div>
 
@@ -132,13 +147,13 @@ export default function LatestNewsPage() {
                       </h2>
                       
                       <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-8 line-clamp-3">
-                        {item.subtitle || "Master these fundamental skills to enhance your ball handling skills and stand out on the pitch. Expert advice from our professional coaching staff."}
+                        {formatNewsExcerpt(item.excerpt)}
                       </p>
                     </div>
 
-                    {/* <div className="mt-auto">
+                    <div className="mt-auto">
                       <Link 
-                        href={`/latest-news/${item.id}`}
+                        href={`/latest-news/${item.unique_id}`}
                         className="inline-flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-[#00F6FF] group/link"
                       >
                         Read More
@@ -146,19 +161,19 @@ export default function LatestNewsPage() {
                              <ExternalLink size={14} />
                         </span>
                       </Link>
-                    </div> */}
+                    </div>
                   </div>
 
                   {/* Image Container */}
                   <div className="md:w-[40%] relative min-h-[250px] md:min-h-full overflow-hidden">
                     <Image
-                      src={item.image || "/images/news-placeholder.jpg"}
+                      src={formatNewsImage(item.image_url)}
                       alt={item.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                       unoptimized
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#12143A] via-transparent to-transparent hidden md:block" />
+                    <div className="absolute inset-0 bg-linear-to-r from-[#12143A] via-transparent to-transparent hidden md:block" />
                   </div>
                 </div>
               ))}

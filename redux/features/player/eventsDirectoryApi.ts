@@ -1,25 +1,118 @@
 import { EventListResponse, EventRegistration } from "@/types/scout/eventsType";
 import { baseApi } from "../../api/baseApi";
 
+export interface EventDataApi {
+  id: number;
+  event_name: string;
+  venue_name: string;
+  venue_address?: string;
+  event_date: string;
+  event_time?: string;
+  registration_fee: string;
+  event_type?: string;
+  is_full?: boolean;
+  maximum_capacity?: number;
+  registered_count?: number;
+  description?: string;
+  minimum_age?: number;
+  maximum_age?: number;
+  created_at?: string;
+  status?: string;
+}
+
+export interface EventsResponse {
+  results?: EventDataApi[];
+  data?: EventDataApi[];
+}
+
+export interface EventDetailsResponse {
+  data?: EventDataApi;
+}
+
+export interface RegistrationPayload {
+  event_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  date_of_birth: string;
+  emergency_contact_name: string;
+  emergency_phone: string;
+  relationship: string;
+  medical_conditions?: string;
+  allergies?: string;
+  promo_code?: string;
+}
+
+export interface RegistrationResponse {
+  data?: {
+    registration_id?: string;
+    id?: string | number;
+  };
+  registration_id?: string;
+  id?: string | number;
+}
+
+export interface CheckoutResponse {
+  checkout_url?: string;
+}
+
+export interface VerifyPaymentResponse {
+  status?: string;
+}
+
+export interface RegistrationStatusResponse {
+  data?: {
+    registration_status?: string;
+    payment_status?: string;
+    status?: string;
+  };
+  registration_status?: string;
+  payment_status?: string;
+  status?: string;
+}
+
+export interface MyRegistration {
+  id: number | string;
+  registration_id?: string;
+  event_id?: number | string;
+  event?: EventDataApi | number | string;
+  event_details?: EventDataApi;
+  status?: string;
+  registration_status?: string;
+  created_at?: string;
+  email?: string;
+}
+
+export interface MyRegistrationsResponse {
+  results?: MyRegistration[];
+  data?: MyRegistration[];
+}
+
+export interface PromoValidateResponse {
+  data?: {
+    discount_amount?: string | number;
+  };
+}
+
 export const eventsDirectoryApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getEvents: builder.query<EventListResponse, void>({
       query: () => "/events/",
     }),
-    getEventDetails: builder.query<any, string | number>({
-      query: (id) => `/events/${id}/`,
+    getPlayerEventDetails: builder.query<EventDetailsResponse | EventDataApi, string | number>({
+      query: (id) => `/players/events/${id}/`,
+      providesTags: (result, error, id) => [{ type: "Events", id }, "Events"],
     }),
     getMyRegistrations: builder.query<EventRegistration[], void>({
       query: () => `/players/event-registrations/`,
       providesTags: ["Events"],
     }),
     checkout: builder.mutation<
-      any,
+      CheckoutResponse,
       {
         registration_id: string;
-        success_url: string;
-        cancel_url: string;
-        promo_code?: string;
       }
     >({
       query: (data) => ({
@@ -27,9 +120,25 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Events"],
+    }),
+    getUpcomingRegistrations: builder.query<MyRegistrationsResponse | MyRegistration[], void>({
+      query: () => "/players/event-registrations/upcoming/",
+      providesTags: ["Events"],
+    }),
+    getPastRegistrations: builder.query<MyRegistrationsResponse | MyRegistration[], void>({
+      query: () => "/players/event-registrations/past/",
+      providesTags: ["Events"],
+    }),
+    cancelRegistration: builder.mutation<any, string | number>({
+      query: (id) => ({
+        url: `/players/event-registrations/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Events"],
     }),
     verifyPayment: builder.mutation<
-      any,
+      VerifyPaymentResponse,
       { session_id: string; registration_id: string }
     >({
       query: (data) => ({
@@ -37,6 +146,7 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Events"],
     }),
  getRegistrationStatus: builder.query<any, string>({
   query: (registration_id) =>
@@ -51,7 +161,7 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
       invalidatesTags: ["Events"], // 🔥 important
     }),
     applyPromoCode: builder.mutation<
-      any,
+      { data?: unknown, message?: string },
       { code: string; event_id: number | string }
     >({
       query: (data) => ({
@@ -61,7 +171,7 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
       }),
     }),
     validatePromo: builder.mutation<
-      any,
+      PromoValidateResponse,
       { code: string; amount: number; usage_type: string }
     >({
       query: (data) => ({
@@ -74,13 +184,16 @@ export const eventsDirectoryApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetEventsQuery,
-  useGetEventDetailsQuery,
+  useGetPlayerEventsQuery,
+  useGetPlayerEventDetailsQuery,
   useCreateRegistrationMutation,
   useCheckoutMutation,
   useVerifyPaymentMutation,
-  useGetRegistrationStatusQuery,
+  useGetPlayerRegistrationStatusQuery,
   useGetMyRegistrationsQuery,
+  useGetUpcomingRegistrationsQuery,
+  useGetPastRegistrationsQuery,
+  useCancelRegistrationMutation,
   useApplyPromoCodeMutation,
   useValidatePromoMutation,
 } = eventsDirectoryApi;

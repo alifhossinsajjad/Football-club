@@ -192,23 +192,23 @@ const ScoutRegistretionForm = () => {
       last_name: data.last_name,
       date_of_birth: data.date_of_birth,
       nationality: data.nationality,
-      phone_number: data.phone_number,
+      phone_number: data.phone_number ? data.phone_number.replace(/\s+/g, "") : "",
       license_type: data.license_type,
       license_number: data.license_number,
       agency_name: data.agency_name,
       agency_affiliation: data.agency_affiliation,
-      specialization: data.specialization,
-      primary_scouting_regions: data.primary_scouting_regions,
-      secondary_scouting_regions: data.secondary_scouting_regions,
-      age_group_focus: data.age_group_focus,
-      position_focus: data.position_focus,
-      languages_spoken: data.languages_spoken,
+      specialization: data.specialization.map(s => s.toLowerCase().replace(/\s+/g, "_")),
+      primary_scouting_regions: data.primary_scouting_regions.map(r => r.toLowerCase()),
+      secondary_scouting_regions: data.secondary_scouting_regions.map(r => r.toLowerCase()),
+      age_group_focus: data.age_group_focus, // Already matches format e.g. "U-16"
+      position_focus: data.position_focus.map(p => p.toLowerCase()),
+      languages_spoken: data.languages_spoken.map(l => l.toLowerCase()),
       players_discovered: data.players_discovered,
       contracts_signed: data.contracts_signed,
       notable_discoveries: data.notable_discoveries,
       club_affiliations: data.club_affiliations,
-      scout_license_document: data.scout_license_document || null,
-      government_issued_id: data.government_issued_id || null,
+      scout_license_document: null, // Hardcoded to null as per Postman example
+      government_issued_id: null, // Hardcoded to null as per Postman example
       legal_agreement_accepted: data.legal_agreement_accepted,
     };
 
@@ -223,8 +223,7 @@ const ScoutRegistretionForm = () => {
       );
 
       reset();
-      setStep(1);
-      router.push("/login"); // Redirect to login after registration as requested
+      router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (error: unknown) {
       console.error("Scout registration failed:", error);
       await showRegistrationError(error, {
@@ -287,6 +286,7 @@ const ScoutRegistretionForm = () => {
                       label="First Name"
                       name="first_name"
                       register={register}
+                      rules={{ required: "First name is required" }}
                       error={errors.first_name?.message}
                       icon={<User size={16} />}
                       placeholder="John"
@@ -295,6 +295,7 @@ const ScoutRegistretionForm = () => {
                       label="Last Name"
                       name="last_name"
                       register={register}
+                      rules={{ required: "Last name is required" }}
                       error={errors.last_name?.message}
                       icon={<User size={16} />}
                       placeholder="Doe"
@@ -305,6 +306,16 @@ const ScoutRegistretionForm = () => {
                     name="date_of_birth"
                     type="date"
                     register={register}
+                    rules={{ 
+                      required: "Date of birth is required",
+                      validate: (value: string) => {
+                        const date = new Date(value);
+                        const today = new Date();
+                        if (date.getFullYear() < 1920) return "Invalid date";
+                        if (date > today) return "Date of birth cannot be in the future";
+                        return true;
+                      }
+                    }}
                     error={errors.date_of_birth?.message}
                     icon={<Calendar size={16} />}
                     value={watch("date_of_birth")}
@@ -313,6 +324,7 @@ const ScoutRegistretionForm = () => {
                     label="Nationality"
                     name="nationality"
                     register={register}
+                    rules={{ required: "Nationality is required" }}
                     error={errors.nationality?.message}
                     icon={<Globe size={16} />}
                     options={countries}
@@ -321,6 +333,16 @@ const ScoutRegistretionForm = () => {
                     label="Phone Number"
                     name="phone_number"
                     control={control as any}
+                    rules={{
+                      required: "Phone number is required",
+                      validate: (value: string) => {
+                        const number = value.split(" ")[1] || "";
+                        const totalLength = value.replace(/\s+/g, "").length;
+                        if (number.length < 7) return "Phone number is too short";
+                        if (totalLength > 15) return "Phone number cannot exceed 15 digits";
+                        return true;
+                      }
+                    }}
                     error={errors.phone_number?.message}
                     icon={<Phone size={16} />}
                     placeholder="XXX XXX XXX"
@@ -330,6 +352,13 @@ const ScoutRegistretionForm = () => {
                     name="email"
                     type="email"
                     register={register}
+                    rules={{ 
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address"
+                      }
+                    }}
                     error={errors.email?.message}
                     icon={<Mail size={16} />}
                     placeholder="scout@example.com"
@@ -339,6 +368,10 @@ const ScoutRegistretionForm = () => {
                     name="password"
                     type="password"
                     register={register}
+                    rules={{ 
+                      required: "Password is required",
+                      minLength: { value: 8, message: "Password must be at least 8 characters" }
+                    }}
                     error={errors.password?.message}
                     icon={<Lock size={16} />}
                     placeholder="********"
@@ -348,6 +381,10 @@ const ScoutRegistretionForm = () => {
                     name="confirm_password"
                     type="password"
                     register={register}
+                    rules={{ 
+                      required: "Please confirm your password",
+                      validate: (value: string) => value === watch("password") || "Passwords do not match"
+                    }}
                     error={errors.confirm_password?.message}
                     icon={<Lock size={16} />}
                     placeholder="********"
@@ -359,7 +396,7 @@ const ScoutRegistretionForm = () => {
               {step === 1 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-4">
                   <div className="flex flex-col items-center mb-4">
-                    <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
+                    <div className="p-4 bg-linear-to-br from-cyan-500 to-blue-600 rounded-full shadow-lg shadow-cyan-500/20 mb-4">
                       <CheckCircle size={32} className="text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">
@@ -388,6 +425,7 @@ const ScoutRegistretionForm = () => {
                       label="License Type"
                       name="license_type"
                       register={register}
+                      rules={{ required: "License type is required" }}
                       error={errors.license_type?.message}
                       placeholder="Select License Type"
                     />
@@ -396,6 +434,7 @@ const ScoutRegistretionForm = () => {
                         label="License Number (if applicable)"
                         name="license_number"
                         register={register}
+                        rules={{ required: "License number is required" }}
                         error={errors.license_number?.message}
                         placeholder="e.g. FIFA-12345"
                       />
@@ -403,6 +442,7 @@ const ScoutRegistretionForm = () => {
                         label="Agency Name (if applicable)"
                         name="agency_name"
                         register={register}
+                        rules={{ required: "Agency name or 'Independent' is required" }}
                         error={errors.agency_name?.message}
                         placeholder="Independent or Agency name"
                       />
@@ -411,6 +451,7 @@ const ScoutRegistretionForm = () => {
                       label="Agency Affiliation"
                       name="agency_affiliation"
                       register={register}
+                      rules={{ required: "Agency affiliation is required" }}
                       error={errors.agency_affiliation?.message}
                       placeholder="Select Affiliation"
                     />
@@ -422,6 +463,7 @@ const ScoutRegistretionForm = () => {
                       <Controller
                         name="specialization"
                         control={control}
+                        rules={{ required: "Please select at least one specialization" }}
                         render={({ field }) => (
                           <div className="flex flex-wrap gap-2">
                             {[
@@ -465,7 +507,7 @@ const ScoutRegistretionForm = () => {
               {step === 2 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-4">
                   <div className="flex flex-col items-center mb-4">
-                    <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full shadow-lg shadow-purple-500/20 mb-4">
+                    <div className="p-4 bg-linear-to-br from-purple-500 to-indigo-600 rounded-full shadow-lg shadow-purple-500/20 mb-4">
                       <MapPin size={32} className="text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">
@@ -486,6 +528,7 @@ const ScoutRegistretionForm = () => {
                       <Controller
                         name="primary_scouting_regions"
                         control={control}
+                        rules={{ required: "Please select at least one primary region" }}
                         render={({ field }) => (
                           <div className="grid grid-cols-3 gap-2">
                             {[
@@ -529,6 +572,7 @@ const ScoutRegistretionForm = () => {
                       <Controller
                         name="age_group_focus"
                         control={control}
+                        rules={{ required: "Please select at least one age group" }}
                         render={({ field }) => (
                           <div className="grid grid-cols-4 gap-2">
                             {[
@@ -568,6 +612,7 @@ const ScoutRegistretionForm = () => {
                       <Controller
                         name="position_focus"
                         control={control}
+                        rules={{ required: "Please select at least one position focus" }}
                         render={({ field }) => (
                           <div className="grid grid-cols-3 gap-2">
                             {[
@@ -607,6 +652,7 @@ const ScoutRegistretionForm = () => {
                       <Controller
                         name="languages_spoken"
                         control={control}
+                        rules={{ required: "Please select at least one language" }}
                         render={({ field }) => (
                           <div className="grid grid-cols-3 gap-2">
                             {[
@@ -646,7 +692,7 @@ const ScoutRegistretionForm = () => {
               {step === 3 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-4">
                   <div className="flex flex-col items-center mb-4">
-                    <div className="p-4 bg-gradient-to-br from-cyan-400 to-indigo-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
+                    <div className="p-4 bg-linear-to-br from-cyan-400 to-indigo-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
                       <Trophy size={32} className="text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">
@@ -662,6 +708,7 @@ const ScoutRegistretionForm = () => {
                       label="Players Discovered *"
                       name="players_discovered"
                       register={register}
+                      rules={{ required: "Please enter number of players discovered" }}
                       error={errors.players_discovered?.message}
                       placeholder="e.g. 5-10"
                     />
@@ -669,6 +716,7 @@ const ScoutRegistretionForm = () => {
                       label="Contracts Signed *"
                       name="contracts_signed"
                       register={register}
+                      rules={{ required: "Please enter number of contracts signed" }}
                       error={errors.contracts_signed?.message}
                       placeholder="e.g. 3"
                     />
@@ -704,7 +752,7 @@ const ScoutRegistretionForm = () => {
               {step === 4 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-4">
                   <div className="flex flex-col items-center mb-4">
-                    <div className="p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
+                    <div className="p-4 bg-linear-to-br from-cyan-400 to-blue-600 rounded-full shadow-lg shadow-cyan-400/20 mb-4">
                       <Shield size={32} className="text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">
@@ -846,7 +894,7 @@ const ScoutRegistretionForm = () => {
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className="w-full py-4 bg-gradient-to-r from-[#00E5FF] to-[#00A3FF] text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_30px_rgba(0,229,255,0.5)] hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-linear-to-r from-[#00E5FF] to-[#00A3FF] text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_30px_rgba(0,229,255,0.5)] hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     <User size={18} />
                     Create Account
@@ -865,7 +913,7 @@ const ScoutRegistretionForm = () => {
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-green-600 border border-emerald-400/20 rounded-2xl text-white font-bold hover:from-emerald-400 hover:to-green-500 transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                        className="flex-[2] py-4 bg-linear-to-r from-emerald-500 to-green-600 border border-emerald-400/20 rounded-2xl text-white font-bold hover:from-emerald-400 hover:to-green-500 transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                       >
                         {isLoading ? (
                           "Processing..."

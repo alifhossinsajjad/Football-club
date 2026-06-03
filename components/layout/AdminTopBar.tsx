@@ -17,7 +17,7 @@ const AdminTopBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
 
-  console.log(user);
+// console.log(user);
   const router = useRouter();
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const AdminTopBar: React.FC = () => {
                     className="w-10 h-10 rounded-full object-cover border border-gray-200"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#9C27B0] to-[#00E5FF] flex items-center justify-center text-white font-semibold text-lg">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-r from-[#9C27B0] to-[#00E5FF] flex items-center justify-center text-white font-semibold text-lg">
                     {user?.first_name?.charAt(0).toUpperCase() || "U"}
                   </div>
                 )}

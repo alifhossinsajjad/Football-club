@@ -13,6 +13,7 @@ interface Props {
   icon?: React.ReactNode;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
+  rules?: any;
 }
 
 const DarkInput = ({
@@ -25,6 +26,7 @@ const DarkInput = ({
   icon,
   onChange,
   value,
+  rules,
 }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
   const [hasValue, setHasValue] = useState(value ? String(value).length > 0 : false);
@@ -45,17 +47,8 @@ const DarkInput = ({
       : "password"
     : type;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHasValue(e.target.value.length > 0);
-    // Call the register's onChange if it exists
-    if (register && register(name) && register(name).onChange) {
-      register(name).onChange(e);
-    }
-    // Call the passed onChange prop if it exists
-    if (onChange) {
-      onChange(e);
-    }
-  };
+  const hasRegisterFn = typeof register === "function";
+  const registerProps = hasRegisterFn ? register(name, rules) : {};
 
   const displayDate = isDateType && hasValue && !isFocused && value ? formatRegistrationDate(value) : "";
 
@@ -73,12 +66,25 @@ const DarkInput = ({
       )}
       <div className="relative">
         <input
-          {...register(name)}
+          {...registerProps}
           type={resolvedType}
           placeholder={placeholder || (label ? `Enter ${label.toLowerCase()}` : "")}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          onChange={handleChange}
+          onBlur={(e) => {
+            setIsFocused(false);
+            if (registerProps.onBlur) {
+              registerProps.onBlur(e);
+            }
+          }}
+          onChange={(e) => {
+            setHasValue(e.target.value.length > 0);
+            if (registerProps.onChange) {
+              registerProps.onChange(e);
+            }
+            if (onChange) {
+              onChange(e);
+            }
+          }}
           className={`w-full bg-[#050B14]/60 border rounded-xl px-4 py-3 text-white outline-none transition-all duration-300 placeholder:text-gray-600
           ${error 
             ? "border-red-500/50 bg-red-500/5 focus:border-red-500" 

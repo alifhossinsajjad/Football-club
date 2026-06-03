@@ -17,7 +17,7 @@ const ClubTopBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
 
-  console.log(user);
+// console.log(user);
   const router = useRouter();
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const ClubTopBar: React.FC = () => {
                     className="w-10 h-10 rounded-full object-cover border border-gray-200"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#9C27B0] to-[#00E5FF] flex items-center justify-center text-white font-semibold text-lg">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-r from-[#9C27B0] to-[#00E5FF] flex items-center justify-center text-white font-semibold text-lg">
                     {user?.first_name?.charAt(0).toUpperCase() || "U"}
                   </div>
                 )}
@@ -81,9 +81,9 @@ const ClubTopBar: React.FC = () => {
                 {/* Name + Role */}
                 <div className="hidden lg:block text-left">
                   <p className="text-sm font-medium text-white truncate">
-                    {user?.first_name} {user?.last_name}
+                    {String(user?.first_name ?? "")} {String(user?.last_name ?? "")}
                   </p>
-                  <p className="text-xs text-white  capitalize">{user?.role}</p>
+                  <p className="text-xs text-white capitalize">{String(user?.role ?? "")}</p>
                 </div>
               </button>
             </div>
@@ -93,10 +93,10 @@ const ClubTopBar: React.FC = () => {
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 transform origin-top-right transition-all">
                 <div className="px-4 py-3 border-b border-gray-100 mb-1">
                   <p className="text-sm font-semibold text-gray-900 truncate">
-                    {user?.email}
+                    {String(user?.email ?? "")}
                   </p>
                   <p className="text-xs text-gray-500 capitalize">
-                    {user?.role}
+                    {String(user?.role ?? "")}
                   </p>
                 </div>
 

@@ -30,9 +30,7 @@ const HowItWorks = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block text-white"
-          >
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block text-white">
             HOW IT WORKS
           </h2>
           <p className="text-landing mt-2">
@@ -44,33 +42,27 @@ const HowItWorks = () => {
         {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative">
           {steps.map((step, index) => (
-            <div
-              key={index}
-              className="group relative"
-            >
+            <div key={index} className="group relative">
               {/* Main Card with Gradient Border */}
               <div className="relative p-8 md:p-10 rounded-2xl bg-[var(--bg-card,#0A1424)] h-full">
                 {/* Gradient Border using pseudo-element */}
                 <div
-                  className="absolute inset-0 rounded-2xl p-[2px] bg-gradient-to-br opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+                  className="absolute inset-0 rounded-2xl p-[2px] bg-linear-to-br opacity-60 group-hover:opacity-100 transition-opacity duration-300"
                   style={{
                     background: `linear-gradient(135deg, ${theme.colors.primaryCyan}, ${theme.colors.primaryMagenta})`,
-                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                    WebkitMaskComposite: 'xor',
-                    maskComposite: 'exclude',
-                    pointerEvents: 'none',
+                    WebkitMask:
+                      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    WebkitMaskComposite: "xor",
+                    maskComposite: "exclude",
+                    pointerEvents: "none",
                   }}
                 />
 
                 {/* Content */}
-                <div className="relative z-10 flex flex-col items-center text-center">
-                  {/* Step Number with Staggered Position */}
+                <div className="relative z-10 flex flex-col items-center text-center h-full justify-center">
+                  {/* Step Number */}
                   <div
-                    className={`font-display text-7xl md:text-8xl font-black mb-4 ${
-                      index === 0 ? 'self-start -mt-4 ml-[-0.5rem]' : 
-                      index === 1 ? 'self-center' : 
-                      'self-end -mt-2 mr-[-0.5rem]'
-                    }`}
+                    className="font-display text-7xl md:text-8xl font-black mb-6 leading-none self-center"
                     style={{ color: "#09585E" }}
                   >
                     {step.number}
@@ -94,12 +86,12 @@ const HowItWorks = () => {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
                     {step.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+                  <p className="text-gray-400 text-sm md:text-base leading-relaxed mt-auto px-2">
                     {step.description}
                   </p>
                 </div>
@@ -107,8 +99,6 @@ const HowItWorks = () => {
             </div>
           ))}
         </div>
-
-        
       </div>
     </section>
   );

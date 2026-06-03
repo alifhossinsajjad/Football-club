@@ -22,6 +22,8 @@ export interface LocalizationSettings {
   enabledLanguages: string[];
 }
 
+
+
 export interface UserManagementSettings {
   requireEmailVerification: boolean;
   adminApprovalForClubs: boolean;
@@ -139,6 +141,7 @@ export interface UpdateSettingsResponse {
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const adminSettingsApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getGeneralSettings: builder.query<GeneralSettings, void>({
       query: () => "/admin-dashboard/settings/general/",
@@ -150,7 +153,7 @@ export const adminSettingsApi = baseApi.injectEndpoints({
         try {
           await cacheDataLoaded;
           // Example: Setting up Server-Sent Events for real-time config updates
-          const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+          const apiUrl = "http://98.81.136.120:9000/api";
           if (!apiUrl) return;
 
           const eventSource = new EventSource(`${apiUrl}/admin-dashboard/settings/general/stream`);
@@ -193,6 +196,7 @@ export const adminSettingsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard"],
     }),
+
     getUserManagementSettings: builder.query<UserManagementSettings, void>({
       query: () => "/admin-dashboard/settings/user-management/",
       providesTags: ["Dashboard"],
@@ -207,7 +211,13 @@ export const adminSettingsApi = baseApi.injectEndpoints({
     }),
     getMonetizationSettings: builder.query<MonetizationSettings, void>({
       query: () => "/admin-dashboard/settings/monetization/",
-      transformResponse: (response: any) => response.data || response,
+      transformResponse: (response: MonetizationSettingsResponse | MonetizationSettings) => {
+        // Handle both { success: true, data: {...} } and direct settings object
+        if ('data' in response && response.data && typeof response.data === 'object') {
+          return (response as MonetizationSettingsResponse).data;
+        }
+        return response as MonetizationSettings;
+      },
       providesTags: ["Dashboard"],
     }),
     updateMonetizationSettings: builder.mutation<UpdateSettingsResponse, MonetizationSettings>({
@@ -293,6 +303,7 @@ export const {
   useUpdateGeneralSettingsMutation,
   useGetLocalizationSettingsQuery,
   useUpdateLocalizationSettingsMutation,
+
   useGetUserManagementSettingsQuery,
   useUpdateUserManagementSettingsMutation,
   useGetMonetizationSettingsQuery,

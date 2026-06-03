@@ -9,22 +9,19 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
-  CheckCircle,
   Clock,
+  MapPin,
+  Search,
+  User,
 } from "lucide-react";
 import {
   useGetEventsQuery,
   useGetMyRegistrationsQuery,
+  useGetPastRegistrationsQuery,
+  useGetUpcomingRegistrationsQuery,
+  type EventDataApi,
+  type MyRegistration,
 } from "../../../redux/features/player/eventsDirectoryApi";
-
-interface EventData {
-  id: number;
-  event_name: string;
-  venue_name: string;
-  event_date: string;
-  registration_fee: string;
-  event_type?: string;
-}
 
 // ── Single event card. Fetches its own status if a registrationId exists ──────
 const EventCard = ({
@@ -40,7 +37,17 @@ const EventCard = ({
   isFull: boolean;
   status?: string;
 }) => {
-  const isPending = status === "PENDING";
+  const s = (status || event.status || "").toUpperCase();
+  const isPending = s === "PENDING";
+  const isCompleted = s === "COMPLETED";
+
+  const handleRegister = () => {
+    if (isRegistered) {
+      toast.error("You are already registered for this event.");
+      return;
+    }
+    onViewDetails(event.id);
+  };
 
   return (
     <div className="bg-[#121433] border border-[#1E2550] rounded-[24px] overflow-hidden hover:border-cyan-400/30 transition-all group">
@@ -90,12 +97,17 @@ const EventCard = ({
               €{parseFloat(event.registration_fee || "0").toFixed(0)}
             </span>
           </div>
+          
           <button
             onClick={() => onViewDetails(event.id)}
-            disabled={isFull && !isRegistered}
-            className={`px-8 py-3 rounded-xl font-bold transition-all border ${
+            disabled={isRegistered || (!isRegistered && (isFull || isPending || isCompleted))}
+            className={`px-8 py-3 rounded-xl font-bold transition-all border flex items-center justify-center ${
               isRegistered
                 ? "bg-[#0B0E1E] text-[#04B5A3] border-[#04B5A3] hover:bg-[#04B5A3]/5"
+                : isPending
+                ? "bg-[#0B0E1E] text-amber-500 border-amber-500/20 cursor-not-allowed"
+                : isCompleted
+                ? "bg-[#0B0E1E] text-blue-500 border-blue-500/20 cursor-not-allowed"
                 : isFull
                   ? "bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed"
                   : "bg-[#04B5A3] text-white border-transparent hover:bg-[#039d8f] shadow-[0_4px_12px_rgba(4,181,163,0.3)]"
@@ -116,12 +128,13 @@ const EventCard = ({
 // ── Main page ─────────────────────────────────────────────────────────────────
 const EventsDirectoryPage = () => {
   const router = useRouter();
+  const currentUser = useAppSelector((state: any) => state.auth?.user);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("All Types");
-  const [locationFilter, setLocationFilter] = useState("All Locations");
+  const [activeTab, setActiveTab] = useState<"BROWSE" | "UPCOMING" | "PAST">("BROWSE");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 4;
 
   const { data: eventsData, isLoading } = useGetEventsQuery();
   console.log("player events ", eventsData);
@@ -144,6 +157,7 @@ const registrationsArray = registrationsData ?? [];
         event.venue_name?.includes(locationFilter);
       return matchesSearch && matchesType && matchesLocation;
     });
+  }, [eventsData]);
 
     try {
       const map = JSON.parse(
@@ -154,15 +168,39 @@ const registrationsArray = registrationsData ?? [];
         const bReg = !!map[String(b.id)];
         if (aReg !== bReg) return aReg ? 1 : -1; // Unregistered first
 
-        // Sort by created date (newest first)
-        const timeA = new Date(a.created_at || a.event_date || 0).getTime();
-        const timeB = new Date(b.created_at || b.event_date || 0).getTime();
-        if (timeA === timeB) return b.id - a.id;
-        return timeB - timeA;
+  const pastArray: MyRegistration[] = useMemo(() => {
+    if (!pastData) return [];
+    if (Array.isArray(pastData)) return pastData;
+    return (pastData as any).results || (pastData as any).data || [];
+  }, [pastData]);
+
+  const myRegistrationsArray: MyRegistration[] = useMemo(() => {
+    if (!myRegistrationsData) return [];
+    if (Array.isArray(myRegistrationsData)) return myRegistrationsData;
+    return (myRegistrationsData as any).results || (myRegistrationsData as any).data || [];
+  }, [myRegistrationsData]);
+
+  const filteredItems = useMemo(() => {
+    if (activeTab === "BROWSE") {
+      return eventsArray.filter(e => {
+        const s = (e.status || "").toUpperCase();
+        const matchesSearch = e.event_name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType = typeFilter === "All Types" || e.event_type === typeFilter;
+        
+        // Show ACTIVE, PENDING, COMPLETED. Exclude CANCELLED.
+        const isVisible = (s === "ACTIVE" || s === "PENDING" || s === "COMPLETED" || !s) && s !== "CANCELLED";
+        
+        return isVisible && matchesSearch && matchesType;
       });
-    } catch {
-      // safe fallback
     }
+    
+    const source = activeTab === "UPCOMING" ? upcomingArray : pastArray;
+    return source.filter(r => {
+      const event = typeof r.event === 'object' ? r.event : r.event_details;
+      const name = (event as any)?.event_name || "";
+      return name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [activeTab, eventsArray, upcomingArray, pastArray, searchTerm, typeFilter]);
 
     return result;
   }, [events, searchTerm, typeFilter, locationFilter]);
@@ -171,23 +209,44 @@ const registrationsArray = registrationsData ?? [];
     setCurrentPage(1);
   }, [searchTerm, typeFilter, locationFilter]);
 
-  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
-  const paginatedEvents = useMemo(() => {
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const paginatedItems = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
-    return filteredEvents.slice(start, start + itemsPerPage);
-  }, [filteredEvents, currentPage]);
+    return filteredItems.slice(start, start + itemsPerPage);
+  }, [filteredItems, currentPage]);
 
   const handleViewDetails = (id: number) =>
     router.push(`/player/eventsDirectory/${id}`);
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent mb-8">
+      <h1 className="text-3xl font-bold bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent mb-8">
         Events Directory
       </h1>
 
+      {/* Tabs */}
+      <div className="flex items-center gap-2 mb-8 bg-[#121433]/50 p-1.5 rounded-2xl border border-[#1E2550] w-fit">
+        {[
+          { id: "BROWSE", label: "Browse Events" },
+          { id: "UPCOMING", label: "Upcoming" },
+          { id: "PAST", label: "Past Events" }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === tab.id 
+                ? "bg-cyan-400 text-[#0B0E1E] shadow-[0_0_15px_rgba(34,211,238,0.2)]" 
+                : "text-gray-500 hover:text-white"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Filters */}
-      <div className="bg-[#121433] border border-[#1E2550] rounded-2xl p-6 mb-8 grid md:grid-cols-4 gap-4">
+      <div className="bg-[#121433] border border-[#1E2550] rounded-2xl p-6 mb-8 grid md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <label className="text-xs text-gray-500 font-bold uppercase tracking-wider ml-1">
             Event Type
@@ -276,14 +335,14 @@ const registrationsArray = registrationsData ?? [];
                   onViewDetails={handleViewDetails}
                   isRegistered={isRegistered}
                   isFull={isFull}
-                  status={reg?.status}
+                  status={status}
                 />
               );
             })}
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {/* Pagination this is a new line */} 
+ 	  {totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 pt-10">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
