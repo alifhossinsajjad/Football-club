@@ -53,7 +53,7 @@ export interface UpdateBoostPackagePayload {
 
 export const adminBoostPackageApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getBoostPackages: builder.query<BoostPackageListResponse, void>({
+    getAdminBoostPackages: builder.query<BoostPackageListResponse, void>({
       query: () => "/admin-dashboard/boost-packages/",
       providesTags: ["BoostPackages"],
     }),
@@ -109,7 +109,7 @@ export const adminBoostPackageApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetBoostPackagesQuery,
+  useGetAdminBoostPackagesQuery,
   useGetBoostPackageByIdQuery,
   useCreateBoostPackageMutation,
   useUpdateBoostPackageMutation,
