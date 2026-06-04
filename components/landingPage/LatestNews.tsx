@@ -13,6 +13,7 @@ import {
   formatNewsCategory, 
   formatNewsImage 
 } from "@/utils/news";
+import { motion } from "framer-motion";
 
 export default function LatestNews() {
   const router = useRouter();
@@ -38,12 +39,18 @@ export default function LatestNews() {
   return (
     <div className="bg-[var(--bg-dark,#07142b)] text-white">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center mb-9">
+        <motion.div 
+          initial={{ opacity: 0, y: -20, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-9"
+        >
           <SectionTitel
             title="LATEST NEWS"
             subtitle="Stay updated with training tips, nutrition advice, and gear reviews."
           />
-        </div>
+        </motion.div>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -55,7 +62,13 @@ export default function LatestNews() {
           </div>
         ) : (
           <div className="mb-8">
-            <div className="bg-white p-3 md:p-4 rounded-3xl w-full max-w-3xl mx-auto shadow-2xl">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 40, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-10%" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-white p-3 md:p-4 rounded-3xl w-full max-w-3xl mx-auto shadow-2xl"
+            >
               <div className="flex flex-col gap-3 md:gap-4">
                 {/* Top News */}
                 {newsItems[0] && (
@@ -113,11 +126,17 @@ export default function LatestNews() {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           </div>
         )}
 
-        <div className="flex justify-center items-center w-full mt-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="flex justify-center items-center w-full mt-4"
+        >
           <div className="flex justify-center">
             <button
               onClick={handleViewAllNews}
@@ -126,7 +145,7 @@ export default function LatestNews() {
               View All News <ArrowRight size={18} />
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
 
        <div className="container mx-auto px-4 md:px-0">

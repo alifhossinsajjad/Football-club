@@ -6,6 +6,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { useGetFeaturedClubsQuery } from "@/redux/features/admin/adminHomePageApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 
 export default function Club() {
@@ -83,7 +84,13 @@ export default function Club() {
     >
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: -20, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-12"
+        >
           <h2
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 inline-block"
             style={{
@@ -96,12 +103,18 @@ export default function Club() {
           >
             FEATURED CLUBS
           </h2>
-        </div>
+        </motion.div>
 
         {/* Subtitle */}
-        <p className="text-center text-gray-400 mb-10 pb-4 max-w-2xl mx-auto">
+        <motion.p 
+          initial={{ opacity: 0, y: -10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center text-gray-400 mb-10 pb-4 max-w-2xl mx-auto"
+        >
           Connect with top clubs and academies from around the world.
-        </p>
+        </motion.p>
 
         {/* Carousel / Loading Area */}
         {isLoading ? (
@@ -123,11 +136,16 @@ export default function Club() {
               </button>
             )}
 
-            <div className="flex gap-4 justify-center mx-12 w-full overflow-hidden">
+            <div className="flex gap-4 justify-center mx-12 w-full overflow-hidden py-4">
               {visibleClubs.map((club, i) => (
-                <div
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 30, filter: "blur(5px)" }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                  viewport={{ once: true, margin: "-10%" }}
+                  transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -5, scale: 1.02 }}
                   key={club.id || i}
-                  className="flex-1 min-w-[150px] sm:min-w-[180px] bg-[var(--bg-card,#12143A)] border border-white/5 hover:border-[var(--primary-cyan)]/30 md:min-w-[220px] rounded-xl p-6 text-center transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
+                  className="flex-1 min-w-[150px] sm:min-w-[180px] bg-[var(--bg-card,#12143A)] border border-white/5 hover:border-[var(--primary-cyan)]/30 md:min-w-[220px] rounded-xl p-6 text-center transition-all duration-300 transform hover:shadow-[0_10px_30px_rgba(0,229,255,0.15)] group"
                 >
                   <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center p-2 bg-white/5 rounded-full">
                     <img
@@ -149,7 +167,7 @@ export default function Club() {
                     {club.club_type ||
                       (activeTab === "clubs" ? "Club" : "Academy")}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
 

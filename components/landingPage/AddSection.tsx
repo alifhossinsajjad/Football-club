@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { useGetAllAdsQuery } from "@/redux/features/ads/ads";
+import { motion } from "framer-motion";
 
 const AddSection = () => {
   const { data, isLoading, isError } = useGetAllAdsQuery();
@@ -24,18 +25,33 @@ const AddSection = () => {
   return (
     <div className="w-full bg-transparent mx-auto px-4 py-16">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-center text-white mb-12">Special <span className="text-primary">Offers</span></h2>
+        <motion.div 
+          initial={{ opacity: 0, y: -20, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white">Special <span className="text-primary">Offers</span></h2>
+        </motion.div>
         
         {/* CSS Masonry Layout */}
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
           {data.advertisements.map((ad, index) => (
-            <Link
+            <motion.div
+              initial={{ opacity: 0, y: 40, filter: "blur(5px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-10%" }}
+              transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
               key={ad.ad_id}
-              href={ad.target_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`group relative block w-full rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 mb-6 break-inside-avoid ${heights[index % heights.length]}`}
+              className="mb-6 break-inside-avoid"
             >
+              <Link
+                href={ad.target_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`group relative block w-full rounded-2xl overflow-hidden shadow-md hover:shadow-[0_20px_40px_rgba(0,229,255,0.15)] transition-all duration-300 transform hover:-translate-y-1 ${heights[index % heights.length]}`}
+              >
               <Image
                 src={ad.ad_image_url}
                 alt={ad.title || "Advertisement"}
@@ -54,6 +70,7 @@ const AddSection = () => {
                 </span>
               </div>
             </Link>
+            </motion.div>
           ))}
         </div>
       </div>

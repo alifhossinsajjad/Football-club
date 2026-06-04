@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Plus, Loader2, Search, Filter, Zap } from "lucide-react";
 import {
-  useGetBoostPackagesQuery,
+  useGetAdminBoostPackagesQuery,
   useDeleteBoostPackageMutation,
   useToggleBoostPackageStatusMutation,
   type BoostPackage,
@@ -15,7 +15,7 @@ import BoostPackageDetailsModal from "@/components/adminDashboard/boostPackages/
 import BoostPackageTable from "@/components/adminDashboard/boostPackages/BoostPackageTable";
 
 export default function BoostSubscriptionPage() {
-  const { data: packagesResp, isLoading, isError, refetch } = useGetBoostPackagesQuery();
+  const { data: packagesResp, isLoading, isError, refetch } = useGetAdminBoostPackagesQuery();
   const [deleteBoostPackage, { isLoading: isDeleting }] = useDeleteBoostPackageMutation();
   const [toggleStatus] = useToggleBoostPackageStatusMutation();
 
