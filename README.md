@@ -493,14 +493,5 @@ Copyright © 2025 NextGen Pros. All rights reserved.
 
 ---
 
-## 📞 Support
-
-For questions or support, please contact the development team through the project's internal communication channels.
-
----
-
-<div align="center">
-
-**Made with ❤️ by the RT**
 
 </div>
